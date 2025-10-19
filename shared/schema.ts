@@ -66,9 +66,15 @@ export const revealCardSchema = z.object({
   cardId: z.number(),
 });
 
+export const addBotSchema = z.object({
+  team: z.enum(["dark", "light"]),
+  role: z.enum(["spymaster", "guesser"]),
+});
+
 export type JoinRoomInput = z.infer<typeof joinRoomSchema>;
 export type CreateRoomInput = z.infer<typeof createRoomSchema>;
 export type TeamSelectInput = z.infer<typeof teamSelectSchema>;
 export type RoleSelectInput = z.infer<typeof roleSelectSchema>;
 export type GiveClueInput = z.infer<typeof giveClueSchema>;
 export type RevealCardInput = z.infer<typeof revealCardSchema>;
+export type AddBotInput = z.infer<typeof addBotSchema>;

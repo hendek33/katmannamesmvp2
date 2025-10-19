@@ -10,6 +10,7 @@ import {
   roleSelectSchema,
   giveClueSchema,
   revealCardSchema,
+  addBotSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -189,6 +190,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const gameState = storage.updatePlayerRole(ws.roomCode, ws.playerId, validation.data.role);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Rol seçilemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
+          case "add_bot": {
+            if (!ws.roomCode) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = addBotSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz bot bilgisi" } });
+              return;
+            }
+
+            const gameState = storage.addBot(ws.roomCode, validation.data.team, validation.data.role);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Bot eklenemedi" } });
               return;
             }
 
