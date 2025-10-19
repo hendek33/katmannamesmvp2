@@ -4,11 +4,11 @@ import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Trophy, RotateCcw, Home, Loader2 } from "lucide-react";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 export default function GameEnd() {
   const [, setLocation] = useLocation();
-  const { gameState, playerId, send, isConnected } = useWebSocket();
+  const { gameState, playerId, send, isConnected } = useWebSocketContext();
 
   useEffect(() => {
     if (gameState?.phase === "playing") {

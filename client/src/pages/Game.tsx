@@ -10,13 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { RotateCcw, Send, Copy, Check, Loader2 } from "lucide-react";
 
 export default function Game() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { isConnected, gameState, playerId, roomCode, error, send } = useWebSocket();
+  const { isConnected, gameState, playerId, roomCode, error, send } = useWebSocketContext();
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);

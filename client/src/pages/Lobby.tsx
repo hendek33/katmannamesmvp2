@@ -7,14 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { Copy, Check, Plus, LogIn, Loader2, Bot } from "lucide-react";
 import type { Team } from "@shared/schema";
 
 export default function Lobby() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { isConnected, gameState, playerId, roomCode, error, send } = useWebSocket();
+  const { isConnected, gameState, playerId, roomCode, error, send } = useWebSocketContext();
   const [mode, setMode] = useState<"select" | "create" | "join">("select");
   const [joinCode, setJoinCode] = useState("");
   const [copied, setCopied] = useState(false);

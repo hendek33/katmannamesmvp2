@@ -18,11 +18,19 @@ export function useWebSocket() {
   const maxReconnectAttempts = 5;
 
   useEffect(() => {
+    let isCleanedUp = false;
+
     const connect = () => {
+      if (isCleanedUp) return;
+      
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${protocol}//${window.location.host}/ws`;
 
       try {
+        if (ws.current?.readyState === WebSocket.OPEN || ws.current?.readyState === WebSocket.CONNECTING) {
+          return;
+        }
+
         ws.current = new WebSocket(wsUrl);
 
         ws.current.onopen = () => {
@@ -94,8 +102,13 @@ export function useWebSocket() {
           console.log(`WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`);
           setIsConnected(false);
           
-          // Only reconnect if not a normal closure and haven't exceeded max attempts
-          if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
+          // Don't reconnect if cleaned up or normal closure
+          if (isCleanedUp || event.code === 1000) {
+            return;
+          }
+          
+          // Only reconnect if haven't exceeded max attempts
+          if (reconnectAttempts.current < maxReconnectAttempts) {
             reconnectAttempts.current++;
             const delay = Math.min(3000 * reconnectAttempts.current, 10000);
             console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})...`);
@@ -103,7 +116,7 @@ export function useWebSocket() {
             reconnectTimeout.current = setTimeout(() => {
               connect();
             }, delay);
-          } else if (reconnectAttempts.current >= maxReconnectAttempts) {
+          } else {
             setError("Bağlantı kurulamadı. Lütfen sayfayı yenileyin.");
           }
         };
@@ -121,11 +134,12 @@ export function useWebSocket() {
     connect();
 
     return () => {
+      isCleanedUp = true;
       if (reconnectTimeout.current) {
         clearTimeout(reconnectTimeout.current);
       }
-      if (ws.current) {
-        ws.current.close();
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.close(1000, "Component unmounted");
       }
     };
   }, []);
