@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { RotateCcw, Send, Copy, Check, Loader2 } from "lucide-react";
+import { RotateCcw, Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye } from "lucide-react";
 
 export default function Game() {
   const [, setLocation] = useLocation();
@@ -69,11 +69,19 @@ export default function Game() {
   if (!isConnected || !gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
-        <Card className="p-8 space-y-4 text-center" data-testid="loading-state">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">
-            {!isConnected ? "Sunucuya bağlanılıyor..." : "Yükleniyor..."}
-          </p>
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl animate-pulse-slow">
+          <div className="relative">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
+            <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-lg font-semibold">
+              {!isConnected ? "Bağlanıyor" : "Yükleniyor"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {!isConnected ? "Sunucuya bağlanılıyor..." : "Oyun hazırlanıyor..."}
+            </p>
+          </div>
         </Card>
       </div>
     );
@@ -82,9 +90,16 @@ export default function Game() {
   if (gameState.phase !== "playing") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
-        <Card className="p-8 space-y-4 text-center">
-          <p className="text-muted-foreground">Oyun henüz başlamadı</p>
-          <Button onClick={() => setLocation("/lobby")}>
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl">
+          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-amber-600 to-amber-400 flex items-center justify-center shadow-lg">
+            <Clock className="w-10 h-10 text-white" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-bold">Oyun Başlamadı</h2>
+            <p className="text-muted-foreground">Lobiye dönüp oyunu başlatabilirsiniz</p>
+          </div>
+          <Button onClick={() => setLocation("/lobby")} size="lg" className="bg-gradient-to-r from-blue-600 to-blue-400">
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Lobiye Dön
           </Button>
         </Card>
@@ -96,9 +111,9 @@ export default function Game() {
   if (!currentPlayer) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
-        <Card className="p-8 space-y-4 text-center">
-          <p className="text-muted-foreground">Oyuncu bulunamadı</p>
-          <Button onClick={() => setLocation("/")}>
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl">
+          <p className="text-lg font-semibold text-muted-foreground">Oyuncu bulunamadı</p>
+          <Button onClick={() => setLocation("/")} variant="outline">
             Ana Sayfaya Dön
           </Button>
         </Card>
@@ -115,82 +130,175 @@ export default function Game() {
   const lightPlayers = gameState.players.filter(p => p.team === "light");
 
   return (
-    <div className="min-h-screen p-2 md:p-4 bg-[#8B4513] bg-gradient-to-br from-[#8B4513] to-[#654321] animate-in fade-in duration-500">
-      <div className="max-w-[1600px] mx-auto space-y-2 md:space-y-3">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-2 bg-black/20 rounded-lg backdrop-blur-sm">
-          <div className="flex items-center gap-4">
-            <Logo />
-            <div className="text-sm text-amber-100/80">
-              Oda: <span className="font-mono font-bold text-amber-100">{roomCode}</span>
+    <div className="min-h-screen p-3 md:p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 animate-in fade-in duration-500">
+      <div className="max-w-[1800px] mx-auto space-y-4">
+        {/* Modern Header */}
+        <Card className="p-4 border-2 shadow-2xl bg-gradient-to-r from-slate-800/90 to-slate-900/90 backdrop-blur-sm hover:shadow-primary/20 transition-all">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Logo />
+              <div className="h-8 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Users className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Oda Kodu</div>
+                  <div className="text-sm font-mono font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                    {roomCode}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleCopyRoomCode}
-              data-testid="button-copy-code"
-              className="bg-black/40 border-amber-700/50 text-amber-100 hover:bg-black/60"
-            >
-              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-            </Button>
-            {currentPlayer?.isRoomOwner && (
+            
+            <div className="flex items-center gap-2">
               <Button
                 size="sm"
                 variant="outline"
-                onClick={handleRestart}
-                data-testid="button-restart"
-                className="bg-black/40 border-amber-700/50 text-amber-100 hover:bg-black/60"
+                onClick={handleCopyRoomCode}
+                data-testid="button-copy-code"
+                className="border-2 hover:border-primary hover:bg-primary/10"
               >
-                <RotateCcw className="w-3 h-3 mr-1" />
-                Reset
+                {copied ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </Button>
-            )}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setLocation("/lobby")}
-              className="bg-black/40 border-amber-700/50 text-amber-100 hover:bg-black/60"
-            >
-              Lobby
-            </Button>
+              {currentPlayer?.isRoomOwner && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleRestart}
+                  data-testid="button-restart"
+                  className="border-2 hover:border-amber-500 hover:bg-amber-500/10"
+                >
+                  <RotateCcw className="w-4 h-4 mr-1" />
+                  Yenile
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setLocation("/lobby")}
+                className="border-2 hover:border-cyan-500 hover:bg-cyan-500/10"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Lobby
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Status Banner */}
+        <div className="relative overflow-hidden">
+          <div className={`p-6 rounded-xl border-2 shadow-2xl text-center transition-all ${
+            gameState.currentTeam === "dark"
+              ? "bg-gradient-to-r from-blue-900/90 to-blue-800/90 border-blue-700/50"
+              : "bg-gradient-to-r from-cyan-900/90 to-cyan-800/90 border-cyan-700/50"
+          }`}>
+            <div className="relative z-10">
+              {!isCurrentTurn ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-3">
+                    <Clock className="w-6 h-6 animate-pulse" />
+                    <p className="text-2xl font-bold text-white">
+                      {gameState.currentTeam === "dark" ? "Katman Koyu" : "Katman Açık"} Oynuyor
+                    </p>
+                  </div>
+                  <p className="text-white/70">Sıranızı bekleyin...</p>
+                </div>
+              ) : isSpymaster && !gameState.currentClue ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-3">
+                    <Lightbulb className="w-6 h-6 animate-pulse" />
+                    <p className="text-2xl font-bold text-white">İpucunu Verin</p>
+                  </div>
+                  <p className="text-white/70">Takımınıza yardımcı olun</p>
+                </div>
+              ) : !isSpymaster && gameState.currentClue ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-3">
+                    <Target className="w-6 h-6 animate-pulse" />
+                    <p className="text-2xl font-bold text-white">Tahmin Edin</p>
+                  </div>
+                  <p className="text-white/70">Doğru kartı seçin</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center gap-3">
+                    <Clock className="w-6 h-6 animate-pulse" />
+                    <p className="text-2xl font-bold text-white">Bekleniyor</p>
+                  </div>
+                  <p className="text-white/70">İpucu bekleniyor...</p>
+                </div>
+              )}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
           </div>
         </div>
 
-        {/* Status Message */}
-        <div className="text-center py-3 bg-amber-50/90 rounded-lg shadow-lg">
-          <p className="text-base font-semibold text-gray-800">
-            {!isCurrentTurn 
-              ? `${gameState.currentTeam === "dark" ? "Katman Koyu" : "Katman Açık"} takımının sırası...`
-              : isSpymaster && !gameState.currentClue
-              ? "İpucunu ver..."
-              : !isSpymaster && gameState.currentClue
-              ? "Tahmin et..."
-              : "Bekleniyor..."}
-          </p>
-        </div>
-
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_280px] gap-3">
+        <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr_320px] gap-4">
           {/* Left Side - Dark Team */}
-          <div className="space-y-3">
-            <Card className="p-6 bg-gradient-to-br from-red-900/90 to-red-950/90 border-red-800/50 shadow-2xl">
-              <div className="text-center space-y-2">
-                <h3 className="text-sm font-semibold text-red-100 uppercase tracking-wide">Katman Koyu</h3>
-                <div className="text-7xl font-bold text-red-100">{gameState.darkCardsRemaining}</div>
-                <p className="text-xs text-red-200/70">Kalan Kart</p>
+          <div className="space-y-4">
+            {/* Score Card */}
+            <Card className="p-8 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-600 animate-pulse" />
+                  <h3 className="text-sm font-bold text-blue-100 uppercase tracking-wider">Katman Koyu</h3>
+                </div>
+                <div className="relative">
+                  <div className="text-8xl font-black text-blue-100 group-hover:scale-110 transition-transform">
+                    {gameState.darkCardsRemaining}
+                  </div>
+                  <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
+                  {gameState.currentTeam === "dark" && (
+                    <div className="inline-block px-3 py-1 bg-blue-600/30 rounded-full">
+                      <p className="text-xs text-blue-100 font-bold">● SIRA SIZDE</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
             
-            <Card className="p-4 bg-red-950/60 border-red-800/30 backdrop-blur-sm">
-              <h4 className="text-xs font-semibold text-red-100 mb-3 uppercase">Oyuncular</h4>
+            {/* Players Card */}
+            <Card className="p-5 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-4 h-4 text-blue-400" />
+                <h4 className="text-sm font-bold text-blue-100 uppercase tracking-wide">Oyuncular</h4>
+              </div>
               <div className="space-y-2">
                 {darkPlayers.map(player => (
-                  <div key={player.id} className="flex items-center gap-2 text-xs text-red-100/90">
-                    <span className={player.id === playerId ? "font-bold" : ""}>{player.username}</span>
-                    <span className="text-red-300/60">({player.role === "spymaster" ? "İpucu" : "Tahminci"})</span>
+                  <div 
+                    key={player.id} 
+                    className={`flex items-center justify-between p-2 rounded-lg transition-all ${
+                      player.id === playerId 
+                        ? "bg-blue-600/30 border border-blue-500/50" 
+                        : "bg-blue-900/20 hover:bg-blue-900/40"
+                    }`}
+                  >
+                    <span className={`text-sm ${player.id === playerId ? "font-bold text-blue-100" : "text-blue-200/90"}`}>
+                      {player.username}
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      player.role === "spymaster" 
+                        ? "bg-amber-500/20 text-amber-300 font-semibold" 
+                        : "bg-blue-500/20 text-blue-300"
+                    }`}>
+                      {player.role === "spymaster" ? (
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          İpucu
+                        </span>
+                      ) : (
+                        "Tahminci"
+                      )}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -198,7 +306,7 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="grid grid-cols-5 gap-2 md:gap-3" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
@@ -211,48 +319,64 @@ export default function Game() {
               ))}
             </div>
 
-            {/* Clue Display at Bottom */}
+            {/* Clue Input/Display at Bottom */}
             <div className="flex justify-center">
               {canGiveClue ? (
-                <Card className="p-4 bg-amber-50/95 border-2 border-amber-700/50 shadow-lg inline-block">
-                  <div className="flex items-center gap-3">
-                    <Input
-                      data-testid="input-clue-word"
-                      placeholder="İPUCU"
-                      value={clueWord}
-                      onChange={(e) => setClueWord(e.target.value.toUpperCase())}
-                      onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
-                      maxLength={20}
-                      className="w-40 text-center font-bold text-lg uppercase bg-white"
-                    />
-                    <Input
-                      data-testid="input-clue-count"
-                      type="number"
-                      min="0"
-                      max="9"
-                      value={clueCount}
-                      onChange={(e) => setClueCount(e.target.value)}
-                      className="w-16 text-center font-bold text-2xl bg-white"
-                    />
-                    <Button
-                      onClick={handleGiveClue}
-                      disabled={!clueWord.trim() || parseInt(clueCount) < 0}
-                      data-testid="button-give-clue"
-                      className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
+                <Card className="p-6 border-2 shadow-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 hover:shadow-amber-500/50 transition-all">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center gap-2 text-amber-900">
+                      <Lightbulb className="w-5 h-5" />
+                      <Label className="text-sm font-bold uppercase">İpucu Ver</Label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        data-testid="input-clue-word"
+                        placeholder="KELİME"
+                        value={clueWord}
+                        onChange={(e) => setClueWord(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
+                        maxLength={20}
+                        className="w-48 text-center font-bold text-xl uppercase bg-white border-2 border-amber-500/30 focus:border-amber-500"
+                      />
+                      <Input
+                        data-testid="input-clue-count"
+                        type="number"
+                        min="0"
+                        max="9"
+                        value={clueCount}
+                        onChange={(e) => setClueCount(e.target.value)}
+                        className="w-20 text-center font-bold text-3xl bg-white border-2 border-amber-500/30 focus:border-amber-500"
+                      />
+                      <Button
+                        onClick={handleGiveClue}
+                        disabled={!clueWord.trim() || parseInt(clueCount) < 0}
+                        data-testid="button-give-clue"
+                        size="lg"
+                        className="h-14 px-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl hover:shadow-amber-500/50 group"
+                      >
+                        <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-8 py-4 bg-amber-50/95 border-2 border-amber-700/50 shadow-lg inline-block">
-                  <div className="text-center">
-                    <span className="text-2xl font-bold text-gray-900 uppercase tracking-wider">
-                      {gameState.currentClue.word}
-                    </span>
-                    <span className="ml-4 text-4xl font-bold text-gray-900">
-                      {gameState.currentClue.count}
-                    </span>
+                <Card className="px-12 py-8 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shimmer" />
+                  <div className="relative text-center space-y-2">
+                    <div className="flex items-center justify-center gap-2 text-amber-900/60">
+                      <Lightbulb className="w-4 h-4" />
+                      <span className="text-xs font-semibold uppercase">İpucu</span>
+                    </div>
+                    <div className="flex items-baseline justify-center gap-6">
+                      <span className="text-4xl font-black text-amber-900 uppercase tracking-wider">
+                        {gameState.currentClue.word}
+                      </span>
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-lg">
+                        <span className="text-3xl font-black text-white">
+                          {gameState.currentClue.count}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </Card>
               ) : null}
@@ -260,58 +384,124 @@ export default function Game() {
           </div>
 
           {/* Right Side - Light Team */}
-          <div className="space-y-3">
-            <Card className="p-6 bg-gradient-to-br from-cyan-700/90 to-cyan-900/90 border-cyan-600/50 shadow-2xl">
-              <div className="text-center space-y-2">
-                <h3 className="text-sm font-semibold text-cyan-100 uppercase tracking-wide">Katman Açık</h3>
-                <div className="text-7xl font-bold text-cyan-100">{gameState.lightCardsRemaining}</div>
-                <p className="text-xs text-cyan-200/70">Kalan Kart</p>
+          <div className="space-y-4">
+            {/* Score Card */}
+            <Card className="p-8 border-2 shadow-2xl bg-gradient-to-br from-cyan-950/95 to-cyan-900/95 border-cyan-700/50 hover:shadow-cyan-500/30 transition-all group">
+              <div className="text-center space-y-4">
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse" />
+                  <h3 className="text-sm font-bold text-cyan-100 uppercase tracking-wider">Katman Açık</h3>
+                </div>
+                <div className="relative">
+                  <div className="text-8xl font-black text-cyan-100 group-hover:scale-110 transition-transform">
+                    {gameState.lightCardsRemaining}
+                  </div>
+                  <div className="absolute inset-0 blur-2xl bg-cyan-500/20 group-hover:bg-cyan-500/40 transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-cyan-200/80 font-semibold uppercase">Kalan Kart</p>
+                  {gameState.currentTeam === "light" && (
+                    <div className="inline-block px-3 py-1 bg-cyan-600/30 rounded-full">
+                      <p className="text-xs text-cyan-100 font-bold">● SIRA SIZDE</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
             
-            <Card className="p-4 bg-cyan-950/60 border-cyan-800/30 backdrop-blur-sm">
-              <h4 className="text-xs font-semibold text-cyan-100 mb-3 uppercase">Oyuncular</h4>
+            {/* Players Card */}
+            <Card className="p-5 border-2 bg-cyan-950/80 border-cyan-800/30 backdrop-blur-sm shadow-xl">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-4 h-4 text-cyan-400" />
+                <h4 className="text-sm font-bold text-cyan-100 uppercase tracking-wide">Oyuncular</h4>
+              </div>
               <div className="space-y-2">
                 {lightPlayers.map(player => (
-                  <div key={player.id} className="flex items-center gap-2 text-xs text-cyan-100/90">
-                    <span className={player.id === playerId ? "font-bold" : ""}>{player.username}</span>
-                    <span className="text-cyan-300/60">({player.role === "spymaster" ? "İpucu" : "Tahminci"})</span>
+                  <div 
+                    key={player.id} 
+                    className={`flex items-center justify-between p-2 rounded-lg transition-all ${
+                      player.id === playerId 
+                        ? "bg-cyan-600/30 border border-cyan-500/50" 
+                        : "bg-cyan-900/20 hover:bg-cyan-900/40"
+                    }`}
+                  >
+                    <span className={`text-sm ${player.id === playerId ? "font-bold text-cyan-100" : "text-cyan-200/90"}`}>
+                      {player.username}
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      player.role === "spymaster" 
+                        ? "bg-amber-500/20 text-amber-300 font-semibold" 
+                        : "bg-cyan-500/20 text-cyan-300"
+                    }`}>
+                      {player.role === "spymaster" ? (
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" />
+                          İpucu
+                        </span>
+                      ) : (
+                        "Tahminci"
+                      )}
+                    </span>
                   </div>
                 ))}
               </div>
             </Card>
 
-            <Card className="p-4 bg-amber-100/95 border-amber-700/30 backdrop-blur-sm max-h-64 overflow-y-auto">
-              <h4 className="text-xs font-semibold text-gray-800 mb-3 uppercase">Oyun Durumu</h4>
-              <div className="space-y-2 text-xs text-gray-700">
+            {/* Game Status Card */}
+            <Card className="p-5 border-2 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-slate-700/50 backdrop-blur-sm shadow-xl max-h-80 overflow-y-auto">
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-4 h-4 text-primary" />
+                <h4 className="text-sm font-bold text-white uppercase tracking-wide">Oyun Durumu</h4>
+              </div>
+              <div className="space-y-3">
                 {gameState.currentClue && (
-                  <div className="p-2 bg-amber-200/50 rounded">
-                    <span className="font-semibold">Aktif İpucu:</span>
-                    <div className="font-bold text-sm">
-                      {gameState.currentClue.word} {gameState.currentClue.count}
+                  <div className="p-3 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30">
+                    <div className="text-xs text-amber-300 font-semibold mb-1">Aktif İpucu</div>
+                    <div className="text-lg font-black text-amber-100">
+                      {gameState.currentClue.word} <span className="text-2xl">{gameState.currentClue.count}</span>
                     </div>
                   </div>
                 )}
-                <div className="p-2 bg-white/50 rounded">
-                  <span className="font-semibold">Sıra:</span> {gameState.currentTeam === "dark" ? "Katman Koyu" : "Katman Açık"}
-                </div>
-                <div className="p-2 bg-white/50 rounded">
-                  <span className="font-semibold">Açılan Kartlar:</span> {gameState.revealHistory.length}/25
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+                    <div className="text-xs text-muted-foreground mb-1">Sıra</div>
+                    <div className={`text-sm font-bold ${
+                      gameState.currentTeam === "dark" ? "text-blue-400" : "text-cyan-400"
+                    }`}>
+                      {gameState.currentTeam === "dark" ? "Koyu" : "Açık"}
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white/5 rounded-lg border border-white/10">
+                    <div className="text-xs text-muted-foreground mb-1">Açılan</div>
+                    <div className="text-sm font-bold text-white">
+                      {gameState.revealHistory.length}/25
+                    </div>
+                  </div>
                 </div>
                 {gameState.revealHistory.length > 0 && (
-                  <div className="mt-3">
-                    <div className="text-xs font-semibold text-gray-600 mb-1">Son Açılan Kartlar:</div>
-                    <div className="space-y-1">
+                  <div>
+                    <div className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-2">
+                      <Clock className="w-3 h-3" />
+                      Son Açılan Kartlar
+                    </div>
+                    <div className="space-y-2">
                       {gameState.revealHistory.slice(-5).reverse().map((entry, idx) => (
-                        <div key={idx} className="text-xs p-1 bg-white/30 rounded flex items-center gap-2">
-                          <span className={`w-2 h-2 rounded-full ${
-                            entry.type === "dark" ? "bg-red-600" :
-                            entry.type === "light" ? "bg-cyan-600" :
+                        <div 
+                          key={idx} 
+                          className="flex items-center gap-3 p-2 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-all"
+                        >
+                          <div className={`w-3 h-3 rounded-full shadow-lg ${
+                            entry.type === "dark" ? "bg-blue-600 shadow-blue-500/50" :
+                            entry.type === "light" ? "bg-cyan-600 shadow-cyan-500/50" :
                             entry.type === "neutral" ? "bg-gray-400" :
-                            "bg-black"
-                          }`}></span>
-                          <span className="font-medium">{entry.word}</span>
-                          <span className="text-gray-500 text-[10px]">({entry.team === "dark" ? "Koyu" : "Açık"})</span>
+                            "bg-red-600 shadow-red-500/50"
+                          }`} />
+                          <span className="text-sm font-semibold text-white flex-1">{entry.word}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            entry.team === "dark" ? "bg-blue-600/20 text-blue-300" : "bg-cyan-600/20 text-cyan-300"
+                          }`}>
+                            {entry.team === "dark" ? "Koyu" : "Açık"}
+                          </span>
                         </div>
                       ))}
                     </div>
