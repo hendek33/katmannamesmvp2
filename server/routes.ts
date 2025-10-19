@@ -118,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const { playerId, gameState, isReconnect } = result;
             const existingClients = roomClients.get(validation.data.roomCode);
             if (existingClients) {
-              for (const client of existingClients) {
+              for (const client of Array.from(existingClients)) {
                 if (client.playerId === playerId) {
                   client.replaced = true;
                   client.close();
@@ -338,6 +338,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
             }
+            break;
+          }
+
+          case "return_to_lobby": {
+            if (!ws.roomCode) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const gameState = storage.returnToLobby(ws.roomCode);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Lobiye dönülemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "returned_to_lobby",
+              payload: { gameState },
+            });
             break;
           }
 

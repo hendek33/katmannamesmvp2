@@ -98,7 +98,10 @@ export default function GameEnd() {
             )}
 
             <Button
-              onClick={() => setLocation("/lobby")}
+              onClick={() => {
+                send("return_to_lobby", {});
+                setLocation("/lobby");
+              }}
               variant="outline"
               className="w-full"
               size="lg"

@@ -13,6 +13,7 @@ export interface IStorage {
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null;
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
   restartGame(roomCode: string, playerId: string): GameState | null;
+  returnToLobby(roomCode: string): GameState | null;
   removePlayer(roomCode: string, playerId: string): void;
   cleanupEmptyRooms(): void;
 }
@@ -41,9 +42,13 @@ export class MemStorage implements IStorage {
     const words = getRandomWords(25);
     const cards: Card[] = [];
     
+    const darkFirst = Math.random() > 0.5;
+    const darkCards = darkFirst ? 9 : 8;
+    const lightCards = darkFirst ? 8 : 9;
+    
     const types: CardType[] = [
-      ...Array(9).fill("dark"),
-      ...Array(8).fill("light"),
+      ...Array(darkCards).fill("dark"),
+      ...Array(lightCards).fill("light"),
       ...Array(7).fill("neutral"),
       "assassin"
     ];
@@ -218,6 +223,7 @@ export class MemStorage implements IStorage {
     room.phase = "playing";
     room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
+    room.currentTeam = room.darkCardsRemaining === 9 ? "dark" : "light";
     room.currentClue = null;
     room.winner = null;
     room.revealHistory = [];
@@ -303,9 +309,25 @@ export class MemStorage implements IStorage {
 
     room.cards = this.createGameCards();
     room.phase = "playing";
-    room.currentTeam = Math.random() > 0.5 ? "dark" : "light";
     room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
+    room.currentTeam = room.darkCardsRemaining === 9 ? "dark" : "light";
+    room.currentClue = null;
+    room.winner = null;
+    room.revealHistory = [];
+
+    return room;
+  }
+
+  returnToLobby(roomCode: string): GameState | null {
+    const room = this.rooms.get(roomCode);
+    if (!room) return null;
+
+    room.phase = "lobby";
+    room.cards = [];
+    room.darkCardsRemaining = 0;
+    room.lightCardsRemaining = 0;
+    room.currentTeam = null;
     room.currentClue = null;
     room.winner = null;
     room.revealHistory = [];

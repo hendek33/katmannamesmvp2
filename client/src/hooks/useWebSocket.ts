@@ -86,6 +86,7 @@ export function useWebSocket() {
               case "game_started":
               case "card_revealed":
               case "game_restarted":
+              case "returned_to_lobby":
                 setGameState(message.payload.gameState);
                 break;
 
