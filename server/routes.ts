@@ -201,8 +201,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           case "add_bot": {
-            if (!ws.roomCode) {
+            if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi bot ekleyebilir" } });
               return;
             }
 

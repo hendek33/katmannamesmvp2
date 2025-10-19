@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { Copy, Check, Plus, LogIn, Loader2 } from "lucide-react";
+import { Copy, Check, Plus, LogIn, Loader2, Bot } from "lucide-react";
 import type { Team } from "@shared/schema";
 
 export default function Lobby() {
@@ -83,6 +83,10 @@ export default function Lobby() {
 
   const handleStartGame = () => {
     send("start_game", {});
+  };
+
+  const handleAddBot = (team: "dark" | "light", role: "spymaster" | "guesser") => {
+    send("add_bot", { team, role });
   };
 
   if (!isConnected) {
@@ -270,6 +274,66 @@ export default function Lobby() {
                 <li>Her takımda bir İpucu Veren olmalı</li>
               </ul>
             </Card>
+
+            {currentPlayer?.isRoomOwner && (
+              <Card className="p-6 space-y-4 bg-accent/5">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-primary" />
+                  <h3 className="font-semibold">Test Botları</h3>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Test için işlevsiz botlar ekle
+                </p>
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label className="text-xs">Katman Koyu</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleAddBot("dark", "spymaster")}
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        data-testid="button-add-bot-dark-spymaster"
+                      >
+                        İpucu Veren
+                      </Button>
+                      <Button
+                        onClick={() => handleAddBot("dark", "guesser")}
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        data-testid="button-add-bot-dark-guesser"
+                      >
+                        Tahminci
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs">Katman Açık</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleAddBot("light", "spymaster")}
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        data-testid="button-add-bot-light-spymaster"
+                      >
+                        İpucu Veren
+                      </Button>
+                      <Button
+                        onClick={() => handleAddBot("light", "guesser")}
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        data-testid="button-add-bot-light-guesser"
+                      >
+                        Tahminci
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )}
 
             <Button
               onClick={handleStartGame}

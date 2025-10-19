@@ -135,6 +135,15 @@ export class MemStorage implements IStorage {
     const room = this.rooms.get(roomCode);
     if (!room || room.phase !== "lobby") return null;
 
+    if (role === "spymaster") {
+      const teamPlayers = room.players.filter(p => p.team === team);
+      const currentSpymaster = teamPlayers.find(p => p.role === "spymaster");
+      
+      if (currentSpymaster) {
+        currentSpymaster.role = "guesser";
+      }
+    }
+
     const botNumber = room.players.filter(p => p.isBot).length + 1;
     const botId = randomUUID();
     
