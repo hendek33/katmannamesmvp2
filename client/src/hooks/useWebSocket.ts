@@ -14,6 +14,8 @@ export function useWebSocket() {
   const [roomCode, setRoomCode] = useState<string>("");
   const [error, setError] = useState<string>("");
   const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const reconnectAttempts = useRef<number>(0);
+  const maxReconnectAttempts = 5;
 
   useEffect(() => {
     const connect = () => {
@@ -26,6 +28,8 @@ export function useWebSocket() {
         ws.current.onopen = () => {
           setIsConnected(true);
           setError("");
+          reconnectAttempts.current = 0;
+          console.log("WebSocket connected");
           
           const savedRoomCode = localStorage.getItem("katmannames_room_code");
           const savedPlayerId = localStorage.getItem("katmannames_player_id");
@@ -86,11 +90,22 @@ export function useWebSocket() {
           }
         };
 
-        ws.current.onclose = () => {
+        ws.current.onclose = (event) => {
+          console.log(`WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`);
           setIsConnected(false);
-          reconnectTimeout.current = setTimeout(() => {
-            connect();
-          }, 3000);
+          
+          // Only reconnect if not a normal closure and haven't exceeded max attempts
+          if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
+            reconnectAttempts.current++;
+            const delay = Math.min(3000 * reconnectAttempts.current, 10000);
+            console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})...`);
+            
+            reconnectTimeout.current = setTimeout(() => {
+              connect();
+            }, delay);
+          } else if (reconnectAttempts.current >= maxReconnectAttempts) {
+            setError("Bağlantı kurulamadı. Lütfen sayfayı yenileyin.");
+          }
         };
 
         ws.current.onerror = (error) => {
