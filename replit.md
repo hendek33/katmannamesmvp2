@@ -40,6 +40,11 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 - ✅ Oyun durumu takibi
 - ✅ Kazanan belirleme
 - ✅ Sayfa yenileme dayanıklılığı
+- ✅ Bot ekleme sistemi (owner-only, spymaster uniqueness)
+- ✅ Kronolojik reveal history (son 5 kart)
+- ✅ Lobiye dönme butonu (oyun bitince)
+- ✅ Rastgele kart dağılımı (9-8 veya 8-9)
+- ✅ WebSocket reconnection loop düzeltildi
 
 ### Tasarım Özellikleri
 - 🎨 Karanlık lacivert/grimsi tema
@@ -59,23 +64,28 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ### WebSocket Bağlantıları
 - Path: `/ws`
 - Protocol: `ws://` (dev) / `wss://` (production)
+- **WebSocketContext**: Merkezi WebSocket yönetimi (tek bağlantı, sayfa geçişlerinde kalıcı)
 - Gerçek zamanlı event'ler:
   - `join_room` - Odaya katılma
   - `create_room` - Oda oluşturma
   - `select_team` - Takım seçimi
   - `select_role` - Rol değiştirme
+  - `add_bot` - Bot ekleme (owner-only)
   - `start_game` - Oyunu başlatma
   - `give_clue` - İpucu verme
   - `reveal_card` - Kart açma
   - `restart_game` - Oyunu yeniden başlatma
+  - `return_to_lobby` - Lobby'ye dönme
 
 ### Oyun Mekaniği
 - 25 kart total (5x5 grid)
-- 9 Katman Koyu kartı
-- 8 Katman Açık kartı
+- **Rastgele Dağılım**: Her oyun başında random olarak:
+  - Bir takım 9 kart alır (başlayan takım)
+  - Diğer takım 8 kart alır
 - 7 Tarafsız kart
 - 1 Yasak kart
-- Sıra başlatan takım (rastgele seçilir)
+- **Başlayan takım**: Her zaman 9 kartı olan takım başlar
+- **Reveal History**: Son 5 açılan kart kronolojik sırayla gösterilir
 
 ### Deployment
 - **Hedef Platform**: Render
@@ -86,40 +96,57 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 
 ## Son Değişiklikler
 
-### 2025-01-19
-- ✅ Proje kurulumu tamamlandı
-- ✅ Tüm schema'lar ve TypeScript tipleri oluşturuldu
-- ✅ Tasarım sistemi konfigürasyonu (Tailwind, fonts, colors)
-- ✅ Tüm React komponentleri oluşturuldu:
-  - Logo komponent (katmanlı tasarım)
-  - GameCard (özgün tasarımlar, animasyonlar)
-  - PlayerList (takım/rol yönetimi)
-  - ClueDisplay (ipucu gösterimi)
-  - GameStatus (skor takibi)
-  - Welcome sayfası
-  - Lobby sayfası
-  - Game sayfası
-  - GameEnd sayfası
-- ✅ 250+ Türkçe kelime listesi eklendi
-- ✅ README ve deployment dokümanları hazırlandı
+### 2025-10-19
+- ✅ **WebSocket Reconnection Loop Düzeltildi**
+  - WebSocketContext ile merkezi bağlantı yönetimi
+  - Sayfa geçişlerinde tek WebSocket instance kullanımı
+  - Reconnection loop sorunu tamamen giderildi
 
-### Bir Sonraki Adımlar
-- ⏳ WebSocket backend implementasyonu
-- ⏳ Oda yönetimi ve oyuncu senkronizasyonu
-- ⏳ Oyun mantığı (kart dağıtma, tahmin kontrolü, kazanan belirleme)
-- ⏳ Frontend-backend entegrasyonu
-- ⏳ Test ve polish
+- ✅ **Lobiye Dönme Özelliği**
+  - `return_to_lobby` event handler eklendi
+  - GameEnd sayfasından lobby'ye dönüş
+  - Oyun state'i temizleniyor (cards, clue, winner reset)
+
+- ✅ **Rastgele Kart Dağılımı**
+  - Her oyun başında hangi takımın 9, hangisinin 8 kart alacağı random
+  - Başlayan takım her zaman 9 kartı olan takım
+  - Codenames kurallarına uygun
+
+- ✅ **Bot Sistemi**
+  - Owner-only bot ekleme yetkisi
+  - Spymaster uniqueness enforcement
+  - Dark/Light takımlarına bot ekleme
+
+- ✅ **Reveal History**
+  - Son 5 açılan kart kronolojik gösterim
+  - Timestamp tracking
+  - Color-coded card display
+
+### 2025-01-19
+- ✅ İlk proje kurulumu
+- ✅ Tüm UI komponentleri ve sayfalar
+- ✅ Backend WebSocket implementasyonu
+- ✅ Oyun mekaniği (turn switching, win conditions)
+- ✅ 250+ Türkçe kelime listesi
+
+### Tamamlanmış Özellikler
+- ✅ Full stack oyun tamamlandı
+- ✅ WebSocket gerçek zamanlı senkronizasyon
+- ✅ Oda yönetimi ve oyuncu tracking
+- ✅ Bot desteği ve role management
+- ✅ UI/UX polish ve animasyonlar
 
 ## Geliştirici Notları
 
 ### Önemli Dosyalar
 - `shared/schema.ts` - Tüm veri modelleri ve tipleri
 - `server/words.ts` - Türkçe kelime listesi
-- `server/routes.ts` - WebSocket ve API endpoint'leri
+- `server/routes.ts` - WebSocket event handlers ve broadcast logic
 - `server/storage.ts` - In-memory oyun durumu yönetimi
+- `client/src/contexts/WebSocketContext.tsx` - Merkezi WebSocket yönetimi
+- `client/src/hooks/useWebSocket.ts` - WebSocket connection ve event handling
 - `client/src/index.css` - Tailwind konfigürasyonu ve custom CSS
 - `tailwind.config.ts` - Tasarım token'ları ve animasyonlar
-- `design_guidelines.md` - Tasarım kuralları ve standartlar
 
 ### Tasarım Prensipleri
 - Karanlık tema her yerde varsayılan
@@ -129,7 +156,9 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 - Türkçe dil desteği %100
 
 ### WebSocket Event Handling
+- **Merkezi Bağlantı**: WebSocketContext ile tek instance
 - Her event için validation (Zod schemas)
-- Room state senkronizasyonu
-- Reconnection handling (username + room code)
+- Room state senkronizasyonu ve broadcast
+- Automatic reconnection (5 deneme, exponential backoff)
 - Error handling ve user feedback
+- Stale connection cleanup (5 saniye timeout)
