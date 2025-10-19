@@ -2,7 +2,9 @@ import { type Player, type Team } from "@shared/schema";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Crown, Eye, Target } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Users, Crown, Eye, Target, Edit2, Check } from "lucide-react";
+import { useState } from "react";
 
 interface PlayerListProps {
   players: Player[];
@@ -10,6 +12,9 @@ interface PlayerListProps {
   onTeamSelect?: (team: Team) => void;
   onRoleToggle?: () => void;
   isLobby?: boolean;
+  darkTeamName?: string;
+  lightTeamName?: string;
+  onTeamNameChange?: (team: Team, name: string) => void;
 }
 
 export function PlayerList({ 
@@ -17,7 +22,10 @@ export function PlayerList({
   currentPlayerId, 
   onTeamSelect, 
   onRoleToggle,
-  isLobby = false 
+  isLobby = false,
+  darkTeamName = "Mavi Takım",
+  lightTeamName = "Kırmızı Takım",
+  onTeamNameChange
 }: PlayerListProps) {
   const darkTeam = players.filter(p => p.team === "dark");
   const lightTeam = players.filter(p => p.team === "light");
@@ -30,12 +38,59 @@ export function PlayerList({
     title: string; 
     players: Player[];
     gradient: string;
-  }) => (
+  }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedName, setEditedName] = useState(title);
+
+    const handleSaveName = () => {
+      if (editedName.trim() && onTeamNameChange) {
+        onTeamNameChange(team, editedName.trim());
+      }
+      setIsEditing(false);
+    };
+
+    return (
     <Card className="p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1">
           <div className={`w-3 h-3 rounded-full ${gradient}`} />
-          <h3 className="font-semibold text-sm">{title}</h3>
+          {isLobby && isEditing ? (
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+                maxLength={20}
+                className="h-7 text-sm font-semibold max-w-[150px]"
+                autoFocus
+              />
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 w-7 p-0"
+                onClick={handleSaveName}
+              >
+                <Check className="w-4 h-4" />
+              </Button>
+            </div>
+          ) : (
+            <>
+              <h3 className="font-semibold text-sm">{title}</h3>
+              {isLobby && onTeamNameChange && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 w-6 p-0"
+                  onClick={() => {
+                    setEditedName(title);
+                    setIsEditing(true);
+                  }}
+                >
+                  <Edit2 className="w-3 h-3" />
+                </Button>
+              )}
+            </>
+          )}
           <Badge variant="secondary" className="text-xs">
             {teamPlayers.length}
           </Badge>
@@ -95,7 +150,8 @@ export function PlayerList({
         ))}
       </div>
     </Card>
-  );
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -122,16 +178,16 @@ export function PlayerList({
 
       <TeamSection 
         team="dark"
-        title="Katman Koyu"
+        title={darkTeamName}
         players={darkTeam}
         gradient="bg-gradient-to-r from-blue-600 to-blue-400"
       />
       
       <TeamSection 
         team="light"
-        title="Katman Açık"
+        title={lightTeamName}
         players={lightTeam}
-        gradient="bg-gradient-to-r from-cyan-500 to-cyan-300"
+        gradient="bg-gradient-to-r from-red-600 to-red-400"
       />
     </div>
   );

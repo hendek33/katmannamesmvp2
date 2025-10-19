@@ -44,7 +44,7 @@ export default function GameEnd() {
   const winnerText = gameState.winner === "dark" ? "Katman Koyu" : "Katman Açık";
   const winnerGradient = gameState.winner === "dark"
     ? "from-blue-600 to-blue-400"
-    : "from-cyan-500 to-cyan-300";
+    : "from-red-600 to-red-400";
 
   const handlePlayAgain = () => {
     if (currentPlayer?.isRoomOwner) {

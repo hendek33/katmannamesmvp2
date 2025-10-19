@@ -11,6 +11,7 @@ import {
   giveClueSchema,
   revealCardSchema,
   addBotSchema,
+  updateTeamNameSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -222,6 +223,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const gameState = storage.addBot(ws.roomCode, validation.data.team, validation.data.role);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Bot eklenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
+          case "update_team_name": {
+            if (!ws.roomCode) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = updateTeamNameSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz takım ismi" } });
+              return;
+            }
+
+            const gameState = storage.updateTeamName(ws.roomCode, validation.data.team, validation.data.name);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Takım ismi güncellenemedi" } });
               return;
             }
 

@@ -46,6 +46,8 @@ export interface GameState {
   currentClue: Clue | null;
   winner: Team | null;
   revealHistory: RevealHistoryEntry[];
+  darkTeamName: string;
+  lightTeamName: string;
 }
 
 export const joinRoomSchema = z.object({
@@ -80,6 +82,11 @@ export const addBotSchema = z.object({
   role: z.enum(["spymaster", "guesser"]),
 });
 
+export const updateTeamNameSchema = z.object({
+  team: z.enum(["dark", "light"]),
+  name: z.string().min(1).max(20),
+});
+
 export type JoinRoomInput = z.infer<typeof joinRoomSchema>;
 export type CreateRoomInput = z.infer<typeof createRoomSchema>;
 export type TeamSelectInput = z.infer<typeof teamSelectSchema>;
@@ -87,3 +94,4 @@ export type RoleSelectInput = z.infer<typeof roleSelectSchema>;
 export type GiveClueInput = z.infer<typeof giveClueSchema>;
 export type RevealCardInput = z.infer<typeof revealCardSchema>;
 export type AddBotInput = z.infer<typeof addBotSchema>;
+export type UpdateTeamNameInput = z.infer<typeof updateTeamNameSchema>;

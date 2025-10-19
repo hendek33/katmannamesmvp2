@@ -18,7 +18,7 @@ export function GameStatus({ currentTeam, darkCardsRemaining, lightCardsRemainin
             variant={currentTeam === "dark" ? "default" : "secondary"}
             className={currentTeam === "dark" 
               ? "bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500" 
-              : "bg-gradient-to-r from-cyan-500 to-cyan-300 hover:from-cyan-600 hover:to-cyan-400 text-gray-900"
+              : "bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 text-gray-900"
             }
             data-testid="current-turn"
           >
@@ -35,7 +35,7 @@ export function GameStatus({ currentTeam, darkCardsRemaining, lightCardsRemainin
           <div className="h-4 w-px bg-border" />
           
           <div className="flex items-center gap-2" data-testid="light-remaining">
-            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-500 to-cyan-300" />
+            <div className="w-3 h-3 rounded-full bg-gradient-to-r from-red-600 to-red-400" />
             <span className="text-sm font-semibold">{lightCardsRemaining}</span>
           </div>
         </div>

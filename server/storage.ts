@@ -9,6 +9,7 @@ export interface IStorage {
   addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null;
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null;
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
+  updateTeamName(roomCode: string, team: Team, name: string): GameState | null;
   startGame(roomCode: string): GameState | null;
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null;
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
@@ -91,6 +92,8 @@ export class MemStorage implements IStorage {
       currentClue: null,
       winner: null,
       revealHistory: [],
+      darkTeamName: "Mavi Takım",
+      lightTeamName: "Kırmızı Takım",
     };
 
     this.rooms.set(roomCode, gameState);
@@ -205,6 +208,19 @@ export class MemStorage implements IStorage {
     }
 
     player.role = role;
+    return room;
+  }
+
+  updateTeamName(roomCode: string, team: Team, name: string): GameState | null {
+    const room = this.rooms.get(roomCode);
+    if (!room || !team) return null;
+
+    if (team === "dark") {
+      room.darkTeamName = name;
+    } else {
+      room.lightTeamName = name;
+    }
+
     return room;
   }
 

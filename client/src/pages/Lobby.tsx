@@ -89,6 +89,10 @@ export default function Lobby() {
     send("add_bot", { team, role });
   };
 
+  const handleTeamNameChange = (team: "dark" | "light", name: string) => {
+    send("update_team_name", { team, name });
+  };
+
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
@@ -134,18 +138,18 @@ export default function Lobby() {
             </Card>
 
             <Card 
-              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-500/20 relative overflow-hidden" 
+              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 hover:border-red-600/50 hover:shadow-2xl hover:shadow-red-600/20 relative overflow-hidden" 
               onClick={() => setMode("join")}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative flex items-center gap-6">
-                <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-600 to-cyan-400 shadow-lg group-hover:scale-110 transition-transform">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-red-700 to-red-500 shadow-lg group-hover:scale-110 transition-transform">
                   <LogIn className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold text-2xl">Odaya Katıl</h3>
-                    <Users className="w-5 h-5 text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Users className="w-5 h-5 text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <p className="text-muted-foreground mt-1">Oda kodu ile arkadaşının oyununa gir</p>
                 </div>
@@ -173,9 +177,9 @@ export default function Lobby() {
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
           <Logo className="justify-center" />
           
-          <Card className="p-8 space-y-6 shadow-2xl border-2 hover:shadow-cyan-500/20 transition-shadow">
+          <Card className="p-8 space-y-6 shadow-2xl border-2 hover:shadow-red-600/20 transition-shadow">
             <div className="space-y-3 text-center">
-              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg">
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-red-700 to-red-500 flex items-center justify-center shadow-lg">
                 <LogIn className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold">Odaya Katıl</h2>
@@ -195,7 +199,7 @@ export default function Lobby() {
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   onKeyDown={(e) => e.key === "Enter" && handleJoinRoom()}
                   maxLength={6}
-                  className="text-center text-2xl font-mono tracking-widest h-14 border-2 focus:border-cyan-500 transition-colors"
+                  className="text-center text-2xl font-mono tracking-widest h-14 border-2 focus:border-red-600 transition-colors"
                   autoFocus
                 />
               </div>
@@ -214,7 +218,7 @@ export default function Lobby() {
               <Button
                 onClick={handleJoinRoom}
                 disabled={joinCode.length < 4}
-                className="flex-1 bg-gradient-to-r from-cyan-600 to-cyan-400 hover:from-cyan-700 hover:to-cyan-500"
+                className="flex-1 bg-gradient-to-r from-red-700 to-red-500 hover:from-red-800 hover:to-red-600"
                 data-testid="button-join-room"
               >
                 Katıl
@@ -253,7 +257,7 @@ export default function Lobby() {
         <Logo />
         
         {/* Room Code Card - Modern Design */}
-        <Card className="p-6 border-2 shadow-xl bg-gradient-to-br from-primary/5 via-transparent to-cyan-500/5 hover:shadow-2xl transition-all">
+        <Card className="p-6 border-2 shadow-xl bg-gradient-to-br from-primary/5 via-transparent to-red-600/5 hover:shadow-2xl transition-all">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
@@ -273,10 +277,10 @@ export default function Lobby() {
               <div className="text-right">
                 <div className="text-xs font-semibold text-muted-foreground mb-1">ODA KODU</div>
                 <div className="relative">
-                  <div className="text-3xl font-mono font-black tracking-wider bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent" data-testid="room-code">
+                  <div className="text-3xl font-mono font-black tracking-wider bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent" data-testid="room-code">
                     {roomCode}
                   </div>
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 blur-lg -z-10" />
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-red-600/20 blur-lg -z-10" />
                 </div>
               </div>
               <Button
@@ -305,6 +309,9 @@ export default function Lobby() {
               onTeamSelect={handleTeamSelect}
               onRoleToggle={handleRoleToggle}
               isLobby={true}
+              darkTeamName={gameState.darkTeamName}
+              lightTeamName={gameState.lightTeamName}
+              onTeamNameChange={handleTeamNameChange}
             />
           </div>
 
@@ -387,7 +394,7 @@ export default function Lobby() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-cyan-500" />
+                      <div className="w-3 h-3 rounded-full bg-red-600" />
                       Katman Açık
                     </Label>
                     <div className="flex gap-2">
@@ -395,7 +402,7 @@ export default function Lobby() {
                         onClick={() => handleAddBot("light", "spymaster")}
                         variant="outline"
                         size="sm"
-                        className="flex-1 text-xs hover:bg-cyan-500/10 hover:border-cyan-500/50"
+                        className="flex-1 text-xs hover:bg-red-600/10 hover:border-red-600/50"
                         data-testid="button-add-bot-light-spymaster"
                       >
                         İpucu Veren
@@ -404,7 +411,7 @@ export default function Lobby() {
                         onClick={() => handleAddBot("light", "guesser")}
                         variant="outline"
                         size="sm"
-                        className="flex-1 text-xs hover:bg-cyan-500/10 hover:border-cyan-500/50"
+                        className="flex-1 text-xs hover:bg-red-600/10 hover:border-red-600/50"
                         data-testid="button-add-bot-light-guesser"
                       >
                         Tahminci

@@ -13,9 +13,9 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
     if (card.revealed) {
       switch (card.type) {
         case "dark":
-          return "bg-metallic-dark border-blue-500/50 shadow-[0_0_20px_rgba(100,149,237,0.3)]";
+          return "bg-metallic-dark border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.4)]";
         case "light":
-          return "bg-neon-light border-cyan-400/50 shadow-[0_0_20px_rgba(64,224,208,0.3)]";
+          return "bg-neon-light border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.4)]";
         case "neutral":
           return "bg-neutral-texture border-gray-500/50 shadow-sm";
         case "assassin":
@@ -28,7 +28,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
         case "dark":
           return "bg-metallic-dark/30 border-blue-500/30";
         case "light":
-          return "bg-neon-light/30 border-cyan-400/30";
+          return "bg-neon-light/30 border-red-500/30";
         case "neutral":
           return "bg-neutral-texture/30 border-gray-500/30";
         case "assassin":
@@ -46,7 +46,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       case "dark":
         return "text-blue-100 font-semibold";
       case "light":
-        return "text-cyan-100 font-semibold";
+        return "text-red-100 font-semibold";
       case "neutral":
         return "text-gray-200";
       case "assassin":

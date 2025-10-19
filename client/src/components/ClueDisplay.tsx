@@ -20,7 +20,7 @@ export function ClueDisplay({ clue }: ClueDisplayProps) {
 
   const teamColor = clue.team === "dark" 
     ? "from-blue-600 to-blue-400" 
-    : "from-cyan-500 to-cyan-300";
+    : "from-red-600 to-red-400";
 
   return (
     <Card className="p-4 border-2 border-primary/30 bg-card/80" data-testid="clue-display">

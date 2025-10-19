@@ -144,7 +144,7 @@ export default function Game() {
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">Oda Kodu</div>
-                  <div className="text-sm font-mono font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                  <div className="text-sm font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
                     {roomCode}
                   </div>
                 </div>
@@ -181,7 +181,7 @@ export default function Game() {
                 size="sm"
                 variant="outline"
                 onClick={() => setLocation("/lobby")}
-                className="border-2 hover:border-cyan-500 hover:bg-cyan-500/10"
+                className="border-2 hover:border-red-600 hover:bg-red-600/10"
               >
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 Lobby
@@ -195,7 +195,7 @@ export default function Game() {
           <div className={`p-6 rounded-xl border-2 shadow-2xl text-center transition-all ${
             gameState.currentTeam === "dark"
               ? "bg-gradient-to-r from-blue-900/90 to-blue-800/90 border-blue-700/50"
-              : "bg-gradient-to-r from-cyan-900/90 to-cyan-800/90 border-cyan-700/50"
+              : "bg-gradient-to-r from-red-950/90 to-red-900/90 border-red-800/50"
           }`}>
             <div className="relative z-10">
               {!isCurrentTurn ? (
@@ -386,23 +386,23 @@ export default function Game() {
           {/* Right Side - Light Team */}
           <div className="space-y-4">
             {/* Score Card */}
-            <Card className="p-8 border-2 shadow-2xl bg-gradient-to-br from-cyan-950/95 to-cyan-900/95 border-cyan-700/50 hover:shadow-cyan-500/30 transition-all group">
+            <Card className="p-8 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-cyan-500 animate-pulse" />
-                  <h3 className="text-sm font-bold text-cyan-100 uppercase tracking-wider">Katman Açık</h3>
+                  <div className="w-3 h-3 rounded-full bg-red-600 animate-pulse" />
+                  <h3 className="text-sm font-bold text-red-100 uppercase tracking-wider">Katman Açık</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-8xl font-black text-cyan-100 group-hover:scale-110 transition-transform">
+                  <div className="text-8xl font-black text-red-100 group-hover:scale-110 transition-transform">
                     {gameState.lightCardsRemaining}
                   </div>
-                  <div className="absolute inset-0 blur-2xl bg-cyan-500/20 group-hover:bg-cyan-500/40 transition-all" />
+                  <div className="absolute inset-0 blur-2xl bg-red-600/20 group-hover:bg-red-600/40 transition-all" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs text-cyan-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                   {gameState.currentTeam === "light" && (
-                    <div className="inline-block px-3 py-1 bg-cyan-600/30 rounded-full">
-                      <p className="text-xs text-cyan-100 font-bold">● SIRA SIZDE</p>
+                    <div className="inline-block px-3 py-1 bg-red-700/30 rounded-full">
+                      <p className="text-xs text-red-100 font-bold">● SIRA SIZDE</p>
                     </div>
                   )}
                 </div>
@@ -410,10 +410,10 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-5 border-2 bg-cyan-950/80 border-cyan-800/30 backdrop-blur-sm shadow-xl">
+            <Card className="p-5 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
               <div className="flex items-center gap-2 mb-4">
-                <Users className="w-4 h-4 text-cyan-400" />
-                <h4 className="text-sm font-bold text-cyan-100 uppercase tracking-wide">Oyuncular</h4>
+                <Users className="w-4 h-4 text-red-500" />
+                <h4 className="text-sm font-bold text-red-100 uppercase tracking-wide">Oyuncular</h4>
               </div>
               <div className="space-y-2">
                 {lightPlayers.map(player => (
@@ -421,17 +421,17 @@ export default function Game() {
                     key={player.id} 
                     className={`flex items-center justify-between p-2 rounded-lg transition-all ${
                       player.id === playerId 
-                        ? "bg-cyan-600/30 border border-cyan-500/50" 
-                        : "bg-cyan-900/20 hover:bg-cyan-900/40"
+                        ? "bg-red-700/30 border border-red-600/50" 
+                        : "bg-red-950/20 hover:bg-red-950/40"
                     }`}
                   >
-                    <span className={`text-sm ${player.id === playerId ? "font-bold text-cyan-100" : "text-cyan-200/90"}`}>
+                    <span className={`text-sm ${player.id === playerId ? "font-bold text-red-100" : "text-red-200/90"}`}>
                       {player.username}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded ${
                       player.role === "spymaster" 
                         ? "bg-amber-500/20 text-amber-300 font-semibold" 
-                        : "bg-cyan-500/20 text-cyan-300"
+                        : "bg-red-600/20 text-red-400"
                     }`}>
                       {player.role === "spymaster" ? (
                         <span className="flex items-center gap-1">
@@ -466,7 +466,7 @@ export default function Game() {
                   <div className="p-3 bg-white/5 rounded-lg border border-white/10">
                     <div className="text-xs text-muted-foreground mb-1">Sıra</div>
                     <div className={`text-sm font-bold ${
-                      gameState.currentTeam === "dark" ? "text-blue-400" : "text-cyan-400"
+                      gameState.currentTeam === "dark" ? "text-blue-400" : "text-red-500"
                     }`}>
                       {gameState.currentTeam === "dark" ? "Koyu" : "Açık"}
                     </div>
@@ -492,13 +492,13 @@ export default function Game() {
                         >
                           <div className={`w-3 h-3 rounded-full shadow-lg ${
                             entry.type === "dark" ? "bg-blue-600 shadow-blue-500/50" :
-                            entry.type === "light" ? "bg-cyan-600 shadow-cyan-500/50" :
+                            entry.type === "light" ? "bg-red-700 shadow-red-600/50" :
                             entry.type === "neutral" ? "bg-gray-400" :
                             "bg-red-600 shadow-red-500/50"
                           }`} />
                           <span className="text-sm font-semibold text-white flex-1">{entry.word}</span>
                           <span className={`text-xs px-2 py-0.5 rounded ${
-                            entry.team === "dark" ? "bg-blue-600/20 text-blue-300" : "bg-cyan-600/20 text-cyan-300"
+                            entry.team === "dark" ? "bg-blue-600/20 text-blue-300" : "bg-red-700/20 text-red-400"
                           }`}>
                             {entry.team === "dark" ? "Koyu" : "Açık"}
                           </span>
