@@ -18,6 +18,10 @@ externalPort = 80
 localPort = 34287
 externalPort = 3000
 
+[[ports]]
+localPort = 35057
+externalPort = 3001
+
 [env]
 PORT = "5000"
 
@@ -47,3 +51,4 @@ outputType = "webview"
 
 [agent]
 integrations = ["javascript_websocket:1.0.0", "javascript_mem_db:1.0.0"]
+expertMode = true
