@@ -27,6 +27,14 @@ export interface Clue {
   team: Team;
 }
 
+export interface RevealHistoryEntry {
+  cardId: number;
+  word: string;
+  type: CardType;
+  team: Team;
+  timestamp: number;
+}
+
 export interface GameState {
   roomCode: string;
   phase: GamePhase;
@@ -37,6 +45,7 @@ export interface GameState {
   lightCardsRemaining: number;
   currentClue: Clue | null;
   winner: Team | null;
+  revealHistory: RevealHistoryEntry[];
 }
 
 export const joinRoomSchema = z.object({

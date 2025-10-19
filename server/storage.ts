@@ -85,6 +85,7 @@ export class MemStorage implements IStorage {
       lightCardsRemaining: 0,
       currentClue: null,
       winner: null,
+      revealHistory: [],
     };
 
     this.rooms.set(roomCode, gameState);
@@ -219,6 +220,7 @@ export class MemStorage implements IStorage {
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
     room.currentClue = null;
     room.winner = null;
+    room.revealHistory = [];
 
     return room;
   }
@@ -243,7 +245,7 @@ export class MemStorage implements IStorage {
 
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null {
     const room = this.rooms.get(roomCode);
-    if (!room || room.phase !== "playing") return null;
+    if (!room || room.phase !== "playing" || !room.currentTeam) return null;
 
     const player = room.players.find(p => p.id === playerId);
     if (!player || player.role !== "guesser" || player.team !== room.currentTeam) {
@@ -254,6 +256,14 @@ export class MemStorage implements IStorage {
     if (!card || card.revealed) return null;
 
     card.revealed = true;
+    
+    room.revealHistory.push({
+      cardId: card.id,
+      word: card.word,
+      type: card.type,
+      team: room.currentTeam,
+      timestamp: Date.now(),
+    });
 
     if (card.type === "dark") {
       room.darkCardsRemaining--;
@@ -261,7 +271,7 @@ export class MemStorage implements IStorage {
         room.winner = "dark";
         room.phase = "ended";
       } else if (room.currentTeam !== "dark") {
-        room.currentTeam = room.currentTeam === "dark" ? "light" : "dark";
+        room.currentTeam = "dark";
         room.currentClue = null;
       }
     } else if (card.type === "light") {
@@ -270,7 +280,7 @@ export class MemStorage implements IStorage {
         room.winner = "light";
         room.phase = "ended";
       } else if (room.currentTeam !== "light") {
-        room.currentTeam = room.currentTeam === "dark" ? "light" : "dark";
+        room.currentTeam = "light";
         room.currentClue = null;
       }
     } else if (card.type === "assassin") {
@@ -298,6 +308,7 @@ export class MemStorage implements IStorage {
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
     room.currentClue = null;
     room.winner = null;
+    room.revealHistory = [];
 
     return room;
   }
@@ -317,11 +328,11 @@ export class MemStorage implements IStorage {
   }
 
   cleanupEmptyRooms(): void {
-    for (const [roomCode, room] of this.rooms.entries()) {
+    Array.from(this.rooms.entries()).forEach(([roomCode, room]) => {
       if (room.players.length === 0) {
         this.rooms.delete(roomCode);
       }
-    }
+    });
   }
 }
 
