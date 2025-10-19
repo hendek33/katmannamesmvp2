@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Copy, Check, Plus, LogIn, Loader2, Bot } from "lucide-react";
+import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft } from "lucide-react";
 import type { Team } from "@shared/schema";
 
 export default function Lobby() {
@@ -92,9 +92,15 @@ export default function Lobby() {
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
-        <Card className="p-8 space-y-4 text-center" data-testid="loading-state">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Sunucuya bağlanılıyor...</p>
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl animate-pulse-slow">
+          <div className="relative">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
+            <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-lg font-semibold">Bağlanıyor</p>
+            <p className="text-sm text-muted-foreground">Sunucuya bağlanılıyor...</p>
+          </div>
         </Card>
       </div>
     );
@@ -103,34 +109,45 @@ export default function Lobby() {
   if (!roomCode && mode === "select") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
-        <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
+        <div className="w-full max-w-lg space-y-8 animate-in fade-in duration-500">
           <Logo className="justify-center" />
           
           <div className="space-y-4">
             <Card 
-              className="p-6 space-y-4 hover-elevate cursor-pointer transition-all" 
+              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 relative overflow-hidden" 
               onClick={handleCreateRoom}
               data-testid="button-create-room"
             >
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-md bg-primary/10">
-                  <Plus className="w-6 h-6 text-primary" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative flex items-center gap-6">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 shadow-lg group-hover:scale-110 transition-transform">
+                  <Plus className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">Oda Oluştur</h3>
-                  <p className="text-sm text-muted-foreground">Yeni bir oyun başlat</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-2xl">Oda Oluştur</h3>
+                    <Sparkles className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <p className="text-muted-foreground mt-1">Yeni bir oyun başlat ve arkadaşlarını bekle</p>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-6 space-y-4 hover-elevate cursor-pointer transition-all" onClick={() => setMode("join")}>
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-md bg-accent/10">
-                  <LogIn className="w-6 h-6 text-accent-foreground" />
+            <Card 
+              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 hover:border-cyan-500/50 hover:shadow-2xl hover:shadow-cyan-500/20 relative overflow-hidden" 
+              onClick={() => setMode("join")}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative flex items-center gap-6">
+                <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-600 to-cyan-400 shadow-lg group-hover:scale-110 transition-transform">
+                  <LogIn className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">Odaya Katıl</h3>
-                  <p className="text-sm text-muted-foreground">Oda kodu ile gir</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-2xl">Odaya Katıl</h3>
+                    <Users className="w-5 h-5 text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <p className="text-muted-foreground mt-1">Oda kodu ile arkadaşının oyununa gir</p>
                 </div>
               </div>
             </Card>
@@ -139,9 +156,10 @@ export default function Lobby() {
           <Button
             variant="ghost"
             onClick={() => setLocation("/")}
-            className="w-full"
+            className="w-full group"
             data-testid="button-back"
           >
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Geri Dön
           </Button>
         </div>
@@ -155,45 +173,52 @@ export default function Lobby() {
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
           <Logo className="justify-center" />
           
-          <Card className="p-6 md:p-8 space-y-6 shadow-xl border-2">
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold">Odaya Katıl</h2>
+          <Card className="p-8 space-y-6 shadow-2xl border-2 hover:shadow-cyan-500/20 transition-shadow">
+            <div className="space-y-3 text-center">
+              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-cyan-600 to-cyan-400 flex items-center justify-center shadow-lg">
+                <LogIn className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold">Odaya Katıl</h2>
               <p className="text-sm text-muted-foreground">
-                Arkadaşının oda kodunu gir
+                Arkadaşının sana verdiği oda kodunu gir
               </p>
             </div>
 
-            <div className="space-y-3">
-              <Label htmlFor="roomCode">Oda Kodu</Label>
-              <Input
-                id="roomCode"
-                data-testid="input-room-code"
-                placeholder="ABCD12"
-                value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                onKeyDown={(e) => e.key === "Enter" && handleJoinRoom()}
-                maxLength={6}
-                className="text-center text-lg font-mono tracking-wider"
-                autoFocus
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="roomCode" className="text-sm font-semibold">Oda Kodu</Label>
+                <Input
+                  id="roomCode"
+                  data-testid="input-room-code"
+                  placeholder="ABCD12"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => e.key === "Enter" && handleJoinRoom()}
+                  maxLength={6}
+                  className="text-center text-2xl font-mono tracking-widest h-14 border-2 focus:border-cyan-500 transition-colors"
+                  autoFocus
+                />
+              </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button
                 variant="outline"
                 onClick={() => setMode("select")}
                 className="flex-1"
                 data-testid="button-back"
               >
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 Geri
               </Button>
               <Button
                 onClick={handleJoinRoom}
                 disabled={joinCode.length < 4}
-                className="flex-1"
+                className="flex-1 bg-gradient-to-r from-cyan-600 to-cyan-400 hover:from-cyan-700 hover:to-cyan-500"
                 data-testid="button-join-room"
               >
                 Katıl
+                <LogIn className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </Card>
@@ -205,9 +230,9 @@ export default function Lobby() {
   if (!gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
-        <Card className="p-8 space-y-4 text-center" data-testid="loading-state">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Yükleniyor...</p>
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
+          <p className="text-lg font-semibold text-muted-foreground">Yükleniyor...</p>
         </Card>
       </div>
     );
@@ -220,41 +245,60 @@ export default function Lobby() {
     gameState.players.filter(p => p.team === "dark").length > 0 &&
     gameState.players.filter(p => p.team === "light").length > 0;
 
+  const playerCount = gameState.players.length;
+
   return (
     <div className="min-h-screen p-4 bg-background bg-grid-pattern animate-in fade-in duration-500">
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         <Logo />
         
-        <Card className="p-6 space-y-4 border-2">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-semibold">Oyun Lobisi</h2>
-              <p className="text-sm text-muted-foreground">
-                Oyuncular takımlarını seçiyor
-              </p>
+        {/* Room Code Card - Modern Design */}
+        <Card className="p-6 border-2 shadow-xl bg-gradient-to-br from-primary/5 via-transparent to-cyan-500/5 hover:shadow-2xl transition-all">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold">Oyun Lobisi</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {playerCount} oyuncu • Takımlar hazırlanıyor
+                  </p>
+                </div>
+              </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <div className="text-right">
-                <div className="text-xs text-muted-foreground">Oda Kodu</div>
-                <div className="text-lg font-mono font-bold" data-testid="room-code">
-                  {roomCode}
+                <div className="text-xs font-semibold text-muted-foreground mb-1">ODA KODU</div>
+                <div className="relative">
+                  <div className="text-3xl font-mono font-black tracking-wider bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent" data-testid="room-code">
+                    {roomCode}
+                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-cyan-500/20 blur-lg -z-10" />
                 </div>
               </div>
               <Button
-                size="icon"
+                size="lg"
                 variant="outline"
                 onClick={handleCopyRoomCode}
+                className="h-14 w-14 border-2 hover:border-primary hover:bg-primary/10 transition-all"
                 data-testid="button-copy-code"
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? (
+                  <Check className="w-6 h-6 text-green-500" />
+                ) : (
+                  <Copy className="w-6 h-6" />
+                )}
               </Button>
             </div>
           </div>
         </Card>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Main Player Area */}
+          <div className="lg:col-span-2">
             <PlayerList
               players={gameState.players}
               currentPlayerId={playerId}
@@ -264,35 +308,68 @@ export default function Lobby() {
             />
           </div>
 
+          {/* Sidebar */}
           <div className="space-y-4">
-            <Card className="p-6 space-y-4">
-              <h3 className="font-semibold">Nasıl Oynanır?</h3>
-              <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
-                <li>Bir takım seçin</li>
-                <li>İpucu Veren veya Tahminci olun</li>
-                <li>En az 4 oyuncu gerekli</li>
-                <li>Her takımda bir İpucu Veren olmalı</li>
+            {/* How to Play */}
+            <Card className="p-6 space-y-4 border-2 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-purple-600/10 to-pink-600/10">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                </div>
+                <h3 className="font-bold text-lg">Nasıl Oynanır?</h3>
+              </div>
+              <ul className="text-sm space-y-3">
+                <li className="flex items-start gap-3 text-muted-foreground">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-primary">1</span>
+                  </div>
+                  <span>Bir takım seçin (Koyu veya Açık)</span>
+                </li>
+                <li className="flex items-start gap-3 text-muted-foreground">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-primary">2</span>
+                  </div>
+                  <span>İpucu Veren veya Tahminci rolünü seçin</span>
+                </li>
+                <li className="flex items-start gap-3 text-muted-foreground">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-primary">3</span>
+                  </div>
+                  <span>Her takımda bir İpucu Veren olmalı</span>
+                </li>
+                <li className="flex items-start gap-3 text-muted-foreground">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-primary">4</span>
+                  </div>
+                  <span>Oyunu başlatmak için hazır olun!</span>
+                </li>
               </ul>
             </Card>
 
+            {/* Bot Controls */}
             {currentPlayer?.isRoomOwner && (
-              <Card className="p-6 space-y-4 bg-accent/5">
+              <Card className="p-6 space-y-4 border-2 bg-gradient-to-br from-amber-500/5 to-orange-500/5 hover:shadow-lg transition-shadow">
                 <div className="flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-primary" />
-                  <h3 className="font-semibold">Test Botları</h3>
+                  <div className="p-2 rounded-lg bg-amber-500/10">
+                    <Bot className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <h3 className="font-bold">Test Botları</h3>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Test için işlevsiz botlar ekle
                 </p>
                 <div className="space-y-3">
                   <div className="space-y-2">
-                    <Label className="text-xs">Katman Koyu</Label>
+                    <Label className="text-xs font-semibold flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-600" />
+                      Katman Koyu
+                    </Label>
                     <div className="flex gap-2">
                       <Button
                         onClick={() => handleAddBot("dark", "spymaster")}
                         variant="outline"
                         size="sm"
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs hover:bg-blue-600/10 hover:border-blue-600/50"
                         data-testid="button-add-bot-dark-spymaster"
                       >
                         İpucu Veren
@@ -301,7 +378,7 @@ export default function Lobby() {
                         onClick={() => handleAddBot("dark", "guesser")}
                         variant="outline"
                         size="sm"
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs hover:bg-blue-600/10 hover:border-blue-600/50"
                         data-testid="button-add-bot-dark-guesser"
                       >
                         Tahminci
@@ -309,13 +386,16 @@ export default function Lobby() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs">Katman Açık</Label>
+                    <Label className="text-xs font-semibold flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-cyan-500" />
+                      Katman Açık
+                    </Label>
                     <div className="flex gap-2">
                       <Button
                         onClick={() => handleAddBot("light", "spymaster")}
                         variant="outline"
                         size="sm"
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs hover:bg-cyan-500/10 hover:border-cyan-500/50"
                         data-testid="button-add-bot-light-spymaster"
                       >
                         İpucu Veren
@@ -324,7 +404,7 @@ export default function Lobby() {
                         onClick={() => handleAddBot("light", "guesser")}
                         variant="outline"
                         size="sm"
-                        className="flex-1 text-xs"
+                        className="flex-1 text-xs hover:bg-cyan-500/10 hover:border-cyan-500/50"
                         data-testid="button-add-bot-light-guesser"
                       >
                         Tahminci
@@ -335,21 +415,27 @@ export default function Lobby() {
               </Card>
             )}
 
-            <Button
-              onClick={handleStartGame}
-              disabled={!canStartGame}
-              className="w-full"
-              size="lg"
-              data-testid="button-start-game"
-            >
-              Oyunu Başlat
-            </Button>
-            
-            {!canStartGame && currentPlayer?.isRoomOwner && (
-              <p className="text-xs text-center text-muted-foreground">
-                Her takımda en az bir İpucu Veren olmalı
-              </p>
-            )}
+            {/* Start Game Button */}
+            <div className="space-y-3">
+              <Button
+                onClick={handleStartGame}
+                disabled={!canStartGame}
+                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 shadow-lg hover:shadow-xl hover:shadow-green-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                size="lg"
+                data-testid="button-start-game"
+              >
+                <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                Oyunu Başlat
+              </Button>
+              
+              {!canStartGame && currentPlayer?.isRoomOwner && (
+                <Card className="p-3 bg-amber-500/10 border-amber-500/20">
+                  <p className="text-xs text-center text-amber-700 dark:text-amber-400 font-medium">
+                    ⚠️ Her takımda en az bir İpucu Veren olmalı
+                  </p>
+                </Card>
+              )}
+            </div>
           </div>
         </div>
       </div>
