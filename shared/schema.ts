@@ -11,6 +11,7 @@ export interface Player {
   team: Team;
   role: Role;
   isRoomOwner: boolean;
+  isBot: boolean;
 }
 
 export interface Card {

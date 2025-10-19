@@ -6,6 +6,7 @@ export interface IStorage {
   createRoom(ownerUsername: string): { roomCode: string; playerId: string; gameState: GameState };
   getRoom(roomCode: string): GameState | undefined;
   joinRoom(roomCode: string, username: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null;
+  addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null;
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null;
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
   startGame(roomCode: string): GameState | null;
@@ -71,6 +72,7 @@ export class MemStorage implements IStorage {
       team: null,
       role: "guesser",
       isRoomOwner: true,
+      isBot: false,
     };
 
     const gameState: GameState = {
@@ -120,12 +122,35 @@ export class MemStorage implements IStorage {
       team: null,
       role: "guesser",
       isRoomOwner: false,
+      isBot: false,
     };
 
     room.players.push(player);
     this.playerToRoom.set(playerId, roomCode);
 
     return { playerId, gameState: room, isReconnect: false };
+  }
+
+  addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null {
+    const room = this.rooms.get(roomCode);
+    if (!room || room.phase !== "lobby") return null;
+
+    const botNumber = room.players.filter(p => p.isBot).length + 1;
+    const botId = randomUUID();
+    
+    const bot: Player = {
+      id: botId,
+      username: `Bot ${botNumber}`,
+      team,
+      role,
+      isRoomOwner: false,
+      isBot: true,
+    };
+
+    room.players.push(bot);
+    this.playerToRoom.set(botId, roomCode);
+
+    return room;
   }
 
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null {
