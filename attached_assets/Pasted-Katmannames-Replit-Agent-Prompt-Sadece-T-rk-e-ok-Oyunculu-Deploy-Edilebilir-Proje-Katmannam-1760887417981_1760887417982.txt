@@ -1,0 +1,99 @@
+Katmannames – Replit Agent Prompt (Sadece Türkçe, Çok Oyunculu, Deploy Edilebilir)
+
+Proje: Katmannames — Codenames tarzında ama tamamen özgün, yalnızca çok oyunculu çalışan kelime oyunu.
+Hedef: Render’a sorunsuz deploy edilebilecek şekilde proje yapıp teslim et.
+
+🎮 Kullanıcı Oyuna Girerken Şu Akış Olmalı:
+1. Karşılama Ekranı
+
+Oyunun kısa açıklaması (1–2 cümle).
+
+Küçük yazıyla: “Bu oyun resmi Codenames değildir.”
+
+Kullanıcıdan yalnızca takma ad (kullanıcı adı) istenir.
+
+“Devam” butonu ile lobiye geçilir.
+
+2. Lobi (Oyun Odası Sistemi)
+
+İki seçenek:
+✅ Oda Oluştur → Yeni bir oda kodu üret, kullanıcıyı içeri al.
+✅ Odaya Katıl → Oda kodu girerek mevcut oyuna katıl.
+
+Lobi ekranında şunlar görünür:
+
+Oda kodu (kopyalanabilir)
+
+Odaya bağlı oyuncular listesi (isimleri görünür)
+
+Her oyuncu takım seçebilir: Katman Koyu / Katman Açık
+
+Her takımda bir kişi “İpucu Veren” rolünü seçebilir, diğerleri otomatik Tahminci olur
+
+Oda sahibi için “Oyunu Başlat” butonu görünür.
+
+3. Oyun Ekranı
+
+5×5 kelime kartı ızgarası otomatik oluşturulur. Kart türleri gizli olarak:
+
+Katman Koyu takım kelimeleri
+
+Katman Açık takım kelimeleri
+
+Tarafsız kelimeler
+
+1 adet Yasak kelime
+
+Üst kısımda:
+
+Oda kodu
+
+Sıra hangi takımda
+
+Kalan kelime sayıları
+
+“Yeniden Başlat” butonu (sadece oda sahibinde)
+
+İpucu Veren kişi için ipucu girme alanı açılır:
+
+İpucu (tek kelime) + Sayı
+
+Gönderince sıradaki takımın tahmini başlar.
+
+Tahminciler kartlara tıklayarak açabilir. Sonuçlar:
+
+Doğru takım → Tahmine devam eder
+
+Yanlış takım / Tarafsız → Sıra değişir
+
+Yasak kelime → Oyun biter, diğer takım kazanır
+
+4. Oyun Biterse
+
+Ekranda net bir şekilde “Kazanan Takım” gösterilir.
+
+“Tekrar Oyna” ve “Lobiye Dön” seçenekleri sunulur.
+
+Oda kodu aynı kalır, oyuncular çıkmadan tekrar oynayabilir.
+
+5. Ekstra Gereksinimler
+
+Oyun tamamen Türkçe olacak (menüler, butonlar, uyarılar).
+
+Tasarım sade, karanlık tema ağırlıklı, özgün görünüşlü olmalı.
+
+Mobil cihazlarda da rahat oynanabilir olmalı.
+
+Oyuncu sayfa yenilese bile aynı odaya geri dönebilmeli (oda kodu + isim ile).
+
+README dosyasında çok kısa şekilde şu olmalı:
+
+Oyunun nasıl oynandığı
+
+Render’a nasıl deploy edileceği
+
+“Bu oyun resmi Codenames değildir.” notu
+
+✅ Son İstek:
+
+Tüm bu özelliklerle birlikte çalışır proje dosyalarını oluştur, çalıştığından emin ol ve Render’a deploy edilebilir hale getir.
