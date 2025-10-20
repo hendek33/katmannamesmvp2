@@ -301,7 +301,7 @@ export default function Lobby() {
       {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="relative z-10 max-w-6xl mx-auto space-y-6">
         {/* Room Code Card - Modern Design */}
         <Card className="p-6 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-2xl transition-all">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">

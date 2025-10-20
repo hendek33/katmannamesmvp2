@@ -84,7 +84,7 @@ export default function GameEnd() {
       {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      <div className="w-full max-w-md space-y-8 animate-in zoom-in duration-500">
+      <div className="relative z-10 w-full max-w-md space-y-8 animate-in zoom-in duration-500">
         <Logo className="justify-center" size="large" />
 
         <Card className="p-8 md:p-12 space-y-8 text-center shadow-2xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30">

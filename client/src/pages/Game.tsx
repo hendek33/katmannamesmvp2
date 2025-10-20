@@ -166,7 +166,7 @@ export default function Game() {
           marginLeft: scale < 1 ? `${-(100 / scale - 100) / 2}%` : '0',
           height: scale < 1 ? `${100 / scale}%` : '100%',
         }}
-        className="p-2 md:p-3 animate-in fade-in duration-500 transition-transform"
+        className="relative z-10 p-2 md:p-3 animate-in fade-in duration-500 transition-transform"
       >
         <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
         {/* Modern Header */}
