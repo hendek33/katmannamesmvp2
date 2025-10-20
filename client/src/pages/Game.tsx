@@ -47,8 +47,8 @@ export default function Game() {
       const vw = window.innerWidth;
       
       // Base content dimensions (actual size needed for all content)
-      const baseHeight = 1500; // Full height including all content + extra buffer
-      const baseWidth = 2400; // Full width with expanded side panels + extra buffer
+      const baseHeight = 1200; // Optimized for smaller cards
+      const baseWidth = 2000; // Optimized for narrower side panels
       
       // Calculate scale to fit height and width with safe margins
       const scaleHeight = (vh - 40) / baseHeight; // -40 for safe margin
@@ -285,11 +285,11 @@ export default function Game() {
         </div>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(280px,22vw)_1fr_minmax(280px,22vw)] gap-3 md:gap-4 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(260px,20vw)_1fr_minmax(260px,20vw)] gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
           {/* Left Side - Dark Team */}
-          <div className="space-y-3 md:space-y-4 overflow-y-auto">
+          <div className="space-y-2 md:space-y-3 overflow-y-auto">
             {/* Score Card */}
-            <Card className="p-5 md:p-6 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
+            <Card className="p-3 md:p-4 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
@@ -313,7 +313,7 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-5 md:p-6 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
+            <Card className="p-3 md:p-4 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-4 h-4 text-blue-400" />
                 <h4 className="text-sm font-bold text-blue-100 uppercase tracking-wide">Oyuncular</h4>
@@ -352,8 +352,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-3 md:space-y-4 flex flex-col min-h-0">
-            <div className="grid grid-cols-5 gap-2 md:gap-3 flex-shrink-0" data-testid="game-grid">
+          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0">
+            <div className="grid grid-cols-5 gap-1.5 md:gap-2 flex-shrink-0" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
@@ -430,9 +430,9 @@ export default function Game() {
           </div>
 
           {/* Right Side - Light Team */}
-          <div className="space-y-3 md:space-y-4 overflow-y-auto">
+          <div className="space-y-2 md:space-y-3 overflow-y-auto">
             {/* Score Card */}
-            <Card className="p-5 md:p-6 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
+            <Card className="p-3 md:p-4 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
@@ -456,7 +456,7 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-5 md:p-6 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
+            <Card className="p-3 md:p-4 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-4 h-4 text-red-500" />
                 <h4 className="text-sm font-bold text-red-100 uppercase tracking-wide">Oyuncular</h4>

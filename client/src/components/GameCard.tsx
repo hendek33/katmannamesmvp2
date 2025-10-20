@@ -60,13 +60,13 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       disabled={!canClick}
       data-testid={`card-${card.id}`}
       className={cn(
-        "relative rounded-lg border-[3px] p-1.5 md:p-2 w-full",
-        "aspect-[3/2]",
+        "relative rounded-md border-2 p-1 md:p-1.5 w-full",
+        "aspect-[4/3]",
         "transition-all duration-300 flex flex-col overflow-hidden",
         colors.border,
         colors.bg,
         colors.shadow,
-        canClick && "cursor-pointer hover:scale-[1.08] hover:-translate-y-2 active:scale-100",
+        canClick && "cursor-pointer hover:scale-[1.05] hover:-translate-y-1 active:scale-100",
         !card.revealed && !isSpymaster && "opacity-100",
         card.revealed && "opacity-95",
         !canClick && "cursor-default"
