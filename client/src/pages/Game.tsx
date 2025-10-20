@@ -46,8 +46,8 @@ export default function Game() {
       const vw = window.innerWidth;
       
       // Base content dimensions (actual size needed for all content including clue balloon)
-      const baseHeight = 1300; // Full height including header, grid, clue input, margins
-      const baseWidth = 1800; // Full width including side panels
+      const baseHeight = 1150; // Full height including header, grid, clue input, margins
+      const baseWidth = 1600; // Full width including side panels
       
       // Calculate scale to fit height and width
       const scaleHeight = (vh - 20) / baseHeight; // -20 for safe margin
