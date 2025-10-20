@@ -42,7 +42,8 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 - ✅ Sayfa yenileme dayanıklılığı
 - ✅ Bot ekleme sistemi (owner-only, spymaster uniqueness)
 - ✅ Kronolojik reveal history (son 5 kart)
-- ✅ Lobiye dönme butonu (oyun bitince)
+- ✅ Oyunu düzenle butonu (owner-only, oyun bitince lobby'ye döner)
+- ✅ Oyundan çıkma butonu (tüm oyuncular, oda listesine döner)
 - ✅ Rastgele kart dağılımı (9-8 veya 8-9)
 - ✅ WebSocket reconnection loop düzeltildi
 - ✅ Takım ismi değiştirme (lobby'de düzenlenebilir)
@@ -79,7 +80,8 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
   - `give_clue` - İpucu verme
   - `reveal_card` - Kart açma
   - `restart_game` - Oyunu yeniden başlatma
-  - `return_to_lobby` - Lobby'ye dönme
+  - `return_to_lobby` - Lobby'ye dönme (owner-only)
+  - `leave_room` - Oyundan çıkma (tüm oyuncular)
 
 ### Oyun Mekaniği
 - 25 kart total (5x5 grid)
@@ -100,7 +102,26 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 
 ## Son Değişiklikler
 
-### 2025-10-20 (Lobi Sistemi İyileştirmeleri)
+### 2025-10-20 (Oyundan Çıkma ve Z-Index Düzeltmeleri)
+- ✅ **Oyundan Çıkma Özelliği**
+  - Tüm oyuncular için "Oyundan Çık" butonu (Game ve GameEnd sayfalarında)
+  - leave_room WebSocket event'i eklendi
+  - Çıkış sonrası oda listesine yönlendirme
+  - localStorage temizleme (room_code, player_id)
+  
+- ✅ **"Oyunu Düzenle" Butonu**
+  - GameEnd'de "Lobiye Dön" → "Oyunu Düzenle" olarak değiştirildi
+  - Sadece oda moderatörü (room owner) kullanabilir
+  - return_to_lobby event'i ile oyunu lobby fazına döndürür
+  - Otomatik /game sayfasına yönlendirme (lobby fazında)
+  
+- ✅ **Partikül Z-Index Düzeltmesi**
+  - Partiküllere z-index: 0 eklendi
+  - Tüm sayfalarda içerik z-index: 10 ile güncelendi
+  - Partiküller artık kartların altında kalıyor
+  - Lobby, Game, GameEnd, RoomList, Welcome sayfaları düzeltildi
+
+### 2025-10-20 (Lobi Sistemi İyileştirmeleri - Önceki)
 - ✅ **Welcome Sayfası Temizlendi**
   - "Yeni Başlat" butonu kaldırıldı (gereksiz)
   

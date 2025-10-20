@@ -380,6 +380,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "leave_room": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const roomCode = ws.roomCode;
+            const playerId = ws.playerId;
+
+            storage.removePlayer(roomCode, playerId);
+            
+            const clients = roomClients.get(roomCode);
+            if (clients) {
+              clients.delete(ws);
+            }
+
+            ws.roomCode = undefined;
+            ws.playerId = undefined;
+
+            const room = storage.getRoom(roomCode);
+            if (room) {
+              broadcastToRoom(roomCode, {
+                type: "player_left",
+                payload: { gameState: room },
+              });
+            }
+
+            if (clients && clients.size === 0) {
+              roomClients.delete(roomCode);
+            }
+
+            sendToClient(ws, { type: "left_room", payload: {} });
+            break;
+          }
+
           case "return_to_lobby": {
             if (!ws.roomCode) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });

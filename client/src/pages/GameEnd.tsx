@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Trophy, RotateCcw, Home, Loader2 } from "lucide-react";
+import { Trophy, RotateCcw, Home, Loader2, ArrowLeft } from "lucide-react";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 export default function GameEnd() {
@@ -11,7 +11,7 @@ export default function GameEnd() {
   const { gameState, playerId, send, isConnected } = useWebSocketContext();
 
   useEffect(() => {
-    if (gameState?.phase === "playing") {
+    if (gameState?.phase === "playing" || gameState?.phase === "lobby") {
       setLocation("/game");
     }
   }, [gameState, setLocation]);
@@ -127,18 +127,34 @@ export default function GameEnd() {
               </Card>
             )}
 
+            {currentPlayer?.isRoomOwner && (
+              <Button
+                onClick={() => {
+                  send("return_to_lobby", {});
+                }}
+                variant="outline"
+                className="w-full"
+                size="lg"
+                data-testid="button-back-to-lobby"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Oyunu Düzenle
+              </Button>
+            )}
+            
             <Button
               onClick={() => {
-                send("return_to_lobby", {});
-                setLocation("/lobby");
+                send("leave_room", {});
+                localStorage.removeItem("katmannames_room_code");
+                localStorage.removeItem("katmannames_player_id");
+                setLocation("/rooms");
               }}
-              variant="outline"
+              variant="destructive"
               className="w-full"
               size="lg"
-              data-testid="button-back-to-lobby"
             >
-              <Home className="w-4 h-4 mr-2" />
-              Lobiye Dön
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Oyundan Çık
             </Button>
           </div>
         </Card>
