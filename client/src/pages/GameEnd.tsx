@@ -55,7 +55,7 @@ export default function GameEnd() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="w-full max-w-md space-y-8 animate-in zoom-in duration-500">
-        <Logo className="justify-center" />
+        <Logo className="justify-center" size="large" />
 
         <Card className="p-8 md:p-12 space-y-8 text-center shadow-2xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <div className="space-y-4">

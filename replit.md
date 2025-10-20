@@ -104,7 +104,9 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 - ✅ **Logo Entegrasyonu**
   - Özel logo (logo.png) tüm sayfalarda kullanılıyor
   - Logo komponenti güncellendi (sadece logo, yazı kaldırıldı)
-  - Optimize edilmiş boyut: 96x96px (mobil), 128x128px (desktop)
+  - Optimize edilmiş boyut: 
+    - Oyun ekranı: 96x96px (mobil), 128x128px (desktop)
+    - Diğer sayfalar: 128x128px (mobil), 192x192px (desktop)
 
 - ✅ **Arkaplan ile Uyumlu Tasarım**
   - Tüm kartlar yarı saydam koyu arka plan (bg-slate-900/85-90)

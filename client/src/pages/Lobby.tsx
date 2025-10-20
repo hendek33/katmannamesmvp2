@@ -116,7 +116,7 @@ export default function Lobby() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <div className="w-full max-w-lg space-y-8 animate-in fade-in duration-500">
-          <Logo className="justify-center" />
+          <Logo className="justify-center" size="large" />
           
           <div className="space-y-4">
             <Card 
@@ -177,7 +177,7 @@ export default function Lobby() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
-          <Logo className="justify-center" />
+          <Logo className="justify-center" size="large" />
           
           <Card className="p-8 space-y-6 shadow-2xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30 hover:shadow-red-600/20 transition-shadow">
             <div className="space-y-3 text-center">
@@ -256,7 +256,7 @@ export default function Lobby() {
   return (
     <div className="min-h-screen p-4 bg-slate-900 animate-in fade-in duration-500" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="max-w-6xl mx-auto space-y-6">
-        <Logo />
+        <Logo size="large" />
         
         {/* Room Code Card - Modern Design */}
         <Card className="p-6 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-2xl transition-all">
