@@ -4,14 +4,14 @@ import type { RoomListItem } from "@shared/schema";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Lock, Users, Play } from "lucide-react";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 export default function RoomList() {
   const [, setLocation] = useLocation();
-  const [rooms, setRooms] = useState<RoomListItem[]>([]);
+  const { isConnected, send, gameState, roomsList } = useWebSocketContext();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [username, setUsername] = useState("");
-  const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("katmannames_username");
@@ -23,75 +23,40 @@ export default function RoomList() {
   }, [setLocation]);
 
   useEffect(() => {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    const websocket = new WebSocket(wsUrl);
+    if (isConnected) {
+      send("list_rooms", {});
+      
+      const pollInterval = setInterval(() => {
+        send("list_rooms", {});
+      }, 3000);
 
-    websocket.onopen = () => {
-      websocket.send(JSON.stringify({ type: "list_rooms", payload: {} }));
-      setWs(websocket);
-    };
+      return () => clearInterval(pollInterval);
+    }
+  }, [isConnected, send]);
 
-    websocket.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        
-        if (message.type === "rooms_list") {
-          setRooms(message.payload.rooms);
-        } else if (message.type === "room_created") {
-          localStorage.setItem("katmannames_room_code", message.payload.roomCode);
-          localStorage.setItem("katmannames_player_id", message.payload.playerId);
-          setLocation("/game");
-        } else if (message.type === "room_joined") {
-          const roomCode = message.payload.gameState.roomCode;
-          localStorage.setItem("katmannames_room_code", roomCode);
-          localStorage.setItem("katmannames_player_id", message.payload.playerId);
-          setLocation("/game");
-        } else if (message.type === "error") {
-          alert(message.payload.message);
-        }
-      } catch (error) {
-        console.error("Message parse error:", error);
-      }
-    };
-
-    const pollInterval = setInterval(() => {
-      if (websocket.readyState === WebSocket.OPEN) {
-        websocket.send(JSON.stringify({ type: "list_rooms", payload: {} }));
-      }
-    }, 3000);
-
-    return () => {
-      clearInterval(pollInterval);
-      websocket.close();
-    };
-  }, [setLocation]);
+  useEffect(() => {
+    if (gameState) {
+      setLocation("/game");
+    }
+  }, [gameState, setLocation]);
 
   const handleJoinRoom = (roomCode: string, hasPassword: boolean) => {
-    if (!ws || ws.readyState !== WebSocket.OPEN) return;
-
     if (hasPassword) {
       const password = prompt("Bu oda şifreli. Lütfen şifreyi girin:");
       if (!password) return;
       
-      ws.send(JSON.stringify({
-        type: "join_room",
-        payload: {
-          roomCode,
-          username,
-          password,
-          playerId: localStorage.getItem("katmannames_player_id") || undefined,
-        }
-      }));
+      send("join_room", {
+        roomCode,
+        username,
+        password,
+        playerId: localStorage.getItem("katmannames_player_id") || undefined,
+      });
     } else {
-      ws.send(JSON.stringify({
-        type: "join_room",
-        payload: {
-          roomCode,
-          username,
-          playerId: localStorage.getItem("katmannames_player_id") || undefined,
-        }
-      }));
+      send("join_room", {
+        roomCode,
+        username,
+        playerId: localStorage.getItem("katmannames_player_id") || undefined,
+      });
     }
   };
 
@@ -153,12 +118,12 @@ export default function RoomList() {
             </div>
 
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-              {rooms.length === 0 ? (
+              {roomsList.length === 0 ? (
                 <div className="text-center py-12 text-slate-400">
                   Henüz aktif oda yok. İlk odayı sen oluştur!
                 </div>
               ) : (
-                rooms.map((room) => (
+                roomsList.map((room: RoomListItem) => (
                   <Card 
                     key={room.roomCode}
                     className="bg-slate-800/60 border-slate-700 hover:bg-slate-800/80 transition-all cursor-pointer"
@@ -210,41 +175,38 @@ export default function RoomList() {
         </Card>
       </div>
 
-      {showCreateModal && ws && (
+      {showCreateModal && (
         <CreateRoomModal 
           username={username}
           onClose={() => setShowCreateModal(false)}
-          ws={ws}
+          send={send}
         />
       )}
 
-      {showJoinModal && ws && (
+      {showJoinModal && (
         <JoinRoomModal 
           username={username}
           onClose={() => setShowJoinModal(false)}
-          ws={ws}
+          send={send}
         />
       )}
     </div>
   );
 }
 
-function CreateRoomModal({ username, onClose, ws }: { 
+function CreateRoomModal({ username, onClose, send }: { 
   username: string; 
   onClose: () => void; 
-  ws: WebSocket;
+  send: (type: string, payload: any) => void;
 }) {
   const [password, setPassword] = useState("");
   const [hasPassword, setHasPassword] = useState(false);
 
   const handleCreate = () => {
-    ws.send(JSON.stringify({
-      type: "create_room",
-      payload: {
-        username,
-        password: hasPassword ? password : undefined,
-      }
-    }));
+    send("create_room", {
+      username,
+      password: hasPassword ? password : undefined,
+    });
     onClose();
   };
 
@@ -306,10 +268,10 @@ function CreateRoomModal({ username, onClose, ws }: {
   );
 }
 
-function JoinRoomModal({ username, onClose, ws }: { 
+function JoinRoomModal({ username, onClose, send }: { 
   username: string; 
   onClose: () => void; 
-  ws: WebSocket;
+  send: (type: string, payload: any) => void;
 }) {
   const [roomCode, setRoomCode] = useState("");
   const [password, setPassword] = useState("");
@@ -318,15 +280,12 @@ function JoinRoomModal({ username, onClose, ws }: {
   const handleJoin = () => {
     if (!roomCode.trim()) return;
 
-    ws.send(JSON.stringify({
-      type: "join_room",
-      payload: {
-        roomCode: roomCode.toUpperCase(),
-        username,
-        password: needsPassword ? password : undefined,
-        playerId: localStorage.getItem("katmannames_player_id") || undefined,
-      }
-    }));
+    send("join_room", {
+      roomCode: roomCode.toUpperCase(),
+      username,
+      password: needsPassword ? password : undefined,
+      playerId: localStorage.getItem("katmannames_player_id") || undefined,
+    });
     onClose();
   };
 

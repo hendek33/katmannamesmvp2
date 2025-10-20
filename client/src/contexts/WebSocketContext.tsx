@@ -1,6 +1,6 @@
 import { createContext, useContext, ReactNode } from "react";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import type { GameState } from "@shared/schema";
+import type { GameState, RoomListItem } from "@shared/schema";
 
 interface WebSocketContextType {
   isConnected: boolean;
@@ -8,6 +8,7 @@ interface WebSocketContextType {
   playerId: string;
   roomCode: string;
   error: string;
+  roomsList: RoomListItem[];
   send: (type: string, payload: any) => void;
 }
 

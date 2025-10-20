@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import type { GameState } from "@shared/schema";
+import type { GameState, RoomListItem } from "@shared/schema";
 
 type WSMessage = {
   type: string;
@@ -13,6 +13,7 @@ export function useWebSocket() {
   const [playerId, setPlayerId] = useState<string>("");
   const [roomCode, setRoomCode] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [roomsList, setRoomsList] = useState<RoomListItem[]>([]);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -60,6 +61,10 @@ export function useWebSocket() {
             const message: WSMessage = JSON.parse(event.data);
             
             switch (message.type) {
+              case "rooms_list":
+                setRoomsList(message.payload.rooms);
+                break;
+
               case "room_created":
                 setPlayerId(message.payload.playerId);
                 setRoomCode(message.payload.roomCode);
@@ -160,6 +165,7 @@ export function useWebSocket() {
     playerId,
     roomCode,
     error,
+    roomsList,
     send,
   };
 }
