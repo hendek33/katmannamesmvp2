@@ -107,7 +107,9 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
   - Lobby'den logo kaldırıldı
   - Optimize edilmiş boyut: 
     - Oyun ekranı: 128x128px (mobil), 160x160px (desktop)
-    - Welcome & GameEnd: 160x160px (mobil), 224x224px (desktop)
+    - Welcome: 320x320px (mobil), 384x384px (desktop) - ÇOK BÜYÜK
+    - GameEnd: 160x160px (mobil), 224x224px (desktop)
+  - Welcome kartı logo ile uyumlu: Turuncu/mavi gradient, kalın kenarlık
 
 - ✅ **Arkaplan ile Uyumlu Tasarım**
   - Tüm kartlar yarı saydam koyu arka plan (bg-slate-900/85-90)

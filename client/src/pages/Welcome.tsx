@@ -20,8 +20,14 @@ export default function Welcome() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
-        <div className="text-center space-y-4">
-          <Logo className="justify-center" size="large" />
+        <div className="text-center space-y-6">
+          <div className="flex justify-center">
+            <img 
+              src="/logo.png" 
+              alt="Katmannames Logo" 
+              className="w-80 h-80 md:w-96 md:h-96 object-contain"
+            />
+          </div>
           
           <div className="space-y-2">
             <h2 className="text-xl md:text-2xl font-semibold text-foreground">
@@ -33,7 +39,7 @@ export default function Welcome() {
           </div>
         </div>
 
-        <Card className="p-6 md:p-8 space-y-6 shadow-xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30">
+        <Card className="p-6 md:p-8 space-y-6 shadow-xl border-4 bg-gradient-to-br from-orange-950/40 via-slate-900/95 to-blue-950/40 backdrop-blur-lg border-orange-600/50">
           <div className="space-y-3">
             <Label htmlFor="username" className="text-sm font-medium">
               Kullanıcı Adı
