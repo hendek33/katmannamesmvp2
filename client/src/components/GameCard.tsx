@@ -61,7 +61,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       data-testid={`card-${card.id}`}
       className={cn(
         "relative rounded border p-0.5 md:p-1 w-full",
-        "aspect-square",
+        "aspect-[3/2]",
         "transition-all duration-300 flex flex-col overflow-hidden",
         colors.border,
         colors.bg,
