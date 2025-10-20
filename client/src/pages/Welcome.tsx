@@ -33,7 +33,7 @@ export default function Welcome() {
           </div>
         </div>
 
-        <Card className="p-6 md:p-8 space-y-6 shadow-xl border-2">
+        <Card className="p-6 md:p-8 space-y-6 shadow-xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <div className="space-y-3">
             <Label htmlFor="username" className="text-sm font-medium">
               Kullanıcı Adı

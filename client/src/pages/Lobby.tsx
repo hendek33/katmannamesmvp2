@@ -98,7 +98,7 @@ export default function Lobby() {
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl animate-pulse-slow">
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30 animate-pulse-slow">
           <div className="relative">
             <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
             <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
@@ -120,7 +120,7 @@ export default function Lobby() {
           
           <div className="space-y-4">
             <Card 
-              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 relative overflow-hidden" 
+              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20 relative overflow-hidden" 
               onClick={handleCreateRoom}
               data-testid="button-create-room"
             >
@@ -140,7 +140,7 @@ export default function Lobby() {
             </Card>
 
             <Card 
-              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 hover:border-red-600/50 hover:shadow-2xl hover:shadow-red-600/20 relative overflow-hidden" 
+              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:border-red-600/50 hover:shadow-2xl hover:shadow-red-600/20 relative overflow-hidden" 
               onClick={() => setMode("join")}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -179,7 +179,7 @@ export default function Lobby() {
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
           <Logo className="justify-center" />
           
-          <Card className="p-8 space-y-6 shadow-2xl border-2 hover:shadow-red-600/20 transition-shadow">
+          <Card className="p-8 space-y-6 shadow-2xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30 hover:shadow-red-600/20 transition-shadow">
             <div className="space-y-3 text-center">
               <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-red-700 to-red-500 flex items-center justify-center shadow-lg">
                 <LogIn className="w-8 h-8 text-white" />
@@ -236,7 +236,7 @@ export default function Lobby() {
   if (!gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl">
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
           <p className="text-lg font-semibold text-muted-foreground">Yükleniyor...</p>
         </Card>
@@ -259,7 +259,7 @@ export default function Lobby() {
         <Logo />
         
         {/* Room Code Card - Modern Design */}
-        <Card className="p-6 border-2 shadow-xl bg-gradient-to-br from-primary/5 via-transparent to-red-600/5 hover:shadow-2xl transition-all">
+        <Card className="p-6 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-2xl transition-all">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="space-y-1">
               <div className="flex items-center gap-3">

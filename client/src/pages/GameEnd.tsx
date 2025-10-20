@@ -19,7 +19,7 @@ export default function GameEnd() {
   if (!isConnected || !gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-8 space-y-4 text-center" data-testid="loading-state">
+        <Card className="p-8 space-y-4 text-center bg-slate-900/90 backdrop-blur-md border-orange-900/30" data-testid="loading-state">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground">Yükleniyor...</p>
         </Card>
@@ -30,7 +30,7 @@ export default function GameEnd() {
   if (!gameState.winner) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-8 space-y-4 text-center">
+        <Card className="p-8 space-y-4 text-center bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <p className="text-muted-foreground">Oyun henüz bitmedi</p>
           <Button onClick={() => setLocation("/game")}>
             Oyuna Dön
@@ -57,7 +57,7 @@ export default function GameEnd() {
       <div className="w-full max-w-md space-y-8 animate-in zoom-in duration-500">
         <Logo className="justify-center" />
 
-        <Card className="p-8 md:p-12 space-y-8 text-center shadow-2xl border-2">
+        <Card className="p-8 md:p-12 space-y-8 text-center shadow-2xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <div className="space-y-4">
             <div className={`mx-auto w-20 h-20 rounded-full bg-gradient-to-r ${winnerGradient} flex items-center justify-center animate-glow-pulse`}>
               <Trophy className="w-10 h-10 text-white" />

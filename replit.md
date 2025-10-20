@@ -101,8 +101,14 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ## Son Değişiklikler
 
 ### 2025-10-20 (Son Güncelleme)
+- ✅ **Arkaplan ile Uyumlu Tasarım**
+  - Tüm kartlar yarı saydam koyu arka plan (bg-slate-900/85-90)
+  - Backdrop blur efekti ile modern görünüm
+  - Turuncu kenarlıklar (border-orange-900/30) arkaplan ile uyumlu
+  - Tüm sayfalarda tutarlı tasarım dili
+
 - ✅ **Özel Arkaplan Eklendi**
-  - arkaplan.png dosyası tüm sayfalarda arka plan olarak kullanılıyor
+  - arkaplan.png dosyası client/public/ klasöründe
   - Background-size: cover ile tam ekran kaplama
   - Tüm sayfalarda (Welcome, Lobby, Game, GameEnd) uygulandı
   

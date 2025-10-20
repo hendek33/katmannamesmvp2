@@ -69,7 +69,7 @@ export default function Game() {
   if (!isConnected || !gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl animate-pulse-slow">
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30 animate-pulse-slow">
           <div className="relative">
             <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
             <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
@@ -90,7 +90,7 @@ export default function Game() {
   if (gameState.phase !== "playing") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl">
+        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-amber-600 to-amber-400 flex items-center justify-center shadow-lg">
             <Clock className="w-10 h-10 text-white" />
           </div>
@@ -134,7 +134,7 @@ export default function Game() {
       <div className="scale-[0.8] origin-top w-[125%] -ml-[12.5%] h-[125%] p-2 md:p-3 animate-in fade-in duration-500">
         <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
         {/* Modern Header */}
-        <Card className="p-2 md:p-3 border-2 shadow-2xl bg-gradient-to-r from-slate-800/90 to-slate-900/90 backdrop-blur-sm hover:shadow-primary/20 transition-all flex-shrink-0">
+        <Card className="p-2 md:p-3 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Logo />
