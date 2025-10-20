@@ -51,11 +51,11 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ### Tasarım Özellikleri
 - 🎨 Karanlık lacivert/grimsi tema
 - 🎨 Mavi/Kırmızı renk şeması (Koyu = Mavi, Açık = Kırmızı)
-- 🃏 Özgün kart tasarımları:
-  - **Katman Koyu (Mavi)**: Mavi metalik gradient + geometric patterns
-  - **Katman Açık (Kırmızı)**: Kırmızı neon gradient + grid textures
-  - **Tarafsız**: Gri crosshatch patterns
-  - **Yasak**: Kırmızı-siyah checkerboard + glow efektleri
+- 🃏 Özgün kart tasarımları (iki katmanlı modern stil):
+  - **Katman Koyu (Mavi)**: Açık mavi gradient + koyu mavi alt panel
+  - **Katman Açık (Kırmızı)**: Açık kırmızı gradient + koyu kırmızı alt panel
+  - **Tarafsız**: Açık amber gradient + koyu amber alt panel
+  - **Yasak**: Gri-siyah gradient + siyah alt panel + pulse efekti
 - ✨ Hover ve flip animasyonları
 - 📱 Responsive mobil tasarım
 - 🎯 3D kart efektleri (dokular, ışık, gölge)
@@ -101,10 +101,15 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ## Son Değişiklikler
 
 ### 2025-10-20 (Son Güncelleme)
-- ✅ **Kart Texture'ları Aktif Edildi**
-  - GameCard'dan bg-grid-pattern override kaldırıldı
-  - Açılan kartlar artık texture arka planlarını doğru gösteriyor
-  - Spymaster preview'da da texture'lar görünür
+- ✅ **Kart Tasarımı Yenilendi**
+  - İki katmanlı modern tasarım (üstte açık gradient, altta koyu panel)
+  - Mavi takım: Açık mavi gradient + koyu mavi panel
+  - Kırmızı takım: Açık kırmızı/turuncu gradient + koyu kırmızı panel
+  - Tarafsız: Açık bej/amber gradient + koyu amber panel
+  - Yasak: Gri/siyah gradient + siyah panel + pulse animasyonu
+  - Kelimeler alt panelde beyaz renkte
+  - Hover efekti: Kart yukarı kalkar ve büyür
+  - Renkli gölge efektleri
 
 - ✅ **Takım İsimleri Oyun Ekranında**
   - Game.tsx'de hardcoded "Katman Koyu/Açık" kaldırıldı
