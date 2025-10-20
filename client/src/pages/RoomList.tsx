@@ -14,7 +14,7 @@ export default function RoomList() {
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
+    const storedUsername = localStorage.getItem("katmannames_username");
     if (!storedUsername) {
       setLocation("/");
       return;
@@ -39,13 +39,13 @@ export default function RoomList() {
         if (message.type === "rooms_list") {
           setRooms(message.payload.rooms);
         } else if (message.type === "room_created") {
-          localStorage.setItem("roomCode", message.payload.roomCode);
-          localStorage.setItem("playerId", message.payload.playerId);
+          localStorage.setItem("katmannames_room_code", message.payload.roomCode);
+          localStorage.setItem("katmannames_player_id", message.payload.playerId);
           setLocation("/lobby");
         } else if (message.type === "room_joined") {
           const roomCode = message.payload.gameState.roomCode;
-          localStorage.setItem("roomCode", roomCode);
-          localStorage.setItem("playerId", message.payload.playerId);
+          localStorage.setItem("katmannames_room_code", roomCode);
+          localStorage.setItem("katmannames_player_id", message.payload.playerId);
           setLocation("/lobby");
         } else if (message.type === "error") {
           alert(message.payload.message);
@@ -80,7 +80,7 @@ export default function RoomList() {
           roomCode,
           username,
           password,
-          playerId: localStorage.getItem("playerId") || undefined,
+          playerId: localStorage.getItem("katmannames_player_id") || undefined,
         }
       }));
     } else {
@@ -89,7 +89,7 @@ export default function RoomList() {
         payload: {
           roomCode,
           username,
-          playerId: localStorage.getItem("playerId") || undefined,
+          playerId: localStorage.getItem("katmannames_player_id") || undefined,
         }
       }));
     }
@@ -347,7 +347,7 @@ function JoinRoomModal({ username, onClose, ws }: {
         roomCode: roomCode.toUpperCase(),
         username,
         password: needsPassword ? password : undefined,
-        playerId: localStorage.getItem("playerId") || undefined,
+        playerId: localStorage.getItem("katmannames_player_id") || undefined,
       }
     }));
     onClose();

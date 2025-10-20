@@ -100,7 +100,33 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 
 ## Son Değişiklikler
 
-### 2025-10-20 (Son Güncelleme)
+### 2025-10-20 (Yeni Lobi Sistemi)
+- ✅ **Oda Listesi Sistemi**
+  - Yeni RoomList sayfası eklendi (Welcome → RoomList → Lobby → Game akışı)
+  - Aktif odaların listelenmesi (oyuncu sayısı, şifre durumu, oda fazı)
+  - Her 3 saniyede otomatik oda listesi güncelleme
+  - Oda kodu, oyuncu sayısı, şifreli/şifresiz durum gösterimi
+  
+- ✅ **Şifreli Oda Desteği**
+  - Oda oluşturma sırasında şifre belirleme
+  - Şifreli odalara katılırken şifre kontrolü
+  - Backend'de password storage ve validation
+  
+- ✅ **Oda Oluşturma Modal**
+  - Şifreli/şifresiz oda oluşturma seçeneği
+  - Modern modal UI tasarımı
+  
+- ✅ **Oda Kodu ile Katılma**
+  - Manuel oda kodu girişi
+  - Şifreli odalarda şifre input
+  
+- ✅ **Backend İyileştirmeleri**
+  - list_rooms WebSocket event'i
+  - RoomListItem interface'i
+  - hasPassword ve createdAt alanları GameState'e eklendi
+  - Password validation join_room'da
+
+### 2025-10-20 (Önceki Güncellemeler)
 - ✅ **Işık Efektleri**
   - 5 adet büyük radial gradient ışık efekti
   - Turuncu, mavi ve altın renkli ışıklar

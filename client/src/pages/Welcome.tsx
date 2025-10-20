@@ -12,7 +12,7 @@ export default function Welcome() {
 
   const handleContinue = () => {
     if (username.trim().length >= 2) {
-      localStorage.setItem("username", username.trim());
+      localStorage.setItem("katmannames_username", username.trim());
       setLocation("/rooms");
     }
   };
