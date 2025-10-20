@@ -337,14 +337,10 @@ export default function Game() {
           {/* Center - Grid */}
           <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1">
             <div 
-              className="grid grid-cols-5 gap-2 md:gap-3 w-full h-full max-h-full" 
+              className="grid grid-cols-5 gap-2 md:gap-3 w-full" 
               style={{ 
-                gridAutoRows: '1fr',
                 transform: 'scale(0.7)',
-                transformOrigin: 'top center',
-                width: '142.86%',
-                height: '142.86%',
-                marginLeft: '-21.43%'
+                transformOrigin: 'top center'
               }} 
               data-testid="game-grid">
               {gameState.cards.map((card) => (
