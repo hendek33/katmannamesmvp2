@@ -45,14 +45,17 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 - ✅ Lobiye dönme butonu (oyun bitince)
 - ✅ Rastgele kart dağılımı (9-8 veya 8-9)
 - ✅ WebSocket reconnection loop düzeltildi
+- ✅ Takım ismi değiştirme (lobby'de düzenlenebilir)
+- ✅ Mavi/kırmızı renk şeması (Katman Koyu = mavi, Katman Açık = kırmızı)
 
 ### Tasarım Özellikleri
 - 🎨 Karanlık lacivert/grimsi tema
+- 🎨 Mavi/Kırmızı renk şeması (Koyu = Mavi, Açık = Kırmızı)
 - 🃏 Özgün kart tasarımları:
-  - **Katman Koyu**: Soğuk mavi metalik + dokular
-  - **Katman Açık**: Turkuaz/siber neon + desenler
-  - **Tarafsız**: Gri desenli
-  - **Yasak**: Kırmızı-siyah kontrast + uyarı efektleri
+  - **Katman Koyu (Mavi)**: Mavi metalik gradient + geometric patterns
+  - **Katman Açık (Kırmızı)**: Kırmızı neon gradient + grid textures
+  - **Tarafsız**: Gri crosshatch patterns
+  - **Yasak**: Kırmızı-siyah checkerboard + glow efektleri
 - ✨ Hover ve flip animasyonları
 - 📱 Responsive mobil tasarım
 - 🎯 3D kart efektleri (dokular, ışık, gölge)
@@ -71,6 +74,7 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
   - `select_team` - Takım seçimi
   - `select_role` - Rol değiştirme
   - `add_bot` - Bot ekleme (owner-only)
+  - `update_team_name` - Takım ismini değiştirme
   - `start_game` - Oyunu başlatma
   - `give_clue` - İpucu verme
   - `reveal_card` - Kart açma
@@ -96,7 +100,26 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 
 ## Son Değişiklikler
 
-### 2025-10-19
+### 2025-10-19 (Son Güncelleme)
+- ✅ **Takım İsmi Değiştirme**
+  - Lobby'de takım isimleri düzenlenebilir
+  - Edit butonu ve input field ile inline editing
+  - Backend'e update_team_name event handler eklendi
+  - Real-time senkronizasyon ile tüm oyunculara yansıma
+
+- ✅ **Renk Şeması Güncelleme**
+  - Tüm turkuaz/cyan renkler kırmızı ile değiştirildi
+  - Katman Koyu = Mavi (blue)
+  - Katman Açık = Kırmızı (red)
+  - Game.tsx, Lobby.tsx, GameEnd.tsx, PlayerList.tsx, GameCard.tsx, ClueDisplay.tsx, GameStatus.tsx güncellendi
+
+- ✅ **Kart Arka Plan Textures**
+  - bg-metallic-dark: Mavi metalik gradient + geometric patterns
+  - bg-neon-light: Kırmızı neon gradient + grid textures
+  - bg-neutral-texture: Gri crosshatch patterns
+  - bg-assassin-danger: Kırmızı-siyah checkerboard + radial glow
+
+### 2025-10-19 (Önceki)
 - ✅ **WebSocket Reconnection Loop Düzeltildi**
   - WebSocketContext ile merkezi bağlantı yönetimi
   - Sayfa geçişlerinde tek WebSocket instance kullanımı
