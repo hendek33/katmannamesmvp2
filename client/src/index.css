@@ -397,85 +397,62 @@
 }
 
 /* Particle Animations */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100vh) translateX(50px) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-@keyframes float-reverse {
-  0%, 100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  90% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(-100vh) translateX(-30px) rotate(-360deg);
-    opacity: 0;
-  }
-}
+@keyframes float-1 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(30vw, -40vh) rotate(180deg); } }
+@keyframes float-2 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(-25vw, 35vh) rotate(-120deg); } }
+@keyframes float-3 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(40vw, 30vh) rotate(240deg); } }
+@keyframes float-4 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(-35vw, -25vh) rotate(-180deg); } }
+@keyframes float-5 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(20vw, 45vh) rotate(90deg); } }
+@keyframes float-6 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(-30vw, -35vh) rotate(-270deg); } }
+@keyframes float-7 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(35vw, -20vh) rotate(150deg); } }
+@keyframes float-8 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(-20vw, 40vh) rotate(-90deg); } }
+@keyframes float-9 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(25vw, -30vh) rotate(200deg); } }
+@keyframes float-10 { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(-40vw, 20vh) rotate(-150deg); } }
 
 .particle {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
   filter: blur(1px);
-  bottom: -20px;
+  opacity: 0.7;
 }
 
-.particle-1 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.6); animation: float 15s infinite; left: 5%; animation-delay: -8s; }
-.particle-2 { width: 6px; height: 6px; background: rgba(59, 130, 246, 0.5); animation: float-reverse 18s infinite; left: 12%; animation-delay: -12s; }
-.particle-3 { width: 10px; height: 10px; background: rgba(251, 191, 36, 0.4); animation: float 20s infinite; left: 18%; animation-delay: -5s; }
-.particle-4 { width: 7px; height: 7px; background: rgba(251, 146, 60, 0.5); animation: float-reverse 16s infinite; left: 25%; animation-delay: -10s; }
-.particle-5 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.6); animation: float 22s infinite; left: 32%; animation-delay: -15s; }
-.particle-6 { width: 5px; height: 5px; background: rgba(251, 191, 36, 0.5); animation: float-reverse 19s infinite; left: 38%; animation-delay: -7s; }
-.particle-7 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.4); animation: float 17s infinite; left: 45%; animation-delay: -13s; }
-.particle-8 { width: 6px; height: 6px; background: rgba(59, 130, 246, 0.6); animation: float-reverse 21s infinite; left: 52%; animation-delay: -9s; }
-.particle-9 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.6); animation: float 18s infinite; left: 58%; animation-delay: -11s; }
-.particle-10 { width: 9px; height: 9px; background: rgba(251, 146, 60, 0.5); animation: float-reverse 20s infinite; left: 65%; animation-delay: -14s; }
-.particle-11 { width: 6px; height: 6px; background: rgba(96, 165, 250, 0.5); animation: float 16s infinite; left: 72%; animation-delay: -6s; }
-.particle-12 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.4); animation: float-reverse 19s infinite; left: 78%; animation-delay: -16s; }
-.particle-13 { width: 5px; height: 5px; background: rgba(251, 146, 60, 0.6); animation: float 23s infinite; left: 85%; animation-delay: -8s; }
-.particle-14 { width: 10px; height: 10px; background: rgba(59, 130, 246, 0.4); animation: float-reverse 17s infinite; left: 92%; animation-delay: -12s; }
-.particle-15 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.5); animation: float 21s infinite; left: 8%; animation-delay: -10s; }
-.particle-16 { width: 6px; height: 6px; background: rgba(251, 146, 60, 0.6); animation: float-reverse 18s infinite; left: 15%; animation-delay: -5s; }
-.particle-17 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.5); animation: float 20s infinite; left: 22%; animation-delay: -13s; }
-.particle-18 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.6); animation: float-reverse 16s infinite; left: 28%; animation-delay: -7s; }
-.particle-19 { width: 5px; height: 5px; background: rgba(251, 146, 60, 0.4); animation: float 19s infinite; left: 35%; animation-delay: -15s; }
-.particle-20 { width: 7px; height: 7px; background: rgba(59, 130, 246, 0.5); animation: float-reverse 22s infinite; left: 42%; animation-delay: -9s; }
-.particle-21 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.5); animation: float 17s infinite; left: 48%; animation-delay: -11s; }
-.particle-22 { width: 6px; height: 6px; background: rgba(251, 146, 60, 0.6); animation: float-reverse 20s infinite; left: 55%; animation-delay: -14s; }
-.particle-23 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.4); animation: float 18s infinite; left: 62%; animation-delay: -6s; }
-.particle-24 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.6); animation: float-reverse 21s infinite; left: 68%; animation-delay: -16s; }
-.particle-25 { width: 5px; height: 5px; background: rgba(59, 130, 246, 0.5); animation: float 19s infinite; left: 75%; animation-delay: -8s; }
-.particle-26 { width: 10px; height: 10px; background: rgba(251, 146, 60, 0.5); animation: float-reverse 16s infinite; left: 82%; animation-delay: -12s; }
-.particle-27 { width: 6px; height: 6px; background: rgba(251, 191, 36, 0.4); animation: float 22s infinite; left: 88%; animation-delay: -10s; }
-.particle-28 { width: 8px; height: 8px; background: rgba(96, 165, 250, 0.6); animation: float-reverse 17s infinite; left: 95%; animation-delay: -5s; }
-.particle-29 { width: 7px; height: 7px; background: rgba(251, 146, 60, 0.6); animation: float 20s infinite; left: 10%; animation-delay: -13s; }
-.particle-30 { width: 9px; height: 9px; background: rgba(59, 130, 246, 0.4); animation: float-reverse 18s infinite; left: 17%; animation-delay: -7s; }
-.particle-31 { width: 5px; height: 5px; background: rgba(251, 191, 36, 0.5); animation: float 16s infinite; left: 23%; animation-delay: -15s; }
-.particle-32 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.4); animation: float-reverse 21s infinite; left: 30%; animation-delay: -9s; }
-.particle-33 { width: 6px; height: 6px; background: rgba(96, 165, 250, 0.5); animation: float 19s infinite; left: 37%; animation-delay: -11s; }
-.particle-34 { width: 10px; height: 10px; background: rgba(251, 191, 36, 0.6); animation: float-reverse 17s infinite; left: 43%; animation-delay: -14s; }
-.particle-35 { width: 7px; height: 7px; background: rgba(59, 130, 246, 0.6); animation: float 20s infinite; left: 50%; animation-delay: -6s; }
-.particle-36 { width: 9px; height: 9px; background: rgba(251, 146, 60, 0.5); animation: float-reverse 18s infinite; left: 57%; animation-delay: -16s; }
-.particle-37 { width: 5px; height: 5px; background: rgba(251, 191, 36, 0.4); animation: float 22s infinite; left: 63%; animation-delay: -8s; }
-.particle-38 { width: 8px; height: 8px; background: rgba(96, 165, 250, 0.6); animation: float-reverse 16s infinite; left: 70%; animation-delay: -12s; }
-.particle-39 { width: 6px; height: 6px; background: rgba(251, 146, 60, 0.6); animation: float 19s infinite; left: 77%; animation-delay: -10s; }
-.particle-40 { width: 7px; height: 7px; background: rgba(59, 130, 246, 0.5); animation: float-reverse 21s infinite; left: 83%; animation-delay: -5s; }
+.particle-1 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.6); animation: float-1 15s infinite alternate ease-in-out; left: 5%; top: 20%; }
+.particle-2 { width: 6px; height: 6px; background: rgba(59, 130, 246, 0.5); animation: float-2 18s infinite alternate ease-in-out; left: 12%; top: 45%; }
+.particle-3 { width: 10px; height: 10px; background: rgba(251, 191, 36, 0.4); animation: float-3 20s infinite alternate ease-in-out; left: 18%; top: 70%; }
+.particle-4 { width: 7px; height: 7px; background: rgba(251, 146, 60, 0.5); animation: float-4 16s infinite alternate ease-in-out; left: 25%; top: 15%; }
+.particle-5 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.6); animation: float-5 22s infinite alternate ease-in-out; left: 32%; top: 55%; }
+.particle-6 { width: 5px; height: 5px; background: rgba(251, 191, 36, 0.5); animation: float-6 19s infinite alternate ease-in-out; left: 38%; top: 35%; }
+.particle-7 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.4); animation: float-7 17s infinite alternate ease-in-out; left: 45%; top: 80%; }
+.particle-8 { width: 6px; height: 6px; background: rgba(59, 130, 246, 0.6); animation: float-8 21s infinite alternate ease-in-out; left: 52%; top: 25%; }
+.particle-9 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.6); animation: float-9 18s infinite alternate ease-in-out; left: 58%; top: 60%; }
+.particle-10 { width: 9px; height: 9px; background: rgba(251, 146, 60, 0.5); animation: float-10 20s infinite alternate ease-in-out; left: 65%; top: 40%; }
+.particle-11 { width: 6px; height: 6px; background: rgba(96, 165, 250, 0.5); animation: float-1 16s infinite alternate ease-in-out; left: 72%; top: 75%; }
+.particle-12 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.4); animation: float-2 19s infinite alternate ease-in-out; left: 78%; top: 30%; }
+.particle-13 { width: 5px; height: 5px; background: rgba(251, 146, 60, 0.6); animation: float-3 23s infinite alternate ease-in-out; left: 85%; top: 50%; }
+.particle-14 { width: 10px; height: 10px; background: rgba(59, 130, 246, 0.4); animation: float-4 17s infinite alternate ease-in-out; left: 92%; top: 10%; }
+.particle-15 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.5); animation: float-5 21s infinite alternate ease-in-out; left: 8%; top: 65%; }
+.particle-16 { width: 6px; height: 6px; background: rgba(251, 146, 60, 0.6); animation: float-6 18s infinite alternate ease-in-out; left: 15%; top: 85%; }
+.particle-17 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.5); animation: float-7 20s infinite alternate ease-in-out; left: 22%; top: 50%; }
+.particle-18 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.6); animation: float-8 16s infinite alternate ease-in-out; left: 28%; top: 30%; }
+.particle-19 { width: 5px; height: 5px; background: rgba(251, 146, 60, 0.4); animation: float-9 19s infinite alternate ease-in-out; left: 35%; top: 60%; }
+.particle-20 { width: 7px; height: 7px; background: rgba(59, 130, 246, 0.5); animation: float-10 22s infinite alternate ease-in-out; left: 42%; top: 90%; }
+.particle-21 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.5); animation: float-1 17s infinite alternate ease-in-out; left: 48%; top: 20%; }
+.particle-22 { width: 6px; height: 6px; background: rgba(251, 146, 60, 0.6); animation: float-2 20s infinite alternate ease-in-out; left: 55%; top: 45%; }
+.particle-23 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.4); animation: float-3 18s infinite alternate ease-in-out; left: 62%; top: 70%; }
+.particle-24 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.6); animation: float-4 21s infinite alternate ease-in-out; left: 68%; top: 15%; }
+.particle-25 { width: 5px; height: 5px; background: rgba(59, 130, 246, 0.5); animation: float-5 19s infinite alternate ease-in-out; left: 75%; top: 55%; }
+.particle-26 { width: 10px; height: 10px; background: rgba(251, 146, 60, 0.5); animation: float-6 16s infinite alternate ease-in-out; left: 82%; top: 35%; }
+.particle-27 { width: 6px; height: 6px; background: rgba(251, 191, 36, 0.4); animation: float-7 22s infinite alternate ease-in-out; left: 88%; top: 80%; }
+.particle-28 { width: 8px; height: 8px; background: rgba(96, 165, 250, 0.6); animation: float-8 17s infinite alternate ease-in-out; left: 95%; top: 25%; }
+.particle-29 { width: 7px; height: 7px; background: rgba(251, 146, 60, 0.6); animation: float-9 20s infinite alternate ease-in-out; left: 10%; top: 60%; }
+.particle-30 { width: 9px; height: 9px; background: rgba(59, 130, 246, 0.4); animation: float-10 18s infinite alternate ease-in-out; left: 17%; top: 40%; }
+.particle-31 { width: 5px; height: 5px; background: rgba(251, 191, 36, 0.5); animation: float-1 16s infinite alternate ease-in-out; left: 23%; top: 75%; }
+.particle-32 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.4); animation: float-2 21s infinite alternate ease-in-out; left: 30%; top: 30%; }
+.particle-33 { width: 6px; height: 6px; background: rgba(96, 165, 250, 0.5); animation: float-3 19s infinite alternate ease-in-out; left: 37%; top: 50%; }
+.particle-34 { width: 10px; height: 10px; background: rgba(251, 191, 36, 0.6); animation: float-4 17s infinite alternate ease-in-out; left: 43%; top: 10%; }
+.particle-35 { width: 7px; height: 7px; background: rgba(59, 130, 246, 0.6); animation: float-5 20s infinite alternate ease-in-out; left: 50%; top: 65%; }
+.particle-36 { width: 9px; height: 9px; background: rgba(251, 146, 60, 0.5); animation: float-6 18s infinite alternate ease-in-out; left: 57%; top: 85%; }
+.particle-37 { width: 5px; height: 5px; background: rgba(251, 191, 36, 0.4); animation: float-7 22s infinite alternate ease-in-out; left: 63%; top: 50%; }
+.particle-38 { width: 8px; height: 8px; background: rgba(96, 165, 250, 0.6); animation: float-8 16s infinite alternate ease-in-out; left: 70%; top: 30%; }
+.particle-39 { width: 6px; height: 6px; background: rgba(251, 146, 60, 0.6); animation: float-9 19s infinite alternate ease-in-out; left: 77%; top: 60%; }
+.particle-40 { width: 7px; height: 7px; background: rgba(59, 130, 246, 0.5); animation: float-10 21s infinite alternate ease-in-out; left: 83%; top: 90%; }

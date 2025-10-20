@@ -140,8 +140,6 @@ export default function Game() {
         <Card className="p-2 md:p-3 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Logo />
-              <div className="h-8 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Users className="w-4 h-4 text-primary" />
