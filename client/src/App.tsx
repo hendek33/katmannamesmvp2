@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import Welcome from "@/pages/Welcome";
+import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
 import Game from "@/pages/Game";
 import GameEnd from "@/pages/GameEnd";
@@ -14,6 +15,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Welcome} />
+      <Route path="/rooms" component={RoomList} />
       <Route path="/lobby" component={Lobby} />
       <Route path="/game" component={Game} />
       <Route path="/end" component={GameEnd} />
