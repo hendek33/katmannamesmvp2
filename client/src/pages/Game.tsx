@@ -219,54 +219,6 @@ export default function Game() {
           </div>
         </Card>
 
-        {/* Status Banner */}
-        <div className="relative overflow-hidden flex-shrink-0">
-          <div className={`p-2 rounded-xl border-2 shadow-2xl text-center transition-all ${
-            gameState.currentTeam === "dark"
-              ? "bg-gradient-to-r from-blue-900/90 to-blue-800/90 border-blue-700/50"
-              : "bg-gradient-to-r from-red-950/90 to-red-900/90 border-red-800/50"
-          }`}>
-            <div className="relative z-10">
-              {!isCurrentTurn ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center gap-2">
-                    <Clock className="w-5 h-5 animate-pulse" />
-                    <p className="text-lg font-bold text-white">
-                      {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} Oynuyor
-                    </p>
-                  </div>
-                  <p className="text-sm text-white/70">Sıranızı bekleyin...</p>
-                </div>
-              ) : isSpymaster && !gameState.currentClue ? (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-2">
-                    <Lightbulb className="w-5 h-5 animate-pulse" />
-                    <p className="text-lg font-bold text-white">İpucunu Verin</p>
-                  </div>
-                  <p className="text-sm text-white/70">Takımınıza yardımcı olun</p>
-                </div>
-              ) : !isSpymaster && gameState.currentClue ? (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-2">
-                    <Target className="w-5 h-5 animate-pulse" />
-                    <p className="text-lg font-bold text-white">Tahmin Edin</p>
-                  </div>
-                  <p className="text-sm text-white/70">Doğru kartı seçin</p>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-2">
-                    <Clock className="w-5 h-5 animate-pulse" />
-                    <p className="text-lg font-bold text-white">Bekleniyor</p>
-                  </div>
-                  <p className="text-sm text-white/70">İpucu bekleniyor...</p>
-                </div>
-              )}
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-shimmer" />
-          </div>
-        </div>
-
         {/* Main Game Area */}
         <div className="grid grid-cols-1 xl:grid-cols-[minmax(170px,13vw)_1fr_minmax(170px,13vw)] gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
           {/* Left Side - Dark Team */}
