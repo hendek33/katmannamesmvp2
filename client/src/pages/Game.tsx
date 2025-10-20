@@ -336,8 +336,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1">
-            <div className="grid grid-cols-5 gap-2 md:gap-3 w-full h-full max-h-full" style={{ gridAutoRows: '1fr' }} data-testid="game-grid">
+          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1 overflow-hidden">
+            <div className="grid grid-cols-5 gap-2 md:gap-3 w-full flex-1 min-h-0" style={{ gridAutoRows: '1fr' }} data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
@@ -350,7 +350,7 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display at Bottom */}
-            <div className="flex justify-center">
+            <div className="flex justify-center flex-shrink-0">
               {canGiveClue ? (
                 <Card className="p-2 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
                   <div className="space-y-2">
