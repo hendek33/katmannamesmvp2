@@ -348,6 +348,71 @@ export default function Game() {
               ))}
             </div>
 
+            {/* Clue Input/Display at Bottom */}
+            <div className="flex justify-center flex-shrink-0 mt-auto">
+              {canGiveClue ? (
+                <Card className="p-3 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
+                  <div className="space-y-2">
+                    <div className="text-center space-y-1">
+                      <div className="flex items-center justify-center gap-1.5 text-amber-900">
+                        <Lightbulb className="w-4 h-4" />
+                        <Label className="text-xs font-bold uppercase">İpucu Ver</Label>
+                      </div>
+                      <p className="text-[10px] text-amber-800/70 font-medium">Takımınıza yardımcı olur</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        data-testid="input-clue-word"
+                        placeholder="KELİME"
+                        value={clueWord}
+                        onChange={(e) => setClueWord(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
+                        maxLength={20}
+                        className="w-40 text-center font-bold text-lg uppercase bg-white border-2 border-amber-500/30 focus:border-amber-500 h-10"
+                      />
+                      <Input
+                        data-testid="input-clue-count"
+                        type="number"
+                        min="0"
+                        max="9"
+                        value={clueCount}
+                        onChange={(e) => setClueCount(e.target.value)}
+                        className="w-16 text-center font-bold text-2xl text-black bg-white border-2 border-amber-500/30 focus:border-amber-500 h-10"
+                      />
+                      <Button
+                        onClick={handleGiveClue}
+                        disabled={!clueWord.trim() || parseInt(clueCount) < 0}
+                        data-testid="button-give-clue"
+                        size="sm"
+                        className="h-10 px-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl hover:shadow-amber-500/50 group"
+                      >
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ) : gameState.currentClue ? (
+                <Card className="px-4 py-2 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shimmer" />
+                  <div className="relative text-center space-y-1">
+                    <div className="flex items-center justify-center gap-1.5 text-amber-900/60">
+                      <Lightbulb className="w-3 h-3" />
+                      <span className="text-xs font-semibold uppercase">İpucu</span>
+                    </div>
+                    <div className="flex items-baseline justify-center gap-3">
+                      <span className="text-xl font-black text-amber-900 uppercase tracking-wider">
+                        {gameState.currentClue.word}
+                      </span>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-lg">
+                        <span className="text-lg font-black text-white">
+                          {gameState.currentClue.count}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ) : null}
+            </div>
           </div>
 
           {/* Right Side - Light Team */}
