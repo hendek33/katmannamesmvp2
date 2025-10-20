@@ -101,6 +101,17 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ## Son Değişiklikler
 
 ### 2025-10-20 (Son Güncelleme)
+- ✅ **Oyun Ekranı Layout Optimizasyonu**
+  - Sayfa artık h-screen içinde, scroll yapmadan tüm içerik görünüyor
+  - Flexbox layout ile dinamik alan yönetimi
+  - Grid gap'ler azaltıldı (2px)
+  - Yan paneller daha kompakt (280px, overflow-y-auto)
+  - Skor kartları küçültüldü (5xl font → text-5xl)
+  - Status banner küçültüldü (p-6 → p-3)
+  - Clue display kompakt hale getirildi
+  - Header minimal boyutta
+
+### 2025-10-20
 - ✅ **Kart Tasarımı Yenilendi**
   - İki katmanlı modern tasarım (üstte açık gradient, altta koyu panel)
   - 3:2 aspect ratio (en-boy oranı)

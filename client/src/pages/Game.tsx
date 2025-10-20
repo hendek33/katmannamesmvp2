@@ -130,10 +130,10 @@ export default function Game() {
   const lightPlayers = gameState.players.filter(p => p.team === "light");
 
   return (
-    <div className="min-h-screen p-3 md:p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 animate-in fade-in duration-500">
-      <div className="max-w-[1800px] mx-auto space-y-4">
+    <div className="h-screen overflow-hidden p-2 md:p-3 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 animate-in fade-in duration-500">
+      <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
         {/* Modern Header */}
-        <Card className="p-4 border-2 shadow-2xl bg-gradient-to-r from-slate-800/90 to-slate-900/90 backdrop-blur-sm hover:shadow-primary/20 transition-all">
+        <Card className="p-2 md:p-3 border-2 shadow-2xl bg-gradient-to-r from-slate-800/90 to-slate-900/90 backdrop-blur-sm hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Logo />
@@ -191,8 +191,8 @@ export default function Game() {
         </Card>
 
         {/* Status Banner */}
-        <div className="relative overflow-hidden">
-          <div className={`p-6 rounded-xl border-2 shadow-2xl text-center transition-all ${
+        <div className="relative overflow-hidden flex-shrink-0">
+          <div className={`p-3 rounded-xl border-2 shadow-2xl text-center transition-all ${
             gameState.currentTeam === "dark"
               ? "bg-gradient-to-r from-blue-900/90 to-blue-800/90 border-blue-700/50"
               : "bg-gradient-to-r from-red-950/90 to-red-900/90 border-red-800/50"
@@ -200,37 +200,37 @@ export default function Game() {
             <div className="relative z-10">
               {!isCurrentTurn ? (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-center gap-3">
-                    <Clock className="w-6 h-6 animate-pulse" />
-                    <p className="text-2xl font-bold text-white">
+                  <div className="flex items-center justify-center gap-2">
+                    <Clock className="w-5 h-5 animate-pulse" />
+                    <p className="text-lg font-bold text-white">
                       {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} Oynuyor
                     </p>
                   </div>
-                  <p className="text-white/70">Sıranızı bekleyin...</p>
+                  <p className="text-sm text-white/70">Sıranızı bekleyin...</p>
                 </div>
               ) : isSpymaster && !gameState.currentClue ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center gap-3">
-                    <Lightbulb className="w-6 h-6 animate-pulse" />
-                    <p className="text-2xl font-bold text-white">İpucunu Verin</p>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-center gap-2">
+                    <Lightbulb className="w-5 h-5 animate-pulse" />
+                    <p className="text-lg font-bold text-white">İpucunu Verin</p>
                   </div>
-                  <p className="text-white/70">Takımınıza yardımcı olun</p>
+                  <p className="text-sm text-white/70">Takımınıza yardımcı olun</p>
                 </div>
               ) : !isSpymaster && gameState.currentClue ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center gap-3">
-                    <Target className="w-6 h-6 animate-pulse" />
-                    <p className="text-2xl font-bold text-white">Tahmin Edin</p>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-center gap-2">
+                    <Target className="w-5 h-5 animate-pulse" />
+                    <p className="text-lg font-bold text-white">Tahmin Edin</p>
                   </div>
-                  <p className="text-white/70">Doğru kartı seçin</p>
+                  <p className="text-sm text-white/70">Doğru kartı seçin</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-center gap-3">
-                    <Clock className="w-6 h-6 animate-pulse" />
-                    <p className="text-2xl font-bold text-white">Bekleniyor</p>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-center gap-2">
+                    <Clock className="w-5 h-5 animate-pulse" />
+                    <p className="text-lg font-bold text-white">Bekleniyor</p>
                   </div>
-                  <p className="text-white/70">İpucu bekleniyor...</p>
+                  <p className="text-sm text-white/70">İpucu bekleniyor...</p>
                 </div>
               )}
             </div>
@@ -239,23 +239,23 @@ export default function Game() {
         </div>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[320px_1fr_320px] gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-[280px_1fr_280px] gap-2 flex-1 min-h-0 overflow-hidden">
           {/* Left Side - Dark Team */}
-          <div className="space-y-4">
+          <div className="space-y-2 overflow-y-auto">
             {/* Score Card */}
-            <Card className="p-8 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
-              <div className="text-center space-y-4">
+            <Card className="p-4 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
+              <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-blue-600 animate-pulse" />
-                  <h3 className="text-sm font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
+                  <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                  <h3 className="text-xs font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-8xl font-black text-blue-100 group-hover:scale-110 transition-transform">
+                  <div className="text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
                     {gameState.darkCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <p className="text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
                   {gameState.currentTeam === "dark" && (
                     <div className="inline-block px-3 py-1 bg-blue-600/30 rounded-full">
@@ -306,8 +306,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-4">
-            <div className="grid grid-cols-5 gap-2 md:gap-3" data-testid="game-grid">
+          <div className="space-y-2 overflow-y-auto">
+            <div className="grid grid-cols-5 gap-1.5 md:gap-2" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
@@ -322,7 +322,7 @@ export default function Game() {
             {/* Clue Input/Display at Bottom */}
             <div className="flex justify-center">
               {canGiveClue ? (
-                <Card className="p-6 border-2 shadow-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 hover:shadow-amber-500/50 transition-all">
+                <Card className="p-3 border-2 shadow-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 hover:shadow-amber-500/50 transition-all">
                   <div className="space-y-3">
                     <div className="flex items-center justify-center gap-2 text-amber-900">
                       <Lightbulb className="w-5 h-5" />
@@ -360,19 +360,19 @@ export default function Game() {
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-12 py-8 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group">
+                <Card className="px-6 py-4 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shimmer" />
                   <div className="relative text-center space-y-2">
                     <div className="flex items-center justify-center gap-2 text-amber-900/60">
                       <Lightbulb className="w-4 h-4" />
                       <span className="text-xs font-semibold uppercase">İpucu</span>
                     </div>
-                    <div className="flex items-baseline justify-center gap-6">
-                      <span className="text-4xl font-black text-amber-900 uppercase tracking-wider">
+                    <div className="flex items-baseline justify-center gap-4">
+                      <span className="text-2xl font-black text-amber-900 uppercase tracking-wider">
                         {gameState.currentClue.word}
                       </span>
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-lg">
-                        <span className="text-3xl font-black text-white">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-lg">
+                        <span className="text-xl font-black text-white">
                           {gameState.currentClue.count}
                         </span>
                       </div>
@@ -384,21 +384,21 @@ export default function Game() {
           </div>
 
           {/* Right Side - Light Team */}
-          <div className="space-y-4">
+          <div className="space-y-2 overflow-y-auto">
             {/* Score Card */}
-            <Card className="p-8 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
-              <div className="text-center space-y-4">
+            <Card className="p-4 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
+              <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-600 animate-pulse" />
-                  <h3 className="text-sm font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
+                  <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+                  <h3 className="text-xs font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-8xl font-black text-red-100 group-hover:scale-110 transition-transform">
+                  <div className="text-5xl font-black text-red-100 group-hover:scale-110 transition-transform">
                     {gameState.lightCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-red-600/20 group-hover:bg-red-600/40 transition-all" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <p className="text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                   {gameState.currentTeam === "light" && (
                     <div className="inline-block px-3 py-1 bg-red-700/30 rounded-full">
