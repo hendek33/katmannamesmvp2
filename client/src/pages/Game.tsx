@@ -174,7 +174,7 @@ export default function Game() {
         }}
         className="relative z-10 p-2 md:p-3 animate-in fade-in duration-500 transition-transform"
       >
-        <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
+        <div className="w-full h-full flex flex-col gap-2">
         {/* Modern Header */}
         <Card className="p-1.5 md:p-2 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
@@ -285,7 +285,7 @@ export default function Game() {
         </div>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[380px_1fr_380px] gap-3 md:gap-4 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(280px,22vw)_1fr_minmax(280px,22vw)] gap-3 md:gap-4 flex-1 min-h-0 overflow-hidden">
           {/* Left Side - Dark Team */}
           <div className="space-y-3 md:space-y-4 overflow-y-auto">
             {/* Score Card */}
