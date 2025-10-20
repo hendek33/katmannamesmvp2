@@ -144,17 +144,19 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
   - Shadow efektleri kaldırıldı, daha temiz görünüm
   - Sayı input'u text-black ile okunabilir hale getirildi
 
-- ✅ **Oyun Ekranı %80 Ölçeklendirme**
-  - CSS transform: scale(0.8) ile tüm oyun ekranı %80'e küçültüldü
-  - 100% tarayıcı ölçeğinde tüm içerik ekrana sığıyor, scroll yok
+- ✅ **Oyun Ekranı %75 Ölçeklendirme (İyileştirilmiş)**
+  - CSS transform: scale(0.75) ile tüm oyun ekranı %75'e küçültüldü
+  - 100% tarayıcı ölçeğinde ipucu balonu ile birlikte her şey ekrana sığıyor
   - Transform-origin: top ile yukarıdan hizalama
-  - Width compensation: 125% (-12.5% margin)
-  - Grid gap'ler minimal (1-1.5px)
-  - Kartlar kompakt (p-1.5/p-2, text-xs/sm)
-  - Yan paneller 280px
-  - Skor kartları text-5xl
-  - Status banner p-3
-  - Header minimal boyut
+  - Width compensation: 133.33% (-16.665% margin)
+  - Grid gap'ler ultra minimal (0.5-1px)
+  - Kartlar ultra kompakt (p-1.5/p-2)
+  - Yan paneller 260px
+  - Skor kartları p-3
+  - Status banner p-2
+  - Header p-1.5/p-2
+  - İpucu balonu kompakt (p-2, h-10 input, w-40/w-16)
+  - İpucu gösterim balonu küçük (px-4 py-2, text-xl)
 
 ### 2025-10-20
 - ✅ **Kart Tasarımı Yenilendi**

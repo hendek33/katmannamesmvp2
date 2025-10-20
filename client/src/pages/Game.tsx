@@ -141,11 +141,11 @@ export default function Game() {
       {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      <div className="scale-[0.8] origin-top w-[125%] -ml-[12.5%] h-[125%] p-2 md:p-3 animate-in fade-in duration-500">
-        <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
+      <div className="scale-[0.75] origin-top w-[133.33%] -ml-[16.665%] h-[133.33%] p-1.5 md:p-2 animate-in fade-in duration-500">
+        <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-1.5">
         {/* Modern Header */}
-        <Card className="p-2 md:p-3 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <Card className="p-1.5 md:p-2 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-lg bg-primary/10">
@@ -201,7 +201,7 @@ export default function Game() {
 
         {/* Status Banner */}
         <div className="relative overflow-hidden flex-shrink-0">
-          <div className={`p-3 rounded-xl border-2 shadow-2xl text-center transition-all ${
+          <div className={`p-2 rounded-xl border-2 shadow-2xl text-center transition-all ${
             gameState.currentTeam === "dark"
               ? "bg-gradient-to-r from-blue-900/90 to-blue-800/90 border-blue-700/50"
               : "bg-gradient-to-r from-red-950/90 to-red-900/90 border-red-800/50"
@@ -248,11 +248,11 @@ export default function Game() {
         </div>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[280px_1fr_280px] gap-2 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 xl:grid-cols-[260px_1fr_260px] gap-1.5 flex-1 min-h-0 overflow-hidden">
           {/* Left Side - Dark Team */}
-          <div className="space-y-2 overflow-y-auto">
+          <div className="space-y-1.5 overflow-y-auto">
             {/* Score Card */}
-            <Card className="p-4 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
+            <Card className="p-3 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
@@ -276,7 +276,7 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-5 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
+            <Card className="p-3 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-4 h-4 text-blue-400" />
                 <h4 className="text-sm font-bold text-blue-100 uppercase tracking-wide">Oyuncular</h4>
@@ -315,8 +315,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-2 flex flex-col min-h-0">
-            <div className="grid grid-cols-5 gap-1 md:gap-1.5 flex-shrink-0" data-testid="game-grid">
+          <div className="space-y-1.5 flex flex-col min-h-0">
+            <div className="grid grid-cols-5 gap-0.5 md:gap-1 flex-shrink-0" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
@@ -331,13 +331,13 @@ export default function Game() {
             {/* Clue Input/Display at Bottom */}
             <div className="flex justify-center">
               {canGiveClue ? (
-                <Card className="p-3 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-center gap-2 text-amber-900">
-                      <Lightbulb className="w-5 h-5" />
-                      <Label className="text-sm font-bold uppercase">İpucu Ver</Label>
+                <Card className="p-2 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-center gap-1.5 text-amber-900">
+                      <Lightbulb className="w-4 h-4" />
+                      <Label className="text-xs font-bold uppercase">İpucu Ver</Label>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Input
                         data-testid="input-clue-word"
                         placeholder="KELİME"
@@ -345,7 +345,7 @@ export default function Game() {
                         onChange={(e) => setClueWord(e.target.value.toUpperCase())}
                         onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                         maxLength={20}
-                        className="w-48 text-center font-bold text-xl uppercase bg-white border-2 border-amber-500/30 focus:border-amber-500"
+                        className="w-40 text-center font-bold text-lg uppercase bg-white border-2 border-amber-500/30 focus:border-amber-500 h-10"
                       />
                       <Input
                         data-testid="input-clue-count"
@@ -354,34 +354,34 @@ export default function Game() {
                         max="9"
                         value={clueCount}
                         onChange={(e) => setClueCount(e.target.value)}
-                        className="w-20 text-center font-bold text-3xl text-black bg-white border-2 border-amber-500/30 focus:border-amber-500"
+                        className="w-16 text-center font-bold text-2xl text-black bg-white border-2 border-amber-500/30 focus:border-amber-500 h-10"
                       />
                       <Button
                         onClick={handleGiveClue}
                         disabled={!clueWord.trim() || parseInt(clueCount) < 0}
                         data-testid="button-give-clue"
-                        size="lg"
-                        className="h-14 px-6 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl hover:shadow-amber-500/50 group"
+                        size="sm"
+                        className="h-10 px-4 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl hover:shadow-amber-500/50 group"
                       >
-                        <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </div>
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-6 py-4 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group">
+                <Card className="px-4 py-2 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shimmer" />
-                  <div className="relative text-center space-y-2">
-                    <div className="flex items-center justify-center gap-2 text-amber-900/60">
-                      <Lightbulb className="w-4 h-4" />
+                  <div className="relative text-center space-y-1">
+                    <div className="flex items-center justify-center gap-1.5 text-amber-900/60">
+                      <Lightbulb className="w-3 h-3" />
                       <span className="text-xs font-semibold uppercase">İpucu</span>
                     </div>
-                    <div className="flex items-baseline justify-center gap-4">
-                      <span className="text-2xl font-black text-amber-900 uppercase tracking-wider">
+                    <div className="flex items-baseline justify-center gap-3">
+                      <span className="text-xl font-black text-amber-900 uppercase tracking-wider">
                         {gameState.currentClue.word}
                       </span>
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-lg">
-                        <span className="text-xl font-black text-white">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-lg">
+                        <span className="text-lg font-black text-white">
                           {gameState.currentClue.count}
                         </span>
                       </div>
@@ -393,9 +393,9 @@ export default function Game() {
           </div>
 
           {/* Right Side - Light Team */}
-          <div className="space-y-2 overflow-y-auto">
+          <div className="space-y-1.5 overflow-y-auto">
             {/* Score Card */}
-            <Card className="p-4 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
+            <Card className="p-3 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
               <div className="text-center space-y-2">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
@@ -419,7 +419,7 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-5 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
+            <Card className="p-3 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-4 h-4 text-red-500" />
                 <h4 className="text-sm font-bold text-red-100 uppercase tracking-wide">Oyuncular</h4>
