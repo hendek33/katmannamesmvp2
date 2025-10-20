@@ -46,19 +46,19 @@ export default function Game() {
       const vh = window.innerHeight;
       const vw = window.innerWidth;
       
-      // Base content dimensions (actual size needed for all content)
-      const baseHeight = 1000; // Optimized for much smaller square cards
-      const baseWidth = 1800; // Optimized for narrower side panels
+      // Base content dimensions - designed for full-size content at 1920x1080
+      const baseHeight = 1400; // Full height: header + 5 rows of cards + ipucu + margins
+      const baseWidth = 2200; // Full width: side panels (20vw each) + 5 columns + gaps
       
       // Calculate scale to fit height and width with safe margins
-      const scaleHeight = (vh - 40) / baseHeight; // -40 for safe margin
-      const scaleWidth = (vw - 40) / baseWidth; // -40 for safe margin
+      const scaleHeight = (vh - 60) / baseHeight; // -60 for safe margin
+      const scaleWidth = (vw - 60) / baseWidth; // -60 for safe margin
       
       // Use the smaller scale to ensure everything fits
-      let newScale = Math.min(scaleHeight, scaleWidth, 1);
+      let newScale = Math.min(scaleHeight, scaleWidth);
       
-      // Clamp between reasonable values - allow more aggressive scaling
-      newScale = Math.max(0.25, Math.min(1, newScale));
+      // Clamp between reasonable values - allow aggressive scaling down, no scaling up
+      newScale = Math.max(0.2, Math.min(1, newScale));
       
       setScale(newScale);
     };
@@ -353,7 +353,7 @@ export default function Game() {
 
           {/* Center - Grid */}
           <div className="space-y-2 md:space-y-3 flex flex-col min-h-0">
-            <div className="grid grid-cols-5 gap-1 md:gap-1.5 flex-shrink-0" data-testid="game-grid">
+            <div className="grid grid-cols-5 gap-2 md:gap-3 flex-shrink-0" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
