@@ -11,7 +11,8 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { RotateCcw, Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye } from "lucide-react";
+import { RotateCcw, Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Lobby from "./Lobby";
 
 export default function Game() {
@@ -21,6 +22,7 @@ export default function Game() {
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
+  const [showRoomCode, setShowRoomCode] = useState(false);
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -160,44 +162,115 @@ export default function Game() {
         <div className="w-full h-full flex flex-col gap-2 overflow-hidden">
         {/* Modern Header */}
         <Card className="p-1.5 md:p-2 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between gap-4">
+            {/* Left Side - Room Code & Players */}
+            <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Users className="w-4 h-4 text-primary" />
+                <div className="text-xs text-muted-foreground">Oda Kodu:</div>
+                <div className="text-sm font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
+                  {showRoomCode ? roomCode : "••••••"}
                 </div>
-                <div>
-                  <div className="text-xs text-muted-foreground">Oda Kodu</div>
-                  <div className="text-sm font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
-                    {roomCode}
-                  </div>
-                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowRoomCode(!showRoomCode)}
+                  className="h-6 w-6 p-0 hover:bg-primary/10"
+                >
+                  {showRoomCode ? (
+                    <EyeOff className="w-3 h-3" />
+                  ) : (
+                    <Eye className="w-3 h-3" />
+                  )}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleCopyRoomCode}
+                  data-testid="button-copy-code"
+                  className="h-7 border-2 hover:border-primary hover:bg-primary/10"
+                >
+                  {copied ? (
+                    <Check className="w-3 h-3 text-green-500" />
+                  ) : (
+                    <Copy className="w-3 h-3" />
+                  )}
+                </Button>
               </div>
+              
+              {/* Players Dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 border-2 hover:border-blue-500 hover:bg-blue-500/10"
+                  >
+                    <Users className="w-3 h-3 mr-1" />
+                    Oyuncular ({gameState.players.length})
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900/95 border-2 border-orange-900/30 max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
+                      Oyuncular & İzleyiciler
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 max-h-96 overflow-y-auto">
+                    {/* Dark Team */}
+                    <div>
+                      <h3 className="text-sm font-bold text-blue-400 mb-2">{gameState.darkTeamName}</h3>
+                      <div className="space-y-1">
+                        {darkPlayers.map(player => (
+                          <div key={player.id} className="flex items-center justify-between p-2 rounded bg-blue-950/50 border border-blue-800/30">
+                            <span className="text-sm text-blue-100">{player.username}</span>
+                            <span className="text-xs text-blue-300">{player.role === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Light Team */}
+                    <div>
+                      <h3 className="text-sm font-bold text-red-400 mb-2">{gameState.lightTeamName}</h3>
+                      <div className="space-y-1">
+                        {lightPlayers.map(player => (
+                          <div key={player.id} className="flex items-center justify-between p-2 rounded bg-red-950/50 border border-red-800/30">
+                            <span className="text-sm text-red-100">{player.username}</span>
+                            <span className="text-xs text-red-300">{player.role === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Spectators */}
+                    {gameState.players.filter(p => !p.team).length > 0 && (
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-400 mb-2">İzleyiciler</h3>
+                        <div className="space-y-1">
+                          {gameState.players.filter(p => !p.team).map(player => (
+                            <div key={player.id} className="flex items-center p-2 rounded bg-slate-800/50 border border-slate-700/30">
+                              <span className="text-sm text-gray-300">{player.username}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             
+            {/* Right Side - Actions */}
             <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleCopyRoomCode}
-                data-testid="button-copy-code"
-                className="border-2 hover:border-primary hover:bg-primary/10"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </Button>
               {currentPlayer?.isRoomOwner && (
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={handleRestart}
                   data-testid="button-restart"
-                  className="border-2 hover:border-amber-500 hover:bg-amber-500/10"
+                  className="h-7 border-2 hover:border-amber-500 hover:bg-amber-500/10"
                 >
-                  <RotateCcw className="w-4 h-4 mr-1" />
+                  <RotateCcw className="w-3 h-3 mr-1" />
                   Yenile
                 </Button>
               )}
@@ -210,9 +283,9 @@ export default function Game() {
                   localStorage.removeItem("katmannames_player_id");
                   setLocation("/rooms");
                 }}
-                className="border-2 hover:border-red-600 hover:bg-red-600/10"
+                className="h-7 border-2 hover:border-red-600 hover:bg-red-600/10"
               >
-                <ArrowLeft className="w-4 h-4 mr-1" />
+                <ArrowLeft className="w-3 h-3 mr-1" />
                 Oyundan Çık
               </Button>
             </div>
