@@ -54,8 +54,8 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 - 🃏 Özgün kart tasarımları (iki katmanlı modern stil):
   - **Katman Koyu (Mavi)**: Açık mavi gradient + koyu mavi alt panel
   - **Katman Açık (Kırmızı)**: Açık kırmızı gradient + koyu kırmızı alt panel
-  - **Tarafsız**: Açık amber gradient + koyu amber alt panel
-  - **Yasak**: Gri-siyah gradient + siyah alt panel + pulse efekti
+  - **Tarafsız**: Açık bej gradient + koyu stone alt panel
+  - **Yasak**: Gri-siyah gradient + siyah alt panel
 - ✨ Hover ve flip animasyonları
 - 📱 Responsive mobil tasarım
 - 🎯 3D kart efektleri (dokular, ışık, gölge)
@@ -104,11 +104,12 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 - ✅ **Kart Tasarımı Yenilendi**
   - İki katmanlı modern tasarım (üstte açık gradient, altta koyu panel)
   - Mavi takım: Açık mavi gradient + koyu mavi panel
-  - Kırmızı takım: Açık kırmızı/turuncu gradient + koyu kırmızı panel
-  - Tarafsız: Açık bej/amber gradient + koyu amber panel
-  - Yasak: Gri/siyah gradient + siyah panel + pulse animasyonu
-  - Kelimeler alt panelde beyaz renkte
-  - Hover efekti: Kart yukarı kalkar ve büyür
+  - Kırmızı takım: Açık kırmızı gradient + koyu kırmızı panel
+  - Tarafsız: Açık bej (stone) gradient + koyu stone panel
+  - Yasak: Gri/siyah gradient + siyah panel
+  - Yumuşak yuvarlatılmış köşeler ve ince çerçeveler
+  - Kelimeler alt panelde beyaz renkte, uppercase
+  - Hover efekti: Kart 8% büyür ve 2px yukarı kalkar
   - Renkli gölge efektleri
 
 - ✅ **Takım İsimleri Oyun Ekranında**

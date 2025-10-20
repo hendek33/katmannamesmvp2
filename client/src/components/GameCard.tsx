@@ -28,9 +28,9 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
           };
         case "neutral":
           return {
-            bg: "bg-gradient-to-b from-amber-200 to-amber-300",
-            border: "border-amber-400",
-            panel: "bg-amber-800",
+            bg: "bg-gradient-to-b from-stone-100 to-stone-200",
+            border: "border-stone-300",
+            panel: "bg-stone-700",
             shadow: "shadow-md",
           };
         case "assassin":
@@ -38,7 +38,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
             bg: "bg-gradient-to-b from-gray-700 to-gray-800",
             border: "border-gray-900",
             panel: "bg-black",
-            shadow: "shadow-xl shadow-red-600/60 animate-pulse",
+            shadow: "shadow-xl shadow-gray-900/60",
           };
       }
     }
@@ -60,12 +60,12 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       disabled={!canClick}
       data-testid={`card-${card.id}`}
       className={cn(
-        "relative rounded-lg border-4 p-2 min-h-[90px] md:min-h-[110px]",
-        "transition-all duration-300 flex flex-col",
+        "relative rounded-xl border-[3px] p-2.5 min-h-[90px] md:min-h-[110px]",
+        "transition-all duration-300 flex flex-col overflow-hidden",
         colors.border,
         colors.bg,
         colors.shadow,
-        canClick && "cursor-pointer hover:scale-105 hover:-translate-y-1 active:scale-100",
+        canClick && "cursor-pointer hover:scale-[1.08] hover:-translate-y-2 active:scale-100",
         !card.revealed && !isSpymaster && "opacity-100",
         card.revealed && "opacity-95",
         !canClick && "cursor-default"
@@ -74,10 +74,10 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       <div className="flex-1" />
       
       <div className={cn(
-        "rounded px-3 py-2 flex items-center justify-center min-h-[36px]",
+        "rounded-lg px-3 py-2.5 flex items-center justify-center min-h-[38px]",
         colors.panel
       )}>
-        <span className="text-white font-bold text-sm md:text-base uppercase tracking-wide text-center leading-tight">
+        <span className="text-white font-bold text-sm md:text-base uppercase tracking-wider text-center leading-tight">
           {card.word}
         </span>
       </div>
