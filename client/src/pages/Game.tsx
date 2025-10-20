@@ -45,19 +45,19 @@ export default function Game() {
       const vh = window.innerHeight;
       const vw = window.innerWidth;
       
-      // Base content height we need (approximate)
-      const baseHeight = 1000; // Approximate height of unscaled content
-      const baseWidth = 1400; // Approximate width of unscaled content
+      // Base content dimensions (actual size needed for all content including clue balloon)
+      const baseHeight = 1300; // Full height including header, grid, clue input, margins
+      const baseWidth = 1800; // Full width including side panels
       
       // Calculate scale to fit height and width
-      const scaleHeight = vh / baseHeight;
-      const scaleWidth = vw / baseWidth;
+      const scaleHeight = (vh - 20) / baseHeight; // -20 for safe margin
+      const scaleWidth = (vw - 20) / baseWidth; // -20 for safe margin
       
       // Use the smaller scale to ensure everything fits
       let newScale = Math.min(scaleHeight, scaleWidth, 1);
       
       // Clamp between reasonable values
-      newScale = Math.max(0.5, Math.min(1, newScale));
+      newScale = Math.max(0.4, Math.min(1, newScale));
       
       setScale(newScale);
     };

@@ -151,7 +151,9 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
   - Transform: scale() ile dinamik ölçeklendirme
   - Transform-origin: top center ile merkezli hizalama
   - Width/height/margin otomatik kompansasyon
-  - Min scale: 0.5, Max scale: 1.0
+  - Base dimensions: 1300px height, 1800px width
+  - Safe margin: 20px her yönde
+  - Min scale: 0.4, Max scale: 1.0
   - Her ekran çözünürlüğünde tam sığma garantisi
   - Smooth transition efekti
 
