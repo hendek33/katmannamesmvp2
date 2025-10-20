@@ -335,11 +335,11 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1">
+          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1 overflow-visible">
             <div 
-              className="grid grid-cols-5 gap-2 md:gap-3 w-full" 
+              className="grid grid-cols-5 gap-2 md:gap-3 w-full flex-shrink-0" 
               style={{ 
-                transform: 'scale(0.7)',
+                transform: 'scale(0.84)',
                 transformOrigin: 'top center'
               }} 
               data-testid="game-grid">
