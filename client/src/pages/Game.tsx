@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
 import { GameCard } from "@/components/GameCard";
@@ -20,6 +20,8 @@ export default function Game() {
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (error) {
@@ -36,6 +38,35 @@ export default function Game() {
       setLocation("/end");
     }
   }, [gameState, setLocation]);
+
+  // Dynamic scaling based on viewport
+  useEffect(() => {
+    const calculateScale = () => {
+      const vh = window.innerHeight;
+      const vw = window.innerWidth;
+      
+      // Base content height we need (approximate)
+      const baseHeight = 1000; // Approximate height of unscaled content
+      const baseWidth = 1400; // Approximate width of unscaled content
+      
+      // Calculate scale to fit height and width
+      const scaleHeight = vh / baseHeight;
+      const scaleWidth = vw / baseWidth;
+      
+      // Use the smaller scale to ensure everything fits
+      let newScale = Math.min(scaleHeight, scaleWidth, 1);
+      
+      // Clamp between reasonable values
+      newScale = Math.max(0.5, Math.min(1, newScale));
+      
+      setScale(newScale);
+    };
+
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    
+    return () => window.removeEventListener('resize', calculateScale);
+  }, []);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -141,8 +172,18 @@ export default function Game() {
       {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      <div className="scale-[0.75] origin-top w-[133.33%] -ml-[16.665%] h-[133.33%] p-1.5 md:p-2 animate-in fade-in duration-500">
-        <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-1.5">
+      <div 
+        ref={containerRef}
+        style={{ 
+          transform: `scale(${scale})`,
+          transformOrigin: 'top center',
+          width: scale < 1 ? `${100 / scale}%` : '100%',
+          marginLeft: scale < 1 ? `${-(100 / scale - 100) / 2}%` : '0',
+          height: scale < 1 ? `${100 / scale}%` : '100%',
+        }}
+        className="p-2 md:p-3 animate-in fade-in duration-500 transition-transform"
+      >
+        <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
         {/* Modern Header */}
         <Card className="p-1.5 md:p-2 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
