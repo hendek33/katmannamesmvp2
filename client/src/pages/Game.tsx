@@ -336,8 +336,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1 overflow-hidden">
-            <div className="grid grid-cols-5 gap-2 md:gap-3 w-full flex-1 min-h-0" style={{ gridAutoRows: '1fr' }} data-testid="game-grid">
+          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1 overflow-auto">
+            <div className="grid grid-cols-5 gap-2 md:gap-3 w-full" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
