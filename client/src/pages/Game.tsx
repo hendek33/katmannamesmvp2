@@ -130,8 +130,9 @@ export default function Game() {
   const lightPlayers = gameState.players.filter(p => p.team === "light");
 
   return (
-    <div className="h-screen overflow-hidden p-2 md:p-3 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 animate-in fade-in duration-500">
-      <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="scale-[0.8] origin-top w-[125%] -ml-[12.5%] h-[125%] p-2 md:p-3 animate-in fade-in duration-500">
+        <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
         {/* Modern Header */}
         <Card className="p-2 md:p-3 border-2 shadow-2xl bg-gradient-to-r from-slate-800/90 to-slate-900/90 backdrop-blur-sm hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -510,6 +511,7 @@ export default function Game() {
               </div>
             </Card>
           </div>
+        </div>
         </div>
       </div>
     </div>

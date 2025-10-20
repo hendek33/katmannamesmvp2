@@ -101,17 +101,17 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ## Son Değişiklikler
 
 ### 2025-10-20 (Son Güncelleme)
-- ✅ **Oyun Ekranı Layout Optimizasyonu**
-  - Sayfa artık h-screen içinde, scroll yapmadan tüm içerik görünüyor
-  - Flexbox layout ile dinamik alan yönetimi
+- ✅ **Oyun Ekranı %80 Ölçeklendirme**
+  - CSS transform: scale(0.8) ile tüm oyun ekranı %80'e küçültüldü
+  - 100% tarayıcı ölçeğinde tüm içerik ekrana sığıyor, scroll yok
+  - Transform-origin: top ile yukarıdan hizalama
+  - Width compensation: 125% (-12.5% margin)
   - Grid gap'ler minimal (1-1.5px)
-  - Kartlar küçültüldü - tahta scroll olmadan sığıyor
-  - Kart padding: p-2.5 → p-1.5/p-2
-  - Kart font: text-sm/base → text-xs/sm
-  - Yan paneller kompakt (280px, overflow-y-auto)
-  - Skor kartları küçültüldü (text-5xl)
-  - Status banner minimal (p-3)
-  - Header minimal boyutta
+  - Kartlar kompakt (p-1.5/p-2, text-xs/sm)
+  - Yan paneller 280px
+  - Skor kartları text-5xl
+  - Status banner p-3
+  - Header minimal boyut
 
 ### 2025-10-20
 - ✅ **Kart Tasarımı Yenilendi**
