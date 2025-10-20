@@ -13,8 +13,10 @@ export default function GameEnd() {
   useEffect(() => {
     if (gameState?.phase === "playing" || gameState?.phase === "lobby") {
       setLocation("/game");
+    } else if (!gameState && isConnected) {
+      setLocation("/rooms");
     }
-  }, [gameState, setLocation]);
+  }, [gameState, isConnected, setLocation]);
 
   if (!isConnected || !gameState) {
     return (
