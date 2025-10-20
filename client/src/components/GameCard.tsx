@@ -60,9 +60,9 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       disabled={!canClick}
       data-testid={`card-${card.id}`}
       className={cn(
-        "relative rounded-lg border-[3px] p-1.5 md:p-2 w-full",
+        "relative rounded-lg border-2 p-1 w-full",
         "aspect-[3/2]",
-        "transition-all duration-300 flex flex-col overflow-hidden",
+        "transition-all duration-200 flex flex-col overflow-hidden",
         colors.border,
         colors.bg,
         colors.shadow,
@@ -75,10 +75,10 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       <div className="flex-1" />
       
       <div className={cn(
-        "rounded px-2 py-1.5 md:px-3 md:py-2 flex items-center justify-center",
+        "rounded px-1.5 py-1 flex items-center justify-center",
         colors.panel
       )}>
-        <span className="text-white font-bold text-xs md:text-sm uppercase tracking-wide text-center leading-tight">
+        <span className="text-white font-bold text-[10px] md:text-xs uppercase tracking-tight text-center leading-tight">
           {card.word}
         </span>
       </div>

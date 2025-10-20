@@ -306,8 +306,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-2 flex flex-col min-h-0">
-            <div className="grid grid-cols-5 gap-1 md:gap-1.5 flex-shrink-0" data-testid="game-grid">
+          <div className="space-y-1.5 flex flex-col min-h-0">
+            <div className="grid grid-cols-5 gap-1 flex-shrink-0" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
