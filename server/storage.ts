@@ -1,11 +1,17 @@
-import type { GameState, Player, Card, CardType, Team, Clue } from "@shared/schema";
+import type { GameState, Player, Card, CardType, Team, Clue, RoomListItem } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { getRandomWords } from "./words";
 
+interface RoomData {
+  gameState: GameState;
+  password?: string;
+}
+
 export interface IStorage {
-  createRoom(ownerUsername: string): { roomCode: string; playerId: string; gameState: GameState };
+  createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState };
   getRoom(roomCode: string): GameState | undefined;
-  joinRoom(roomCode: string, username: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null;
+  joinRoom(roomCode: string, username: string, password?: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null;
+  listRooms(): RoomListItem[];
   addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null;
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null;
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
@@ -20,7 +26,7 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private rooms: Map<string, GameState>;
+  private rooms: Map<string, RoomData>;
   private playerToRoom: Map<string, string>;
 
   constructor() {
@@ -68,7 +74,7 @@ export class MemStorage implements IStorage {
     return cards;
   }
 
-  createRoom(ownerUsername: string): { roomCode: string; playerId: string; gameState: GameState } {
+  createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState } {
     const roomCode = this.generateRoomCode();
     const playerId = randomUUID();
     
@@ -94,21 +100,31 @@ export class MemStorage implements IStorage {
       revealHistory: [],
       darkTeamName: "Mavi Takım",
       lightTeamName: "Kırmızı Takım",
+      hasPassword: !!password,
+      createdAt: Date.now(),
     };
 
-    this.rooms.set(roomCode, gameState);
+    this.rooms.set(roomCode, { gameState, password });
     this.playerToRoom.set(playerId, roomCode);
 
     return { roomCode, playerId, gameState };
   }
 
   getRoom(roomCode: string): GameState | undefined {
-    return this.rooms.get(roomCode);
+    const roomData = this.rooms.get(roomCode);
+    return roomData?.gameState;
   }
 
-  joinRoom(roomCode: string, username: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null {
-    const room = this.rooms.get(roomCode);
-    if (!room) return null;
+  joinRoom(roomCode: string, username: string, password?: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+
+    // Check password if room has one
+    if (roomData.password && roomData.password !== password) {
+      return null;
+    }
+
+    const room = roomData.gameState;
 
     if (reconnectPlayerId) {
       const existingPlayer = room.players.find(p => p.id === reconnectPlayerId && p.username === username);
@@ -140,9 +156,28 @@ export class MemStorage implements IStorage {
     return { playerId, gameState: room, isReconnect: false };
   }
 
+  listRooms(): RoomListItem[] {
+    const roomList: RoomListItem[] = [];
+    
+    this.rooms.forEach((roomData) => {
+      roomList.push({
+        roomCode: roomData.gameState.roomCode,
+        playerCount: roomData.gameState.players.length,
+        hasPassword: roomData.gameState.hasPassword,
+        phase: roomData.gameState.phase,
+        createdAt: roomData.gameState.createdAt,
+      });
+    });
+
+    // Sort by creation time, newest first
+    return roomList.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
   addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room || room.phase !== "lobby") return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    if (room.phase !== "lobby") return null;
 
     if (role === "spymaster") {
       const teamPlayers = room.players.filter(p => p.team === team);
@@ -172,8 +207,9 @@ export class MemStorage implements IStorage {
   }
 
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room) return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
 
     const player = room.players.find(p => p.id === playerId);
     if (!player) return null;
@@ -192,8 +228,9 @@ export class MemStorage implements IStorage {
   }
 
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room) return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
 
     const player = room.players.find(p => p.id === playerId);
     if (!player || !player.team) return null;
@@ -212,8 +249,9 @@ export class MemStorage implements IStorage {
   }
 
   updateTeamName(roomCode: string, team: Team, name: string): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room || !team) return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData || !team) return null;
+    const room = roomData.gameState;
 
     if (team === "dark") {
       room.darkTeamName = name;
@@ -225,8 +263,10 @@ export class MemStorage implements IStorage {
   }
 
   startGame(roomCode: string): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room || room.phase !== "lobby") return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    if (room.phase !== "lobby") return null;
 
     const darkTeam = room.players.filter(p => p.team === "dark");
     const lightTeam = room.players.filter(p => p.team === "light");
@@ -248,8 +288,10 @@ export class MemStorage implements IStorage {
   }
 
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room || room.phase !== "playing") return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    if (room.phase !== "playing") return null;
 
     const player = room.players.find(p => p.id === playerId);
     if (!player || player.role !== "spymaster" || player.team !== room.currentTeam) {
@@ -266,8 +308,10 @@ export class MemStorage implements IStorage {
   }
 
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room || room.phase !== "playing" || !room.currentTeam) return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    if (room.phase !== "playing" || !room.currentTeam) return null;
 
     const player = room.players.find(p => p.id === playerId);
     if (!player || player.role !== "guesser" || player.team !== room.currentTeam) {
@@ -317,8 +361,9 @@ export class MemStorage implements IStorage {
   }
 
   restartGame(roomCode: string, playerId: string): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room) return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
 
     const player = room.players.find(p => p.id === playerId);
     if (!player || !player.isRoomOwner) return null;
@@ -336,8 +381,9 @@ export class MemStorage implements IStorage {
   }
 
   returnToLobby(roomCode: string): GameState | null {
-    const room = this.rooms.get(roomCode);
-    if (!room) return null;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
 
     room.phase = "lobby";
     room.cards = [];
@@ -352,8 +398,9 @@ export class MemStorage implements IStorage {
   }
 
   removePlayer(roomCode: string, playerId: string): void {
-    const room = this.rooms.get(roomCode);
-    if (!room) return;
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return;
+    const room = roomData.gameState;
 
     room.players = room.players.filter(p => p.id !== playerId);
     this.playerToRoom.delete(playerId);
@@ -366,8 +413,8 @@ export class MemStorage implements IStorage {
   }
 
   cleanupEmptyRooms(): void {
-    Array.from(this.rooms.entries()).forEach(([roomCode, room]) => {
-      if (room.players.length === 0) {
+    Array.from(this.rooms.entries()).forEach(([roomCode, roomData]) => {
+      if (roomData.gameState.players.length === 0) {
         this.rooms.delete(roomCode);
       }
     });

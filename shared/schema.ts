@@ -48,16 +48,28 @@ export interface GameState {
   revealHistory: RevealHistoryEntry[];
   darkTeamName: string;
   lightTeamName: string;
+  hasPassword: boolean;
+  createdAt: number;
+}
+
+export interface RoomListItem {
+  roomCode: string;
+  playerCount: number;
+  hasPassword: boolean;
+  phase: GamePhase;
+  createdAt: number;
 }
 
 export const joinRoomSchema = z.object({
   roomCode: z.string().min(4).max(6),
   username: z.string().min(2).max(20),
   playerId: z.string().optional(),
+  password: z.string().optional(),
 });
 
 export const createRoomSchema = z.object({
   username: z.string().min(2).max(20),
+  password: z.string().optional(),
 });
 
 export const teamSelectSchema = z.object({

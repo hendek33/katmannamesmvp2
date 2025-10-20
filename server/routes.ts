@@ -75,6 +75,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { type, payload } = message;
 
         switch (type) {
+          case "list_rooms": {
+            const roomList = storage.listRooms();
+            sendToClient(ws, {
+              type: "rooms_list",
+              payload: { rooms: roomList },
+            });
+            break;
+          }
+
           case "create_room": {
             const validation = createRoomSchema.safeParse(payload);
             if (!validation.success) {
@@ -82,7 +91,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            const { roomCode, playerId, gameState } = storage.createRoom(validation.data.username);
+            const { roomCode, playerId, gameState } = storage.createRoom(
+              validation.data.username,
+              validation.data.password
+            );
             
             ws.playerId = playerId;
             ws.roomCode = roomCode;
@@ -109,10 +121,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const result = storage.joinRoom(
               validation.data.roomCode, 
               validation.data.username,
+              validation.data.password,
               validation.data.playerId
             );
             if (!result) {
-              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı veya şifre yanlış" } });
               return;
             }
 
