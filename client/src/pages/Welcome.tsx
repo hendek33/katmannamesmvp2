@@ -20,7 +20,7 @@ export default function Welcome() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Particles */}
-      {[...Array(20)].map((_, i) => (
+      {[...Array(40)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       

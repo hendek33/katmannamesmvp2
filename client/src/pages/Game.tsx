@@ -131,7 +131,7 @@ export default function Game() {
 
   return (
     <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-      {[...Array(20)].map((_, i) => (
+      {[...Array(40)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       <div className="scale-[0.8] origin-top w-[125%] -ml-[12.5%] h-[125%] p-2 md:p-3 animate-in fade-in duration-500">
