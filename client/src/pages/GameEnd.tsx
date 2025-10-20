@@ -19,7 +19,7 @@ export default function GameEnd() {
   if (!isConnected || !gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        {[...Array(40)].map((_, i) => (
+        {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
         <Card className="p-8 space-y-4 text-center bg-slate-900/90 backdrop-blur-md border-orange-900/30" data-testid="loading-state">
@@ -33,7 +33,7 @@ export default function GameEnd() {
   if (!gameState.winner) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        {[...Array(40)].map((_, i) => (
+        {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
         <Card className="p-8 space-y-4 text-center bg-slate-900/90 backdrop-blur-md border-orange-900/30">

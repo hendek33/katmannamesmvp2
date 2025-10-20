@@ -102,11 +102,12 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 
 ### 2025-10-20 (Son Güncelleme)
 - ✅ **Partikül Efektleri**
-  - Arkaplan üzerine 40 adet animasyonlu partikül
+  - Arkaplan üzerine 70 adet animasyonlu partikül
   - Uyumlu renkler: Turuncu (orange-600), Mavi (blue-500/600), Altın (amber-400)
   - Random yönlerde hareket (yukarı, aşağı, sağa, sola)
   - 10 farklı animasyon paterni, infinite alternate ile gidip gelme
-  - Ekranın her yerinde dağılmış (top pozisyonları %10-90 arası)
+  - Hızlı animasyonlar (8-12 saniye döngüler)
+  - Ekranın her yerinde yoğun dağılım
   - Tüm sayfalarda aktif (Welcome, Lobby, Game, GameEnd)
 
 - ✅ **Logo Entegrasyonu**
