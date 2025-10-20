@@ -25,7 +25,7 @@ export default function Welcome() {
             <img 
               src="/logo.png" 
               alt="Katmannames Logo" 
-              className="w-80 h-80 md:w-96 md:h-96 object-contain"
+              className="w-80 md:w-96 h-auto object-contain"
             />
           </div>
           
