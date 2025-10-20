@@ -95,6 +95,14 @@ export function useWebSocket() {
                 setGameState(message.payload.gameState);
                 break;
 
+              case "left_room":
+                setGameState(null);
+                setRoomCode("");
+                setPlayerId("");
+                localStorage.removeItem("katmannames_room_code");
+                localStorage.removeItem("katmannames_player_id");
+                break;
+
               case "error":
                 setError(message.payload.message);
                 break;
