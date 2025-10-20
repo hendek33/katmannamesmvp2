@@ -15,14 +15,14 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
         case "dark":
           return {
             bg: "bg-gradient-to-b from-blue-400 to-blue-500",
-            border: "border-blue-500",
+            border: "border-blue-300",
             panel: "bg-blue-900",
             shadow: "shadow-lg shadow-blue-500/50",
           };
         case "light":
           return {
             bg: "bg-gradient-to-b from-red-400 to-red-500",
-            border: "border-red-500",
+            border: "border-red-300",
             panel: "bg-red-900",
             shadow: "shadow-lg shadow-red-500/50",
           };
@@ -36,7 +36,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
         case "assassin":
           return {
             bg: "bg-gradient-to-b from-gray-700 to-gray-800",
-            border: "border-gray-900",
+            border: "border-gray-600",
             panel: "bg-black",
             shadow: "shadow-xl shadow-gray-900/60",
           };
@@ -45,7 +45,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
     
     return {
       bg: "bg-gradient-to-b from-slate-300 to-slate-400",
-      border: "border-slate-500",
+      border: "border-slate-400",
       panel: "bg-slate-700",
       shadow: "shadow-md",
     };
@@ -60,7 +60,8 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       disabled={!canClick}
       data-testid={`card-${card.id}`}
       className={cn(
-        "relative rounded-xl border-[3px] p-2.5 min-h-[90px] md:min-h-[110px]",
+        "relative rounded-xl border-[3px] p-2.5 w-full",
+        "aspect-[3/2]",
         "transition-all duration-300 flex flex-col overflow-hidden",
         colors.border,
         colors.bg,

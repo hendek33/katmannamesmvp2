@@ -103,11 +103,12 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ### 2025-10-20 (Son Güncelleme)
 - ✅ **Kart Tasarımı Yenilendi**
   - İki katmanlı modern tasarım (üstte açık gradient, altta koyu panel)
-  - Mavi takım: Açık mavi gradient + koyu mavi panel
-  - Kırmızı takım: Açık kırmızı gradient + koyu kırmızı panel
-  - Tarafsız: Açık bej (stone) gradient + koyu stone panel
-  - Yasak: Gri/siyah gradient + siyah panel
-  - Yumuşak yuvarlatılmış köşeler ve ince çerçeveler
+  - 3:2 aspect ratio (en-boy oranı)
+  - Mavi takım: Açık mavi gradient + koyu mavi panel + açık mavi çerçeve
+  - Kırmızı takım: Açık kırmızı gradient + koyu kırmızı panel + açık kırmızı çerçeve
+  - Tarafsız: Açık bej (stone) gradient + koyu stone panel + bej çerçeve
+  - Yasak: Gri/siyah gradient + siyah panel + açık gri çerçeve
+  - Yumuşak yuvarlatılmış köşeler ve belirgin 3px çerçeveler
   - Kelimeler alt panelde beyaz renkte, uppercase
   - Hover efekti: Kart 8% büyür ve 2px yukarı kalkar
   - Renkli gölge efektleri
