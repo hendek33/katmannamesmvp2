@@ -203,7 +203,7 @@ export default function Game() {
                   <div className="flex items-center justify-center gap-3">
                     <Clock className="w-6 h-6 animate-pulse" />
                     <p className="text-2xl font-bold text-white">
-                      {gameState.currentTeam === "dark" ? "Katman Koyu" : "Katman Açık"} Oynuyor
+                      {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} Oynuyor
                     </p>
                   </div>
                   <p className="text-white/70">Sıranızı bekleyin...</p>
@@ -247,7 +247,7 @@ export default function Game() {
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-blue-600 animate-pulse" />
-                  <h3 className="text-sm font-bold text-blue-100 uppercase tracking-wider">Katman Koyu</h3>
+                  <h3 className="text-sm font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
                 </div>
                 <div className="relative">
                   <div className="text-8xl font-black text-blue-100 group-hover:scale-110 transition-transform">
@@ -390,7 +390,7 @@ export default function Game() {
               <div className="text-center space-y-4">
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-600 animate-pulse" />
-                  <h3 className="text-sm font-bold text-red-100 uppercase tracking-wider">Katman Açık</h3>
+                  <h3 className="text-sm font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
                 </div>
                 <div className="relative">
                   <div className="text-8xl font-black text-red-100 group-hover:scale-110 transition-transform">

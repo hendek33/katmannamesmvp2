@@ -100,7 +100,18 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 
 ## Son Değişiklikler
 
-### 2025-10-19 (Son Güncelleme)
+### 2025-10-20 (Son Güncelleme)
+- ✅ **Kart Texture'ları Aktif Edildi**
+  - GameCard'dan bg-grid-pattern override kaldırıldı
+  - Açılan kartlar artık texture arka planlarını doğru gösteriyor
+  - Spymaster preview'da da texture'lar görünür
+
+- ✅ **Takım İsimleri Oyun Ekranında**
+  - Game.tsx'de hardcoded "Katman Koyu/Açık" kaldırıldı
+  - Skor kartlarında ve sıra göstergesinde dinamik takım isimleri
+  - Lobby'de yapılan takım ismi değişiklikleri oyunda da yansıyor
+
+### 2025-10-19
 - ✅ **Takım İsmi Değiştirme**
   - Lobby'de takım isimleri düzenlenebilir
   - Edit butonu ve input field ile inline editing

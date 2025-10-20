@@ -66,7 +66,6 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       className={cn(
         "relative rounded-md border-2 p-3 md:p-4 min-h-[80px] md:min-h-[100px]",
         "transition-all duration-300",
-        "bg-grid-pattern",
         getCardStyles(),
         canClick && "hover-elevate active-elevate-2 cursor-pointer hover:scale-105",
         card.revealed && "opacity-90",
