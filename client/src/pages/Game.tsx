@@ -40,27 +40,10 @@ export default function Game() {
     }
   }, [gameState, setLocation]);
 
-  // Dynamic scaling based on viewport
+  // Dynamic scaling disabled - using CSS flexbox
   useEffect(() => {
     const calculateScale = () => {
-      const vh = window.innerHeight;
-      const vw = window.innerWidth;
-      
-      // Base content dimensions for full-size layout with 3:2 aspect ratio cards
-      const baseHeight = 1400; // Header + 5 rows of 3:2 cards + ipucu + gaps + margins
-      const baseWidth = 2200; // Side panels (20vw) + 5 columns of cards + gaps
-      
-      // Calculate scale to fit both dimensions
-      const scaleHeight = (vh - 40) / baseHeight;
-      const scaleWidth = (vw - 40) / baseWidth;
-      
-      // Use the smaller scale to ensure everything fits
-      let newScale = Math.min(scaleHeight, scaleWidth, 1);
-      
-      // Clamp to reasonable minimum
-      newScale = Math.max(0.3, newScale);
-      
-      setScale(newScale);
+      setScale(1); // Always scale 1
     };
 
     calculateScale();
@@ -353,7 +336,17 @@ export default function Game() {
 
           {/* Center - Grid */}
           <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1">
-            <div className="grid grid-cols-5 gap-2 md:gap-3 w-full flex-shrink-0" data-testid="game-grid">
+            <div 
+              className="grid grid-cols-5 gap-2 md:gap-3 w-full h-full max-h-full" 
+              style={{ 
+                gridAutoRows: '1fr',
+                transform: 'scale(0.7)',
+                transformOrigin: 'top center',
+                width: '142.86%',
+                height: '142.86%',
+                marginLeft: '-21.43%'
+              }} 
+              data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
