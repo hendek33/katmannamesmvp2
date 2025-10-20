@@ -101,6 +101,15 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ## Son Değişiklikler
 
 ### 2025-10-20 (Son Güncelleme)
+- ✅ **Özel Arkaplan Eklendi**
+  - arkaplan.png dosyası tüm sayfalarda arka plan olarak kullanılıyor
+  - Background-size: cover ile tam ekran kaplama
+  - Tüm sayfalarda (Welcome, Lobby, Game, GameEnd) uygulandı
+  
+- ✅ **İpucu Kartı İyileştirmesi**
+  - Shadow efektleri kaldırıldı, daha temiz görünüm
+  - Sayı input'u text-black ile okunabilir hale getirildi
+
 - ✅ **Oyun Ekranı %80 Ölçeklendirme**
   - CSS transform: scale(0.8) ile tüm oyun ekranı %80'e küçültüldü
   - 100% tarayıcı ölçeğinde tüm içerik ekrana sığıyor, scroll yok

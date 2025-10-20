@@ -89,13 +89,15 @@ export default function Lobby() {
     send("add_bot", { team, role });
   };
 
-  const handleTeamNameChange = (team: "dark" | "light", name: string) => {
-    send("update_team_name", { team, name });
+  const handleTeamNameChange = (team: Team, name: string) => {
+    if (team === "dark" || team === "light") {
+      send("update_team_name", { team, name });
+    }
   };
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/attached_assets/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <Card className="p-12 space-y-6 text-center border-2 shadow-2xl animate-pulse-slow">
           <div className="relative">
             <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
@@ -112,7 +114,7 @@ export default function Lobby() {
 
   if (!roomCode && mode === "select") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/attached_assets/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <div className="w-full max-w-lg space-y-8 animate-in fade-in duration-500">
           <Logo className="justify-center" />
           
@@ -173,7 +175,7 @@ export default function Lobby() {
 
   if (!roomCode && mode === "join") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/attached_assets/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
           <Logo className="justify-center" />
           
@@ -233,7 +235,7 @@ export default function Lobby() {
 
   if (!gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/attached_assets/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <Card className="p-12 space-y-6 text-center border-2 shadow-2xl">
           <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
           <p className="text-lg font-semibold text-muted-foreground">Yükleniyor...</p>
@@ -252,7 +254,7 @@ export default function Lobby() {
   const playerCount = gameState.players.length;
 
   return (
-    <div className="min-h-screen p-4 bg-background bg-grid-pattern animate-in fade-in duration-500">
+    <div className="min-h-screen p-4 bg-slate-900 animate-in fade-in duration-500" style={{ backgroundImage: 'url(/attached_assets/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="max-w-6xl mx-auto space-y-6">
         <Logo />
         
