@@ -101,6 +101,14 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 ## Son Değişiklikler
 
 ### 2025-10-20 (Son Güncelleme)
+- ✅ **Işık Efektleri**
+  - 5 adet büyük radial gradient ışık efekti
+  - Turuncu, mavi ve altın renkli ışıklar
+  - Pulse ve rotate animasyonları (8-12 saniye)
+  - Screen blend mode ile atmosferik görünüm
+  - Blur(80px) ile yumuşak geçişler
+  - Tüm sayfalarda aktif (Welcome, Lobby, Game, GameEnd)
+
 - ✅ **Partikül Efektleri**
   - Arkaplan üzerine 70 adet animasyonlu partikül
   - Uyumlu renkler: Turuncu (orange-600), Mavi (blue-500/600), Altın (amber-400)

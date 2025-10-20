@@ -98,6 +98,13 @@ export default function Lobby() {
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {/* Light Effects */}
+        <div className="light-effect light-1" />
+        <div className="light-effect light-2" />
+        <div className="light-effect light-3" />
+        <div className="light-effect light-4" />
+        <div className="light-effect light-5" />
+        
         {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
@@ -118,6 +125,13 @@ export default function Lobby() {
   if (!roomCode && mode === "select") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {/* Light Effects */}
+        <div className="light-effect light-1" />
+        <div className="light-effect light-2" />
+        <div className="light-effect light-3" />
+        <div className="light-effect light-4" />
+        <div className="light-effect light-5" />
+        
         {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
@@ -180,6 +194,13 @@ export default function Lobby() {
   if (!roomCode && mode === "join") {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {/* Light Effects */}
+        <div className="light-effect light-1" />
+        <div className="light-effect light-2" />
+        <div className="light-effect light-3" />
+        <div className="light-effect light-4" />
+        <div className="light-effect light-5" />
+        
         {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
@@ -241,6 +262,13 @@ export default function Lobby() {
   if (!gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {/* Light Effects */}
+        <div className="light-effect light-1" />
+        <div className="light-effect light-2" />
+        <div className="light-effect light-3" />
+        <div className="light-effect light-4" />
+        <div className="light-effect light-5" />
+        
         {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
@@ -263,7 +291,14 @@ export default function Lobby() {
 
   return (
     <div className="min-h-screen p-4 bg-slate-900 animate-in fade-in duration-500 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-      {[...Array(20)].map((_, i) => (
+      {/* Light Effects */}
+      <div className="light-effect light-1" />
+      <div className="light-effect light-2" />
+      <div className="light-effect light-3" />
+      <div className="light-effect light-4" />
+      <div className="light-effect light-5" />
+      
+      {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       <div className="max-w-6xl mx-auto space-y-6">

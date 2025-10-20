@@ -131,6 +131,13 @@ export default function Game() {
 
   return (
     <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      {/* Light Effects */}
+      <div className="light-effect light-1" />
+      <div className="light-effect light-2" />
+      <div className="light-effect light-3" />
+      <div className="light-effect light-4" />
+      <div className="light-effect light-5" />
+      
       {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}

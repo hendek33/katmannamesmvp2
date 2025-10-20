@@ -19,6 +19,13 @@ export default function GameEnd() {
   if (!isConnected || !gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {/* Light Effects */}
+        <div className="light-effect light-1" />
+        <div className="light-effect light-2" />
+        <div className="light-effect light-3" />
+        <div className="light-effect light-4" />
+        <div className="light-effect light-5" />
+        
         {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
@@ -33,6 +40,13 @@ export default function GameEnd() {
   if (!gameState.winner) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {/* Light Effects */}
+        <div className="light-effect light-1" />
+        <div className="light-effect light-2" />
+        <div className="light-effect light-3" />
+        <div className="light-effect light-4" />
+        <div className="light-effect light-5" />
+        
         {[...Array(70)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1}`} />
         ))}
@@ -60,7 +74,14 @@ export default function GameEnd() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-      {[...Array(20)].map((_, i) => (
+      {/* Light Effects */}
+      <div className="light-effect light-1" />
+      <div className="light-effect light-2" />
+      <div className="light-effect light-3" />
+      <div className="light-effect light-4" />
+      <div className="light-effect light-5" />
+      
+      {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       <div className="w-full max-w-md space-y-8 animate-in zoom-in duration-500">
