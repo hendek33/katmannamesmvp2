@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { RotateCcw, Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye } from "lucide-react";
+import Lobby from "./Lobby";
 
 export default function Game() {
   const [, setLocation] = useLocation();
@@ -118,24 +119,8 @@ export default function Game() {
     );
   }
 
-  if (gameState.phase !== "playing") {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30">
-          <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-amber-600 to-amber-400 flex items-center justify-center shadow-lg">
-            <Clock className="w-10 h-10 text-white" />
-          </div>
-          <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Oyun Başlamadı</h2>
-            <p className="text-muted-foreground">Lobiye dönüp oyunu başlatabilirsiniz</p>
-          </div>
-          <Button onClick={() => setLocation("/lobby")} size="lg" className="bg-gradient-to-r from-blue-600 to-blue-400">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Lobiye Dön
-          </Button>
-        </Card>
-      </div>
-    );
+  if (gameState.phase === "lobby") {
+    return <Lobby />;
   }
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);

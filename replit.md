@@ -100,7 +100,21 @@ Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Tü
 
 ## Son Değişiklikler
 
-### 2025-10-20 (Yeni Lobi Sistemi)
+### 2025-10-20 (Lobi Sistemi İyileştirmeleri)
+- ✅ **Welcome Sayfası Temizlendi**
+  - "Yeni Başlat" butonu kaldırıldı (gereksiz)
+  
+- ✅ **RoomList Partikülleri Düzeltildi**
+  - Partikül renderingı standart particle-${i} class'larına çevrildi
+  - Light effect'ler standart light-effect class'larına çevrildi
+  
+- ✅ **Lobby Sayfası Kaldırıldı**
+  - RoomList'ten direkt /game'e yönlendirme
+  - Game.tsx içinde phase: lobby durumunda Lobby component'i render ediliyor
+  - Yeni akış: Welcome → RoomList → Game (lobby mode) → Game (playing mode)
+  - Gereksiz sayfa geçişi kaldırıldı
+
+### 2025-10-20 (Yeni Lobi Sistemi - Önceki)
 - ✅ **Oda Listesi Sistemi**
   - Yeni RoomList sayfası eklendi (Welcome → RoomList → Lobby → Game akışı)
   - Aktif odaların listelenmesi (oyuncu sayısı, şifre durumu, oda fazı)

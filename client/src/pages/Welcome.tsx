@@ -81,18 +81,6 @@ export default function Welcome() {
           >
             Devam
           </Button>
-          
-          <Button
-            variant="ghost"
-            onClick={() => {
-              localStorage.clear();
-              window.location.reload();
-            }}
-            className="w-full text-xs"
-            data-testid="button-clear-storage"
-          >
-            Yeni Başlat
-          </Button>
         </Card>
 
         <p className="text-xs text-center text-muted-foreground italic">

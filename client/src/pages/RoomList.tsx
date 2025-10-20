@@ -41,12 +41,12 @@ export default function RoomList() {
         } else if (message.type === "room_created") {
           localStorage.setItem("katmannames_room_code", message.payload.roomCode);
           localStorage.setItem("katmannames_player_id", message.payload.playerId);
-          setLocation("/lobby");
+          setLocation("/game");
         } else if (message.type === "room_joined") {
           const roomCode = message.payload.gameState.roomCode;
           localStorage.setItem("katmannames_room_code", roomCode);
           localStorage.setItem("katmannames_player_id", message.payload.playerId);
-          setLocation("/lobby");
+          setLocation("/game");
         } else if (message.type === "error") {
           alert(message.payload.message);
         }
@@ -115,40 +115,17 @@ export default function RoomList() {
         style={{ backgroundImage: 'url(/arkaplan.png)' }}
       />
 
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 70 }).map((_, i) => {
-          const colors = ['bg-orange-600', 'bg-blue-500', 'bg-blue-600', 'bg-amber-400'];
-          const color = colors[Math.floor(Math.random() * colors.length)];
-          const size = Math.random() * 4 + 2;
-          const left = Math.random() * 100;
-          const top = Math.random() * 100;
-          const animationPattern = Math.floor(Math.random() * 10) + 1;
-          const delay = -(Math.random() * 16 + 5);
-          
-          return (
-            <div
-              key={i}
-              className={`absolute ${color} rounded-full opacity-60`}
-              style={{
-                width: `${size}px`,
-                height: `${size}px`,
-                left: `${left}%`,
-                top: `${top}%`,
-                animation: `moveRandomly${animationPattern} ${Math.random() * 4 + 8}s infinite alternate`,
-                animationDelay: `${delay}s`,
-              }}
-            />
-          );
-        })}
-      </div>
+      {/* Particles */}
+      {[...Array(70)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1}`} />
+      ))}
 
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-[800px] h-[800px] rounded-full bg-gradient-radial from-orange-600/40 to-transparent blur-[80px] -left-48 top-1/4 animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute w-[600px] h-[600px] rounded-full bg-gradient-radial from-blue-600/30 to-transparent blur-[80px] right-0 top-0 animate-pulse" style={{ animationDuration: '10s' }} />
-        <div className="absolute w-[700px] h-[700px] rounded-full bg-gradient-radial from-amber-400/20 to-transparent blur-[80px] left-1/3 bottom-0 animate-[pulse_12s_infinite]" />
-        <div className="absolute w-[500px] h-[500px] rounded-full bg-gradient-radial from-orange-500/30 to-transparent blur-[80px] right-1/4 bottom-1/4 animate-[rotate_10s_linear_infinite]" />
-        <div className="absolute w-[600px] h-[600px] rounded-full bg-gradient-radial from-blue-500/25 to-transparent blur-[80px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" style={{ animationDuration: '9s' }} />
-      </div>
+      {/* Light Effects */}
+      <div className="light-effect light-1" />
+      <div className="light-effect light-2" />
+      <div className="light-effect light-3" />
+      <div className="light-effect light-4" />
+      <div className="light-effect light-5" />
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-8">
         <Card className="w-full max-w-4xl bg-slate-900/90 backdrop-blur-lg border-orange-900/30 shadow-2xl">
