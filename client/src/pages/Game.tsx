@@ -268,7 +268,7 @@ export default function Game() {
         </div>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(260px,20vw)_1fr_minmax(260px,20vw)] gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 xl:grid-cols-[minmax(170px,13vw)_1fr_minmax(170px,13vw)] gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
           {/* Left Side - Dark Team */}
           <div className="space-y-2 md:space-y-3 overflow-y-auto">
             {/* Score Card */}
@@ -351,11 +351,14 @@ export default function Game() {
             {/* Clue Input/Display at Bottom */}
             <div className="flex justify-center flex-shrink-0 mt-auto">
               {canGiveClue ? (
-                <Card className="p-2 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
+                <Card className="p-3 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
                   <div className="space-y-2">
-                    <div className="flex items-center justify-center gap-1.5 text-amber-900">
-                      <Lightbulb className="w-4 h-4" />
-                      <Label className="text-xs font-bold uppercase">İpucu Ver</Label>
+                    <div className="text-center space-y-1">
+                      <div className="flex items-center justify-center gap-1.5 text-amber-900">
+                        <Lightbulb className="w-4 h-4" />
+                        <Label className="text-xs font-bold uppercase">İpucu Ver</Label>
+                      </div>
+                      <p className="text-[10px] text-amber-800/70 font-medium">Takımınıza yardımcı olur</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Input
