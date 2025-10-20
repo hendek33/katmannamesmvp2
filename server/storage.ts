@@ -119,13 +119,9 @@ export class MemStorage implements IStorage {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
 
-    // Check password if room has one
-    if (roomData.password && roomData.password !== password) {
-      return null;
-    }
-
     const room = roomData.gameState;
 
+    // Check if reconnecting with playerId
     if (reconnectPlayerId) {
       const existingPlayer = room.players.find(p => p.id === reconnectPlayerId && p.username === username);
       if (existingPlayer) {
@@ -134,10 +130,16 @@ export class MemStorage implements IStorage {
       }
     }
 
+    // Check if reconnecting by username
     if (room.players.some(p => p.username === username)) {
       const existingPlayer = room.players.find(p => p.username === username)!;
       this.playerToRoom.set(existingPlayer.id, roomCode);
       return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
+    }
+
+    // For new players, check password
+    if (roomData.password && roomData.password !== password) {
+      return null;
     }
 
     const playerId = randomUUID();
