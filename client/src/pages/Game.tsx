@@ -323,7 +323,7 @@ export default function Game() {
             {/* Clue Input/Display at Bottom */}
             <div className="flex justify-center">
               {canGiveClue ? (
-                <Card className="p-3 border-2 shadow-2xl bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 hover:shadow-amber-500/50 transition-all">
+                <Card className="p-3 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
                   <div className="space-y-3">
                     <div className="flex items-center justify-center gap-2 text-amber-900">
                       <Lightbulb className="w-5 h-5" />
@@ -346,7 +346,7 @@ export default function Game() {
                         max="9"
                         value={clueCount}
                         onChange={(e) => setClueCount(e.target.value)}
-                        className="w-20 text-center font-bold text-3xl bg-white border-2 border-amber-500/30 focus:border-amber-500"
+                        className="w-20 text-center font-bold text-3xl text-black bg-white border-2 border-amber-500/30 focus:border-amber-500"
                       />
                       <Button
                         onClick={handleGiveClue}
