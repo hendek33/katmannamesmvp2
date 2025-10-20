@@ -18,7 +18,7 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: '75%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
         <div className="text-center space-y-4">
           <Logo className="justify-center" />

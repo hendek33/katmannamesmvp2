@@ -18,7 +18,7 @@ export default function GameEnd() {
 
   if (!isConnected || !gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: '75%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <Card className="p-8 space-y-4 text-center" data-testid="loading-state">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground">Yükleniyor...</p>
@@ -29,7 +29,7 @@ export default function GameEnd() {
 
   if (!gameState.winner) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: '75%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
         <Card className="p-8 space-y-4 text-center">
           <p className="text-muted-foreground">Oyun henüz bitmedi</p>
           <Button onClick={() => setLocation("/game")}>
@@ -53,7 +53,7 @@ export default function GameEnd() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: '75%', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       <div className="w-full max-w-md space-y-8 animate-in zoom-in duration-500">
         <Logo className="justify-center" />
 
