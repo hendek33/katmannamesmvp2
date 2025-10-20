@@ -60,8 +60,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       disabled={!canClick}
       data-testid={`card-${card.id}`}
       className={cn(
-        "relative rounded-md border-2 p-1.5 md:p-2 w-full",
-        "aspect-[3/2]",
+        "relative rounded-md border-2 p-1.5 md:p-2 w-full h-full max-h-full",
         "transition-all duration-300 flex flex-col overflow-hidden",
         colors.border,
         colors.bg,
@@ -71,6 +70,7 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
         card.revealed && "opacity-95",
         !canClick && "cursor-default"
       )}
+      style={{ aspectRatio: '3/2' }}
     >
       <div className="flex-1" />
       

@@ -40,27 +40,11 @@ export default function Game() {
     }
   }, [gameState, setLocation]);
 
-  // Dynamic scaling based on viewport
+  // Dynamic scaling based on viewport - DISABLED, using CSS flexbox instead
   useEffect(() => {
     const calculateScale = () => {
-      const vh = window.innerHeight;
-      const vw = window.innerWidth;
-      
-      // Base content dimensions - designed for full-size content at 1920x1080
-      const baseHeight = 1400; // Full height: header + 5 rows of cards + ipucu + margins
-      const baseWidth = 2200; // Full width: side panels (20vw each) + 5 columns + gaps
-      
-      // Calculate scale to fit height and width with safe margins
-      const scaleHeight = (vh - 60) / baseHeight; // -60 for safe margin
-      const scaleWidth = (vw - 60) / baseWidth; // -60 for safe margin
-      
-      // Use the smaller scale to ensure everything fits
-      let newScale = Math.min(scaleHeight, scaleWidth);
-      
-      // Clamp between reasonable values - allow aggressive scaling down, no scaling up
-      newScale = Math.max(0.2, Math.min(1, newScale));
-      
-      setScale(newScale);
+      // Always use scale 1, let CSS handle the sizing
+      setScale(1);
     };
 
     calculateScale();
@@ -174,7 +158,7 @@ export default function Game() {
         }}
         className="relative z-10 p-2 md:p-3 animate-in fade-in duration-500 transition-transform"
       >
-        <div className="w-full h-full flex flex-col gap-2">
+        <div className="w-full h-full flex flex-col gap-2 overflow-hidden">
         {/* Modern Header */}
         <Card className="p-1.5 md:p-2 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
@@ -352,8 +336,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0">
-            <div className="grid grid-cols-5 gap-2 md:gap-3 flex-shrink-0" data-testid="game-grid">
+          <div className="space-y-2 md:space-y-3 flex flex-col min-h-0 flex-1">
+            <div className="grid grid-cols-5 gap-2 md:gap-3 w-full h-full max-h-full" style={{ gridAutoRows: '1fr' }} data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
