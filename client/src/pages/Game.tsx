@@ -47,8 +47,8 @@ export default function Game() {
       const vw = window.innerWidth;
       
       // Base content dimensions (actual size needed for all content)
-      const baseHeight = 1200; // Optimized for smaller cards
-      const baseWidth = 2000; // Optimized for narrower side panels
+      const baseHeight = 1000; // Optimized for much smaller square cards
+      const baseWidth = 1800; // Optimized for narrower side panels
       
       // Calculate scale to fit height and width with safe margins
       const scaleHeight = (vh - 40) / baseHeight; // -40 for safe margin
@@ -353,7 +353,7 @@ export default function Game() {
 
           {/* Center - Grid */}
           <div className="space-y-2 md:space-y-3 flex flex-col min-h-0">
-            <div className="grid grid-cols-5 gap-1.5 md:gap-2 flex-shrink-0" data-testid="game-grid">
+            <div className="grid grid-cols-5 gap-1 md:gap-1.5 flex-shrink-0" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
