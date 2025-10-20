@@ -18,7 +18,10 @@ export default function GameEnd() {
 
   if (!isConnected || !gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1}`} />
+        ))}
         <Card className="p-8 space-y-4 text-center bg-slate-900/90 backdrop-blur-md border-orange-900/30" data-testid="loading-state">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
           <p className="text-muted-foreground">Yükleniyor...</p>
@@ -29,7 +32,10 @@ export default function GameEnd() {
 
   if (!gameState.winner) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1}`} />
+        ))}
         <Card className="p-8 space-y-4 text-center bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <p className="text-muted-foreground">Oyun henüz bitmedi</p>
           <Button onClick={() => setLocation("/game")}>
@@ -53,7 +59,10 @@ export default function GameEnd() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      {[...Array(20)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1}`} />
+      ))}
       <div className="w-full max-w-md space-y-8 animate-in zoom-in duration-500">
         <Logo className="justify-center" size="large" />
 

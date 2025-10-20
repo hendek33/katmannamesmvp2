@@ -130,7 +130,10 @@ export default function Game() {
   const lightPlayers = gameState.players.filter(p => p.team === "light");
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      {[...Array(20)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1}`} />
+      ))}
       <div className="scale-[0.8] origin-top w-[125%] -ml-[12.5%] h-[125%] p-2 md:p-3 animate-in fade-in duration-500">
         <div className="max-w-[1800px] h-full mx-auto flex flex-col gap-2">
         {/* Modern Header */}

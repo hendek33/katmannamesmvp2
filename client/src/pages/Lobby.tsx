@@ -97,7 +97,10 @@ export default function Lobby() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1}`} />
+        ))}
         <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30 animate-pulse-slow">
           <div className="relative">
             <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
@@ -114,7 +117,10 @@ export default function Lobby() {
 
   if (!roomCode && mode === "select") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1}`} />
+        ))}
         <div className="w-full max-w-lg space-y-8 animate-in fade-in duration-500">
           <div className="space-y-4">
             <Card 
@@ -173,7 +179,10 @@ export default function Lobby() {
 
   if (!roomCode && mode === "join") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1}`} />
+        ))}
         <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
           <Card className="p-8 space-y-6 shadow-2xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30 hover:shadow-red-600/20 transition-shadow">
             <div className="space-y-3 text-center">
@@ -231,7 +240,10 @@ export default function Lobby() {
 
   if (!gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1}`} />
+        ))}
         <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30">
           <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
           <p className="text-lg font-semibold text-muted-foreground">Yükleniyor...</p>
@@ -250,7 +262,10 @@ export default function Lobby() {
   const playerCount = gameState.players.length;
 
   return (
-    <div className="min-h-screen p-4 bg-slate-900 animate-in fade-in duration-500" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="min-h-screen p-4 bg-slate-900 animate-in fade-in duration-500 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      {[...Array(20)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1}`} />
+      ))}
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Room Code Card - Modern Design */}
         <Card className="p-6 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-2xl transition-all">

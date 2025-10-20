@@ -18,8 +18,13 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-      <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+      {/* Particles */}
+      {[...Array(20)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1}`} />
+      ))}
+      
+      <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500 relative z-10">
         <div className="text-center space-y-6">
           <div className="flex justify-center">
             <img 

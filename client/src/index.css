@@ -395,3 +395,67 @@
   background-size: 100% 100%, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 100% 100%;
   background-position: 0 0, 0 0, 0 10px, 10px -10px, 10px 0, 0 0;
 }
+
+/* Particle Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(50px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(-30px) rotate(-360deg);
+    opacity: 0;
+  }
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(1px);
+  bottom: -20px;
+}
+
+.particle-1 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.6); animation: float 15s infinite; left: 10%; animation-delay: 0s; }
+.particle-2 { width: 6px; height: 6px; background: rgba(59, 130, 246, 0.5); animation: float-reverse 18s infinite; left: 20%; animation-delay: 2s; }
+.particle-3 { width: 10px; height: 10px; background: rgba(251, 191, 36, 0.4); animation: float 20s infinite; left: 30%; animation-delay: 4s; }
+.particle-4 { width: 7px; height: 7px; background: rgba(251, 146, 60, 0.5); animation: float-reverse 16s infinite; left: 40%; animation-delay: 1s; }
+.particle-5 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.6); animation: float 22s infinite; left: 50%; animation-delay: 3s; }
+.particle-6 { width: 5px; height: 5px; background: rgba(251, 191, 36, 0.5); animation: float-reverse 19s infinite; left: 60%; animation-delay: 5s; }
+.particle-7 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.4); animation: float 17s infinite; left: 70%; animation-delay: 2s; }
+.particle-8 { width: 6px; height: 6px; background: rgba(59, 130, 246, 0.6); animation: float-reverse 21s infinite; left: 80%; animation-delay: 4s; }
+.particle-9 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.6); animation: float 18s infinite; left: 90%; animation-delay: 1s; }
+.particle-10 { width: 9px; height: 9px; background: rgba(251, 146, 60, 0.5); animation: float-reverse 20s infinite; left: 15%; animation-delay: 6s; }
+.particle-11 { width: 6px; height: 6px; background: rgba(96, 165, 250, 0.5); animation: float 16s infinite; left: 25%; animation-delay: 3s; }
+.particle-12 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.4); animation: float-reverse 19s infinite; left: 35%; animation-delay: 5s; }
+.particle-13 { width: 5px; height: 5px; background: rgba(251, 146, 60, 0.6); animation: float 23s infinite; left: 45%; animation-delay: 2s; }
+.particle-14 { width: 10px; height: 10px; background: rgba(59, 130, 246, 0.4); animation: float-reverse 17s infinite; left: 55%; animation-delay: 4s; }
+.particle-15 { width: 7px; height: 7px; background: rgba(251, 191, 36, 0.5); animation: float 21s infinite; left: 65%; animation-delay: 1s; }
+.particle-16 { width: 6px; height: 6px; background: rgba(251, 146, 60, 0.6); animation: float-reverse 18s infinite; left: 75%; animation-delay: 3s; }
+.particle-17 { width: 9px; height: 9px; background: rgba(96, 165, 250, 0.5); animation: float 20s infinite; left: 85%; animation-delay: 5s; }
+.particle-18 { width: 8px; height: 8px; background: rgba(251, 191, 36, 0.6); animation: float-reverse 16s infinite; left: 95%; animation-delay: 2s; }
+.particle-19 { width: 5px; height: 5px; background: rgba(251, 146, 60, 0.4); animation: float 19s infinite; left: 12%; animation-delay: 4s; }
+.particle-20 { width: 7px; height: 7px; background: rgba(59, 130, 246, 0.5); animation: float-reverse 22s infinite; left: 88%; animation-delay: 1s; }
