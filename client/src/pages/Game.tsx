@@ -446,11 +446,11 @@ export default function Game() {
                   </Button>
                 </div>
               ) : gameState.currentClue ? (
-                <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30">
+                <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30 animate-clue-appear">
                   <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
                   <span className="text-xs font-medium text-amber-300">İpucu:</span>
                   <span className="text-xs font-black text-amber-100">{gameState.currentClue.word}</span>
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center animate-bounce-slow">
                     <span className="text-xs font-black text-white">{gameState.currentClue.count}</span>
                   </div>
                 </div>
@@ -1010,17 +1010,17 @@ export default function Game() {
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg">
+                <Card className="px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up">
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 sm:gap-2 mb-0.5 sm:mb-1">
-                      <Lightbulb className="w-3 h-3 text-amber-400" />
+                      <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
                       <span className="text-[9px] sm:text-[10px] font-semibold uppercase text-amber-400 tracking-wider">Aktif İpucu</span>
                     </div>
                     <div className="flex items-center justify-center gap-2">
-                      <span className="text-lg sm:text-xl font-black text-amber-400 uppercase tracking-wider">
+                      <span className="text-lg sm:text-xl font-black text-amber-400 uppercase tracking-wider animate-text-glow">
                         {gameState.currentClue.word}
                       </span>
-                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-500 flex items-center justify-center shadow-xl">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-500 flex items-center justify-center shadow-xl animate-bounce-slow">
                         <span className="text-base sm:text-lg font-black text-white">
                           {gameState.currentClue.count}
                         </span>

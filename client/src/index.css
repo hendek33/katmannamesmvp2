@@ -449,6 +449,76 @@
   }
 }
 
+/* Clue appear animation */
+@keyframes clueAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-clue-appear {
+  animation: clueAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Clue slide up animation */
+@keyframes clueSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-clue-slide-up {
+  animation: clueSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Text glow animation */
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.6),
+                 0 0 20px rgba(251, 191, 36, 0.4),
+                 0 0 30px rgba(251, 191, 36, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.8),
+                 0 0 30px rgba(251, 191, 36, 0.6),
+                 0 0 40px rgba(251, 191, 36, 0.4);
+  }
+}
+
+.animate-text-glow {
+  animation: textGlow 2s ease-in-out infinite;
+}
+
+/* Slow bounce animation */
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 2s ease-in-out infinite;
+}
+
 /* Card drop animation */
 @keyframes cardDrop {
   0% {
