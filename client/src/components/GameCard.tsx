@@ -134,7 +134,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `url(${logoImg})`,
-          backgroundSize: '40%',
+          backgroundSize: '70%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           opacity: 0.1,
