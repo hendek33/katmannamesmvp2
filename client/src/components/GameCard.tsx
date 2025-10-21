@@ -14,45 +14,40 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       switch (card.type) {
         case "dark":
           return {
-            bg: "bg-gradient-to-br from-blue-500 to-blue-600",
+            gradient: "from-blue-400 to-blue-600",
             border: "border-blue-700",
             panel: "bg-blue-900",
             shadow: "shadow-xl shadow-blue-900/50",
-            texture: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-400/20 via-transparent to-transparent",
           };
         case "light":
           return {
-            bg: "bg-gradient-to-br from-red-500 to-red-600",
+            gradient: "from-red-400 to-red-600",
             border: "border-red-700",
             panel: "bg-red-900",
             shadow: "shadow-xl shadow-red-900/50",
-            texture: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-400/20 via-transparent to-transparent",
           };
         case "neutral":
           return {
-            bg: "bg-gradient-to-br from-stone-200 to-stone-300",
-            border: "border-stone-400",
+            gradient: "from-stone-200 to-stone-400",
+            border: "border-stone-500",
             panel: "bg-stone-700",
             shadow: "shadow-lg shadow-stone-700/30",
-            texture: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-stone-100/30 via-transparent to-transparent",
           };
         case "assassin":
           return {
-            bg: "bg-gradient-to-br from-gray-800 to-gray-900",
+            gradient: "from-gray-700 to-gray-900",
             border: "border-gray-950",
             panel: "bg-black",
             shadow: "shadow-2xl shadow-black/70",
-            texture: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-600/20 via-transparent to-transparent",
           };
       }
     }
     
     return {
-      bg: "bg-gradient-to-br from-slate-300 to-slate-400",
-      border: "border-slate-500",
+      gradient: "from-slate-300 to-slate-500",
+      border: "border-slate-600",
       panel: "bg-slate-700",
       shadow: "shadow-lg shadow-slate-800/40",
-      texture: "",
     };
   };
 
@@ -69,12 +64,11 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
         "aspect-[3/2]",
         "flex flex-col overflow-hidden",
         "transition-transform transform-gpu",
+        "bg-gradient-to-br",
+        colors.gradient,
         colors.border,
-        colors.bg,
         colors.shadow,
         canClick && "cursor-pointer hover:scale-[1.05] hover:-translate-y-1 active:scale-[1.02]",
-        !card.revealed && !isSpymaster && "opacity-100",
-        card.revealed && "opacity-95",
         !canClick && "cursor-default"
       )}
       style={{
@@ -82,9 +76,6 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
                          repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px)`,
       }}
     >
-      {/* Card texture overlay */}
-      <div className={cn("absolute inset-0 pointer-events-none", colors.texture)} />
-      
       {/* Subtle top edge highlight for depth */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
       
