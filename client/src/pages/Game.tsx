@@ -363,7 +363,7 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="flex flex-col min-h-0 flex-1 gap-1 items-center justify-start p-1 lg:p-2 relative pt-4">
+          <div className="flex flex-col min-h-0 flex-1 gap-1 items-center justify-start p-1 lg:p-2 pb-0 relative pt-4">
             {/* Mobile Score Display */}
             <div className="lg:hidden w-full flex-shrink-0">
               <div className="grid grid-cols-2 gap-2">
@@ -402,7 +402,7 @@ export default function Game() {
                  min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
                  min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
                  max-w-[1000px]
-                 mb-12 lg:mb-16" 
+                 mb-14" 
                  data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
@@ -416,7 +416,7 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-2 lg:bottom-4 xl:bottom-6 left-0 right-0 flex justify-center p-1 sm:p-2 z-10">
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0 z-10">
               {canGiveClue ? (
                 <Card className="px-2 py-2 sm:px-4 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
                   <div className="space-y-1 sm:space-y-2">
