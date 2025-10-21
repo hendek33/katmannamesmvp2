@@ -100,21 +100,34 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "flex flex-col overflow-hidden",
         "transition-transform transform-gpu",
         colors.border,
-        (card.revealed || isSpymaster) && colors.bg,
+        (isSpymaster && !card.revealed) && colors.bg,
         colors.shadow,
         !card.revealed && "cursor-pointer"
       )}
       style={{
-        backgroundImage: card.revealed 
-          ? `url('${getRevealedCardImage()}')`
-          : !isSpymaster 
-            ? `url('/kelime kartı arkaplan.png')` 
+        backgroundImage: !card.revealed && !isSpymaster 
+          ? `url('/kelime kartı arkaplan.png')` 
+          : isSpymaster && !card.revealed
+            ? undefined
             : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundColor: !card.revealed && !isSpymaster ? '#1a1f2e' : undefined
       }}
     >
+      {/* Revealed card overlay */}
+      {card.revealed && (
+        <div 
+          className="absolute inset-0 rounded-lg animate-card-flip"
+          style={{
+            backgroundImage: `url('${getRevealedCardImage()}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 20
+          }}
+        />
+      )}
+      
       {/* Reveal button in top-left corner */}
       {canReveal && (
         <button
@@ -164,17 +177,19 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       >
         <div className="flex-1" />
         
-        {/* Word panel */}
-        <div className={cn(
-          "relative rounded px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
-          "flex items-center justify-center",
-          "border-t border-black/20",
-          colors.panel
-        )}>
-          <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md">
-            {card.word}
-          </span>
-        </div>
+        {/* Word panel - hide when revealed */}
+        {!card.revealed && (
+          <div className={cn(
+            "relative rounded px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
+            "flex items-center justify-center",
+            "border-t border-black/20",
+            isSpymaster ? colors.panel : "bg-slate-700"
+          )}>
+            <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md">
+              {card.word}
+            </span>
+          </div>
+        )}
       </button>
       
       {/* Bottom edge shadow for depth */}
