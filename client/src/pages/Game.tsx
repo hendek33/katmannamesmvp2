@@ -725,17 +725,17 @@ export default function Game() {
                       <button
                         type="button"
                         onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                        className="h-3.5 w-3.5 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[8px] rounded"
+                        className="h-6 sm:h-7 w-6 sm:w-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded border border-slate-700"
                       >
                         -
                       </button>
-                      <div className="h-3.5 w-6 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded text-[9px] font-black text-amber-400">
+                      <div className="h-6 sm:h-7 w-8 sm:w-10 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded text-sm font-black text-amber-400">
                         {clueCount}
                       </div>
                       <button
                         type="button"
                         onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                        className="h-3.5 w-3.5 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[8px] rounded"
+                        className="h-6 sm:h-7 w-6 sm:w-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded border border-slate-700"
                       >
                         +
                       </button>
@@ -745,9 +745,9 @@ export default function Game() {
                       disabled={!clueWord.trim() || parseInt(clueCount) < 0}
                       data-testid="button-give-clue"
                       size="sm"
-                      className="h-5 sm:h-6 px-2 sm:px-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-[9px] sm:text-[10px]"
+                      className="h-6 sm:h-7 px-2 sm:px-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-[10px] sm:text-xs"
                     >
-                      <Send className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5" />
+                      <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />
                       Gönder
                     </Button>
                   </div>
