@@ -15,6 +15,7 @@ interface GameCardProps {
 
 export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isLifted, setIsLifted] = useState(false);
   
   // Randomly select a revealed card image based on card type
   const getRevealedCardImage = () => {
@@ -104,6 +105,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       img.src = revealedImage;
     } else {
       setImageLoaded(false);
+      setIsLifted(false); // Reset lift state when card is unrevealed
     }
   }, [card.revealed, revealedImage]);
 
@@ -123,12 +125,18 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       {/* Revealed card overlay - drops in after image loads */}
       {card.revealed && imageLoaded && revealedImage && (
         <div 
-          className="absolute inset-0 rounded-lg animate-card-drop"
+          className={cn(
+            "absolute inset-0 rounded-lg cursor-pointer animate-card-drop",
+            isLifted ? "card-lifted" : "card-not-lifted"
+          )}
+          onClick={() => setIsLifted(!isLifted)}
+          title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
           style={{
             backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            zIndex: 20
+            zIndex: isLifted ? 30 : 20,
+            boxShadow: isLifted ? '0 20px 40px rgba(0,0,0,0.5)' : '0 4px 8px rgba(0,0,0,0.3)'
           }}
         />
       )}

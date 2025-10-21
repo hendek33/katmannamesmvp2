@@ -303,6 +303,27 @@
   animation: cardDrop 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+/* Card lift animation */
+@keyframes cardLift {
+  0% {
+    transform: translateY(0) rotateX(0deg);
+  }
+  100% {
+    transform: translateY(-50px) rotateX(15deg);
+  }
+}
+
+.card-lifted {
+  transform: translateY(-50px) rotateX(15deg);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.card-not-lifted {
+  transform: translateY(0) rotateX(0deg);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /**
  * Using the elevate system.
  * Automatic contrast adjustment.
