@@ -361,6 +361,9 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     if (room.phase !== "playing" || !room.currentTeam) return null;
+    
+    // Check if there's an active clue - can't reveal cards without a clue
+    if (!room.currentClue) return null;
 
     const player = room.players.find(p => p.id === playerId);
     if (!player || player.role !== "guesser" || player.team !== room.currentTeam) {
