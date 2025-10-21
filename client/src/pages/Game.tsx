@@ -269,27 +269,27 @@ export default function Game() {
         </Card>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_180px] xl:grid-cols-[200px_1fr_200px] gap-2 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(150px,15vw)_1fr_minmax(150px,15vw)] xl:grid-cols-[minmax(180px,14vw)_1fr_minmax(180px,14vw)] 2xl:grid-cols-[minmax(200px,12vw)_1fr_minmax(200px,12vw)] gap-2 flex-1 min-h-0">
           {/* Left Side - Dark Team */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2">
             {/* Score Card */}
-            <Card className="p-2 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
-              <div className="text-center space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                  <h3 className="text-[10px] font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
+            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
+              <div className="text-center space-y-0.5 lg:space-y-1">
+                <div className="flex items-center justify-center gap-0.5 lg:gap-1">
+                  <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                  <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-4xl lg:text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
+                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
                     {gameState.darkCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[10px] text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[8px] lg:text-[10px] xl:text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
                   {gameState.currentTeam === "dark" && (
-                    <div className="inline-block px-2 py-0.5 bg-blue-600/30 rounded-full">
-                      <p className="text-[9px] text-blue-100 font-bold">● SIRA SIZDE</p>
+                    <div className="inline-block px-1 lg:px-2 py-0.5 bg-blue-600/30 rounded-full">
+                      <p className="text-[7px] lg:text-[9px] xl:text-[10px] text-blue-100 font-bold">● SIRA SIZDE</p>
                     </div>
                   )}
                 </div>
@@ -297,32 +297,32 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-3 md:p-4 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="w-4 h-4 text-blue-400" />
-                <h4 className="text-sm font-bold text-blue-100 uppercase tracking-wide">Oyuncular</h4>
+            <Card className="p-2 lg:p-3 xl:p-4 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
+              <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
+                <Users className="w-3 h-3 lg:w-4 lg:h-4 text-blue-400" />
+                <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-blue-100 uppercase tracking-wide">Oyuncular</h4>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1 lg:space-y-1.5 xl:space-y-2">
                 {darkPlayers.map(player => (
                   <div 
                     key={player.id} 
-                    className={`flex items-center justify-between p-2 rounded-lg transition-all ${
+                    className={`flex items-center justify-between p-1 lg:p-1.5 xl:p-2 rounded-lg transition-all ${
                       player.id === playerId 
                         ? "bg-blue-600/30 border border-blue-500/50" 
                         : "bg-blue-900/20 hover:bg-blue-900/40"
                     }`}
                   >
-                    <span className={`text-sm ${player.id === playerId ? "font-bold text-blue-100" : "text-blue-200/90"}`}>
+                    <span className={`text-[9px] lg:text-[11px] xl:text-sm ${player.id === playerId ? "font-bold text-blue-100" : "text-blue-200/90"}`}>
                       {player.username}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded ${
+                    <span className={`text-[8px] lg:text-[10px] xl:text-xs px-1 lg:px-1.5 xl:px-2 py-0.5 lg:py-1 rounded ${
                       player.role === "spymaster" 
                         ? "bg-amber-500/20 text-amber-300 font-semibold" 
                         : "bg-blue-500/20 text-blue-300"
                     }`}>
                       {player.role === "spymaster" ? (
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
+                        <span className="flex items-center gap-0.5 lg:gap-1">
+                          <Eye className="w-2 h-2 lg:w-3 lg:h-3" />
                           İpucu
                         </span>
                       ) : (
@@ -458,23 +458,23 @@ export default function Game() {
           {/* Right Side - Light Team */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2">
             {/* Score Card */}
-            <Card className="p-2 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
-              <div className="text-center space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
-                  <h3 className="text-[10px] font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
+            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
+              <div className="text-center space-y-0.5 lg:space-y-1">
+                <div className="flex items-center justify-center gap-0.5 lg:gap-1">
+                  <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-red-600 animate-pulse" />
+                  <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-4xl lg:text-5xl font-black text-red-100 group-hover:scale-110 transition-transform">
+                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-red-100 group-hover:scale-110 transition-transform">
                     {gameState.lightCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-red-600/20 group-hover:bg-red-600/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[10px] text-red-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[8px] lg:text-[10px] xl:text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                   {gameState.currentTeam === "light" && (
-                    <div className="inline-block px-2 py-0.5 bg-red-700/30 rounded-full">
-                      <p className="text-[9px] text-red-100 font-bold">● SIRA SIZDE</p>
+                    <div className="inline-block px-1 lg:px-2 py-0.5 bg-red-700/30 rounded-full">
+                      <p className="text-[7px] lg:text-[9px] xl:text-[10px] text-red-100 font-bold">● SIRA SIZDE</p>
                     </div>
                   )}
                 </div>
@@ -482,32 +482,32 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-3 md:p-4 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="w-4 h-4 text-red-500" />
-                <h4 className="text-sm font-bold text-red-100 uppercase tracking-wide">Oyuncular</h4>
+            <Card className="p-2 lg:p-3 xl:p-4 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
+              <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
+                <Users className="w-3 h-3 lg:w-4 lg:h-4 text-red-500" />
+                <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-red-100 uppercase tracking-wide">Oyuncular</h4>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1 lg:space-y-1.5 xl:space-y-2">
                 {lightPlayers.map(player => (
                   <div 
                     key={player.id} 
-                    className={`flex items-center justify-between p-2 rounded-lg transition-all ${
+                    className={`flex items-center justify-between p-1 lg:p-1.5 xl:p-2 rounded-lg transition-all ${
                       player.id === playerId 
                         ? "bg-red-700/30 border border-red-600/50" 
                         : "bg-red-950/20 hover:bg-red-950/40"
                     }`}
                   >
-                    <span className={`text-sm ${player.id === playerId ? "font-bold text-red-100" : "text-red-200/90"}`}>
+                    <span className={`text-[9px] lg:text-[11px] xl:text-sm ${player.id === playerId ? "font-bold text-red-100" : "text-red-200/90"}`}>
                       {player.username}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded ${
+                    <span className={`text-[8px] lg:text-[10px] xl:text-xs px-1 lg:px-1.5 xl:px-2 py-0.5 lg:py-1 rounded ${
                       player.role === "spymaster" 
                         ? "bg-amber-500/20 text-amber-300 font-semibold" 
                         : "bg-red-600/20 text-red-400"
                     }`}>
                       {player.role === "spymaster" ? (
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" />
+                        <span className="flex items-center gap-0.5 lg:gap-1">
+                          <Eye className="w-2 h-2 lg:w-3 lg:h-3" />
                           İpucu
                         </span>
                       ) : (
@@ -520,10 +520,10 @@ export default function Game() {
             </Card>
 
             {/* Game Status Card */}
-            <Card className="p-5 border-2 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-slate-700/50 backdrop-blur-sm shadow-xl max-h-80 overflow-y-auto">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-4 h-4 text-primary" />
-                <h4 className="text-sm font-bold text-white uppercase tracking-wide">Oyun Durumu</h4>
+            <Card className="p-2 lg:p-3 xl:p-4 2xl:p-5 border-2 bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-slate-700/50 backdrop-blur-sm shadow-xl max-h-60 lg:max-h-72 xl:max-h-80 overflow-y-auto">
+              <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
+                <Target className="w-3 h-3 lg:w-4 lg:h-4 text-primary" />
+                <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-white uppercase tracking-wide">Oyun Durumu</h4>
               </div>
               <div className="space-y-3">
                 {gameState.currentClue && (
