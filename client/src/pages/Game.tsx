@@ -505,7 +505,7 @@ export default function Game() {
                       gameState.currentTeam === "dark" ? "bg-blue-500" : "bg-red-500"
                     )} />
                     <span className="text-xs font-medium text-slate-300">
-                      Sıra: <span className={gameState.currentTeam === "dark" ? "text-blue-400" : "text-red-400"}>
+                      Sıradaki takım: <span className={gameState.currentTeam === "dark" ? "text-blue-400 font-bold" : "text-red-400 font-bold"}>
                         {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
                       </span>
                     </span>
@@ -947,7 +947,10 @@ export default function Game() {
                     <div className="text-[10px] font-bold text-blue-100">{gameState.darkTeamName}</div>
                     <div className="text-xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
                     {gameState.currentTeam === "dark" && (
-                      <div className="text-[9px] text-blue-100 font-bold">● SIRA</div>
+                      <div className="text-[9px] font-bold">
+                        <span className="text-blue-300">Sıradaki takım: </span>
+                        <span className="text-blue-100">{gameState.darkTeamName}</span>
+                      </div>
                     )}
                   </div>
                 </Card>
@@ -963,7 +966,10 @@ export default function Game() {
                     <div className="text-[10px] font-bold text-red-100">{gameState.lightTeamName}</div>
                     <div className="text-xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
                     {gameState.currentTeam === "light" && (
-                      <div className="text-[9px] text-red-100 font-bold">● SIRA</div>
+                      <div className="text-[9px] font-bold">
+                        <span className="text-red-300">Sıradaki takım: </span>
+                        <span className="text-red-100">{gameState.lightTeamName}</span>
+                      </div>
                     )}
                   </div>
                 </Card>
