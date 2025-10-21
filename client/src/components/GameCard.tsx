@@ -121,12 +121,12 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         
         {/* Word panel */}
         <div className={cn(
-          "relative rounded px-0.5 py-0.5 sm:px-1 sm:py-0.5 md:px-2 md:py-1 lg:px-3 lg:py-1.5 xl:px-4 xl:py-2 2xl:px-5 2xl:py-2.5",
+          "relative rounded px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
           "flex items-center justify-center",
           "border-t border-black/20",
           colors.panel
         )}>
-          <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg uppercase tracking-wide text-center leading-tight drop-shadow-md">
+          <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md">
             {card.word}
           </span>
         </div>
