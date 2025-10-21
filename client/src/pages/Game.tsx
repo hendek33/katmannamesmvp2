@@ -269,9 +269,9 @@ export default function Game() {
         </Card>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[220px_1fr_220px] gap-3 flex-1 min-h-0 overflow-y-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr_180px] xl:grid-cols-[220px_1fr_220px] gap-2 lg:gap-3 flex-1 min-h-0 overflow-y-auto">
           {/* Left Side - Dark Team */}
-          <div className="space-y-2 md:space-y-3 xl:overflow-y-auto">
+          <div className="hidden lg:block space-y-2 md:space-y-3 lg:overflow-y-auto">
             {/* Score Card */}
             <Card className="p-3 md:p-4 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
               <div className="text-center space-y-2">
@@ -337,6 +337,30 @@ export default function Game() {
 
           {/* Center - Grid */}
           <div className="flex flex-col min-h-0 flex-1 gap-3 items-center justify-start overflow-y-auto py-4">
+            {/* Mobile Score Display */}
+            <div className="lg:hidden w-full px-2">
+              <div className="grid grid-cols-2 gap-2">
+                <Card className="p-2 border-2 bg-gradient-to-br from-blue-950/90 to-blue-900/90 border-blue-700/50">
+                  <div className="text-center">
+                    <div className="text-xs font-bold text-blue-100">{gameState.darkTeamName}</div>
+                    <div className="text-2xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
+                    {gameState.currentTeam === "dark" && (
+                      <div className="text-[10px] text-blue-100 font-bold">● SIRA</div>
+                    )}
+                  </div>
+                </Card>
+                <Card className="p-2 border-2 bg-gradient-to-br from-red-950/90 to-red-900/90 border-red-800/50">
+                  <div className="text-center">
+                    <div className="text-xs font-bold text-red-100">{gameState.lightTeamName}</div>
+                    <div className="text-2xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
+                    {gameState.currentTeam === "light" && (
+                      <div className="text-[10px] text-red-100 font-bold">● SIRA</div>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            </div>
+            
             <div className="grid grid-cols-5 gap-1 sm:gap-2 w-full max-w-[1000px] px-2" data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
@@ -417,7 +441,7 @@ export default function Game() {
           </div>
 
           {/* Right Side - Light Team */}
-          <div className="space-y-2 md:space-y-3 xl:overflow-y-auto">
+          <div className="hidden lg:block space-y-2 md:space-y-3 lg:overflow-y-auto">
             {/* Score Card */}
             <Card className="p-3 md:p-4 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
               <div className="text-center space-y-2">
