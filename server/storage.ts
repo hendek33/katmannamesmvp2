@@ -471,6 +471,8 @@ export class MemStorage implements IStorage {
     // Reset guess tracking
     roomData.guessesRemaining = 0;
     roomData.maxGuesses = 0;
+    // Clear votes on restart
+    roomData.cardVotes.clear();
 
     return room;
   }
@@ -492,6 +494,8 @@ export class MemStorage implements IStorage {
     // Reset guess tracking
     roomData.guessesRemaining = 0;
     roomData.maxGuesses = 0;
+    // Clear votes on return to lobby
+    roomData.cardVotes.clear();
 
     return room;
   }

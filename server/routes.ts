@@ -429,6 +429,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
             }
+            
+            // Clear votes on restart
+            broadcastToRoom(ws.roomCode, {
+              type: "votes_updated",
+              payload: { votes: {} },
+            });
             break;
           }
 
@@ -482,6 +488,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             broadcastToRoom(ws.roomCode, {
               type: "returned_to_lobby",
               payload: { gameState },
+            });
+            
+            // Clear votes when returning to lobby
+            broadcastToRoom(ws.roomCode, {
+              type: "votes_updated",
+              payload: { votes: {} },
             });
             break;
           }
