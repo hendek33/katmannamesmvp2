@@ -43,8 +43,10 @@ export function PlayerList({
     const [editedName, setEditedName] = useState(title);
 
     const handleSaveName = () => {
-      if (editedName.trim() && onTeamNameChange) {
-        onTeamNameChange(team, editedName.trim());
+      // Team names are mandatory - ensure there's always a name
+      const finalName = editedName.trim() || (team === "dark" ? "Katman Koyu" : "Katman Açık");
+      if (onTeamNameChange) {
+        onTeamNameChange(team, finalName);
       }
       setIsEditing(false);
     };
@@ -60,8 +62,10 @@ export function PlayerList({
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+                onBlur={handleSaveName}
                 maxLength={20}
                 className="h-6 text-xs font-semibold max-w-[120px]"
+                placeholder="Takım ismi"
                 autoFocus
               />
               <Button

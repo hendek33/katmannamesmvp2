@@ -74,90 +74,91 @@ export default function RoomList() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="h-screen relative overflow-hidden flex flex-col">
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
         style={{ backgroundImage: 'url(/arkaplan.png)' }}
       />
 
-      {/* Particles */}
-      {[...Array(70)].map((_, i) => (
+      {/* Reduced Particles for better performance */}
+      {[...Array(15)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
 
-      {/* Light Effects */}
+      {/* Reduced Light Effects */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
-      <div className="light-effect light-3" />
-      <div className="light-effect light-4" />
-      <div className="light-effect light-5" />
 
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-8">
-        <Card className="w-full max-w-4xl bg-slate-900/90 backdrop-blur-lg border-orange-900/30 shadow-2xl">
-          <div className="p-8">
-            <h1 className="text-4xl font-bold text-center mb-2 text-white">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 sm:p-6">
+        <Card className="w-full max-w-5xl bg-slate-900/90 backdrop-blur-lg border-orange-900/30 shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="p-4 sm:p-6 flex flex-col h-full">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center mb-1 text-white">
               Odalar
             </h1>
-            <p className="text-center text-slate-300 mb-6">
+            <p className="text-center text-xs sm:text-sm text-slate-300 mb-4">
               Bir odaya katıl veya yeni oda oluştur
             </p>
 
-            <div className="flex gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
               <Button 
                 onClick={() => setShowCreateModal(true)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold h-10 sm:h-12 text-sm sm:text-base"
               >
                 Yeni Oda Oluştur
               </Button>
               <Button 
                 onClick={() => setShowJoinModal(true)}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3"
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold h-10 sm:h-12 text-sm sm:text-base"
               >
                 Oda Kodu ile Katıl
               </Button>
             </div>
 
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+            <div className="flex-1 space-y-2 overflow-y-auto pr-1 min-h-0">
               {roomsList.length === 0 ? (
                 <div className="text-center py-12 text-slate-400">
-                  Henüz aktif oda yok. İlk odayı sen oluştur!
+                  <div className="text-5xl mb-4">🏠</div>
+                  <p className="text-sm">Henüz aktif oda yok</p>
+                  <p className="text-xs mt-2">İlk odayı sen oluştur!</p>
                 </div>
               ) : (
                 roomsList.map((room: RoomListItem) => (
                   <Card 
                     key={room.roomCode}
-                    className="bg-slate-800/60 border-slate-700 hover:bg-slate-800/80 transition-all cursor-pointer"
+                    className="bg-slate-800/80 border-slate-700 hover:bg-slate-800 transition-all cursor-pointer group"
                     onClick={() => handleJoinRoom(room.roomCode, room.hasPassword)}
                   >
-                    <div className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="text-2xl font-bold text-orange-400">
+                    <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <div className="text-xl sm:text-2xl font-bold text-orange-400">
                           {room.roomCode}
                         </div>
-                        <div className="flex items-center gap-2 text-slate-300">
-                          <Users size={18} />
-                          <span>{room.playerCount} oyuncu</span>
+                        <div className="flex items-center gap-1 text-slate-300 text-sm">
+                          <Users className="w-4 h-4" />
+                          <span>{room.playerCount}</span>
                         </div>
                         {room.hasPassword && (
                           <div className="flex items-center gap-1 text-yellow-400">
-                            <Lock size={16} />
-                            <span className="text-sm">Şifreli</span>
+                            <Lock className="w-3 h-3" />
+                            <span className="text-xs">Şifreli</span>
                           </div>
                         )}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      <div className="flex items-center gap-2 self-end sm:self-auto">
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
                           room.phase === "lobby" 
                             ? "bg-green-900/50 text-green-300" 
-                            : "bg-blue-900/50 text-blue-300"
+                            : room.phase === "playing"
+                            ? "bg-blue-900/50 text-blue-300"
+                            : "bg-gray-900/50 text-gray-300"
                         }`}>
                           {room.phase === "lobby" && <span className="mr-1">●</span>}
-                          {room.phase === "playing" && <Play size={14} className="inline mr-1" />}
+                          {room.phase === "playing" && <Play className="w-3 h-3 inline mr-1" />}
                           {getPhaseText(room.phase)}
                         </div>
                         <Button 
                           size="sm" 
-                          className="bg-orange-600 hover:bg-orange-700"
+                          className="bg-orange-600 hover:bg-orange-700 h-8 px-3 group-hover:scale-105 transition-transform"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleJoinRoom(room.roomCode, room.hasPassword);

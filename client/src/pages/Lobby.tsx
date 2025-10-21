@@ -390,7 +390,7 @@ export default function Lobby() {
 
             {/* Bot Controls - Compact */}
             {currentPlayer?.isRoomOwner && (
-              <Card className="p-3 sm:p-4 space-y-2 border-2 bg-amber-500/5">
+              <Card className="p-3 sm:p-4 space-y-2 border-2 bg-gradient-to-br from-amber-500/20 to-orange-500/20 backdrop-blur-sm">
                 <div className="flex items-center gap-2 mb-2">
                   <Bot className="w-4 h-4 text-amber-600" />
                   <h3 className="text-sm font-bold">Test Botları</h3>
