@@ -215,7 +215,7 @@ export default function Game() {
                 </Button>
               </div>
             </div>
-          </Card>
+            </Card>
           </div>
           
           {/* Center Section - Game Status and Players */}
@@ -315,6 +315,8 @@ export default function Game() {
               )}
             </div>
           </Card>
+            </div>
+          </div>
           
           {/* Right Section - Actions */}
           <div className="lg:w-[250px] xl:w-[280px] 2xl:w-[320px]">
@@ -633,8 +635,6 @@ export default function Game() {
               </Button>
             </div>
           </Card>
-            </div>
-          </div>
           </div>
         </div>
 
