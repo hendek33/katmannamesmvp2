@@ -269,7 +269,7 @@ export default function Game() {
         </Card>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(170px,13vw)_1fr_minmax(170px,13vw)] gap-2 md:gap-3 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 xl:grid-cols-[220px_1fr_220px] gap-3 flex-1 min-h-0 overflow-hidden">
           {/* Left Side - Dark Team */}
           <div className="space-y-2 md:space-y-3 overflow-y-auto">
             {/* Score Card */}

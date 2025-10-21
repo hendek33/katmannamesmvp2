@@ -1,323 +1,54 @@
 # Katmannames - Replit Project
 
-## Proje Hakkında
+## Overview
 
-Katmannames, Codenames'ten esinlenilmiş, tamamen özgün, çok oyunculu bir Türkçe kelime tahmin oyunudur. Oyun gerçek zamanlı WebSocket bağlantıları kullanarak çalışır ve Render'a deploy edilebilir şekilde tasarlanmıştır.
+Katmannames is a unique, multiplayer Turkish word-guessing game inspired by Codenames, but it is not the official Codenames game. It features real-time gameplay using WebSocket connections and is designed for deployment on Render. The project aims to provide an engaging, real-time multiplayer experience with a distinct visual style and robust technical foundation.
 
-**Bu oyun resmi Codenames değildir.**
+## User Preferences
 
-## Proje Yapısı
+I prefer detailed explanations.
+I want iterative development.
+Ask before making major changes.
+Do not make changes to folder `shared/`.
+Do not make changes to file `server/words.ts`.
 
-### Frontend (client/)
-- **React + TypeScript** - Modern UI framework
-- **Tailwind CSS** - Özelleştirilmiş karanlık tema
-- **Wouter** - Lightweight routing
-- **Shadcn/ui** - Komponent kütüphanesi
-- **WebSocket Client** - Gerçek zamanlı iletişim
+## System Architecture
 
-### Backend (server/)
-- **Express** - HTTP server
-- **WebSocket (ws)** - Gerçek zamanlı oyun odaları
-- **In-memory storage** - Oyun durumu ve oda yönetimi
-- **Turkish word list** - 250+ Türkçe kelime
+### UI/UX Decisions
+The project features a dark navy/grey theme with a blue/red color scheme for the "Katman Koyu" (blue) and "Katman Açık" (red) teams. Unique two-layered modern card designs with distinct gradients and panels for each card type (Dark, Light, Neutral, Assassin) are implemented, including hover and flip animations. The design incorporates 3D card effects (textures, light, shadow), the Poppins font family, and a layered logo design. It is fully responsive for mobile devices and includes dynamic responsive scaling based on viewport size. Particles and light effects enhance the visual atmosphere across all pages.
 
-### Shared (shared/)
-- **TypeScript schemas** - Frontend ve backend arasında paylaşılan tipler
-- **Zod validation** - Runtime type validation
+### Technical Implementations
+- **Frontend**: Built with React + TypeScript, Tailwind CSS for styling (custom dark theme), Wouter for lightweight routing, and Shadcn/ui for components. It utilizes a WebSocket client for real-time communication.
+- **Backend**: Uses Express for the HTTP server and the `ws` library for real-time game rooms. Game state and room management are handled via in-memory storage. A Turkish word list of over 250 words is included.
+- **Shared**: Contains TypeScript schemas and Zod validation for runtime type validation, ensuring consistent data structures between the frontend and backend.
+- **WebSocket Management**: A central `WebSocketContext` manages a single, persistent WebSocket connection across page transitions, handling real-time events like `join_room`, `create_room`, `select_team`, `give_clue`, and `reveal_card`. It includes automatic reconnection, error handling, and stale connection cleanup.
+- **Game Mechanics**: Features a 5x5 card grid with 25 cards total, including a random distribution of 9 cards for the starting team and 8 for the other, 7 neutral cards, and 1 assassin card. The game tracks revealed cards with a chronological history of the last 5.
+- **Room Management**: Supports creating and joining rooms, real-time player lists, team and role selection, bot integration (owner-only), and dynamic team name changes. Password-protected rooms are supported.
 
-## Özellikler
+### Feature Specifications
+- User onboarding with name input.
+- Real-time player list, team, and role selection.
+- In-game mechanics: clue giving, card revealing, game state tracking, winner determination.
+- Persistence across page refreshes.
+- Owner-only features: adding bots, returning to lobby.
+- Player features: leaving a room.
+- Dynamic game elements: random card distribution (9-8 or 8-9), chronological reveal history.
+- The UI includes custom background images, particle effects, and radial light effects.
 
-### Mevcut Özellikler
-- ✅ Kullanıcı karşılama ve isim girişi
-- ✅ Oda oluşturma ve katılma sistemi
-- ✅ Gerçek zamanlı oyuncu listesi
-- ✅ Takım seçimi (Katman Koyu / Katman Açık)
-- ✅ Rol seçimi (İpucu Veren / Tahminci)
-- ✅ 5x5 kelime kartı ızgarası
-- ✅ Türkçe kelime listesi (250+ kelime)
-- ✅ İpucu verme mekanizması
-- ✅ Kart açma ve tahmin sistemi
-- ✅ Oyun durumu takibi
-- ✅ Kazanan belirleme
-- ✅ Sayfa yenileme dayanıklılığı
-- ✅ Bot ekleme sistemi (owner-only, spymaster uniqueness)
-- ✅ Kronolojik reveal history (son 5 kart)
-- ✅ Oyunu düzenle butonu (owner-only, oyun bitince lobby'ye döner)
-- ✅ Oyundan çıkma butonu (tüm oyuncular, oda listesine döner)
-- ✅ Rastgele kart dağılımı (9-8 veya 8-9)
-- ✅ WebSocket reconnection loop düzeltildi
-- ✅ Takım ismi değiştirme (lobby'de düzenlenebilir)
-- ✅ Mavi/kırmızı renk şeması (Katman Koyu = mavi, Katman Açık = kırmızı)
+### System Design Choices
+- **Deployment Target**: Render, with specified build and start commands, and Node.js 20 environment.
+- **Data Flow**: `shared/schema.ts` defines all data models and types for frontend-backend communication, validated by Zod.
+- **State Management**: In-memory storage on the backend for game and room states.
+- **Modularity**: Separation of concerns into `client/`, `server/`, and `shared/` directories.
 
-### Tasarım Özellikleri
-- 🎨 Karanlık lacivert/grimsi tema
-- 🎨 Mavi/Kırmızı renk şeması (Koyu = Mavi, Açık = Kırmızı)
-- 🃏 Özgün kart tasarımları (iki katmanlı modern stil):
-  - **Katman Koyu (Mavi)**: Açık mavi gradient + koyu mavi alt panel
-  - **Katman Açık (Kırmızı)**: Açık kırmızı gradient + koyu kırmızı alt panel
-  - **Tarafsız**: Açık bej gradient + koyu stone alt panel
-  - **Yasak**: Gri-siyah gradient + siyah alt panel
-- ✨ Hover ve flip animasyonları
-- 📱 Responsive mobil tasarım
-- 🎯 3D kart efektleri (dokular, ışık, gölge)
-- 🔤 Poppins font ailesi
-- 🌟 Katmanlı logo tasarımı
+## External Dependencies
 
-## Teknik Detaylar
-
-### WebSocket Bağlantıları
-- Path: `/ws`
-- Protocol: `ws://` (dev) / `wss://` (production)
-- **WebSocketContext**: Merkezi WebSocket yönetimi (tek bağlantı, sayfa geçişlerinde kalıcı)
-- Gerçek zamanlı event'ler:
-  - `join_room` - Odaya katılma
-  - `create_room` - Oda oluşturma
-  - `select_team` - Takım seçimi
-  - `select_role` - Rol değiştirme
-  - `add_bot` - Bot ekleme (owner-only)
-  - `update_team_name` - Takım ismini değiştirme
-  - `start_game` - Oyunu başlatma
-  - `give_clue` - İpucu verme
-  - `reveal_card` - Kart açma
-  - `restart_game` - Oyunu yeniden başlatma
-  - `return_to_lobby` - Lobby'ye dönme (owner-only)
-  - `leave_room` - Oyundan çıkma (tüm oyuncular)
-
-### Oyun Mekaniği
-- 25 kart total (5x5 grid)
-- **Rastgele Dağılım**: Her oyun başında random olarak:
-  - Bir takım 9 kart alır (başlayan takım)
-  - Diğer takım 8 kart alır
-- 7 Tarafsız kart
-- 1 Yasak kart
-- **Başlayan takım**: Her zaman 9 kartı olan takım başlar
-- **Reveal History**: Son 5 açılan kart kronolojik sırayla gösterilir
-
-### Deployment
-- **Hedef Platform**: Render
-- **Build Command**: `npm install && npm run build`
-- **Start Command**: `npm start`
-- **Environment**: Node.js 20
-- **WebSocket Support**: ✅ Desteklenir
-
-## Son Değişiklikler
-
-### 2025-10-20 (Oyundan Çıkma ve Z-Index Düzeltmeleri)
-- ✅ **Oyundan Çıkma Özelliği**
-  - Tüm oyuncular için "Oyundan Çık" butonu (Game ve GameEnd sayfalarında)
-  - leave_room WebSocket event'i eklendi
-  - Çıkış sonrası oda listesine yönlendirme
-  - localStorage temizleme (room_code, player_id)
-  
-- ✅ **"Oyunu Düzenle" Butonu**
-  - GameEnd'de "Lobiye Dön" → "Oyunu Düzenle" olarak değiştirildi
-  - Sadece oda moderatörü (room owner) kullanabilir
-  - return_to_lobby event'i ile oyunu lobby fazına döndürür
-  - Otomatik /game sayfasına yönlendirme (lobby fazında)
-  
-- ✅ **Partikül Z-Index Düzeltmesi**
-  - Partiküllere z-index: 0 eklendi
-  - Tüm sayfalarda içerik z-index: 10 ile güncelendi
-  - Partiküller artık kartların altında kalıyor
-  - Lobby, Game, GameEnd, RoomList, Welcome sayfaları düzeltildi
-
-### 2025-10-20 (Lobi Sistemi İyileştirmeleri - Önceki)
-- ✅ **Welcome Sayfası Temizlendi**
-  - "Yeni Başlat" butonu kaldırıldı (gereksiz)
-  
-- ✅ **RoomList Partikülleri Düzeltildi**
-  - Partikül renderingı standart particle-${i} class'larına çevrildi
-  - Light effect'ler standart light-effect class'larına çevrildi
-  
-- ✅ **Lobby Sayfası Kaldırıldı**
-  - RoomList'ten direkt /game'e yönlendirme
-  - Game.tsx içinde phase: lobby durumunda Lobby component'i render ediliyor
-  - Yeni akış: Welcome → RoomList → Game (lobby mode) → Game (playing mode)
-  - Gereksiz sayfa geçişi kaldırıldı
-
-### 2025-10-20 (Yeni Lobi Sistemi - Önceki)
-- ✅ **Oda Listesi Sistemi**
-  - Yeni RoomList sayfası eklendi (Welcome → RoomList → Lobby → Game akışı)
-  - Aktif odaların listelenmesi (oyuncu sayısı, şifre durumu, oda fazı)
-  - Her 3 saniyede otomatik oda listesi güncelleme
-  - Oda kodu, oyuncu sayısı, şifreli/şifresiz durum gösterimi
-  
-- ✅ **Şifreli Oda Desteği**
-  - Oda oluşturma sırasında şifre belirleme
-  - Şifreli odalara katılırken şifre kontrolü
-  - Backend'de password storage ve validation
-  
-- ✅ **Oda Oluşturma Modal**
-  - Şifreli/şifresiz oda oluşturma seçeneği
-  - Modern modal UI tasarımı
-  
-- ✅ **Oda Kodu ile Katılma**
-  - Manuel oda kodu girişi
-  - Şifreli odalarda şifre input
-  
-- ✅ **Backend İyileştirmeleri**
-  - list_rooms WebSocket event'i
-  - RoomListItem interface'i
-  - hasPassword ve createdAt alanları GameState'e eklendi
-  - Password validation join_room'da
-
-### 2025-10-20 (Önceki Güncellemeler)
-- ✅ **Işık Efektleri**
-  - 5 adet büyük radial gradient ışık efekti
-  - Turuncu, mavi ve altın renkli ışıklar
-  - Pulse ve rotate animasyonları (8-12 saniye)
-  - Screen blend mode ile atmosferik görünüm
-  - Blur(80px) ile yumuşak geçişler
-  - Tüm sayfalarda aktif (Welcome, Lobby, Game, GameEnd)
-
-- ✅ **Partikül Efektleri**
-  - Arkaplan üzerine 70 adet animasyonlu partikül
-  - Uyumlu renkler: Turuncu (orange-600), Mavi (blue-500/600), Altın (amber-400)
-  - Random yönlerde hareket (yukarı, aşağı, sağa, sola)
-  - 10 farklı animasyon paterni, infinite alternate ile gidip gelme
-  - Hızlı animasyonlar (8-12 saniye döngüler)
-  - Ekranın her yerinde yoğun dağılım
-  - Tüm sayfalarda aktif (Welcome, Lobby, Game, GameEnd)
-
-- ✅ **Logo Entegrasyonu**
-  - Özel logo (logo.png) tüm sayfalarda kullanılıyor
-  - Logo komponenti güncellendi (sadece logo, yazı kaldırıldı)
-  - Lobby ve Game ekranından logo kaldırıldı
-  - Optimize edilmiş boyut: 
-    - Oyun ekranı: 128x128px (mobil), 160x160px (desktop)
-    - Welcome: 320px genişlik (mobil), 384px (desktop), yükseklik auto (aspect ratio korunuyor)
-    - GameEnd: 160x160px (mobil), 224x224px (desktop)
-  - Welcome kartı logo ile uyumlu: Turuncu/mavi gradient, kalın kenarlık
-  - Logo native aspect ratio'da (1024×538) tam boyutta görünüyor
-
-- ✅ **Arkaplan ile Uyumlu Tasarım**
-  - Tüm kartlar yarı saydam koyu arka plan (bg-slate-900/85-90)
-  - Backdrop blur efekti ile modern görünüm
-  - Turuncu kenarlıklar (border-orange-900/30) arkaplan ile uyumlu
-  - Tüm sayfalarda tutarlı tasarım dili
-
-- ✅ **Özel Arkaplan Eklendi**
-  - arkaplan.png dosyası client/public/ klasöründe
-  - Background-size: cover ile tam ekran kaplama
-  - Tüm sayfalarda (Welcome, Lobby, Game, GameEnd) uygulandı
-  
-- ✅ **İpucu Kartı İyileştirmesi**
-  - Shadow efektleri kaldırıldı, daha temiz görünüm
-  - Sayı input'u text-black ile okunabilir hale getirildi
-
-- ✅ **Dinamik Responsive Ölçeklendirme**
-  - JavaScript ile viewport boyutuna göre otomatik scale hesaplama
-  - Window resize event listener ile gerçek zamanlı adaptasyon
-  - Hem yükseklik hem genişliğe göre optimize scale değeri
-  - Transform: scale() ile dinamik ölçeklendirme
-  - Transform-origin: top center ile merkezli hizalama
-  - Width/height/margin otomatik kompansasyon
-  - Base dimensions: 1150px height, 1600px width
-  - Safe margin: 20px her yönde
-  - Min scale: 0.4, Max scale: 1.0
-  - Her ekran çözünürlüğünde tam sığma garantisi
-  - Smooth transition efekti
-
-### 2025-10-20
-- ✅ **Kart Tasarımı Yenilendi**
-  - İki katmanlı modern tasarım (üstte açık gradient, altta koyu panel)
-  - 3:2 aspect ratio (en-boy oranı)
-  - Mavi takım: Açık mavi gradient + koyu mavi panel + açık mavi çerçeve
-  - Kırmızı takım: Açık kırmızı gradient + koyu kırmızı panel + açık kırmızı çerçeve
-  - Tarafsız: Açık bej (stone) gradient + koyu stone panel + bej çerçeve
-  - Yasak: Gri/siyah gradient + siyah panel + açık gri çerçeve
-  - Yumuşak yuvarlatılmış köşeler ve belirgin 3px çerçeveler
-  - Kelimeler alt panelde beyaz renkte, uppercase
-  - Hover efekti: Kart 8% büyür ve 2px yukarı kalkar
-  - Renkli gölge efektleri
-
-- ✅ **Takım İsimleri Oyun Ekranında**
-  - Game.tsx'de hardcoded "Katman Koyu/Açık" kaldırıldı
-  - Skor kartlarında ve sıra göstergesinde dinamik takım isimleri
-  - Lobby'de yapılan takım ismi değişiklikleri oyunda da yansıyor
-
-### 2025-10-19
-- ✅ **Takım İsmi Değiştirme**
-  - Lobby'de takım isimleri düzenlenebilir
-  - Edit butonu ve input field ile inline editing
-  - Backend'e update_team_name event handler eklendi
-  - Real-time senkronizasyon ile tüm oyunculara yansıma
-
-- ✅ **Renk Şeması Güncelleme**
-  - Tüm turkuaz/cyan renkler kırmızı ile değiştirildi
-  - Katman Koyu = Mavi (blue)
-  - Katman Açık = Kırmızı (red)
-  - Game.tsx, Lobby.tsx, GameEnd.tsx, PlayerList.tsx, GameCard.tsx, ClueDisplay.tsx, GameStatus.tsx güncellendi
-
-- ✅ **Kart Arka Plan Textures**
-  - bg-metallic-dark: Mavi metalik gradient + geometric patterns
-  - bg-neon-light: Kırmızı neon gradient + grid textures
-  - bg-neutral-texture: Gri crosshatch patterns
-  - bg-assassin-danger: Kırmızı-siyah checkerboard + radial glow
-
-### 2025-10-19 (Önceki)
-- ✅ **WebSocket Reconnection Loop Düzeltildi**
-  - WebSocketContext ile merkezi bağlantı yönetimi
-  - Sayfa geçişlerinde tek WebSocket instance kullanımı
-  - Reconnection loop sorunu tamamen giderildi
-
-- ✅ **Lobiye Dönme Özelliği**
-  - `return_to_lobby` event handler eklendi
-  - GameEnd sayfasından lobby'ye dönüş
-  - Oyun state'i temizleniyor (cards, clue, winner reset)
-
-- ✅ **Rastgele Kart Dağılımı**
-  - Her oyun başında hangi takımın 9, hangisinin 8 kart alacağı random
-  - Başlayan takım her zaman 9 kartı olan takım
-  - Codenames kurallarına uygun
-
-- ✅ **Bot Sistemi**
-  - Owner-only bot ekleme yetkisi
-  - Spymaster uniqueness enforcement
-  - Dark/Light takımlarına bot ekleme
-
-- ✅ **Reveal History**
-  - Son 5 açılan kart kronolojik gösterim
-  - Timestamp tracking
-  - Color-coded card display
-
-### 2025-01-19
-- ✅ İlk proje kurulumu
-- ✅ Tüm UI komponentleri ve sayfalar
-- ✅ Backend WebSocket implementasyonu
-- ✅ Oyun mekaniği (turn switching, win conditions)
-- ✅ 250+ Türkçe kelime listesi
-
-### Tamamlanmış Özellikler
-- ✅ Full stack oyun tamamlandı
-- ✅ WebSocket gerçek zamanlı senkronizasyon
-- ✅ Oda yönetimi ve oyuncu tracking
-- ✅ Bot desteği ve role management
-- ✅ UI/UX polish ve animasyonlar
-
-## Geliştirici Notları
-
-### Önemli Dosyalar
-- `shared/schema.ts` - Tüm veri modelleri ve tipleri
-- `server/words.ts` - Türkçe kelime listesi
-- `server/routes.ts` - WebSocket event handlers ve broadcast logic
-- `server/storage.ts` - In-memory oyun durumu yönetimi
-- `client/src/contexts/WebSocketContext.tsx` - Merkezi WebSocket yönetimi
-- `client/src/hooks/useWebSocket.ts` - WebSocket connection ve event handling
-- `client/src/index.css` - Tailwind konfigürasyonu ve custom CSS
-- `tailwind.config.ts` - Tasarım token'ları ve animasyonlar
-
-### Tasarım Prensipleri
-- Karanlık tema her yerde varsayılan
-- Her kart türü görsel olarak benzersiz olmalı
-- Animasyonlar hafif ve performanslı
-- Mobilde de tam işlevsellik
-- Türkçe dil desteği %100
-
-### WebSocket Event Handling
-- **Merkezi Bağlantı**: WebSocketContext ile tek instance
-- Her event için validation (Zod schemas)
-- Room state senkronizasyonu ve broadcast
-- Automatic reconnection (5 deneme, exponential backoff)
-- Error handling ve user feedback
-- Stale connection cleanup (5 saniye timeout)
+- **React**: Frontend UI library.
+- **TypeScript**: Language for type safety.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **Wouter**: Lightweight React router.
+- **Shadcn/ui**: UI component library.
+- **Express**: Backend web framework.
+- **ws**: WebSocket library for Node.js.
+- **Zod**: Schema declaration and validation library.
+- **Render**: Cloud platform for deployment.
