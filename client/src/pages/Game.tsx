@@ -868,10 +868,10 @@ export default function Game() {
                   <>
                     {/* Current clue if exists */}
                     {gameState.currentClue && (
-                      <div className="p-1 bg-amber-600/20 rounded text-[8px] border border-amber-500/30 flex items-center gap-1">
-                        <Lightbulb className="w-2 h-2 text-amber-400" />
+                      <div className="p-1 bg-amber-600/20 rounded text-[9px] border border-amber-500/30 flex items-center gap-1">
+                        <Lightbulb className="w-2.5 h-2.5 text-amber-400" />
                         <span className="font-bold text-amber-100">
-                          {gameState.currentClue.word} ({gameState.currentClue.count})
+                          İpucu: {gameState.currentClue.word} ({gameState.currentClue.count} kelime)
                         </span>
                       </div>
                     )}
@@ -928,25 +928,28 @@ export default function Game() {
                       return (
                         <div 
                           key={idx} 
-                          className={`px-1 py-0.5 rounded text-[8px] ${bgClass} ${borderClass} border flex items-center gap-1`}
+                          className={`p-1 rounded text-[9px] ${bgClass} ${borderClass} border`}
                         >
-                          <div className={`w-1.5 h-1.5 rounded-full ${
-                            entry.type === "dark" ? "bg-blue-500" :
-                            entry.type === "light" ? "bg-red-500" :
-                            entry.type === "neutral" ? "bg-gray-400" :
-                            "bg-red-700"
-                          }`} />
-                          <span className="font-semibold">{entry.word}</span>
-                          <span className="text-gray-400">-</span>
-                          {isAssassin ? (
-                            <span className="text-red-400">❌ Suikastçı!</span>
-                          ) : isNeutral ? (
-                            <span className="text-gray-400">➖ Tarafsız</span>
-                          ) : isCorrect ? (
-                            <span className="text-green-400">✓</span>
-                          ) : (
-                            <span className="text-orange-400">✗</span>
-                          )}
+                          <div className="flex items-center gap-1">
+                            <div className={`w-2 h-2 rounded-full ${
+                              entry.type === "dark" ? "bg-blue-500" :
+                              entry.type === "light" ? "bg-red-500" :
+                              entry.type === "neutral" ? "bg-gray-400" :
+                              "bg-red-700"
+                            }`} />
+                            <span className="font-semibold text-gray-200">{playerName}</span>
+                            <span className="text-gray-400">→</span>
+                            <span className="font-bold text-white">{entry.word}</span>
+                            {isAssassin ? (
+                              <span className="text-red-400 ml-auto">❌ Suikastçı!</span>
+                            ) : isNeutral ? (
+                              <span className="text-gray-400 ml-auto">➖ Tarafsız</span>
+                            ) : isCorrect ? (
+                              <span className="text-green-400 ml-auto">✓ Doğru</span>
+                            ) : (
+                              <span className="text-orange-400 ml-auto">✗ Yanlış</span>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -955,7 +958,7 @@ export default function Game() {
               </div>
               
               {/* Quick stats at bottom */}
-              <div className="mt-1 pt-1 border-t border-slate-700/50 flex justify-around text-[8px]">
+              <div className="mt-1 pt-1 border-t border-slate-700/50 flex justify-around text-[9px]">
                 <div className="flex items-center gap-1">
                   <span className="text-gray-500">Açılan:</span>
                   <span className="font-bold text-gray-300">{gameState.revealHistory.length}/25</span>
