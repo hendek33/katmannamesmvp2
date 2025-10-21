@@ -958,22 +958,24 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
-                <Button
-                  onClick={() => {
-                    send("end_turn", {});
-                    toast({
-                      title: "Tahmin Tamamlandı",
-                      description: "Sıra diğer takıma geçti",
-                    });
-                  }}
-                  className="h-8 sm:h-10 px-4 sm:px-6 bg-orange-600 hover:bg-orange-700 text-white font-bold shadow-xl text-xs sm:text-sm rounded-lg border-2 border-orange-500"
-                >
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5" />
-                  Tahmini Bitir
-                </Button>
+                <div className="animate-pulse-slow">
+                  <Button
+                    onClick={() => {
+                      send("end_turn", {});
+                      toast({
+                        title: "Tahmin Tamamlandı",
+                        description: "Sıra diğer takıma geçti",
+                      });
+                    }}
+                    className="h-10 sm:h-12 px-6 sm:px-8 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-black shadow-2xl text-sm sm:text-base rounded-xl border-2 border-orange-400/60 transform transition-all hover:scale-105"
+                  >
+                    <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                    TAHMİNİ BİTİR
+                  </Button>
+                </div>
               )}
               {canGiveClue ? (
                 <Card className="px-2 py-1 sm:px-3 sm:py-1.5 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">

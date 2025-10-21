@@ -576,6 +576,10 @@
   animation: bounceSlow 2s ease-in-out infinite;
 }
 
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 
 /* Card drop animation */
 @keyframes cardDrop {
