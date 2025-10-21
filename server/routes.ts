@@ -261,6 +261,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "remove_bot": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi bot kaldırabilir" } });
+              return;
+            }
+
+            const validation = z.object({ botId: z.string() }).safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz bot bilgisi" } });
+              return;
+            }
+
+            // Check if the bot exists and is actually a bot
+            const bot = room?.players.find(p => p.id === validation.data.botId);
+            if (!bot || !bot.isBot) {
+              sendToClient(ws, { type: "error", payload: { message: "Bot bulunamadı" } });
+              return;
+            }
+
+            storage.removePlayer(ws.roomCode, validation.data.botId);
+            const updatedRoom = storage.getRoom(ws.roomCode);
+            
+            if (updatedRoom) {
+              broadcastToRoom(ws.roomCode, {
+                type: "game_updated",
+                payload: { gameState: updatedRoom },
+              });
+            }
+            break;
+          }
+
           case "update_team_name": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });

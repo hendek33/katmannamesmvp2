@@ -342,7 +342,7 @@ export default function Lobby() {
         {/* Main Content Area - Flex Layout */}
         <div className="flex flex-col lg:flex-row gap-3 flex-1 min-h-0">
           {/* Main Player Area */}
-          <div className="flex-1 lg:max-w-[60%]">
+          <div className="flex-1 lg:max-w-[60%] flex flex-col">
             <PlayerList
               players={gameState.players}
               currentPlayerId={playerId}
@@ -352,11 +352,12 @@ export default function Lobby() {
               darkTeamName={gameState.darkTeamName}
               lightTeamName={gameState.lightTeamName}
               onTeamNameChange={handleTeamNameChange}
+              onRemoveBot={handleRemoveBot}
             />
           </div>
 
           {/* Sidebar */}
-          <div className="lg:w-[40%] flex flex-col gap-3">
+          <div className="lg:w-[40%] flex flex-col gap-3 pt-[26px]">
 
             {/* Start Game and Controls */}
             <Card className="p-3 sm:p-4 border-2 bg-gradient-to-br from-green-500/5 to-emerald-500/5">

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, Crown, Eye, Target, Edit2, Check } from "lucide-react";
+import { Users, Crown, Eye, Target, Edit2, Check, X } from "lucide-react";
 import { useState } from "react";
 
 interface PlayerListProps {
@@ -15,6 +15,7 @@ interface PlayerListProps {
   darkTeamName?: string;
   lightTeamName?: string;
   onTeamNameChange?: (team: Team, name: string) => void;
+  onRemoveBot?: (botId: string) => void;
 }
 
 export function PlayerList({ 
@@ -25,7 +26,8 @@ export function PlayerList({
   isLobby = false,
   darkTeamName = "Mavi Takım",
   lightTeamName = "Kırmızı Takım",
-  onTeamNameChange
+  onTeamNameChange,
+  onRemoveBot
 }: PlayerListProps) {
   const darkTeam = players.filter(p => p.team === "dark");
   const lightTeam = players.filter(p => p.team === "light");
@@ -148,6 +150,19 @@ export function PlayerList({
                   data-testid="button-toggle-role"
                 >
                   Değiştir
+                </Button>
+              )}
+              
+              {/* Remove button for bots */}
+              {isLobby && player.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  className="h-5 w-5 p-0 text-red-500 hover:text-red-700"
+                  onClick={() => onRemoveBot(player.id)}
+                  data-testid={`button-remove-bot-${player.id}`}
+                >
+                  <X className="w-3 h-3" />
                 </Button>
               )}
             </div>
