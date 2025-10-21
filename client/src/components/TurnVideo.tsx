@@ -16,11 +16,11 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
     : "/kırmızı takım video tur.mp4";
 
   useEffect(() => {
-    // Auto hide after 4.5 seconds
+    // Auto hide after 4 seconds
     const timer = setTimeout(() => {
       setShow(false);
       onComplete?.();
-    }, 4500);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
