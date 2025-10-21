@@ -36,11 +36,7 @@ export default function Game() {
     }
   }, [error, toast]);
 
-  useEffect(() => {
-    if (gameState?.phase === "ended") {
-      setLocation("/end");
-    }
-  }, [gameState, setLocation]);
+  // Removed redirect on game end - will handle it in the same page
 
   // Auto-scroll to bottom when new log entries are added
   useEffect(() => {
@@ -135,6 +131,13 @@ export default function Game() {
   const darkPlayers = gameState.players.filter(p => p.team === "dark");
   const lightPlayers = gameState.players.filter(p => p.team === "light");
 
+  // Find last revealed card for animation
+  const lastRevealedCard = gameState.revealHistory.length > 0 
+    ? gameState.revealHistory[gameState.revealHistory.length - 1] as any
+    : null;
+  const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
+  const lastCardId = lastRevealedCard?.cardId;
+
   return (
     <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
@@ -145,6 +148,113 @@ export default function Game() {
       {[...Array(8)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
+      
+      {/* Game End Overlay */}
+      {gameState.phase === "ended" && gameState.winner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <Card className="relative max-w-2xl w-full p-8 border-4 bg-gradient-to-br from-slate-900 to-slate-800 shadow-2xl overflow-hidden">
+            {/* Animated background pattern */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 animate-pulse" />
+            </div>
+            
+            {/* Content */}
+            <div className="relative z-10 space-y-6 text-center">
+              {/* Winner announcement */}
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-6xl font-black animate-bounce">
+                  {wasAssassinRevealed ? (
+                    <span className="text-red-500">💀 SUİKASTÇI BULUNDU! 💀</span>
+                  ) : (
+                    <span className="text-yellow-400">🎉 OYUN BİTTİ! 🎉</span>
+                  )}
+                </h1>
+                
+                <div className="text-2xl md:text-4xl font-bold">
+                  <span className="text-white">Kazanan: </span>
+                  <span className={cn(
+                    "animate-pulse font-black",
+                    gameState.winner === "dark" ? "text-blue-400" : "text-red-400"
+                  )}>
+                    {gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                  </span>
+                </div>
+                
+                {wasAssassinRevealed && (
+                  <div className="text-lg text-red-300 animate-pulse">
+                    {lastRevealedCard.playerUsername} suikastçı kartını açtı!
+                  </div>
+                )}
+              </div>
+              
+              {/* Final scores */}
+              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                <Card className="p-4 bg-blue-900/50 border-2 border-blue-600">
+                  <h3 className="text-lg font-bold text-blue-200">{gameState.darkTeamName}</h3>
+                  <p className="text-3xl font-black text-blue-100">{gameState.darkCardsRemaining}</p>
+                  <p className="text-sm text-blue-300">Kalan Kart</p>
+                </Card>
+                
+                <Card className="p-4 bg-red-900/50 border-2 border-red-600">
+                  <h3 className="text-lg font-bold text-red-200">{gameState.lightTeamName}</h3>
+                  <p className="text-3xl font-black text-red-100">{gameState.lightCardsRemaining}</p>
+                  <p className="text-sm text-red-300">Kalan Kart</p>
+                </Card>
+              </div>
+              
+              {/* Game stats */}
+              <div className="space-y-2 text-gray-300">
+                <p>Açılan Kart: {gameState.revealHistory.filter((e: any) => e.word).length} / 25</p>
+                <p>Oyun Süresi: {Math.floor((Date.now() - gameState.createdAt) / 60000)} dakika</p>
+              </div>
+              
+              {/* Action buttons */}
+              <div className="flex justify-center gap-4 pt-4">
+                {currentPlayer?.isRoomOwner && (
+                  <Button
+                    onClick={handleRestart}
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold animate-pulse"
+                  >
+                    <RotateCcw className="w-5 h-5 mr-2" />
+                    Yeni Oyun
+                  </Button>
+                )}
+                <Button
+                  onClick={() => {
+                    send("return_to_lobby", {});
+                  }}
+                  size="lg"
+                  variant="outline"
+                  className="border-2"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  Lobiye Dön
+                </Button>
+              </div>
+            </div>
+            
+            {/* Confetti effect */}
+            {!wasAssassinRevealed && (
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(20)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-2 h-2 bg-gradient-to-br from-yellow-400 to-orange-400 animate-bounce"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      animationDelay: `${Math.random() * 2}s`,
+                      animationDuration: `${2 + Math.random() * 2}s`
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+      )}
+      
       <div className="relative z-10 h-full flex flex-col p-2">
         <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Mobile Header */}
@@ -775,6 +885,9 @@ export default function Game() {
                     hasVoted={cardVotes[card.id]?.includes(gameState.players.find(p => p.id === playerId)?.username || '')}
                     revealedImage={cardImages[card.id]}
                     rowIndex={Math.floor(index / 5)}
+                    isLastCard={card.id === lastCardId && gameState.phase === "ended"}
+                    isAssassinCard={card.type === "assassin" && card.revealed && gameState.phase === "ended"}
+                    gameEnded={gameState.phase === "ended"}
                   />
                 </div>
               ))}

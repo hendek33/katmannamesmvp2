@@ -14,9 +14,12 @@ interface GameCardProps {
   hasVoted?: boolean;
   revealedImage?: string;
   rowIndex?: number;
+  isLastCard?: boolean;
+  isAssassinCard?: boolean;
+  gameEnded?: boolean;
 }
 
-export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0 }: GameCardProps) {
+export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
 
@@ -97,7 +100,9 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         colors.shadow,
         !card.revealed && "cursor-pointer",
         "ring-2 ring-black/20",
-        card.revealed && "animate-pulse-once",
+        card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
+        isAssassinCard && gameEnded && "animate-pulse border-red-600 ring-4 ring-red-500/50",
+        isLastCard && gameEnded && "animate-bounce border-green-500 ring-4 ring-green-400/50",
         "shadow-inner"
       )}
       style={{
