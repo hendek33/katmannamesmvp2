@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft } from "lucide-react";
+import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import type { Team } from "@shared/schema";
 
 export default function Lobby() {
@@ -19,6 +19,7 @@ export default function Lobby() {
   const [joinCode, setJoinCode] = useState("");
   const [copied, setCopied] = useState(false);
   const [username, setUsername] = useState("");
+  const [showRoomCode, setShowRoomCode] = useState(false);
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("katmannames_username");
@@ -319,15 +320,30 @@ export default function Lobby() {
               <div className="text-right">
                 <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground">ODA KODU</div>
                 <div className="text-xl sm:text-2xl font-mono font-black tracking-wider bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent" data-testid="room-code">
-                  {roomCode}
+                  {showRoomCode ? roomCode : "••••••"}
                 </div>
               </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowRoomCode(!showRoomCode)}
+                className="h-10 w-10 border-2 hover:border-primary hover:bg-primary/10 transition-all"
+                data-testid="button-toggle-code"
+                title={showRoomCode ? "Gizle" : "Göster"}
+              >
+                {showRoomCode ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={handleCopyRoomCode}
                 className="h-10 w-10 border-2 hover:border-primary hover:bg-primary/10 transition-all"
                 data-testid="button-copy-code"
+                title="Kopyala"
               >
                 {copied ? (
                   <Check className="w-4 h-4 text-green-500" />
