@@ -363,17 +363,18 @@ export default function Game() {
             
             <div className="grid grid-cols-5 gap-[1px] sm:gap-[2px] md:gap-1 lg:gap-1.5 xl:gap-2 
                  w-full 
-                 max-w-[380px] 
-                 min-[480px]:max-w-[420px] 
-                 sm:max-w-[460px] 
-                 md:max-w-[540px] 
-                 lg:max-w-[620px] 
-                 xl:max-w-[720px] 
-                 2xl:max-w-[820px] 
-                 max-h-[58vh] 
-                 sm:max-h-[62vh] 
-                 md:max-h-[68vh] 
-                 lg:max-h-[72vh] 
+                 max-w-[340px] 
+                 min-[480px]:max-w-[380px] 
+                 sm:max-w-[420px] 
+                 md:max-w-[500px] 
+                 lg:max-w-[650px] 
+                 xl:max-w-[800px] 
+                 2xl:max-w-[950px] 
+                 max-h-[55vh] 
+                 sm:max-h-[60vh] 
+                 md:max-h-[65vh] 
+                 lg:max-h-[70vh] 
+                 xl:max-h-[75vh] 
                  mb-16 sm:mb-20 lg:mb-24" 
                  data-testid="game-grid">
               {gameState.cards.map((card, index) => (
