@@ -6,6 +6,7 @@ import { GameStatus } from "@/components/GameStatus";
 import { ClueDisplay } from "@/components/ClueDisplay";
 import { PlayerList } from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
+import { AssassinVideo } from "@/components/AssassinVideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -27,9 +28,11 @@ export default function Game() {
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
+  const [showAssassinVideo, setShowAssassinVideo] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
+  const assassinShownRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (error) {
@@ -93,6 +96,20 @@ export default function Game() {
     previousTurnRef.current = turnKey;
   }, [gameState?.currentTeam, gameState?.revealHistory?.length, gameState?.phase]);
 
+  // Detect assassin card reveal and show video
+  useEffect(() => {
+    if (!gameState || gameState.phase !== "ended" || assassinShownRef.current) return;
+    
+    const lastReveal = gameState.revealHistory.length > 0 
+      ? gameState.revealHistory[gameState.revealHistory.length - 1] as any
+      : null;
+    
+    if (lastReveal?.type === "assassin") {
+      assassinShownRef.current = true;
+      setShowAssassinVideo(true);
+    }
+  }, [gameState?.revealHistory, gameState?.phase]);
+
   const handleCopyRoomCode = () => {
     if (roomCode) {
       navigator.clipboard.writeText(roomCode);
@@ -124,6 +141,7 @@ export default function Game() {
 
   const handleRestart = () => {
     send("restart_game", {});
+    assassinShownRef.current = false;
   };
 
   useEffect(() => {
@@ -207,14 +225,21 @@ export default function Game() {
         />
       )}
 
-      {/* Game End Notification - Auto disappears */}
-      {gameState.phase === "ended" && gameState.winner && (
+      {/* Assassin Video for black card */}
+      {showAssassinVideo && gameState && gameState.winner && (
+        <AssassinVideo
+          winnerTeam={gameState.winner}
+          winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          onComplete={() => setShowAssassinVideo(false)}
+        />
+      )}
+
+      {/* Game End Notification - Auto disappears (only for non-assassin wins) */}
+      {gameState.phase === "ended" && gameState.winner && !wasAssassinRevealed && (
         <div 
           className="fixed inset-x-0 top-32 z-50 flex justify-center px-4 pointer-events-none"
           style={{
-            animation: wasAssassinRevealed 
-              ? 'slideInBounce 1s ease-out 2s forwards, slideOutFade 1s ease-in 6s forwards' 
-              : 'slideInBounce 1s ease-out forwards, slideOutFade 1s ease-in 4s forwards'
+            animation: 'slideInBounce 1s ease-out forwards, slideOutFade 1s ease-in 4s forwards'
           }}
         >
           {/* Winner text without card wrapper */}
@@ -252,34 +277,25 @@ export default function Game() {
               >
                 KAZANDI!
               </div>
-              
-              {/* Assassin message if applicable */}
-              {wasAssassinRevealed && (
-                <div className="text-2xl text-white/90 mt-4 font-semibold drop-shadow-xl">
-                  Suikastçı kartı açıldı!
-                </div>
-              )}
             </div>
             
-            {/* Confetti particles for non-assassin wins */}
-            {!wasAssassinRevealed && (
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(20)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute w-1 h-2 opacity-70 animate-confetti"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      background: gameState.winner === "dark" 
-                        ? 'linear-gradient(to bottom, #60a5fa, #3b82f6)'
-                        : 'linear-gradient(to bottom, #f87171, #ef4444)',
-                      animationDelay: `${Math.random() * 0.8}s`,
-                      animationDuration: `${3 + Math.random()}s`
-                    }}
-                  />
-                ))}
-              </div>
-            )}
+            {/* Confetti particles */}
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-1 h-2 opacity-70 animate-confetti"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    background: gameState.winner === "dark" 
+                      ? 'linear-gradient(to bottom, #60a5fa, #3b82f6)'
+                      : 'linear-gradient(to bottom, #f87171, #ef4444)',
+                    animationDelay: `${Math.random() * 0.8}s`,
+                    animationDuration: `${3 + Math.random()}s`
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
