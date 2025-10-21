@@ -121,8 +121,12 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         colors.shadow,
         !card.revealed && "cursor-pointer",
         "ring-2 ring-black/20",
-        card.revealed && "animate-pulse-once"
+        card.revealed && "animate-pulse-once",
+        "shadow-inner"
       )}
+      style={{
+        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)'
+      }}
     >
       {/* Revealed card overlay - drops in after image loads */}
       {card.revealed && imageLoaded && revealedImage && (
