@@ -361,7 +361,7 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 grid-rows-5 gap-[2px] sm:gap-1 md:gap-1.5 w-full max-w-[900px] flex-1 auto-rows-fr" data-testid="game-grid">
+            <div className="grid grid-cols-5 gap-[2px] sm:gap-1 md:gap-1.5 w-full max-w-[900px] flex-1" data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
                   key={`pos-${index}`}
