@@ -50,48 +50,48 @@ export function PlayerList({
     };
 
     return (
-    <Card className="p-4 space-y-3">
+    <Card className="p-2 sm:p-3 space-y-2">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 flex-1">
-          <div className={`w-3 h-3 rounded-full ${gradient}`} />
+        <div className="flex items-center gap-1.5 flex-1">
+          <div className={`w-2 h-2 rounded-full ${gradient}`} />
           {isLobby && isEditing ? (
-            <div className="flex items-center gap-2 flex-1">
+            <div className="flex items-center gap-1 flex-1">
               <Input
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
                 maxLength={20}
-                className="h-7 text-sm font-semibold max-w-[150px]"
+                className="h-6 text-xs font-semibold max-w-[120px]"
                 autoFocus
               />
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-7 w-7 p-0"
+                className="h-6 w-6 p-0"
                 onClick={handleSaveName}
               >
-                <Check className="w-4 h-4" />
+                <Check className="w-3 h-3" />
               </Button>
             </div>
           ) : (
             <>
-              <h3 className="font-semibold text-sm">{title}</h3>
+              <h3 className="font-semibold text-xs sm:text-sm">{title}</h3>
               {isLobby && onTeamNameChange && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-6 w-6 p-0"
+                  className="h-5 w-5 p-0"
                   onClick={() => {
                     setEditedName(title);
                     setIsEditing(true);
                   }}
                 >
-                  <Edit2 className="w-3 h-3" />
+                  <Edit2 className="w-2.5 h-2.5" />
                 </Button>
               )}
             </>
           )}
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-[10px] px-1 h-4">
             {teamPlayers.length}
           </Badge>
         </div>
@@ -100,6 +100,7 @@ export function PlayerList({
             size="sm" 
             variant="outline"
             onClick={() => onTeamSelect(team)}
+            className="text-[10px] h-6 px-2"
             data-testid={`button-join-${team}`}
           >
             Katıl
@@ -107,29 +108,29 @@ export function PlayerList({
         )}
       </div>
       
-      <div className="space-y-2">
+      <div className="space-y-1">
         {teamPlayers.map(player => (
           <div 
             key={player.id}
             data-testid={`player-${player.id}`}
-            className={`flex items-center gap-2 p-2 rounded-md ${
+            className={`flex items-center gap-1 p-1.5 rounded ${
               player.id === currentPlayerId ? 'bg-accent/20 border border-accent/30' : 'bg-muted/30'
             }`}
           >
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              {player.isRoomOwner && <Crown className="w-4 h-4 text-yellow-500 flex-shrink-0" />}
-              <span className="text-sm font-medium truncate">{player.username}</span>
+            <div className="flex items-center gap-1 flex-1 min-w-0">
+              {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
+              <span className="text-xs font-medium truncate">{player.username}</span>
             </div>
             
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="flex items-center gap-0.5 flex-shrink-0">
               {player.role === "spymaster" ? (
-                <Badge variant="default" className="text-xs gap-1">
-                  <Eye className="w-3 h-3" />
-                  İstihbarat Şefi
+                <Badge variant="default" className="text-[10px] gap-0.5 px-1 py-0 h-5">
+                  <Eye className="w-2.5 h-2.5" />
+                  <span className="hidden sm:inline">İstihbarat</span> Şefi
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="text-xs gap-1">
-                  <Target className="w-3 h-3" />
+                <Badge variant="secondary" className="text-[10px] gap-0.5 px-1 py-0 h-5">
+                  <Target className="w-2.5 h-2.5" />
                   Ajan
                 </Badge>
               )}
@@ -138,7 +139,7 @@ export function PlayerList({
                 <Button 
                   size="sm" 
                   variant="ghost" 
-                  className="h-6 px-2 text-xs"
+                  className="h-5 px-1 text-[10px]"
                   onClick={onRoleToggle}
                   data-testid="button-toggle-role"
                 >
@@ -154,23 +155,23 @@ export function PlayerList({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Users className="w-4 h-4" />
-        <span className="text-sm font-medium">Oyuncular ({players.length})</span>
+    <div className="space-y-2 h-full overflow-y-auto">
+      <div className="flex items-center gap-1.5 text-muted-foreground px-2">
+        <Users className="w-3 h-3" />
+        <span className="text-xs font-medium">Oyuncular ({players.length})</span>
       </div>
 
       {noTeam.length > 0 && (
-        <Card className="p-4 space-y-2 border-dashed">
-          <h3 className="font-semibold text-sm text-muted-foreground">Takım Seçilmemiş</h3>
+        <Card className="p-2 space-y-1 border-dashed">
+          <h3 className="font-semibold text-xs text-muted-foreground">Takım Seçilmemiş</h3>
           {noTeam.map(player => (
             <div 
               key={player.id}
               data-testid={`player-${player.id}`}
-              className="flex items-center gap-2 p-2 rounded-md bg-muted/30"
+              className="flex items-center gap-1 p-1.5 rounded bg-muted/30"
             >
-              {player.isRoomOwner && <Crown className="w-4 h-4 text-yellow-500" />}
-              <span className="text-sm">{player.username}</span>
+              {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500" />}
+              <span className="text-xs">{player.username}</span>
             </div>
           ))}
         </Card>
