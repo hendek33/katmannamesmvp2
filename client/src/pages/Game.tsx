@@ -872,6 +872,46 @@ export default function Game() {
                       const groupedEntries: JSX.Element[] = [];
                       
                       gameState.revealHistory.forEach((entry: any, idx: number) => {
+                        // Handle special log types
+                        if (entry.type === "end_turn") {
+                          // End turn log
+                          groupedEntries.push(
+                            <div key={`end-turn-${idx}`} className="p-1 rounded text-[10px] bg-gray-800/30 border border-gray-600/50 mb-1 italic">
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-2.5 h-2.5 text-gray-400" />
+                                <span className="text-gray-300">
+                                  {entry.playerUsername} turu sonlandırdı
+                                </span>
+                              </div>
+                            </div>
+                          );
+                          // Add separator after end turn
+                          groupedEntries.push(
+                            <div key={`sep-after-end-${idx}`} className="my-2 border-t-2 border-amber-600/50"></div>
+                          );
+                          currentClueKey = null; // Reset for next turn
+                          return;
+                        }
+                        
+                        if (entry.type === "team_change") {
+                          // Team change log
+                          groupedEntries.push(
+                            <div key={`team-change-${idx}`} className="p-1 rounded text-[10px] bg-purple-800/20 border border-purple-600/30 mb-1 italic">
+                              <div className="flex items-center gap-1">
+                                <Users className="w-2.5 h-2.5 text-purple-400" />
+                                <span className="text-purple-300">
+                                  {entry.playerUsername} takım değiştirdi: 
+                                  <span className={entry.fromTeam === "dark" ? "text-blue-400" : "text-red-400"}> {entry.fromTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
+                                  <span className="text-gray-400"> → </span>
+                                  <span className={entry.toTeam === "dark" ? "text-blue-400" : "text-red-400"}>{entry.toTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
+                                </span>
+                              </div>
+                            </div>
+                          );
+                          return;
+                        }
+                        
+                        // Regular card reveal entries
                         const isCorrect = entry.type === entry.team;
                         const isNeutral = entry.type === "neutral";
                         const isAssassin = entry.type === "assassin";
@@ -912,37 +952,39 @@ export default function Game() {
                           );
                         }
                         
-                        // Add guess entry
-                        groupedEntries.push(
-                          <div key={`entry-${idx}`} className={`p-1.5 rounded text-[11px] border mb-1 ml-2 ${
-                            entry.team === "dark" ? 
-                              "bg-blue-900/30 border-blue-600/50" : 
-                              "bg-red-900/30 border-red-600/50"
-                          }`}>
-                            <div className="flex items-center gap-1.5">
-                              <div className={`w-2.5 h-2.5 rounded-full ${
-                                entry.team === "dark" ? "bg-blue-500" : "bg-red-500"
-                              }`} />
-                              <span className="font-semibold text-gray-200">{playerName}</span>
-                              <span className="text-gray-400">→</span>
-                              <span className={`font-bold ${
-                                entry.type === "dark" ? "text-blue-400" :
-                                entry.type === "light" ? "text-red-400" :
-                                entry.type === "neutral" ? "text-gray-100" :
-                                "text-red-950"
-                              }`}>{entry.word}</span>
-                              {isAssassin ? (
-                                <span className="text-red-400 ml-auto font-bold">❌ Suikastçı!</span>
-                              ) : isNeutral ? (
-                                <span className="text-gray-400 ml-auto">➖ Tarafsız</span>
-                              ) : isCorrect ? (
-                                <span className="text-green-400 ml-auto">✓ Doğru</span>
-                              ) : (
-                                <span className="text-orange-400 ml-auto">✗ Yanlış</span>
-                              )}
+                        // Only add guess entry if it has a word (not special entry types)
+                        if (entry.word) {
+                          groupedEntries.push(
+                            <div key={`entry-${idx}`} className={`p-1.5 rounded text-[11px] border mb-1 ml-2 ${
+                              entry.team === "dark" ? 
+                                "bg-blue-900/30 border-blue-600/50" : 
+                                "bg-red-900/30 border-red-600/50"
+                            }`}>
+                              <div className="flex items-center gap-1.5">
+                                <div className={`w-2.5 h-2.5 rounded-full ${
+                                  entry.team === "dark" ? "bg-blue-500" : "bg-red-500"
+                                }`} />
+                                <span className="font-semibold text-gray-200">{playerName}</span>
+                                <span className="text-gray-400">→</span>
+                                <span className={`font-bold ${
+                                  entry.type === "dark" ? "text-blue-400" :
+                                  entry.type === "light" ? "text-red-400" :
+                                  entry.type === "neutral" ? "text-gray-100" :
+                                  "text-red-950"
+                                }`}>{entry.word}</span>
+                                {isAssassin ? (
+                                  <span className="text-red-400 ml-auto font-bold">❌ Suikastçı!</span>
+                                ) : isNeutral ? (
+                                  <span className="text-gray-400 ml-auto">➖ Tarafsız</span>
+                                ) : isCorrect ? (
+                                  <span className="text-green-400 ml-auto">✓ Doğru</span>
+                                ) : (
+                                  <span className="text-orange-400 ml-auto">✗ Yanlış</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        );
+                          );
+                        }
                       });
                       
                       // Add current clue if exists and no moves yet for this clue

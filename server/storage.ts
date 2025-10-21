@@ -224,12 +224,27 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player) return null;
 
+    const oldTeam = player.team;
+    
     if (team && player.team !== team) {
       const teamPlayers = room.players.filter(p => p.team === team);
       const hasSpymaster = teamPlayers.some(p => p.role === "spymaster");
       
       if (hasSpymaster && player.role === "spymaster") {
         player.role = "guesser";
+      }
+      
+      // Add team change log if during game (runtime extension)
+      if (room.phase === "playing" && oldTeam) {
+        const teamChangeEntry: any = {
+          type: "team_change",
+          playerId: player.id,
+          playerUsername: player.username,
+          fromTeam: oldTeam,
+          toTeam: team,
+          timestamp: Date.now()
+        };
+        room.revealHistory.push(teamChangeEntry);
       }
     }
 
@@ -473,6 +488,20 @@ export class MemStorage implements IStorage {
     if (room.phase !== "playing" || !room.currentClue) {
       return null;
     }
+    
+    // Add end turn log entry (runtime extension)
+    const endTurnEntry: any = {
+      type: "end_turn",
+      team: room.currentTeam,
+      playerId: player.id,
+      playerUsername: player.username,
+      timestamp: Date.now(),
+      clue: room.currentClue ? {
+        word: room.currentClue.word,
+        count: room.currentClue.count
+      } : null
+    };
+    room.revealHistory.push(endTurnEntry);
     
     // Switch teams and reset clue
     room.currentTeam = room.currentTeam === "dark" ? "light" : "dark";
