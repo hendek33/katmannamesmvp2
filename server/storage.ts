@@ -23,6 +23,7 @@ export interface IStorage {
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
   restartGame(roomCode: string, playerId: string): GameState | null;
   returnToLobby(roomCode: string): GameState | null;
+  endTurn(roomCode: string, playerId: string): GameState | null;
   removePlayer(roomCode: string, playerId: string): void;
   cleanupEmptyRooms(): void;
 }
@@ -449,6 +450,31 @@ export class MemStorage implements IStorage {
     roomData.guessesRemaining = 0;
     roomData.maxGuesses = 0;
 
+    return room;
+  }
+
+  endTurn(roomCode: string, playerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Check if player can end turn
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || player.team !== room.currentTeam || player.role !== "guesser") {
+      return null;
+    }
+    
+    // Check if game is in guessing phase
+    if (room.phase !== "playing" || !room.currentClue) {
+      return null;
+    }
+    
+    // Switch teams and reset clue
+    room.currentTeam = room.currentTeam === "dark" ? "light" : "dark";
+    room.currentClue = null;
+    roomData.guessesRemaining = 0;
+    roomData.maxGuesses = 0;
+    
     return room;
   }
 

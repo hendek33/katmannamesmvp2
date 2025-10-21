@@ -441,6 +441,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "end_turn": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const gameState = storage.endTurn(ws.roomCode, ws.playerId);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Tahmin bitirilemedi. Sadece tahminciler kendi sırasında tahmini bitirebilir." } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
           default:
             sendToClient(ws, { type: "error", payload: { message: "Bilinmeyen komut" } });
         }

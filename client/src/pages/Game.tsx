@@ -705,6 +705,24 @@ export default function Game() {
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0 z-10">
+              {/* End Turn Button for Guessers */}
+              {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
+                <Card className="px-2 py-1 sm:px-3 sm:py-1.5 border-2 bg-slate-950/95 border-orange-500/60 shadow-2xl backdrop-blur-lg">
+                  <Button
+                    onClick={() => {
+                      send("end_turn", {});
+                      toast({
+                        title: "Tahmin Tamamlandı",
+                        description: "Sıra diğer takıma geçti",
+                      });
+                    }}
+                    className="h-6 sm:h-7 px-3 sm:px-4 bg-orange-600 hover:bg-orange-700 text-white font-bold shadow-lg text-[10px] sm:text-xs"
+                  >
+                    <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
+                    Tahmini Bitir
+                  </Button>
+                </Card>
+              )}
               {canGiveClue ? (
                 <Card className="px-2 py-1 sm:px-3 sm:py-1.5 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
                   <div className="flex items-center gap-2">
