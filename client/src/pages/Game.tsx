@@ -336,7 +336,7 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="flex flex-col min-h-0 flex-1 gap-2 items-center justify-between p-2">
+          <div className="flex flex-col min-h-0 flex-1 gap-1 items-center justify-between p-1 lg:p-2">
             {/* Mobile Score Display */}
             <div className="lg:hidden w-full flex-shrink-0">
               <div className="grid grid-cols-2 gap-2">
@@ -361,7 +361,8 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 gap-[2px] sm:gap-1 md:gap-1.5 w-full max-w-[900px] flex-1" data-testid="game-grid">
+            <div className="grid grid-cols-5 gap-[1px] sm:gap-[2px] md:gap-1 w-full max-w-[750px] lg:max-w-[850px] flex-1 min-h-0 overflow-hidden" 
+                 data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
                   key={`pos-${index}`}

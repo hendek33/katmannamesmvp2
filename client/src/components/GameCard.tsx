@@ -76,10 +76,10 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
       <div className="flex-1" />
       
       <div className={cn(
-        "rounded px-1 py-0.5 sm:px-2 sm:py-1 md:px-3 md:py-1.5 flex items-center justify-center",
+        "rounded px-0.5 py-0.5 sm:px-1 sm:py-0.5 md:px-2 md:py-1 lg:px-3 lg:py-1.5 flex items-center justify-center",
         colors.panel
       )}>
-        <span className="text-white font-bold text-[10px] sm:text-xs md:text-sm uppercase tracking-wide text-center leading-tight">
+        <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm uppercase tracking-wide text-center leading-tight">
           {card.word}
         </span>
       </div>
