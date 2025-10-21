@@ -101,8 +101,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         !card.revealed && "cursor-pointer",
         "ring-2 ring-black/20",
         card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
-        isAssassinCard && gameEnded && "animate-pulse border-red-600 ring-4 ring-red-500/50",
-        isLastCard && gameEnded && "animate-bounce border-green-500 ring-4 ring-green-400/50",
+        isAssassinCard && gameEnded && "animate-assassin-reveal",
+        isLastCard && gameEnded && !isAssassinCard && "animate-bounce border-green-500 ring-4 ring-green-400/50",
         "shadow-inner"
       )}
       style={{
@@ -123,6 +123,25 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           zIndex: 10
         }}
       />
+      
+      {/* Black particles for assassin card */}
+      {isAssassinCard && gameEnded && (
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 200 }}>
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={`particle-${i}`}
+              className="absolute w-2 h-2 bg-black rounded-full animate-assassin-particle"
+              style={{
+                left: '50%',
+                top: '50%',
+                animationDelay: `${i * 0.1}s`,
+                '--particle-x': `${(Math.random() - 0.5) * 200}px`,
+                '--particle-y': `${(Math.random() - 0.5) * 200}px`,
+              } as React.CSSProperties}
+            />
+          ))}
+        </div>
+      )}
       
       {/* Revealed card overlay - drops in after image loads */}
       {card.revealed && imageLoaded && revealedImage && (

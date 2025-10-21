@@ -152,52 +152,65 @@ export default function Game() {
       {/* Game End Notification - Auto disappears */}
       {gameState.phase === "ended" && gameState.winner && (
         <div 
-          className="fixed inset-x-0 top-20 z-50 flex justify-center px-4 pointer-events-none"
+          className="fixed inset-x-0 top-32 z-50 flex justify-center px-4 pointer-events-none"
           style={{
-            animation: 'slideInBounce 1s ease-out forwards, slideOutFade 1s ease-in 4s forwards'
+            animation: wasAssassinRevealed 
+              ? 'slideInBounce 1s ease-out 2s forwards, slideOutFade 1s ease-in 6s forwards' 
+              : 'slideInBounce 1s ease-out forwards, slideOutFade 1s ease-in 4s forwards'
           }}
         >
+          {/* Winner text without card wrapper */}
           <div className="relative">
-            {/* Main notification card */}
-            <Card className={cn(
-              "relative px-12 py-8 border-4 shadow-2xl",
-              gameState.winner === "dark" 
-                ? "bg-gradient-to-br from-blue-900 to-blue-800 border-blue-500" 
-                : "bg-gradient-to-br from-red-900 to-red-800 border-red-500"
-            )}>
-              {/* Animated glow effect */}
-              <div className="absolute -inset-4 rounded-lg opacity-50 blur-xl animate-pulse"
-                style={{
-                  background: gameState.winner === "dark" 
-                    ? 'radial-gradient(circle, rgba(59,130,246,0.8) 0%, transparent 70%)'
-                    : 'radial-gradient(circle, rgba(239,68,68,0.8) 0%, transparent 70%)'
-                }}
-              />
-              
-              {/* Content */}
-              <div className="relative z-10 text-center space-y-4">
-                {/* Winner text */}
-                <div className="text-5xl md:text-7xl font-black text-white animate-pulse tracking-wider">
-                  {gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                </div>
-                
-                <div className="text-3xl md:text-4xl font-bold text-white/90">
-                  KAZANDI!
-                </div>
-                
-                {wasAssassinRevealed && (
-                  <div className="text-xl text-white/80 mt-2">
-                    Suikastçı kartı açıldı!
-                  </div>
-                )}
+            {/* Animated glow backdrop */}
+            <div className="absolute -inset-8 blur-3xl opacity-70 animate-pulse"
+              style={{
+                background: gameState.winner === "dark" 
+                  ? 'radial-gradient(circle, rgba(59,130,246,1) 0%, transparent 50%)'
+                  : 'radial-gradient(circle, rgba(239,68,68,1) 0%, transparent 50%)'
+              }}
+            />
+            
+            {/* Main text content */}
+            <div className="relative text-center space-y-2">
+              {/* Winner team name */}
+              <div className={cn(
+                "text-6xl md:text-8xl font-black tracking-wider",
+                "animate-pulse drop-shadow-2xl",
+                gameState.winner === "dark" ? "text-blue-400" : "text-red-400"
+              )}
+              style={{
+                textShadow: gameState.winner === "dark" 
+                  ? '0 0 40px rgba(59,130,246,0.8), 0 0 80px rgba(59,130,246,0.5)' 
+                  : '0 0 40px rgba(239,68,68,0.8), 0 0 80px rgba(239,68,68,0.5)'
+              }}
+              >
+                {gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
               </div>
               
-              {/* Confetti particles for winner */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-                {[...Array(30)].map((_, i) => (
+              {/* KAZANDI text */}
+              <div className="text-4xl md:text-6xl font-bold text-white drop-shadow-2xl"
+                style={{
+                  textShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.3)'
+                }}
+              >
+                KAZANDI!
+              </div>
+              
+              {/* Assassin message if applicable */}
+              {wasAssassinRevealed && (
+                <div className="text-2xl text-white/90 mt-4 font-semibold drop-shadow-xl">
+                  Suikastçı kartı açıldı!
+                </div>
+              )}
+            </div>
+            
+            {/* Confetti particles for non-assassin wins */}
+            {!wasAssassinRevealed && (
+              <div className="absolute inset-0 pointer-events-none">
+                {[...Array(40)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-1 h-3 animate-confetti"
+                    className="absolute w-2 h-4 animate-confetti"
                     style={{
                       left: `${Math.random() * 100}%`,
                       background: `linear-gradient(${Math.random() * 360}deg, 
@@ -209,7 +222,7 @@ export default function Game() {
                   />
                 ))}
               </div>
-            </Card>
+            )}
           </div>
         </div>
       )}
