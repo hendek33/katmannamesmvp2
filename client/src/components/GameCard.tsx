@@ -2,6 +2,7 @@ import { type Card } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { CheckSquare } from "lucide-react";
 import { useState, useEffect } from "react";
+import logoImg from "@assets/logoo.png";
 
 interface GameCardProps {
   card: Card;
@@ -128,6 +129,20 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)'
       }}
     >
+      {/* Logo watermark */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url(${logoImg})`,
+          backgroundSize: '40%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.1,
+          filter: 'grayscale(100%)',
+          zIndex: 10
+        }}
+      />
+      
       {/* Revealed card overlay - drops in after image loads */}
       {card.revealed && imageLoaded && revealedImage && (
         <div 
