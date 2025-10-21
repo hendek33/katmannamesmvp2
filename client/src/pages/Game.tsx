@@ -722,23 +722,23 @@ export default function Game() {
                       className="w-20 sm:w-28 text-center font-bold text-[10px] sm:text-xs uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-6 sm:h-7 text-slate-100 placeholder:text-slate-500"
                     />
                     <div className="flex items-center gap-0.5">
-                      <Button
+                      <button
                         type="button"
                         onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                        className="h-4 sm:h-5 w-4 sm:w-5 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px]"
+                        className="h-3.5 w-3.5 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[8px] rounded"
                       >
                         -
-                      </Button>
-                      <div className="h-4 sm:h-5 w-7 sm:w-8 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded">
-                        <span className="text-[10px] sm:text-xs font-black text-amber-400">{clueCount}</span>
+                      </button>
+                      <div className="h-3.5 w-6 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded text-[9px] font-black text-amber-400">
+                        {clueCount}
                       </div>
-                      <Button
+                      <button
                         type="button"
                         onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                        className="h-4 sm:h-5 w-4 sm:w-5 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px]"
+                        className="h-3.5 w-3.5 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[8px] rounded"
                       >
                         +
-                      </Button>
+                      </button>
                     </div>
                     <Button
                       onClick={handleGiveClue}
