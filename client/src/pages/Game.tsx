@@ -605,8 +605,15 @@ export default function Game() {
           {/* Left Side - Dark Team */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
-            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
-              <div className="text-center space-y-0.5 lg:space-y-1">
+            <Card 
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-hidden"
+              style={{
+                backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.95), rgba(30, 58, 138, 0.95)), url('/mavi takım.png')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
                   <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
@@ -658,8 +665,15 @@ export default function Game() {
             {/* Mobile Score Display */}
             <div className="lg:hidden w-full flex-shrink-0">
               <div className="grid grid-cols-2 gap-2">
-                <Card className="p-1.5 border-2 bg-gradient-to-br from-blue-950/90 to-blue-900/90 border-blue-700/50">
-                  <div className="text-center">
+                <Card 
+                  className="p-1.5 border-2 border-blue-700/50 relative overflow-hidden"
+                  style={{
+                    backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.9), rgba(30, 58, 138, 0.9)), url('/mavi takım.png')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                >
+                  <div className="text-center relative z-10">
                     <div className="text-[10px] font-bold text-blue-100">{gameState.darkTeamName}</div>
                     <div className="text-xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
                     {gameState.currentTeam === "dark" && (
@@ -667,8 +681,15 @@ export default function Game() {
                     )}
                   </div>
                 </Card>
-                <Card className="p-1.5 border-2 bg-gradient-to-br from-red-950/90 to-red-900/90 border-red-800/50">
-                  <div className="text-center">
+                <Card 
+                  className="p-1.5 border-2 border-red-800/50 relative overflow-hidden"
+                  style={{
+                    backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.9), rgba(127, 29, 29, 0.9)), url('/kırmızı takım.png')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                >
+                  <div className="text-center relative z-10">
                     <div className="text-[10px] font-bold text-red-100">{gameState.lightTeamName}</div>
                     <div className="text-xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
                     {gameState.currentTeam === "light" && (
@@ -813,8 +834,15 @@ export default function Game() {
           {/* Right Side - Light Team */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
-            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
-              <div className="text-center space-y-0.5 lg:space-y-1">
+            <Card 
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-hidden"
+              style={{
+                backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.95), rgba(127, 29, 29, 0.95)), url('/kırmızı takım.png')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-red-600 animate-pulse" />
                   <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
