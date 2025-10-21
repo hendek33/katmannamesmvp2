@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
 
 export default function Game() {
@@ -77,19 +78,19 @@ export default function Game() {
 
   if (!isConnected || !gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30 animate-pulse-slow">
-          <div className="relative">
-            <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
-            <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
-          </div>
+      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900">
+        <Card className="p-8 space-y-4 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-sm border-orange-900/30">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
           <div className="space-y-2">
-            <p className="text-lg font-semibold">
+            <p className="text-lg font-semibold text-white">
               {!isConnected ? "Bağlanıyor" : "Yükleniyor"}
             </p>
             <p className="text-sm text-muted-foreground">
               {!isConnected ? "Sunucuya bağlanılıyor..." : "Oyun hazırlanıyor..."}
             </p>
+            {error && (
+              <p className="text-sm text-red-500 mt-2">{error}</p>
+            )}
           </div>
         </Card>
       </div>
@@ -123,18 +124,16 @@ export default function Game() {
   const lightPlayers = gameState.players.filter(p => p.team === "light");
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-      {/* Light Effects */}
+    <div className="h-screen overflow-hidden bg-slate-900 relative">
+      {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
-      <div className="light-effect light-3" />
-      <div className="light-effect light-4" />
-      <div className="light-effect light-5" />
       
-      {[...Array(70)].map((_, i) => (
+      {/* Very few particles for better performance */}
+      {[...Array(8)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      <div className="relative z-10 h-full flex flex-col p-2 animate-in fade-in duration-500">
+      <div className="relative z-10 h-full flex flex-col p-2">
         <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Modern Header */}
         <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
