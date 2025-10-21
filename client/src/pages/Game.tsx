@@ -309,7 +309,7 @@ export default function Game() {
                   <div className="w-px h-4 bg-slate-600" />
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-slate-400">Açılan:</span>
-                    <span className="text-xs font-bold text-slate-200">{gameState.revealHistory.length}/25</span>
+                    <span className="text-xs font-bold text-slate-200">{gameState.revealHistory.filter((e: any) => e.word).length}/25</span>
                   </div>
                 </div>
               )}
@@ -1116,7 +1116,7 @@ export default function Game() {
               <div className="mt-1 pt-1 border-t border-slate-700/50 flex justify-around text-[9px]">
                 <div className="flex items-center gap-1">
                   <span className="text-gray-500">Açılan:</span>
-                  <span className="font-bold text-gray-300">{gameState.revealHistory.length}/25</span>
+                  <span className="font-bold text-gray-300">{gameState.revealHistory.filter((e: any) => e.word).length}/25</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-500">Koyu:</span>
