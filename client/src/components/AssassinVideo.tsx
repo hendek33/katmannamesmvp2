@@ -21,20 +21,17 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
     setShowFlash(true);
     setTimeout(() => {
       setShowFlash(false);
-      // Start closing animation
+      // Start closing animation and show winner text immediately
       setIsClosing(true);
-      // Show winner text after video starts sliding out
+      setShowWinnerText(true);
+      // Start fade out after 4 seconds
       setTimeout(() => {
-        setShowWinnerText(true);
-        // Start fade out after 4 seconds (increased from 2)
+        setFadeOutWinner(true);
+        // Complete after fade out animation
         setTimeout(() => {
-          setFadeOutWinner(true);
-          // Complete after fade out animation
-          setTimeout(() => {
-            onComplete?.();
-          }, 800);
-        }, 4000);
-      }, 300);
+          onComplete?.();
+        }, 800);
+      }, 4000);
     }, 300);
   };
 
@@ -53,15 +50,22 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
         />
       )}
       
-      {/* Video overlay */}
-      {show && (
+      {/* Dark overlay - persists until winner text fades */}
+      {(show || showWinnerText) && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm pointer-events-none"
+          className="fixed inset-0 z-[99] bg-black/95 backdrop-blur-sm pointer-events-none"
           style={{
-            animation: isClosing 
-              ? 'fadeOut 0.8s ease-out forwards' 
+            animation: fadeOutWinner 
+              ? 'fadeOut 0.8s ease-out forwards'
               : 'fadeIn 0.5s ease-in-out forwards',
           }}
+        />
+      )}
+      
+      {/* Video */}
+      {show && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
         >
           <div 
             className="relative"
@@ -72,7 +76,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
             }}
           >
             {/* Video with rounded corners */}
-            <div className="relative w-[45vw] max-w-md rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative w-[35vw] max-w-sm rounded-xl overflow-hidden shadow-2xl">
               <video
                 src="/siyah kelime seçme.mp4"
                 autoPlay
@@ -97,7 +101,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
       {/* Winner text */}
       {showWinnerText && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+          className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none"
           style={{
             animation: fadeOutWinner ? 'fadeOut 0.8s ease-out forwards' : 'fadeIn 0.3s ease-in forwards'
           }}
