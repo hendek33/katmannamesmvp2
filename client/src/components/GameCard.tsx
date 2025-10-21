@@ -1,6 +1,7 @@
 import { type Card } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { CheckSquare } from "lucide-react";
+import arkaplanImg from "@assets/arkaplan.png";
 
 interface GameCardProps {
   card: Card;
@@ -67,10 +68,16 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "flex flex-col overflow-hidden",
         "transition-transform transform-gpu",
         colors.border,
-        colors.bg,
+        (card.revealed || isSpymaster) && colors.bg,
         colors.shadow,
         !card.revealed && "cursor-pointer"
       )}
+      style={{
+        backgroundImage: !card.revealed && !isSpymaster ? `url(${arkaplanImg})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: !card.revealed && !isSpymaster ? '#1a1f2e' : undefined
+      }}
     >
       {/* Reveal button in top-left corner */}
       {canReveal && (
