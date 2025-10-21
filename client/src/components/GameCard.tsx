@@ -58,11 +58,11 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     }
     
     return {
-      bg: "bg-gradient-to-br from-slate-300 to-slate-400",
-      border: "border-slate-200",
+      bg: "bg-gradient-to-br from-[#f0dbb9] to-[#e5d0a8]",
+      border: "border-[#d9c4a2]",
       panel: "bg-white",
       textColor: "text-black",
-      shadow: "shadow-lg shadow-slate-800/40",
+      shadow: "shadow-lg shadow-[#c9b492]/40",
     };
   };
 
