@@ -111,8 +111,8 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
                 key={index}
                 className="inline-block"
                 style={{
-                  animation: 'letterAppear 0.5s ease-out forwards',
-                  animationDelay: `${0.5 + index * 0.05}s`,
+                  animation: 'letterDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                  animationDelay: `${0.5 + index * 0.025}s`,
                   opacity: 0
                 }}
               >

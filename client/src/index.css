@@ -434,6 +434,22 @@
   }
 }
 
+/* Letter drop animation - falling from above */
+@keyframes letterDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(5px) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Letter appear animation */
 @keyframes letterAppear {
   0% {
