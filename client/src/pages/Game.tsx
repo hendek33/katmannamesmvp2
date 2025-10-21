@@ -161,12 +161,12 @@ export default function Game() {
         >
           {/* Winner text without card wrapper */}
           <div className="relative">
-            {/* Animated glow backdrop */}
-            <div className="absolute -inset-8 blur-3xl opacity-70 animate-pulse"
+            {/* Subtle glow backdrop */}
+            <div className="absolute -inset-4 blur-2xl opacity-30"
               style={{
                 background: gameState.winner === "dark" 
-                  ? 'radial-gradient(circle, rgba(59,130,246,1) 0%, transparent 50%)'
-                  : 'radial-gradient(circle, rgba(239,68,68,1) 0%, transparent 50%)'
+                  ? 'radial-gradient(circle, rgba(59,130,246,0.6) 0%, transparent 60%)'
+                  : 'radial-gradient(circle, rgba(239,68,68,0.6) 0%, transparent 60%)'
               }}
             />
             
@@ -174,23 +174,22 @@ export default function Game() {
             <div className="relative text-center space-y-2">
               {/* Winner team name */}
               <div className={cn(
-                "text-6xl md:text-8xl font-black tracking-wider",
-                "animate-pulse drop-shadow-2xl",
-                gameState.winner === "dark" ? "text-blue-400" : "text-red-400"
+                "text-5xl md:text-7xl font-bold tracking-wide",
+                gameState.winner === "dark" ? "text-blue-300" : "text-red-300"
               )}
               style={{
                 textShadow: gameState.winner === "dark" 
-                  ? '0 0 40px rgba(59,130,246,0.8), 0 0 80px rgba(59,130,246,0.5)' 
-                  : '0 0 40px rgba(239,68,68,0.8), 0 0 80px rgba(239,68,68,0.5)'
+                  ? '0 2px 10px rgba(59,130,246,0.4)' 
+                  : '0 2px 10px rgba(239,68,68,0.4)'
               }}
               >
                 {gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
               </div>
               
               {/* KAZANDI text */}
-              <div className="text-4xl md:text-6xl font-bold text-white drop-shadow-2xl"
+              <div className="text-3xl md:text-5xl font-semibold text-white/90"
                 style={{
-                  textShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.3)'
+                  textShadow: '0 2px 8px rgba(0,0,0,0.5)'
                 }}
               >
                 KAZANDI!
@@ -207,17 +206,17 @@ export default function Game() {
             {/* Confetti particles for non-assassin wins */}
             {!wasAssassinRevealed && (
               <div className="absolute inset-0 pointer-events-none">
-                {[...Array(40)].map((_, i) => (
+                {[...Array(20)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-2 h-4 animate-confetti"
+                    className="absolute w-1 h-2 opacity-70 animate-confetti"
                     style={{
                       left: `${Math.random() * 100}%`,
-                      background: `linear-gradient(${Math.random() * 360}deg, 
-                        hsl(${Math.random() * 360}, 100%, 50%), 
-                        hsl(${Math.random() * 360}, 100%, 70%))`,
-                      animationDelay: `${Math.random() * 0.5}s`,
-                      animationDuration: `${2 + Math.random()}s`
+                      background: gameState.winner === "dark" 
+                        ? 'linear-gradient(to bottom, #60a5fa, #3b82f6)'
+                        : 'linear-gradient(to bottom, #f87171, #ef4444)',
+                      animationDelay: `${Math.random() * 0.8}s`,
+                      animationDuration: `${3 + Math.random()}s`
                     }}
                   />
                 ))}
