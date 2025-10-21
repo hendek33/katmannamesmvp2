@@ -117,6 +117,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "aspect-[3/2]",
         "flex flex-col",
         !card.revealed && "overflow-hidden",
+        card.revealed && "overflow-visible",
         "transition-all transform-gpu duration-500",
         colors.border,
         colors.bg,
@@ -127,7 +128,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "shadow-inner"
       )}
       style={{
-        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)'
+        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
+        overflow: card.revealed ? 'visible' : 'hidden'
       }}
     >
       {/* Logo watermark */}
@@ -154,15 +156,16 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           onClick={() => setIsLifted(!isLifted)}
           title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
           style={{
-            top: '-8px',
-            left: '-8px',
-            right: '-8px', 
-            bottom: '-8px',
+            top: '-6px',
+            left: '-6px',
+            right: '-6px', 
+            bottom: '-6px',
             backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             zIndex: isLifted ? 30 : 20,
-            boxShadow: isLifted ? '0 20px 40px rgba(0,0,0,0.5)' : '0 4px 8px rgba(0,0,0,0.3)'
+            boxShadow: isLifted ? '0 20px 40px rgba(0,0,0,0.5)' : '0 4px 8px rgba(0,0,0,0.3)',
+            transform: 'scale(1.05)'
           }}
         />
       )}

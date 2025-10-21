@@ -680,6 +680,7 @@ export default function Game() {
             </div>
             
             <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
+                 overflow-visible
                  w-[calc(min(90vw,55vh*1.5))] 
                  min-[360px]:w-[calc(min(85vw,58vh*1.5))]
                  min-[400px]:w-[calc(min(85vw,60vh*1.5))]
@@ -698,10 +699,11 @@ export default function Game() {
               {gameState.cards.map((card, index) => (
                 <div 
                   key={`wrapper-${index}`}
-                  className="animate-card-drop"
+                  className="animate-card-drop overflow-visible"
                   style={{
                     animationDelay: `${index * 0.05}s`,
-                    animationFillMode: 'backwards'
+                    animationFillMode: 'backwards',
+                    overflow: 'visible'
                   }}
                 >
                   <GameCard
