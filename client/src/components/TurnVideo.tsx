@@ -94,28 +94,23 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
 
         {/* Turn notification text */}
         <div 
-          className="absolute -top-20 left-1/2 transform -translate-x-1/2 text-center"
+          className="absolute -top-20 left-1/2 transform -translate-x-1/2 text-center whitespace-nowrap"
           style={{
             animation: 'slideDown 0.8s ease-out 0.5s forwards',
             opacity: 0
           }}
         >
-          <div className="space-y-1">
-            <div className="text-xl md:text-2xl font-bold text-white/90">
-              Sıra
-            </div>
-            <div className={cn(
-              "text-3xl md:text-4xl font-black tracking-wide",
-              team === "dark" ? "text-blue-400" : "text-red-400"
-            )}
-            style={{
-              textShadow: team === "dark" 
-                ? '0 2px 20px rgba(59,130,246,0.8)' 
-                : '0 2px 20px rgba(239,68,68,0.8)'
-            }}
-            >
-              {teamName} Takımında
-            </div>
+          <div className={cn(
+            "text-3xl md:text-4xl font-black tracking-wide",
+            team === "dark" ? "text-blue-400" : "text-red-400"
+          )}
+          style={{
+            textShadow: team === "dark" 
+              ? '0 2px 20px rgba(59,130,246,0.8)' 
+              : '0 2px 20px rgba(239,68,68,0.8)'
+          }}
+          >
+            Sıra {teamName} Takımında
           </div>
         </div>
 
