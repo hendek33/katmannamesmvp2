@@ -134,10 +134,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `url(${logoImg})`,
-          backgroundSize: '70%',
+          backgroundSize: '85%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          opacity: 0.1,
+          opacity: 0.15,
           filter: 'grayscale(100%)',
           zIndex: 10
         }}
