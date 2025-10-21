@@ -405,13 +405,22 @@ export default function Game() {
                  mb-14" 
                  data-testid="game-grid">
               {gameState.cards.map((card, index) => (
-                <GameCard
-                  key={`pos-${index}`}
-                  card={card}
-                  onReveal={() => handleRevealCard(card.id)}
-                  isSpymaster={isSpymaster}
-                  disabled={!canRevealCard}
-                />
+                <div 
+                  key={`wrapper-${index}`}
+                  className="animate-card-drop"
+                  style={{
+                    animationDelay: `${index * 0.05}s`,
+                    animationFillMode: 'backwards'
+                  }}
+                >
+                  <GameCard
+                    key={`pos-${index}`}
+                    card={card}
+                    onReveal={() => handleRevealCard(card.id)}
+                    isSpymaster={isSpymaster}
+                    disabled={!canRevealCard}
+                  />
+                </div>
               ))}
             </div>
 
@@ -609,8 +618,9 @@ export default function Game() {
                           bgClass = "bg-blue-950/30";
                           borderClass = "border-gray-600/50";
                         } else {
-                          bgClass = "bg-blue-950/30";
-                          borderClass = "border-orange-700/50";
+                          // Wrong guess - opponent's card
+                          bgClass = "bg-blue-900/50";
+                          borderClass = "border-orange-600/60";
                         }
                       } else {
                         // Light team move
@@ -624,8 +634,9 @@ export default function Game() {
                           bgClass = "bg-red-950/30";
                           borderClass = "border-gray-600/50";
                         } else {
-                          bgClass = "bg-red-950/30";
-                          borderClass = "border-orange-700/50";
+                          // Wrong guess - opponent's card
+                          bgClass = "bg-red-900/50";
+                          borderClass = "border-orange-600/60";
                         }
                       }
                       
