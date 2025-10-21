@@ -550,12 +550,12 @@ export default function Game() {
             </Card>
 
             {/* Game Log Card */}
-            <Card className="p-2 lg:p-3 xl:p-4 2xl:p-5 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-amber-700/50 backdrop-blur-md shadow-xl">
+            <Card className="p-2 lg:p-3 xl:p-4 2xl:p-5 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-amber-700/50 backdrop-blur-md shadow-xl flex flex-col min-h-0">
               <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
                 <Clock className="w-3 h-3 lg:w-4 lg:h-4 text-amber-400" />
                 <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-amber-300 uppercase tracking-wide">Oyun Günlüğü</h4>
               </div>
-              <div className="max-h-48 lg:max-h-64 xl:max-h-72 overflow-y-auto space-y-1 lg:space-y-1.5">
+              <div className="flex-1 overflow-y-auto min-h-0 max-h-[200px] lg:max-h-[250px] xl:max-h-[300px] space-y-1 lg:space-y-1.5">
                 {/* Show game events in chronological order */}
                 {gameState.revealHistory.length === 0 && !gameState.currentClue ? (
                   <div className="text-[9px] lg:text-[10px] xl:text-xs text-gray-500 italic p-2">
@@ -583,12 +583,16 @@ export default function Game() {
                     )}
                     
                     {/* Reveal history with better formatting */}
-                    {gameState.revealHistory.slice().reverse().map((entry, idx) => {
+                    {gameState.revealHistory.slice().reverse().map((entry: any, idx) => {
                       const isCorrect = entry.type === entry.team || 
                                       (entry.type === "dark" && entry.team === "dark") ||
                                       (entry.type === "light" && entry.team === "light");
                       const isNeutral = entry.type === "neutral";
                       const isAssassin = entry.type === "assassin";
+                      
+                      // Get player name from entry if available, fallback to team name
+                      const playerName = entry.playerUsername || 
+                        (entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName);
                       
                       return (
                         <div 
@@ -609,7 +613,7 @@ export default function Game() {
                             }`} />
                             <div className="flex-1">
                               <div className="text-[8px] lg:text-[9px] xl:text-[10px] text-gray-400">
-                                {entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName} tahmin etti
+                                <span className="font-semibold text-gray-300">{playerName}</span> tahmin etti
                               </div>
                               <div className="text-[10px] lg:text-xs xl:text-sm font-semibold text-gray-200">
                                 "{entry.word}" kelimesine bastı

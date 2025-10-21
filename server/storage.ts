@@ -5,6 +5,8 @@ import { getRandomWords } from "./words";
 interface RoomData {
   gameState: GameState;
   password?: string;
+  guessesRemaining: number;
+  maxGuesses: number;
 }
 
 export interface IStorage {
@@ -104,7 +106,12 @@ export class MemStorage implements IStorage {
       createdAt: Date.now(),
     };
 
-    this.rooms.set(roomCode, { gameState, password });
+    this.rooms.set(roomCode, { 
+      gameState, 
+      password,
+      guessesRemaining: 0,
+      maxGuesses: 0
+    });
     this.playerToRoom.set(playerId, roomCode);
 
     return { roomCode, playerId, gameState };
@@ -285,6 +292,10 @@ export class MemStorage implements IStorage {
     room.currentClue = null;
     room.winner = null;
     room.revealHistory = [];
+    
+    // Reset guess tracking
+    roomData.guessesRemaining = 0;
+    roomData.maxGuesses = 0;
 
     return room;
   }
@@ -305,6 +316,10 @@ export class MemStorage implements IStorage {
       count,
       team: room.currentTeam,
     };
+    
+    // Set guess limit to clue count + 1
+    roomData.maxGuesses = count + 1;
+    roomData.guessesRemaining = count + 1;
 
     return room;
   }
@@ -325,38 +340,68 @@ export class MemStorage implements IStorage {
 
     card.revealed = true;
     
-    room.revealHistory.push({
+    // Add player info to history (runtime extension)
+    const historyEntry: any = {
       cardId: card.id,
       word: card.word,
       type: card.type,
       team: room.currentTeam,
       timestamp: Date.now(),
-    });
+      playerId: player.id,
+      playerUsername: player.username
+    };
+    room.revealHistory.push(historyEntry);
+    
+    // Decrement remaining guesses
+    if (roomData.guessesRemaining > 0) {
+      roomData.guessesRemaining--;
+    }
+
+    let shouldEndTurn = false;
+    let correctGuess = false;
 
     if (card.type === "dark") {
       room.darkCardsRemaining--;
       if (room.darkCardsRemaining === 0) {
         room.winner = "dark";
         room.phase = "ended";
-      } else if (room.currentTeam !== "dark") {
-        room.currentTeam = "dark";
-        room.currentClue = null;
+      } else if (room.currentTeam === "dark") {
+        correctGuess = true;
+        // Check if reached guess limit
+        if (roomData.guessesRemaining === 0) {
+          shouldEndTurn = true;
+        }
+      } else {
+        shouldEndTurn = true;
       }
     } else if (card.type === "light") {
       room.lightCardsRemaining--;
       if (room.lightCardsRemaining === 0) {
         room.winner = "light";
         room.phase = "ended";
-      } else if (room.currentTeam !== "light") {
-        room.currentTeam = "light";
-        room.currentClue = null;
+      } else if (room.currentTeam === "light") {
+        correctGuess = true;
+        // Check if reached guess limit
+        if (roomData.guessesRemaining === 0) {
+          shouldEndTurn = true;
+        }
+      } else {
+        shouldEndTurn = true;
       }
     } else if (card.type === "assassin") {
       room.winner = room.currentTeam === "dark" ? "light" : "dark";
       room.phase = "ended";
     } else {
+      // Neutral card - always ends turn
+      shouldEndTurn = true;
+    }
+    
+    // End turn if needed
+    if (shouldEndTurn && room.phase !== "ended") {
       room.currentTeam = room.currentTeam === "dark" ? "light" : "dark";
       room.currentClue = null;
+      roomData.guessesRemaining = 0;
+      roomData.maxGuesses = 0;
     }
 
     return room;
@@ -378,6 +423,10 @@ export class MemStorage implements IStorage {
     room.currentClue = null;
     room.winner = null;
     room.revealHistory = [];
+    
+    // Reset guess tracking
+    roomData.guessesRemaining = 0;
+    roomData.maxGuesses = 0;
 
     return room;
   }
@@ -395,6 +444,10 @@ export class MemStorage implements IStorage {
     room.currentClue = null;
     room.winner = null;
     room.revealHistory = [];
+    
+    // Reset guess tracking
+    roomData.guessesRemaining = 0;
+    roomData.maxGuesses = 0;
 
     return room;
   }
