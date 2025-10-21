@@ -13,6 +13,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
   const [showFlash, setShowFlash] = useState(false);
   const [showWinnerText, setShowWinnerText] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [fadeOutWinner, setFadeOutWinner] = useState(false);
 
   const handleVideoEnd = () => {
     setVideoEnded(true);
@@ -25,11 +26,15 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
       // Show winner text after video starts sliding out
       setTimeout(() => {
         setShowWinnerText(true);
+        // Start fade out after 4 seconds (increased from 2)
+        setTimeout(() => {
+          setFadeOutWinner(true);
+          // Complete after fade out animation
+          setTimeout(() => {
+            onComplete?.();
+          }, 800);
+        }, 4000);
       }, 300);
-      // Complete after winner text is shown
-      setTimeout(() => {
-        onComplete?.();
-      }, 2000);
     }, 300);
   };
 
@@ -51,9 +56,11 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
       {/* Video overlay */}
       {show && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm pointer-events-none"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm pointer-events-none"
           style={{
-            animation: 'fadeIn 0.5s ease-in-out forwards',
+            animation: isClosing 
+              ? 'fadeOut 0.8s ease-out forwards' 
+              : 'fadeIn 0.5s ease-in-out forwards',
           }}
         >
           <div 
@@ -65,7 +72,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
             }}
           >
             {/* Video with rounded corners */}
-            <div className="relative w-[60vw] max-w-lg rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative w-[45vw] max-w-md rounded-xl overflow-hidden shadow-2xl">
               <video
                 src="/siyah kelime seçme.mp4"
                 autoPlay
@@ -91,6 +98,9 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
       {showWinnerText && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+          style={{
+            animation: fadeOutWinner ? 'fadeOut 0.8s ease-out forwards' : 'fadeIn 0.3s ease-in forwards'
+          }}
         >
           <div className="text-center space-y-4">
             <div className="text-2xl md:text-3xl font-bold text-red-500 animate-letter-fall-sequence">
