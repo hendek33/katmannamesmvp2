@@ -907,10 +907,9 @@ export default function Game() {
                           
                           {/* Guess entry */}
                           <div className={`p-1.5 rounded text-[11px] border mb-1 ${
-                            isCorrect ? (entry.team === "dark" ? "bg-blue-900/30 border-blue-600/50" : "bg-red-900/30 border-red-600/50") :
-                            isAssassin ? "bg-red-950/60 border-red-600" :
-                            isNeutral ? "bg-gray-800/30 border-gray-600/50" :
-                            "bg-orange-900/30 border-orange-600/50"
+                            entry.team === "dark" ? 
+                              "bg-blue-900/30 border-blue-600/50" : 
+                              "bg-red-900/30 border-red-600/50"
                           }`}>
                             <div className="flex items-center gap-1.5">
                               <div className={`w-2.5 h-2.5 rounded-full ${
