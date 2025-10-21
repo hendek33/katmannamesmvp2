@@ -115,7 +115,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       className={cn(
         "relative rounded-lg border-[6px] p-0.5 sm:p-1 lg:p-1.5 w-full",
         "aspect-[3/2]",
-        "flex flex-col overflow-hidden",
+        "flex flex-col",
+        !card.revealed && "overflow-hidden",
         "transition-all transform-gpu duration-500",
         colors.border,
         colors.bg,
@@ -153,10 +154,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           onClick={() => setIsLifted(!isLifted)}
           title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
           style={{
-            top: '-6px',
-            left: '-6px',
-            right: '-6px', 
-            bottom: '-6px',
+            top: '-8px',
+            left: '-8px',
+            right: '-8px', 
+            bottom: '-8px',
             backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
