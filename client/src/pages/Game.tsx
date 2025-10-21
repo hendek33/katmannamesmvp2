@@ -981,7 +981,7 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0 z-[46]">
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
                 <Button
@@ -1046,10 +1046,13 @@ export default function Game() {
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className={cn(
-                  "relative z-[47] px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up",
-                  showClueOverlay && "animate-clue-glow"
-                )}>
+                <Card 
+                  className={cn(
+                    "px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up",
+                    showClueOverlay && "animate-clue-glow"
+                  )}
+                  style={{ zIndex: 50, position: 'relative' }}
+                >
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 sm:gap-2 mb-0.5 sm:mb-1">
                       <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
