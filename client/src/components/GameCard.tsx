@@ -26,28 +26,32 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           return {
             bg: "bg-gradient-to-br from-blue-500 to-blue-600",
             border: "border-blue-400",
-            panel: "bg-black",
+            panel: "bg-white",
+            textColor: "text-black",
             shadow: "shadow-xl shadow-blue-900/50",
           };
         case "light":
           return {
             bg: "bg-gradient-to-br from-red-500 to-red-600",
             border: "border-red-400",
-            panel: "bg-black",
+            panel: "bg-white",
+            textColor: "text-black",
             shadow: "shadow-xl shadow-red-900/50",
           };
         case "neutral":
           return {
             bg: "bg-gradient-to-br from-stone-200 to-stone-300",
             border: "border-stone-100",
-            panel: "bg-black",
+            panel: "bg-white",
+            textColor: "text-black",
             shadow: "shadow-lg shadow-stone-700/30",
           };
         case "assassin":
           return {
-            bg: "bg-gradient-to-br from-gray-800 to-gray-900",
-            border: "border-gray-700",
+            bg: "bg-gradient-to-br from-gray-600 to-gray-700",
+            border: "border-gray-500",
             panel: "bg-black",
+            textColor: "text-white",
             shadow: "shadow-2xl shadow-black/70",
           };
       }
@@ -56,7 +60,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     return {
       bg: "bg-gradient-to-br from-slate-300 to-slate-400",
       border: "border-slate-200",
-      panel: "bg-black",
+      panel: "bg-white",
+      textColor: "text-black",
       shadow: "shadow-lg shadow-slate-800/40",
     };
   };
@@ -193,7 +198,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           "border-t border-black/20",
           colors.panel
         )}>
-          <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md">
+          <span className={cn(
+            "font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md",
+            colors.textColor
+          )}>
             {card.word}
           </span>
         </div>
