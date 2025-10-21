@@ -51,7 +51,20 @@ export default function Game() {
 
   // Detect turn changes and show video
   useEffect(() => {
-    if (!gameState || gameState.phase !== "playing") return;
+    if (!gameState) return;
+
+    // Show video when game starts
+    if (gameState.phase === "playing" && !previousTurnRef.current) {
+      setCurrentTurn(gameState.currentTeam);
+      setShowTurnVideo(true);
+      previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
+      return;
+    }
+
+    if (gameState.phase !== "playing") {
+      previousTurnRef.current = null;
+      return;
+    }
 
     // Use currentTeam and revealHistory length as unique turn identifier
     const turnKey = `${gameState.currentTeam}-${gameState.revealHistory.length}`;

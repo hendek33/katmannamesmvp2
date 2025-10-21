@@ -403,6 +403,17 @@
   }
 }
 
+@keyframes slideDown {
+  0% {
+    transform: translateX(-50%) translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
 @keyframes floatParticle {
   0% {
     transform: translate(0, 0) scale(1);

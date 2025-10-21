@@ -16,11 +16,11 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
     : "/kırmızı takım video tur.mp4";
 
   useEffect(() => {
-    // Auto hide after 5 seconds
+    // Auto hide after 4.5 seconds
     const timer = setTimeout(() => {
       setShow(false);
       onComplete?.();
-    }, 5000);
+    }, 4500);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
@@ -94,18 +94,18 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
 
         {/* Turn notification text */}
         <div 
-          className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 text-center"
+          className="absolute -top-20 left-1/2 transform -translate-x-1/2 text-center"
           style={{
-            animation: 'slideUp 0.8s ease-out 0.5s forwards',
+            animation: 'slideDown 0.8s ease-out 0.5s forwards',
             opacity: 0
           }}
         >
-          <div className="space-y-2">
-            <div className="text-2xl md:text-3xl font-bold text-white/90">
+          <div className="space-y-1">
+            <div className="text-xl md:text-2xl font-bold text-white/90">
               Sıra
             </div>
             <div className={cn(
-              "text-4xl md:text-5xl font-black tracking-wide",
+              "text-3xl md:text-4xl font-black tracking-wide",
               team === "dark" ? "text-blue-400" : "text-red-400"
             )}
             style={{
