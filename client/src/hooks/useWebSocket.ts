@@ -14,6 +14,7 @@ export function useWebSocket() {
   const [roomCode, setRoomCode] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [roomsList, setRoomsList] = useState<RoomListItem[]>([]);
+  const [cardVotes, setCardVotes] = useState<Record<number, string[]>>({});
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -103,6 +104,10 @@ export function useWebSocket() {
                 localStorage.removeItem("katmannames_player_id");
                 break;
 
+              case "votes_updated":
+                setCardVotes(message.payload.votes || {});
+                break;
+                
               case "error":
                 setError(message.payload.message);
                 break;
@@ -174,6 +179,7 @@ export function useWebSocket() {
     roomCode,
     error,
     roomsList,
+    cardVotes,
     send,
   };
 }

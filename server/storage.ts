@@ -7,6 +7,7 @@ interface RoomData {
   password?: string;
   guessesRemaining: number;
   maxGuesses: number;
+  cardVotes: Map<number, Set<string>>; // cardId -> Set of playerIds who voted
 }
 
 export interface IStorage {
@@ -111,7 +112,8 @@ export class MemStorage implements IStorage {
       gameState, 
       password,
       guessesRemaining: 0,
-      maxGuesses: 0
+      maxGuesses: 0,
+      cardVotes: new Map() // Map of cardId to Set of playerIds who voted
     });
     this.playerToRoom.set(playerId, roomCode);
 
@@ -442,6 +444,8 @@ export class MemStorage implements IStorage {
       room.currentClue = null;
       roomData.guessesRemaining = 0;
       roomData.maxGuesses = 0;
+      // Clear votes when turn ends
+      roomData.cardVotes.clear();
     }
 
     return room;
@@ -527,6 +531,8 @@ export class MemStorage implements IStorage {
     room.currentClue = null;
     roomData.guessesRemaining = 0;
     roomData.maxGuesses = 0;
+    // Clear votes when turn ends
+    roomData.cardVotes.clear();
     
     return room;
   }
@@ -552,6 +558,80 @@ export class MemStorage implements IStorage {
         this.rooms.delete(roomCode);
       }
     });
+  }
+
+  voteCard(roomCode: string, playerId: string, cardId: number): { gameState: GameState; votes: Map<number, string[]> } | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Check if game is in playing phase and there's an active clue
+    if (room.phase !== "playing" || !room.currentClue) return null;
+    
+    // Check if player can vote (must be guesser on current team)
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || player.role !== "guesser" || player.team !== room.currentTeam) {
+      return null;
+    }
+    
+    // Check if card exists and is not revealed
+    const card = room.cards.find(c => c.id === cardId);
+    if (!card || card.revealed) return null;
+    
+    // Initialize votes for this card if not exists
+    if (!roomData.cardVotes.has(cardId)) {
+      roomData.cardVotes.set(cardId, new Set());
+    }
+    
+    // Add or remove vote
+    const cardVoters = roomData.cardVotes.get(cardId)!;
+    if (cardVoters.has(playerId)) {
+      cardVoters.delete(playerId);
+    } else {
+      cardVoters.add(playerId);
+    }
+    
+    // Convert votes to format for frontend (Map of cardId to array of usernames)
+    const votesWithUsernames = new Map<number, string[]>();
+    roomData.cardVotes.forEach((voterIds, cardId) => {
+      const usernames = Array.from(voterIds).map(voterId => {
+        const voter = room.players.find(p => p.id === voterId);
+        return voter?.username || 'Unknown';
+      });
+      if (usernames.length > 0) {
+        votesWithUsernames.set(cardId, usernames);
+      }
+    });
+    
+    return { gameState: room, votes: votesWithUsernames };
+  }
+  
+  getCardVotes(roomCode: string): Map<number, string[]> | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Convert votes to format for frontend
+    const votesWithUsernames = new Map<number, string[]>();
+    roomData.cardVotes.forEach((voterIds, cardId) => {
+      const usernames = Array.from(voterIds).map(voterId => {
+        const voter = room.players.find(p => p.id === voterId);
+        return voter?.username || 'Unknown';
+      });
+      if (usernames.length > 0) {
+        votesWithUsernames.set(cardId, usernames);
+      }
+    });
+    
+    return votesWithUsernames;
+  }
+  
+  clearTurnVotes(roomCode: string): void {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return;
+    
+    // Clear all votes when turn changes
+    roomData.cardVotes.clear();
   }
 }
 

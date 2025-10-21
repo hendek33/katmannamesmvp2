@@ -1,14 +1,18 @@
 import { type Card } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { CheckSquare } from "lucide-react";
 
 interface GameCardProps {
   card: Card;
   onReveal?: () => void;
+  onVote?: () => void;
   isSpymaster: boolean;
   disabled?: boolean;
+  voters?: string[];
+  hasVoted?: boolean;
 }
 
-export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProps) {
+export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false }: GameCardProps) {
   const getCardColors = () => {
     if (card.revealed || isSpymaster) {
       switch (card.type) {
@@ -51,14 +55,12 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
     };
   };
 
-  const canClick = !card.revealed && !disabled && !isSpymaster && onReveal;
+  const canVote = !card.revealed && !disabled && !isSpymaster && onVote;
+  const canReveal = !card.revealed && !disabled && !isSpymaster && onReveal;
   const colors = getCardColors();
 
   return (
-    <button
-      onClick={canClick ? onReveal : undefined}
-      disabled={!canClick}
-      data-testid={`card-${card.id}`}
+    <div
       className={cn(
         "relative rounded-lg border-2 p-0.5 sm:p-1 lg:p-1.5 w-full",
         "aspect-[3/2]",
@@ -67,26 +69,71 @@ export function GameCard({ card, onReveal, isSpymaster, disabled }: GameCardProp
         colors.border,
         colors.bg,
         colors.shadow,
-        canClick && "cursor-pointer hover:scale-[1.05] hover:-translate-y-1 active:scale-[1.02]",
-        !canClick && "cursor-default"
+        !card.revealed && "cursor-pointer"
       )}
     >
-      <div className="flex-1" />
+      {/* Reveal button in top-left corner */}
+      {canReveal && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onReveal();
+          }}
+          className="absolute top-1 left-1 z-10 p-1 bg-green-600/80 hover:bg-green-500 rounded transition-colors"
+          title="Kartı Aç"
+        >
+          <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+        </button>
+      )}
       
-      {/* Word panel */}
-      <div className={cn(
-        "relative rounded px-0.5 py-0.5 sm:px-1 sm:py-0.5 md:px-2 md:py-1 lg:px-3 lg:py-1.5 xl:px-4 xl:py-2 2xl:px-5 2xl:py-2.5",
-        "flex items-center justify-center",
-        "border-t border-black/20",
-        colors.panel
-      )}>
-        <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg uppercase tracking-wide text-center leading-tight drop-shadow-md">
-          {card.word}
-        </span>
-      </div>
+      {/* Voters display */}
+      {voters.length > 0 && !card.revealed && (
+        <div className="absolute top-1 right-1 z-10 max-w-[60%]">
+          <div className="flex flex-wrap gap-0.5 justify-end">
+            {voters.map((voter, idx) => (
+              <span
+                key={idx}
+                className={cn(
+                  "px-1 py-0.5 text-[8px] sm:text-[9px] rounded",
+                  hasVoted && voter === voters[voters.length - 1] ? 
+                    "bg-yellow-500/90 text-white font-bold" : 
+                    "bg-black/60 text-white"
+                )}
+              >
+                {voter}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      <button
+        onClick={canVote ? onVote : undefined}
+        disabled={!canVote}
+        data-testid={`card-${card.id}`}
+        className={cn(
+          "flex-1 w-full flex flex-col",
+          canVote && "hover:scale-[1.02] active:scale-[1.01]",
+          hasVoted && "ring-2 ring-yellow-400 ring-inset"
+        )}
+      >
+        <div className="flex-1" />
+        
+        {/* Word panel */}
+        <div className={cn(
+          "relative rounded px-0.5 py-0.5 sm:px-1 sm:py-0.5 md:px-2 md:py-1 lg:px-3 lg:py-1.5 xl:px-4 xl:py-2 2xl:px-5 2xl:py-2.5",
+          "flex items-center justify-center",
+          "border-t border-black/20",
+          colors.panel
+        )}>
+          <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg uppercase tracking-wide text-center leading-tight drop-shadow-md">
+            {card.word}
+          </span>
+        </div>
+      </button>
       
       {/* Bottom edge shadow for depth */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/30 to-transparent" />
-    </button>
+    </div>
   );
 }

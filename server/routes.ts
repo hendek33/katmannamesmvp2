@@ -154,6 +154,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "room_joined",
               payload: { playerId, gameState: getFilteredGameState(gameState, playerId) },
             });
+            
+            // Send initial votes
+            const votes = storage.getCardVotes(validation.data.roomCode);
+            if (votes) {
+              sendToClient(ws, {
+                type: "votes_updated",
+                payload: { votes: Object.fromEntries(votes) },
+              });
+            }
 
             if (!isReconnect) {
               broadcastToRoom(validation.data.roomCode, {
@@ -358,6 +367,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
             }
+            break;
+          }
+
+          case "vote_card": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = z.object({ cardId: z.number() }).safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz kart" } });
+              return;
+            }
+
+            const result = storage.voteCard(ws.roomCode, ws.playerId, validation.data.cardId);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Oy verilemedi" } });
+              return;
+            }
+
+            // Broadcast updated votes to all clients in room
+            broadcastToRoom(ws.roomCode, {
+              type: "votes_updated",
+              payload: { 
+                votes: Object.fromEntries(result.votes) 
+              },
+            });
             break;
           }
 

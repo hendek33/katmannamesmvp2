@@ -9,6 +9,7 @@ interface WebSocketContextType {
   roomCode: string;
   error: string;
   roomsList: RoomListItem[];
+  cardVotes: Record<number, string[]>;
   send: (type: string, payload: any) => void;
 }
 
