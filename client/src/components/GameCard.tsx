@@ -56,28 +56,28 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         case "dark":
           return {
             bg: "bg-gradient-to-br from-blue-500 to-blue-600",
-            border: "border-blue-700",
+            border: "border-blue-400",
             panel: "bg-blue-900",
             shadow: "shadow-xl shadow-blue-900/50",
           };
         case "light":
           return {
             bg: "bg-gradient-to-br from-red-500 to-red-600",
-            border: "border-red-700",
+            border: "border-red-400",
             panel: "bg-red-900",
             shadow: "shadow-xl shadow-red-900/50",
           };
         case "neutral":
           return {
             bg: "bg-gradient-to-br from-stone-200 to-stone-300",
-            border: "border-stone-400",
+            border: "border-stone-100",
             panel: "bg-stone-700",
             shadow: "shadow-lg shadow-stone-700/30",
           };
         case "assassin":
           return {
             bg: "bg-gradient-to-br from-gray-800 to-gray-900",
-            border: "border-gray-950",
+            border: "border-gray-700",
             panel: "bg-black",
             shadow: "shadow-2xl shadow-black/70",
           };
@@ -86,7 +86,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     
     return {
       bg: "bg-gradient-to-br from-slate-300 to-slate-400",
-      border: "border-slate-500",
+      border: "border-slate-200",
       panel: "bg-slate-700",
       shadow: "shadow-lg shadow-slate-800/40",
     };
@@ -112,7 +112,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   return (
     <div
       className={cn(
-        "relative rounded-lg border-4 p-0.5 sm:p-1 lg:p-1.5 w-full",
+        "relative rounded-lg border-[6px] p-0.5 sm:p-1 lg:p-1.5 w-full",
         "aspect-[3/2]",
         "flex flex-col overflow-hidden",
         "transition-all transform-gpu duration-500",
@@ -134,10 +134,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           onClick={() => setIsLifted(!isLifted)}
           title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
           style={{
-            top: '-4px',
-            left: '-4px',
-            right: '-4px', 
-            bottom: '-4px',
+            top: '-6px',
+            left: '-6px',
+            right: '-6px', 
+            bottom: '-6px',
             backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
