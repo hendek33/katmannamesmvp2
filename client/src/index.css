@@ -324,6 +324,23 @@
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Card reveal pulse animation */
+@keyframes pulseOnce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pulse-once {
+  animation: pulseOnce 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /**
  * Using the elevate system.
  * Automatic contrast adjustment.

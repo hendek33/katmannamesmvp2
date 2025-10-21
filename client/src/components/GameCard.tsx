@@ -115,12 +115,13 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "relative rounded-lg border-4 p-0.5 sm:p-1 lg:p-1.5 w-full",
         "aspect-[3/2]",
         "flex flex-col overflow-hidden",
-        "transition-transform transform-gpu",
+        "transition-all transform-gpu duration-500",
         colors.border,
         colors.bg,
         colors.shadow,
         !card.revealed && "cursor-pointer",
-        "ring-2 ring-black/20 ring-offset-1"
+        "ring-2 ring-black/20",
+        card.revealed && "animate-pulse-once"
       )}
     >
       {/* Revealed card overlay - drops in after image loads */}
