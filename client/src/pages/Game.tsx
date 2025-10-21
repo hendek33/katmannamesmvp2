@@ -424,34 +424,44 @@ export default function Game() {
                       <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
                       <span className="text-[10px] sm:text-xs font-bold uppercase text-amber-400 tracking-wider">İpucu Ver</span>
                     </div>
-                    <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
                       <Input
                         data-testid="input-clue-word"
-                        placeholder="İpucu..."
+                        placeholder="İpucu kelimesi..."
                         value={clueWord}
                         onChange={(e) => setClueWord(e.target.value.toUpperCase())}
                         onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                         maxLength={20}
-                        className="w-24 sm:w-40 text-center font-bold text-xs sm:text-sm uppercase bg-slate-900/70 border-2 border-slate-700 focus:border-amber-500 h-8 sm:h-10 text-slate-100 placeholder:text-slate-500"
+                        className="w-full sm:w-40 text-center font-bold text-xs sm:text-sm uppercase bg-slate-900/70 border-2 border-slate-700 focus:border-amber-500 h-8 sm:h-10 text-slate-100 placeholder:text-slate-500"
                       />
-                      <Input
-                        data-testid="input-clue-count"
-                        type="number"
-                        min="0"
-                        max="9"
-                        value={clueCount}
-                        onChange={(e) => setClueCount(e.target.value)}
-                        className="w-10 sm:w-14 text-center font-bold text-sm sm:text-lg bg-slate-900/70 border-2 border-slate-700 focus:border-amber-500 h-8 sm:h-10 text-slate-100"
-                      />
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
+                          className="h-8 sm:h-10 w-8 sm:w-10 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold"
+                        >
+                          -
+                        </Button>
+                        <div className="h-8 sm:h-10 w-12 sm:w-16 flex items-center justify-center bg-slate-900/70 border-2 border-amber-500/60 rounded-md">
+                          <span className="text-lg sm:text-xl font-black text-amber-400">{clueCount}</span>
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
+                          className="h-8 sm:h-10 w-8 sm:w-10 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold"
+                        >
+                          +
+                        </Button>
+                      </div>
                       <Button
                         onClick={handleGiveClue}
                         disabled={!clueWord.trim() || parseInt(clueCount) < 0}
                         data-testid="button-give-clue"
                         size="sm"
-                        className="h-8 sm:h-10 px-2 sm:px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-sm"
+                        className="h-8 sm:h-10 px-3 sm:px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-sm"
                       >
-                        <Send className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
-                        <span className="hidden sm:inline">Gönder</span>
+                        <Send className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        Gönder
                       </Button>
                     </div>
                   </div>
