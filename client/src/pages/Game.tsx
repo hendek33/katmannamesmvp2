@@ -361,20 +361,20 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 gap-[1px] sm:gap-[2px] md:gap-1 lg:gap-1.5 xl:gap-2 
-                 w-full 
-                 max-w-[340px] 
-                 min-[480px]:max-w-[380px] 
-                 sm:max-w-[420px] 
-                 md:max-w-[500px] 
-                 lg:max-w-[650px] 
-                 xl:max-w-[800px] 
-                 2xl:max-w-[950px] 
-                 max-h-[55vh] 
-                 sm:max-h-[60vh] 
-                 md:max-h-[65vh] 
-                 lg:max-h-[70vh] 
-                 xl:max-h-[75vh] 
+            <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
+                 w-[calc(min(90vw,55vh*1.5))] 
+                 min-[360px]:w-[calc(min(85vw,58vh*1.5))]
+                 min-[400px]:w-[calc(min(85vw,60vh*1.5))]
+                 min-[500px]:w-[calc(min(80vw,62vh*1.5))]
+                 min-[600px]:w-[calc(min(80vw,64vh*1.5))]
+                 min-[700px]:w-[calc(min(75vw,66vh*1.5))]
+                 min-[800px]:w-[calc(min(75vw,68vh*1.5))]
+                 min-[900px]:w-[calc(min(70vw,70vh*1.5))]
+                 min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
+                 min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
+                 min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
+                 min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
+                 max-w-[1000px]
                  mb-16 sm:mb-20 lg:mb-24" 
                  data-testid="game-grid">
               {gameState.cards.map((card, index) => (
