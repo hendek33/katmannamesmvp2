@@ -301,7 +301,7 @@ export default function Game() {
         </Card>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(150px,15vw)_1fr_minmax(150px,15vw)] xl:grid-cols-[minmax(180px,14vw)_1fr_minmax(180px,14vw)] 2xl:grid-cols-[minmax(200px,12vw)_1fr_minmax(200px,12vw)] gap-2 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(150px,15vw)_1fr_minmax(200px,18vw)] xl:grid-cols-[minmax(180px,14vw)_1fr_minmax(220px,16vw)] 2xl:grid-cols-[minmax(200px,12vw)_1fr_minmax(250px,15vw)] gap-2 flex-1 min-h-0">
           {/* Left Side - Dark Team */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score Card */}
@@ -416,7 +416,7 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-1 sm:p-2 z-10">
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center p-1 sm:p-2 z-10">
               {canGiveClue ? (
                 <Card className="px-2 py-2 sm:px-4 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
                   <div className="space-y-1 sm:space-y-2">
