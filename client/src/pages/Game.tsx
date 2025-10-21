@@ -178,9 +178,10 @@ export default function Game() {
         </div>
 
         {/* Desktop Header - Aligned with panels below */}
-        <div className="hidden lg:grid lg:grid-cols-[minmax(250px,20vw)_1fr_minmax(250px,20vw)] xl:grid-cols-[minmax(280px,18vw)_1fr_minmax(280px,18vw)] 2xl:grid-cols-[minmax(320px,16vw)_1fr_minmax(320px,16vw)] gap-2 flex-shrink-0">
+        <div className="hidden lg:flex lg:justify-between gap-2 flex-shrink-0">
           {/* Left Section - Room Code */}
-          <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30 hover:shadow-blue-500/20 transition-all">
+          <div className="lg:w-[250px] xl:w-[280px] 2xl:w-[320px]">
+            <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30 hover:shadow-blue-500/20 transition-all">
             <div className="flex items-center justify-start gap-1 h-full">
               <div className="flex items-center gap-2">
                 <div className="text-xs text-muted-foreground">Oda Kodu:</div>
@@ -215,9 +216,12 @@ export default function Game() {
               </div>
             </div>
           </Card>
+          </div>
           
           {/* Center Section - Game Status and Players */}
-          <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-amber-900/30 hover:shadow-amber-500/20 transition-all">
+          <div className="flex-1 flex justify-center">
+            <div className="w-[calc(min(70vw,70vh*1.5))] min-[1200px]:w-[calc(min(65vw,72vh*1.5))] min-[1400px]:w-[calc(min(60vw,74vh*1.5))] min-[1600px]:w-[calc(min(55vw,75vh*1.5))] max-w-[1000px]">
+              <Card className="w-full px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-amber-900/30 hover:shadow-amber-500/20 transition-all">
             <div className="flex justify-center items-center gap-1 h-full">
               {/* Players Dialog */}
               <Dialog>
@@ -628,6 +632,64 @@ export default function Game() {
               </Button>
             </div>
           </Card>
+            </div>
+          </div>
+
+          {/* Right Section - Controls */}
+          <div className="lg:w-[250px] xl:w-[280px] 2xl:w-[320px]">
+            <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
+              <div className="flex items-center justify-end gap-1 h-full">
+                {currentPlayer?.isRoomOwner && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        send("restart_game", {});
+                        toast({
+                          title: "Oyun Yenilendi",
+                          description: "Yeni kelimeler atandı",
+                        });
+                      }}
+                      data-testid="button-restart"
+                      className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
+                    >
+                      <RotateCcw className="w-2.5 h-2.5 mr-0.5" />
+                      <span className="text-[10px]">Yenile</span>
+                    </Button>
+                  </>
+                )}
+                {/* Team/Role Change Dialog - duplicate from center for consistency */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      data-testid="button-change-team"
+                      className="h-6 px-2 border hover:border-green-500 hover:bg-green-500/10"
+                    >
+                      <Users className="w-2.5 h-2.5 mr-0.5" />
+                      <span className="text-[10px]">Takım</span>
+                    </Button>
+                  </DialogTrigger>
+                </Dialog>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    send("leave_room", {});
+                    localStorage.removeItem("katmannames_room_code");
+                    localStorage.removeItem("katmannames_player_id");
+                    setLocation("/rooms");
+                  }}
+                  className="h-6 px-2 border hover:border-red-600 hover:bg-red-600/10"
+                >
+                  <ArrowLeft className="w-2.5 h-2.5 mr-0.5" />
+                  <span className="text-[10px]">Çık</span>
+                </Button>
+              </div>
+            </Card>
+          </div>
         </div>
 
         {/* Main Game Area */}
