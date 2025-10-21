@@ -519,6 +519,22 @@
   animation: bounceSlow 2s ease-in-out infinite;
 }
 
+/* Fade in and out animation for overlay */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* Card drop animation */
 @keyframes cardDrop {
   0% {

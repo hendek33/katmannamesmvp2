@@ -27,8 +27,10 @@ export default function Game() {
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
+  const [showClueOverlay, setShowClueOverlay] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
+  const previousClueRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (error) {
@@ -48,6 +50,30 @@ export default function Game() {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [gameState?.revealHistory, gameState?.currentClue]);
+
+  // Detect clue changes and show overlay
+  useEffect(() => {
+    if (!gameState?.currentClue) {
+      previousClueRef.current = null;
+      return;
+    }
+
+    const clueKey = `${gameState.currentClue.word}-${gameState.currentClue.count}`;
+    
+    // Check if clue is new
+    if (previousClueRef.current !== clueKey) {
+      setShowClueOverlay(true);
+      
+      // Hide overlay after 1 second
+      const timer = setTimeout(() => {
+        setShowClueOverlay(false);
+      }, 1000);
+
+      previousClueRef.current = clueKey;
+      
+      return () => clearTimeout(timer);
+    }
+  }, [gameState?.currentClue]);
 
   // Detect turn changes and show video
   useEffect(() => {
@@ -185,6 +211,16 @@ export default function Game() {
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       
+      {/* Clue Overlay - Darkens background when clue appears */}
+      {showClueOverlay && (
+        <div 
+          className="fixed inset-0 z-[45] bg-black/40 pointer-events-none"
+          style={{
+            animation: 'fadeInOut 1s ease-in-out forwards'
+          }}
+        />
+      )}
+
       {/* Turn Change Video */}
       {showTurnVideo && currentTurn && gameState && (
         <TurnVideo
@@ -450,7 +486,7 @@ export default function Game() {
                   <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
                   <span className="text-xs font-medium text-amber-300">İpucu:</span>
                   <span className="text-xs font-black text-amber-100">{gameState.currentClue.word}</span>
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center animate-bounce-slow">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
                     <span className="text-xs font-black text-white">{gameState.currentClue.count}</span>
                   </div>
                 </div>
@@ -1020,7 +1056,7 @@ export default function Game() {
                       <span className="text-lg sm:text-xl font-black text-amber-400 uppercase tracking-wider animate-text-glow">
                         {gameState.currentClue.word}
                       </span>
-                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-500 flex items-center justify-center shadow-xl animate-bounce-slow">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-500 flex items-center justify-center shadow-xl">
                         <span className="text-base sm:text-lg font-black text-white">
                           {gameState.currentClue.count}
                         </span>
