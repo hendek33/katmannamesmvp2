@@ -889,10 +889,10 @@ export default function Game() {
             </Card>
 
             {/* Game Log Card */}
-            <Card className="p-1.5 lg:p-2 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-amber-700/50 backdrop-blur-md shadow-xl flex flex-col flex-1 min-h-0 overflow-hidden">
+            <Card className="p-1.5 lg:p-2 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-slate-600/50 backdrop-blur-md shadow-xl flex flex-col flex-1 min-h-0 overflow-hidden">
               <div className="flex items-center gap-1 mb-1">
-                <Clock className="w-2.5 h-2.5 text-amber-400" />
-                <h4 className="text-[9px] lg:text-[10px] font-bold text-amber-300 uppercase">Günlük</h4>
+                <Clock className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
+                <h4 className="text-[11px] lg:text-xs xl:text-sm font-bold text-amber-300 uppercase">Günlük</h4>
               </div>
               <div ref={logContainerRef} className="flex-1 overflow-y-auto min-h-0 space-y-0.5 scroll-smooth">
                 {/* Show game events in chronological order */}
