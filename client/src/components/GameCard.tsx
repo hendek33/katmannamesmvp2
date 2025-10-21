@@ -12,44 +12,12 @@ interface GameCardProps {
   disabled?: boolean;
   voters?: string[];
   hasVoted?: boolean;
+  revealedImage?: string;
 }
 
-export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false }: GameCardProps) {
+export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
-  
-  // Randomly select a revealed card image based on card type
-  const getRevealedCardImage = () => {
-    const blueCards = [
-      "ali mavi.png", "blush mavi.png", "hasan mavi.png", "kasım mavi.png", 
-      "mami mavi.png", "noeldayı mavi.png", "nuriben mavi.png", "triel2 mavi.png", "çağrı mavi.png"
-    ];
-    const redCards = [
-      "alik kırmızı.png", "begüm kırmızı.png", "dobby kırmızı.png", "karaman kırmızı.png",
-      "neswin kırmızı.png", "noeldayı kırmızı.png", "perver kırmızı.png", "triel kırmızı.png", "şinasi kırmızı.png"
-    ];
-    const whiteCards = [
-      "blush beyaz.png", "hasan beyaz.png", "mami beyaz.png", "perver beyaz.png",
-      "çağrı normal beyaz.png", "çağrı sigara beyaz.png", "şinasi su beyaz.png"
-    ];
-    const blackCard = "arda siyah.png";
-
-    // Use card ID as seed for consistent image selection
-    const hashCode = String(card.id).split('').reduce((a: number, b: string) => ((a << 5) - a) + b.charCodeAt(0), 0);
-    
-    switch (card.type) {
-      case "dark":
-        return `/açılmış kelime kartları/${blueCards[Math.abs(hashCode) % blueCards.length]}`;
-      case "light":
-        return `/açılmış kelime kartları/${redCards[Math.abs(hashCode) % redCards.length]}`;
-      case "neutral":
-        return `/açılmış kelime kartları/${whiteCards[Math.abs(hashCode) % whiteCards.length]}`;
-      case "assassin":
-        return `/açılmış kelime kartları/${blackCard}`;
-      default:
-        return null;
-    }
-  };
 
   const getCardColors = () => {
     if (card.revealed || isSpymaster) {
@@ -96,7 +64,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const canVote = !card.revealed && !disabled && !isSpymaster && onVote;
   const canReveal = !card.revealed && !disabled && !isSpymaster && onReveal;
   const colors = getCardColors();
-  const revealedImage = card.revealed ? getRevealedCardImage() : null;
   
   // Preload image when card is revealed
   useEffect(() => {

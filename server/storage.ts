@@ -8,6 +8,7 @@ interface RoomData {
   guessesRemaining: number;
   maxGuesses: number;
   cardVotes: Map<number, Set<string>>; // cardId -> Set of playerIds who voted
+  cardImages?: Map<number, string>; // cardId -> image path for revealed cards
 }
 
 export interface IStorage {
@@ -27,6 +28,7 @@ export interface IStorage {
   endTurn(roomCode: string, playerId: string): GameState | null;
   removePlayer(roomCode: string, playerId: string): void;
   cleanupEmptyRooms(): void;
+  getCardImages(roomCode: string): Record<number, string> | null;
 }
 
 export class MemStorage implements IStorage {
@@ -47,6 +49,68 @@ export class MemStorage implements IStorage {
       code += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return this.rooms.has(code) ? this.generateRoomCode() : code;
+  }
+
+  private assignCardImages(roomData: RoomData): void {
+    // Image pools for each card type
+    const imagePools = {
+      dark: [
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/1.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/2.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/3.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/4.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/5.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/6.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/7.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/8.png',
+        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/9.png'
+      ],
+      light: [
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/şinasi kırmızı.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/2.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/3.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/4.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/5.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/6.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/7.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/8.png',
+        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/9.png'
+      ],
+      neutral: [
+        '/açılmış kelime kartları/tarafsız/açık katman beyaz/1.png',
+        '/açılmış kelime kartları/tarafsız/açık katman beyaz/2.png',
+        '/açılmış kelime kartları/tarafsız/açık katman beyaz/3.png',
+        '/açılmış kelime kartları/tarafsız/açık katman beyaz/4.png',
+        '/açılmış kelime kartları/tarafsız/açık katman beyaz/5.png',
+        '/açılmış kelime kartları/tarafsız/açık katman beyaz/6.png',
+        '/açılmış kelime kartları/tarafsız/açık katman beyaz/7.png'
+      ],
+      assassin: ['/açılmış kelime kartları/suikastçı/açık katman siyah/1.png']
+    };
+
+    // Shuffle each pool
+    for (const type in imagePools) {
+      imagePools[type as keyof typeof imagePools] = imagePools[type as keyof typeof imagePools]
+        .sort(() => Math.random() - 0.5);
+    }
+
+    // Create the mapping
+    const cardImages = new Map<number, string>();
+    const imageIndexes = { dark: 0, light: 0, neutral: 0, assassin: 0 };
+
+    // Assign unique images to each card based on its type
+    roomData.gameState.cards.forEach(card => {
+      const type = card.type;
+      const pool = imagePools[type];
+      const index = imageIndexes[type];
+      
+      if (index < pool.length) {
+        cardImages.set(card.id, pool[index]);
+        imageIndexes[type]++;
+      }
+    });
+
+    roomData.cardImages = cardImages;
   }
 
   private createGameCards(): Card[] {
@@ -322,6 +386,9 @@ export class MemStorage implements IStorage {
     room.phase = "playing";
     room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
+    
+    // Assign unique images to cards when game starts
+    this.assignCardImages(roomData);
     room.currentTeam = room.darkCardsRemaining === 9 ? "dark" : "light";
     room.currentClue = null;
     room.winner = null;
@@ -463,6 +530,10 @@ export class MemStorage implements IStorage {
     room.phase = "playing";
     room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
+    
+    // Reassign unique images for the new game
+    this.assignCardImages(roomData);
+    
     room.currentTeam = room.darkCardsRemaining === 9 ? "dark" : "light";
     room.currentClue = null;
     room.winner = null;
@@ -636,6 +707,19 @@ export class MemStorage implements IStorage {
     
     // Clear all votes when turn changes
     roomData.cardVotes.clear();
+  }
+
+  getCardImages(roomCode: string): Record<number, string> | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData || !roomData.cardImages) return null;
+    
+    // Convert Map to object for sending through WebSocket
+    const imagesObject: Record<number, string> = {};
+    roomData.cardImages.forEach((imagePath, cardId) => {
+      imagesObject[cardId] = imagePath;
+    });
+    
+    return imagesObject;
   }
 }
 

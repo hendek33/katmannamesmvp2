@@ -151,9 +151,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             roomClients.get(validation.data.roomCode)!.add(ws);
 
+            const cardImages = storage.getCardImages(validation.data.roomCode);
             sendToClient(ws, {
               type: "room_joined",
-              payload: { playerId, gameState: getFilteredGameState(gameState, playerId) },
+              payload: { 
+                playerId, 
+                gameState: getFilteredGameState(gameState, playerId),
+                cardImages: cardImages || {}
+              },
             });
             
             // Send initial votes
@@ -300,13 +305,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            const cardImages = storage.getCardImages(ws.roomCode);
             const clients = roomClients.get(ws.roomCode);
             if (clients) {
               clients.forEach(client => {
                 if (client.playerId) {
                   sendToClient(client, {
                     type: "game_started",
-                    payload: { gameState: getFilteredGameState(gameState, client.playerId) },
+                    payload: { 
+                      gameState: getFilteredGameState(gameState, client.playerId),
+                      cardImages: cardImages || {}
+                    },
                   });
                 }
               });
@@ -418,13 +427,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            const cardImages = storage.getCardImages(ws.roomCode);
             const clients = roomClients.get(ws.roomCode);
             if (clients) {
               clients.forEach(client => {
                 if (client.playerId) {
                   sendToClient(client, {
                     type: "game_restarted",
-                    payload: { gameState: getFilteredGameState(gameState, client.playerId) },
+                    payload: { 
+                      gameState: getFilteredGameState(gameState, client.playerId),
+                      cardImages: cardImages || {}
+                    },
                   });
                 }
               });

@@ -15,6 +15,7 @@ export function useWebSocket() {
   const [error, setError] = useState<string>("");
   const [roomsList, setRoomsList] = useState<RoomListItem[]>([]);
   const [cardVotes, setCardVotes] = useState<Record<number, string[]>>({});
+  const [cardImages, setCardImages] = useState<Record<number, string>>({});
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -78,6 +79,9 @@ export function useWebSocket() {
                 setPlayerId(message.payload.playerId);
                 setGameState(message.payload.gameState);
                 setRoomCode(message.payload.gameState.roomCode);
+                if (message.payload.cardImages) {
+                  setCardImages(message.payload.cardImages);
+                }
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.gameState.roomCode);
                 break;
@@ -90,10 +94,20 @@ export function useWebSocket() {
                 break;
 
               case "game_started":
-              case "card_revealed":
               case "game_restarted":
+                setGameState(message.payload.gameState);
+                if (message.payload.cardImages) {
+                  setCardImages(message.payload.cardImages);
+                }
+                break;
+                
+              case "card_revealed":
+                setGameState(message.payload.gameState);
+                break;
+                
               case "returned_to_lobby":
                 setGameState(message.payload.gameState);
+                setCardImages({});
                 break;
 
               case "left_room":
@@ -180,6 +194,7 @@ export function useWebSocket() {
     error,
     roomsList,
     cardVotes,
+    cardImages,
     send,
   };
 }

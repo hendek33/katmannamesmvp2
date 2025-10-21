@@ -19,7 +19,7 @@ import Lobby from "./Lobby";
 export default function Game() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { isConnected, gameState, playerId, roomCode, error, send, cardVotes } = useWebSocketContext();
+  const { isConnected, gameState, playerId, roomCode, error, send, cardVotes, cardImages } = useWebSocketContext();
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
@@ -715,6 +715,7 @@ export default function Game() {
                     disabled={!canRevealCard}
                     voters={cardVotes[card.id] || []}
                     hasVoted={cardVotes[card.id]?.includes(gameState.players.find(p => p.id === playerId)?.username || '')}
+                    revealedImage={cardImages[card.id]}
                   />
                 </div>
               ))}
