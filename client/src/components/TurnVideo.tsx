@@ -95,10 +95,6 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
         {/* Turn notification text */}
         <div 
           className="absolute -top-20 left-1/2 transform -translate-x-1/2 text-center whitespace-nowrap"
-          style={{
-            animation: 'slideDown 0.8s ease-out 0.5s forwards',
-            opacity: 0
-          }}
         >
           <div className={cn(
             "text-3xl md:text-4xl font-black tracking-wide",
@@ -110,7 +106,19 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
               : '0 2px 20px rgba(239,68,68,0.8)'
           }}
           >
-            Sıra {teamName} Takımında
+            {`Sıra ${teamName} Takımında`.split('').map((char, index) => (
+              <span
+                key={index}
+                className="inline-block"
+                style={{
+                  animation: 'letterAppear 0.5s ease-out forwards',
+                  animationDelay: `${0.5 + index * 0.05}s`,
+                  opacity: 0
+                }}
+              >
+                {char === ' ' ? '\u00A0' : char}
+              </span>
+            ))}
           </div>
         </div>
 

@@ -434,6 +434,21 @@
   }
 }
 
+/* Letter appear animation */
+@keyframes letterAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.5);
+  }
+  50% {
+    transform: translateY(0) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* Card drop animation */
 @keyframes cardDrop {
   0% {
