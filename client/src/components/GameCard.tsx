@@ -1,7 +1,6 @@
 import { type Card } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { CheckSquare } from "lucide-react";
-import arkaplanImg from "@assets/arkaplan.png";
 
 interface GameCardProps {
   card: Card;
@@ -14,6 +13,39 @@ interface GameCardProps {
 }
 
 export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false }: GameCardProps) {
+  // Randomly select a revealed card image based on card type
+  const getRevealedCardImage = () => {
+    const blueCards = [
+      "ali mavi.png", "blush mavi.png", "hasan mavi.png", "kasım mavi.png", 
+      "mami mavi.png", "noeldayı mavi.png", "nuriben mavi.png", "triel2 mavi.png", "çağrı mavi.png"
+    ];
+    const redCards = [
+      "alik kırmızı.png", "begüm kırmızı.png", "dobby kırmızı.png", "karaman kırmızı.png",
+      "neswin kırmızı.png", "noeldayı kırmızı.png", "perver kırmızı.png", "triel kırmızı.png"
+    ];
+    const whiteCards = [
+      "blush beyaz.png", "hasan beyaz.png", "mami beyaz.png", "perver beyaz.png",
+      "çağrı normal beyaz.png", "çağrı sigara beyaz.png", "şinasi beyaz.png", "şinasi su beyaz.png"
+    ];
+    const blackCard = "arda siyah.png";
+
+    // Use card ID as seed for consistent image selection
+    const hashCode = String(card.id).split('').reduce((a: number, b: string) => ((a << 5) - a) + b.charCodeAt(0), 0);
+    
+    switch (card.type) {
+      case "dark":
+        return `/açılmış kelime kartları/${blueCards[Math.abs(hashCode) % blueCards.length]}`;
+      case "light":
+        return `/açılmış kelime kartları/${redCards[Math.abs(hashCode) % redCards.length]}`;
+      case "neutral":
+        return `/açılmış kelime kartları/${whiteCards[Math.abs(hashCode) % whiteCards.length]}`;
+      case "assassin":
+        return `/açılmış kelime kartları/${blackCard}`;
+      default:
+        return null;
+    }
+  };
+
   const getCardColors = () => {
     if (card.revealed || isSpymaster) {
       switch (card.type) {
@@ -73,7 +105,11 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         !card.revealed && "cursor-pointer"
       )}
       style={{
-        backgroundImage: !card.revealed && !isSpymaster ? `url(${arkaplanImg})` : undefined,
+        backgroundImage: card.revealed 
+          ? `url('${getRevealedCardImage()}')`
+          : !isSpymaster 
+            ? `url('/kelime kartı arkaplan.png')` 
+            : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundColor: !card.revealed && !isSpymaster ? '#1a1f2e' : undefined
