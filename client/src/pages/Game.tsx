@@ -126,7 +126,7 @@ export default function Game() {
   const isSpymaster = currentPlayer.role === "spymaster";
   const isCurrentTurn = currentPlayer.team === gameState.currentTeam;
   const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue;
-  const canRevealCard = !isSpymaster && isCurrentTurn;
+  const canRevealCard = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null;
 
   const darkPlayers = gameState.players.filter(p => p.team === "dark");
   const lightPlayers = gameState.players.filter(p => p.team === "light");
