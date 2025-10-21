@@ -128,10 +128,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           onClick={() => setIsLifted(!isLifted)}
           title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
           style={{
-            top: '-2px',
-            left: '-2px',
-            right: '-2px', 
-            bottom: '-2px',
+            top: '-4px',
+            left: '-4px',
+            right: '-4px', 
+            bottom: '-4px',
             backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
