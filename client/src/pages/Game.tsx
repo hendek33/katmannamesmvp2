@@ -321,15 +321,16 @@ export default function Game() {
                   <p className="text-[8px] lg:text-[10px] xl:text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Minimal Player List */}
-                <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-0.5">
-                  {darkPlayers.map(player => (
-                    <div key={player.id} className="text-[8px] lg:text-[9px] xl:text-[10px] text-blue-200/80 flex items-center justify-center gap-1">
+                <div className="mt-2 pt-2 border-t border-blue-700/30 flex flex-wrap justify-center gap-1 lg:gap-1.5">
+                  {darkPlayers.map((player, idx) => (
+                    <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-blue-200/80 flex items-center gap-0.5">
                       <span className={player.id === playerId ? "font-bold text-blue-100" : ""}>
                         {player.username}
                       </span>
                       {player.role === "spymaster" && (
-                        <Eye className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-amber-400" />
+                        <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                       )}
+                      {idx < darkPlayers.length - 1 && <span className="text-blue-500/50">•</span>}
                     </div>
                   ))}
                 </div>
@@ -493,15 +494,16 @@ export default function Game() {
                   <p className="text-[8px] lg:text-[10px] xl:text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Minimal Player List */}
-                <div className="mt-2 pt-2 border-t border-red-700/30 space-y-0.5">
-                  {lightPlayers.map(player => (
-                    <div key={player.id} className="text-[8px] lg:text-[9px] xl:text-[10px] text-red-200/80 flex items-center justify-center gap-1">
+                <div className="mt-2 pt-2 border-t border-red-700/30 flex flex-wrap justify-center gap-1 lg:gap-1.5">
+                  {lightPlayers.map((player, idx) => (
+                    <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-red-200/80 flex items-center gap-0.5">
                       <span className={player.id === playerId ? "font-bold text-red-100" : ""}>
                         {player.username}
                       </span>
                       {player.role === "spymaster" && (
-                        <Eye className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-amber-400" />
+                        <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                       )}
+                      {idx < lightPlayers.length - 1 && <span className="text-red-500/50">•</span>}
                     </div>
                   ))}
                 </div>
