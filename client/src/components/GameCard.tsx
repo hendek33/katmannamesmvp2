@@ -112,26 +112,31 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   return (
     <div
       className={cn(
-        "relative rounded-lg border-2 p-0.5 sm:p-1 lg:p-1.5 w-full",
+        "relative rounded-lg border-4 p-0.5 sm:p-1 lg:p-1.5 w-full",
         "aspect-[3/2]",
         "flex flex-col overflow-hidden",
         "transition-transform transform-gpu",
         colors.border,
         colors.bg,
         colors.shadow,
-        !card.revealed && "cursor-pointer"
+        !card.revealed && "cursor-pointer",
+        "ring-2 ring-black/20 ring-offset-1"
       )}
     >
       {/* Revealed card overlay - drops in after image loads */}
       {card.revealed && imageLoaded && revealedImage && (
         <div 
           className={cn(
-            "absolute inset-0 rounded-lg cursor-pointer animate-card-drop",
+            "absolute cursor-pointer animate-card-drop rounded-lg",
             isLifted ? "card-lifted" : "card-not-lifted"
           )}
           onClick={() => setIsLifted(!isLifted)}
           title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
           style={{
+            top: '-4px',
+            left: '-4px',
+            right: '-4px', 
+            bottom: '-4px',
             backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
