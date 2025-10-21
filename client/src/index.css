@@ -468,15 +468,23 @@
   animation: clueAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
-/* Clue slide from center animation */
+/* Clue slide from center animation - synchronized with overlay */
 @keyframes clueSlideFromCenter {
   0% {
     opacity: 0;
     transform: translateY(-300px) scale(1.5);
   }
-  40% {
+  15% {
     opacity: 1;
     transform: translateY(-300px) scale(1.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-300px) scale(1.5);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
   100% {
     opacity: 1;
@@ -485,7 +493,7 @@
 }
 
 .animate-clue-slide-up {
-  animation: clueSlideFromCenter 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: clueSlideFromCenter 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* Text glow animation */
