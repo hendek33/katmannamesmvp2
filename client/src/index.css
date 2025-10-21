@@ -242,6 +242,43 @@
   }
 }
 
+/* Pop animation for vote badges */
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes popOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-pop-in {
+  animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.animate-pop-out {
+  animation: popOut 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
 /**
  * Using the elevate system.
  * Automatic contrast adjustment.

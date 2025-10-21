@@ -92,13 +92,16 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           <div className="flex flex-wrap gap-0.5 justify-end">
             {voters.map((voter, idx) => (
               <span
-                key={idx}
+                key={voter}
                 className={cn(
-                  "px-1 py-0.5 text-[8px] sm:text-[9px] rounded",
+                  "px-1 py-0.5 text-[8px] sm:text-[9px] rounded animate-pop-in",
                   hasVoted && voter === voters[voters.length - 1] ? 
                     "bg-yellow-500/90 text-white font-bold" : 
                     "bg-black/60 text-white"
                 )}
+                style={{
+                  animationDelay: `${idx * 0.05}s`
+                }}
               >
                 {voter}
               </span>
