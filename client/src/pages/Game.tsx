@@ -1046,7 +1046,10 @@ export default function Game() {
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up">
+                <Card className={cn(
+                  "relative z-[47] px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up",
+                  showClueOverlay && "animate-clue-glow"
+                )}>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1 sm:gap-2 mb-0.5 sm:mb-1">
                       <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
