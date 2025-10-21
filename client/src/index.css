@@ -514,11 +514,11 @@
     opacity: 0;
     transform: translateY(-250px) scale(1.4);
   }
-  20% {
+  10% {
     opacity: 1;
     transform: translateY(-250px) scale(1.4);
   }
-  40% {
+  75% {
     opacity: 1;
     transform: translateY(-250px) scale(1.4);
   }
@@ -529,7 +529,7 @@
 }
 
 .animate-clue-slide-up {
-  animation: clueSlideFromCenter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: clueSlideFromCenter 2.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* Text glow animation */
