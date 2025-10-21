@@ -23,6 +23,7 @@ export default function Game() {
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
+  const [suppressAnim, setSuppressAnim] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -66,7 +67,13 @@ export default function Game() {
   };
 
   const handleRestart = () => {
+    setSuppressAnim(true);
     send("restart_game", {});
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setSuppressAnim(false);
+      });
+    });
   };
 
   useEffect(() => {
@@ -336,8 +343,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="flex flex-col min-h-0 flex-1 gap-2 md:gap-3 items-center justify-center" style={{ transition: 'none' }}>
-            <div className="grid grid-cols-5 gap-1.5 md:gap-2" data-testid="game-grid" style={{ transition: 'none', willChange: 'auto' }}>
+          <div className={`flex flex-col min-h-0 flex-1 gap-2 md:gap-3 items-center justify-center ${suppressAnim ? 'no-anim' : ''}`}>
+            <div className="grid grid-cols-5 gap-1.5 md:gap-2" data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
                   key={`pos-${index}`}
