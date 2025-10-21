@@ -467,18 +467,18 @@ export default function Game() {
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-3 py-2 sm:px-6 sm:py-3 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg">
+                <Card className="px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg">
                   <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                      <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
-                      <span className="text-[10px] sm:text-xs font-semibold uppercase text-amber-400 tracking-wider">Aktif İpucu</span>
+                    <div className="flex items-center justify-center gap-1 sm:gap-2 mb-0.5 sm:mb-1">
+                      <Lightbulb className="w-3 h-3 text-amber-400" />
+                      <span className="text-[9px] sm:text-[10px] font-semibold uppercase text-amber-400 tracking-wider">Aktif İpucu</span>
                     </div>
-                    <div className="flex items-center justify-center gap-2 sm:gap-3">
-                      <span className="text-xl sm:text-3xl font-black text-amber-400 uppercase tracking-wider">
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="text-lg sm:text-xl font-black text-amber-400 uppercase tracking-wider">
                         {gameState.currentClue.word}
                       </span>
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-amber-500 flex items-center justify-center shadow-xl">
-                        <span className="text-lg sm:text-2xl font-black text-white">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-500 flex items-center justify-center shadow-xl">
+                        <span className="text-base sm:text-lg font-black text-white">
                           {gameState.currentClue.count}
                         </span>
                       </div>
