@@ -52,40 +52,40 @@ export class MemStorage implements IStorage {
   }
 
   private assignCardImages(roomData: RoomData): void {
-    // Image pools for each card type
+    // Image pools for each card type - using actual file names
     const imagePools = {
       dark: [
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/1.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/2.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/3.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/4.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/5.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/6.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/7.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/8.png',
-        '/açılmış kelime kartları/açık katman koyu/açık katman mavi/9.png'
+        '/açılmış kelime kartları/ali mavi.png',
+        '/açılmış kelime kartları/blush mavi.png',
+        '/açılmış kelime kartları/hasan mavi.png',
+        '/açılmış kelime kartları/kasım mavi.png',
+        '/açılmış kelime kartları/mami mavi.png',
+        '/açılmış kelime kartları/noeldayı mavi.png',
+        '/açılmış kelime kartları/nuriben mavi.png',
+        '/açılmış kelime kartları/triel2 mavi.png',
+        '/açılmış kelime kartları/çağrı mavi.png'
       ],
       light: [
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/şinasi kırmızı.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/2.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/3.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/4.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/5.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/6.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/7.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/8.png',
-        '/açılmış kelime kartları/açık katman açık/açık katman kırmızı/9.png'
+        '/açılmış kelime kartları/alik kırmızı.png',
+        '/açılmış kelime kartları/begüm kırmızı.png',
+        '/açılmış kelime kartları/dobby kırmızı.png',
+        '/açılmış kelime kartları/karaman kırmızı.png',
+        '/açılmış kelime kartları/neswin kırmızı.png',
+        '/açılmış kelime kartları/noeldayı kırmızı.png',
+        '/açılmış kelime kartları/perver kırmızı.png',
+        '/açılmış kelime kartları/triel kırmızı.png',
+        '/açılmış kelime kartları/şinasi kırmızı.png'
       ],
       neutral: [
-        '/açılmış kelime kartları/tarafsız/açık katman beyaz/1.png',
-        '/açılmış kelime kartları/tarafsız/açık katman beyaz/2.png',
-        '/açılmış kelime kartları/tarafsız/açık katman beyaz/3.png',
-        '/açılmış kelime kartları/tarafsız/açık katman beyaz/4.png',
-        '/açılmış kelime kartları/tarafsız/açık katman beyaz/5.png',
-        '/açılmış kelime kartları/tarafsız/açık katman beyaz/6.png',
-        '/açılmış kelime kartları/tarafsız/açık katman beyaz/7.png'
+        '/açılmış kelime kartları/blush beyaz.png',
+        '/açılmış kelime kartları/hasan beyaz.png',
+        '/açılmış kelime kartları/mami beyaz.png',
+        '/açılmış kelime kartları/perver beyaz.png',
+        '/açılmış kelime kartları/çağrı normal beyaz.png',
+        '/açılmış kelime kartları/çağrı sigara beyaz.png',
+        '/açılmış kelime kartları/şinasi su beyaz.png'
       ],
-      assassin: ['/açılmış kelime kartları/suikastçı/açık katman siyah/1.png']
+      assassin: ['/açılmış kelime kartları/arda siyah.png']
     };
 
     // Shuffle each pool
