@@ -958,10 +958,10 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
-              {/* End Turn Button for Guessers */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
+              {/* End Turn Button for Guessers - Positioned to the left */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
-                <div className="animate-pulse-slow">
+                <div className="absolute bottom-2 left-4 sm:left-8">
                   <Button
                     onClick={() => {
                       send("end_turn", {});
