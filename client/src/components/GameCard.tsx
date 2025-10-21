@@ -13,9 +13,10 @@ interface GameCardProps {
   voters?: string[];
   hasVoted?: boolean;
   revealedImage?: string;
+  rowIndex?: number;
 }
 
-export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage }: GameCardProps) {
+export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0 }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
 
@@ -135,7 +136,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            zIndex: isLifted ? 30 : 20,
+            zIndex: (4 - rowIndex) * 10 + (isLifted ? 5 : 1),
             boxShadow: isLifted ? '0 20px 40px rgba(0,0,0,0.5)' : '0 4px 8px rgba(0,0,0,0.3)'
           }}
         />

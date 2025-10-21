@@ -774,6 +774,7 @@ export default function Game() {
                     voters={cardVotes[card.id] || []}
                     hasVoted={cardVotes[card.id]?.includes(gameState.players.find(p => p.id === playerId)?.username || '')}
                     revealedImage={cardImages[card.id]}
+                    rowIndex={Math.floor(index / 5)}
                   />
                 </div>
               ))}
