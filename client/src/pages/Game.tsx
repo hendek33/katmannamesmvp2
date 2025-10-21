@@ -416,26 +416,23 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-2 z-10">
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-1 sm:p-2 z-10">
               {canGiveClue ? (
-                <Card className="p-2 border-2 bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 border-amber-600/50 shadow-2xl transition-all backdrop-blur-md relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-600/10 via-orange-600/10 to-amber-600/10" />
-                  <div className="relative space-y-1">
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
-                        <Label className="text-[10px] font-bold uppercase text-amber-300">İpucu Ver</Label>
-                      </div>
+                <Card className="px-2 py-2 sm:px-4 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
+                  <div className="space-y-1 sm:space-y-2">
+                    <div className="flex items-center justify-center gap-1 sm:gap-2">
+                      <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
+                      <span className="text-[10px] sm:text-xs font-bold uppercase text-amber-400 tracking-wider">İpucu Ver</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 sm:gap-2">
                       <Input
                         data-testid="input-clue-word"
-                        placeholder="KELİME"
+                        placeholder="İpucu..."
                         value={clueWord}
                         onChange={(e) => setClueWord(e.target.value.toUpperCase())}
                         onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                         maxLength={20}
-                        className="w-32 text-center font-bold text-sm uppercase bg-slate-800/50 border-2 border-amber-500/30 focus:border-amber-500 h-8 text-amber-100 placeholder:text-amber-900/50"
+                        className="w-24 sm:w-40 text-center font-bold text-xs sm:text-sm uppercase bg-slate-900/70 border-2 border-slate-700 focus:border-amber-500 h-8 sm:h-10 text-slate-100 placeholder:text-slate-500"
                       />
                       <Input
                         data-testid="input-clue-count"
@@ -444,34 +441,34 @@ export default function Game() {
                         max="9"
                         value={clueCount}
                         onChange={(e) => setClueCount(e.target.value)}
-                        className="w-12 text-center font-bold text-lg bg-slate-800/50 border-2 border-amber-500/30 focus:border-amber-500 h-8 text-amber-100"
+                        className="w-10 sm:w-14 text-center font-bold text-sm sm:text-lg bg-slate-900/70 border-2 border-slate-700 focus:border-amber-500 h-8 sm:h-10 text-slate-100"
                       />
                       <Button
                         onClick={handleGiveClue}
                         disabled={!clueWord.trim() || parseInt(clueCount) < 0}
                         data-testid="button-give-clue"
                         size="sm"
-                        className="h-8 px-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-lg hover:shadow-xl hover:shadow-amber-500/50 group border border-amber-500/50"
+                        className="h-8 sm:h-10 px-2 sm:px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-sm"
                       >
-                        <Send className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                        <Send className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                        <span className="hidden sm:inline">Gönder</span>
                       </Button>
                     </div>
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-4 py-2 border-2 shadow-2xl bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 border-amber-600/50 hover:shadow-amber-500/30 transition-all relative overflow-hidden group backdrop-blur-md">
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-orange-600/30 to-amber-600/20 animate-pulse" />
-                  <div className="relative text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <Lightbulb className="w-4 h-4 text-amber-400 animate-pulse" />
-                      <span className="text-xs font-semibold uppercase text-amber-300">Aktif İpucu</span>
+                <Card className="px-3 py-2 sm:px-6 sm:py-3 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                      <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
+                      <span className="text-[10px] sm:text-xs font-semibold uppercase text-amber-400 tracking-wider">Aktif İpucu</span>
                     </div>
-                    <div className="flex items-baseline justify-center gap-3 mt-1">
-                      <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 uppercase tracking-wider">
+                    <div className="flex items-center justify-center gap-2 sm:gap-3">
+                      <span className="text-xl sm:text-3xl font-black text-amber-400 uppercase tracking-wider">
                         {gameState.currentClue.word}
                       </span>
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 flex items-center justify-center shadow-xl border-2 border-amber-400/50">
-                        <span className="text-xl font-black text-white">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-amber-500 flex items-center justify-center shadow-xl">
+                        <span className="text-lg sm:text-2xl font-black text-white">
                           {gameState.currentClue.count}
                         </span>
                       </div>
