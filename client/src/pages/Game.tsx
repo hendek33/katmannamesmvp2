@@ -753,7 +753,7 @@ export default function Game() {
                               send("select_role", { role: "guesser" });
                               toast({
                                 title: "Rol Değiştirildi",
-                                description: "Tahminci rolünü aldınız",
+                                description: "Ajan rolünü aldınız",
                               });
                             }}
                             variant={currentPlayer?.role === "guesser" ? "default" : "outline"}
@@ -765,14 +765,14 @@ export default function Game() {
                             )}
                           >
                             <Target className="w-4 h-4 mr-2" />
-                            Tahminci
+                            Ajan
                           </Button>
                           <Button
                             onClick={() => {
                               send("select_role", { role: "spymaster" });
                               toast({
                                 title: "Rol Değiştirildi",
-                                description: "İpucu veren rolünü aldınız",
+                                description: "İstihbarat Şefi rolünü aldınız",
                               });
                             }}
                             variant={currentPlayer?.role === "spymaster" ? "default" : "outline"}
@@ -784,7 +784,7 @@ export default function Game() {
                             )}
                           >
                             <Eye className="w-4 h-4 mr-2" />
-                            İpucu Veren
+                            İstihbarat Şefi
                           </Button>
                         </div>
                       </div>
@@ -801,8 +801,8 @@ export default function Game() {
                            currentPlayer?.team === "light" ? gameState.lightTeamName : "Seçilmedi"}
                         </span></div>
                         <div>Mevcut Rol: <span className="font-bold text-green-400">
-                          {currentPlayer?.role === "spymaster" ? "İpucu Veren" :
-                           currentPlayer?.role === "guesser" ? "Tahminci" : "Seçilmedi"}
+                          {currentPlayer?.role === "spymaster" ? "İstihbarat Şefi" :
+                           currentPlayer?.role === "guesser" ? "Ajan" : "Seçilmedi"}
                         </span></div>
                       </div>
                     </div>

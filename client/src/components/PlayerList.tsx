@@ -125,12 +125,12 @@ export function PlayerList({
               {player.role === "spymaster" ? (
                 <Badge variant="default" className="text-xs gap-1">
                   <Eye className="w-3 h-3" />
-                  İpucu Veren
+                  İstihbarat Şefi
                 </Badge>
               ) : (
                 <Badge variant="secondary" className="text-xs gap-1">
                   <Target className="w-3 h-3" />
-                  Tahminci
+                  Ajan
                 </Badge>
               )}
               
