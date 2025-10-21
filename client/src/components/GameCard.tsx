@@ -1,6 +1,7 @@
 import { type Card } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { CheckSquare } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface GameCardProps {
   card: Card;
@@ -13,6 +14,8 @@ interface GameCardProps {
 }
 
 export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false }: GameCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
   // Randomly select a revealed card image based on card type
   const getRevealedCardImage = () => {
     const blueCards = [
@@ -91,6 +94,18 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const canVote = !card.revealed && !disabled && !isSpymaster && onVote;
   const canReveal = !card.revealed && !disabled && !isSpymaster && onReveal;
   const colors = getCardColors();
+  const revealedImage = card.revealed ? getRevealedCardImage() : null;
+  
+  // Preload image when card is revealed
+  useEffect(() => {
+    if (card.revealed && revealedImage) {
+      const img = new Image();
+      img.onload = () => setImageLoaded(true);
+      img.src = revealedImage;
+    } else {
+      setImageLoaded(false);
+    }
+  }, [card.revealed, revealedImage]);
 
   return (
     <div
@@ -100,27 +115,17 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "flex flex-col overflow-hidden",
         "transition-transform transform-gpu",
         colors.border,
-        (isSpymaster && !card.revealed) && colors.bg,
+        colors.bg,
         colors.shadow,
         !card.revealed && "cursor-pointer"
       )}
-      style={{
-        backgroundImage: !card.revealed && !isSpymaster 
-          ? `url('/kelime kartı arkaplan.png')` 
-          : isSpymaster && !card.revealed
-            ? undefined
-            : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundColor: !card.revealed && !isSpymaster ? '#1a1f2e' : undefined
-      }}
     >
-      {/* Revealed card overlay */}
-      {card.revealed && (
+      {/* Revealed card overlay - drops in after image loads */}
+      {card.revealed && imageLoaded && revealedImage && (
         <div 
-          className="absolute inset-0 rounded-lg animate-card-flip"
+          className="absolute inset-0 rounded-lg animate-card-drop"
           style={{
-            backgroundImage: `url('${getRevealedCardImage()}')`,
+            backgroundImage: `url('${revealedImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             zIndex: 20
@@ -177,19 +182,19 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       >
         <div className="flex-1" />
         
-        {/* Word panel - hide when revealed */}
-        {!card.revealed && (
-          <div className={cn(
-            "relative rounded px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
-            "flex items-center justify-center",
-            "border-t border-black/20",
-            isSpymaster ? colors.panel : "bg-slate-700"
-          )}>
+        {/* Word panel - always show but style differently */}
+        <div className={cn(
+          "relative rounded px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
+          "flex items-center justify-center",
+          "border-t border-black/20",
+          colors.panel
+        )}>
+          {!card.revealed && (
             <span className="text-white font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md">
               {card.word}
             </span>
-          </div>
-        )}
+          )}
+        </div>
       </button>
       
       {/* Bottom edge shadow for depth */}
