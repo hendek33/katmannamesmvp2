@@ -301,7 +301,7 @@ export default function Game() {
         </Card>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(150px,15vw)_1fr_minmax(200px,18vw)] xl:grid-cols-[minmax(180px,14vw)_1fr_minmax(220px,16vw)] 2xl:grid-cols-[minmax(200px,12vw)_1fr_minmax(250px,15vw)] gap-2 flex-1 min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(150px,15vw)_1fr_minmax(250px,20vw)] xl:grid-cols-[minmax(180px,14vw)_1fr_minmax(280px,18vw)] 2xl:grid-cols-[minmax(200px,12vw)_1fr_minmax(320px,16vw)] gap-2 flex-1 min-h-0">
           {/* Left Side - Dark Team */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score Card */}
@@ -583,7 +583,7 @@ export default function Game() {
                     )}
                     
                     {/* Reveal history with better formatting */}
-                    {gameState.revealHistory.slice().reverse().map((entry: any, idx) => {
+                    {gameState.revealHistory.slice().map((entry: any, idx) => {
                       const isCorrect = entry.type === entry.team;
                       const isNeutral = entry.type === "neutral";
                       const isAssassin = entry.type === "assassin";
