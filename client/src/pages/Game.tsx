@@ -137,9 +137,9 @@ export default function Game() {
         <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Modern Header */}
         <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
-          <div className="grid grid-cols-3 items-center gap-2">
-            {/* Left Side - Room Code & Players */}
-            <div className="flex items-center gap-1">
+          <div className="grid grid-cols-3 items-center">
+            {/* Left Side - Room Code */}
+            <div className="flex items-center justify-start gap-1">
               <div className="flex items-center gap-2">
                 <div className="text-xs text-muted-foreground">Oda Kodu:</div>
                 <div className="text-sm font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
@@ -172,22 +172,26 @@ export default function Game() {
                 </Button>
               </div>
               
+            </div>
+            
+            {/* Center - Game Status and Players */}
+            <div className="flex justify-center items-center gap-2">
               {/* Players Dialog */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-7 border-2 hover:border-blue-500 hover:bg-blue-500/10"
+                    className="h-6 px-2 border hover:border-blue-500 hover:bg-blue-500/10"
                   >
-                    <Users className="w-3 h-3 mr-1" />
-                    Oyuncular ({gameState.players.length})
+                    <Users className="w-2.5 h-2.5 mr-0.5" />
+                    <span className="text-[10px]">{gameState.players.length}</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-slate-900/95 border-2 border-orange-900/30 max-w-2xl">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
-                      Oyuncular & İzleyiciler
+                      Oyuncular
                     </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4 max-h-96 overflow-y-auto">
@@ -233,10 +237,6 @@ export default function Game() {
                   </div>
                 </DialogContent>
               </Dialog>
-            </div>
-            
-            {/* Center - Game Status */}
-            <div className="flex justify-center">
               {gameState.currentClue ? (
                 <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30">
                   <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
@@ -276,10 +276,10 @@ export default function Game() {
                   variant="outline"
                   onClick={handleRestart}
                   data-testid="button-restart"
-                  className="h-7 border-2 hover:border-amber-500 hover:bg-amber-500/10"
+                  className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
                 >
-                  <RotateCcw className="w-3 h-3 mr-1" />
-                  Yenile
+                  <RotateCcw className="w-2.5 h-2.5 mr-0.5" />
+                  <span className="text-[10px]">Yenile</span>
                 </Button>
               )}
               <Button
@@ -291,10 +291,10 @@ export default function Game() {
                   localStorage.removeItem("katmannames_player_id");
                   setLocation("/rooms");
                 }}
-                className="h-7 border-2 hover:border-red-600 hover:bg-red-600/10"
+                className="h-6 px-2 border hover:border-red-600 hover:bg-red-600/10"
               >
-                <ArrowLeft className="w-3 h-3 mr-1" />
-                Oyundan Çık
+                <ArrowLeft className="w-2.5 h-2.5 mr-0.5" />
+                <span className="text-[10px]">Çık</span>
               </Button>
             </div>
           </div>
@@ -403,52 +403,50 @@ export default function Game() {
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0 z-10">
               {canGiveClue ? (
-                <Card className="px-2 py-2 sm:px-4 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
-                  <div className="space-y-1 sm:space-y-2">
-                    <div className="flex items-center justify-center gap-1 sm:gap-2">
-                      <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400" />
-                      <span className="text-[10px] sm:text-xs font-bold uppercase text-amber-400 tracking-wider">İpucu Ver</span>
+                <Card className="px-2 py-1 sm:px-3 sm:py-1.5 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Lightbulb className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
+                      <span className="text-[9px] sm:text-[10px] font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
                     </div>
-                    <div className="flex flex-col sm:flex-row items-center gap-2">
-                      <Input
-                        data-testid="input-clue-word"
-                        placeholder="İpucu kelimesi..."
-                        value={clueWord}
-                        onChange={(e) => setClueWord(e.target.value.toUpperCase())}
-                        onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
-                        maxLength={20}
-                        className="w-full sm:w-40 text-center font-bold text-xs sm:text-sm uppercase bg-slate-900/70 border-2 border-slate-700 focus:border-amber-500 h-8 sm:h-10 text-slate-100 placeholder:text-slate-500"
-                      />
-                      <div className="flex items-center gap-1">
-                        <Button
-                          type="button"
-                          onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                          className="h-8 sm:h-10 w-8 sm:w-10 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold"
-                        >
-                          -
-                        </Button>
-                        <div className="h-8 sm:h-10 w-12 sm:w-16 flex items-center justify-center bg-slate-900/70 border-2 border-amber-500/60 rounded-md">
-                          <span className="text-lg sm:text-xl font-black text-amber-400">{clueCount}</span>
-                        </div>
-                        <Button
-                          type="button"
-                          onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                          className="h-8 sm:h-10 w-8 sm:w-10 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold"
-                        >
-                          +
-                        </Button>
+                    <Input
+                      data-testid="input-clue-word"
+                      placeholder="İpucu..."
+                      value={clueWord}
+                      onChange={(e) => setClueWord(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
+                      maxLength={20}
+                      className="w-20 sm:w-28 text-center font-bold text-[10px] sm:text-xs uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-6 sm:h-7 text-slate-100 placeholder:text-slate-500"
+                    />
+                    <div className="flex items-center gap-0.5">
+                      <Button
+                        type="button"
+                        onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
+                        className="h-5 sm:h-6 w-5 sm:w-6 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs"
+                      >
+                        -
+                      </Button>
+                      <div className="h-5 sm:h-6 w-8 sm:w-10 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded">
+                        <span className="text-xs sm:text-sm font-black text-amber-400">{clueCount}</span>
                       </div>
                       <Button
-                        onClick={handleGiveClue}
-                        disabled={!clueWord.trim() || parseInt(clueCount) < 0}
-                        data-testid="button-give-clue"
-                        size="sm"
-                        className="h-8 sm:h-10 px-3 sm:px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-sm"
+                        type="button"
+                        onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
+                        className="h-5 sm:h-6 w-5 sm:w-6 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs"
                       >
-                        <Send className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                        Gönder
+                        +
                       </Button>
                     </div>
+                    <Button
+                      onClick={handleGiveClue}
+                      disabled={!clueWord.trim() || parseInt(clueCount) < 0}
+                      data-testid="button-give-clue"
+                      size="sm"
+                      className="h-5 sm:h-6 px-2 sm:px-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-[9px] sm:text-[10px]"
+                    >
+                      <Send className="w-2 h-2 sm:w-2.5 sm:h-2.5 mr-0.5" />
+                      Gönder
+                    </Button>
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
