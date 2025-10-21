@@ -24,6 +24,7 @@ export default function Game() {
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
+  const logContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (error) {
@@ -40,6 +41,13 @@ export default function Game() {
       setLocation("/end");
     }
   }, [gameState, setLocation]);
+
+  // Auto-scroll to bottom when new log entries are added
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  }, [gameState?.revealHistory, gameState?.currentClue]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -845,12 +853,12 @@ export default function Game() {
             </Card>
 
             {/* Game Log Card */}
-            <Card className="p-2 lg:p-3 xl:p-4 2xl:p-5 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-amber-700/50 backdrop-blur-md shadow-xl flex flex-col flex-1 min-h-0 overflow-hidden">
-              <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
-                <Clock className="w-3 h-3 lg:w-4 lg:h-4 text-amber-400" />
-                <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-amber-300 uppercase tracking-wide">Oyun Günlüğü</h4>
+            <Card className="p-1.5 lg:p-2 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-amber-700/50 backdrop-blur-md shadow-xl flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="flex items-center gap-1 mb-1">
+                <Clock className="w-2.5 h-2.5 text-amber-400" />
+                <h4 className="text-[9px] lg:text-[10px] font-bold text-amber-300 uppercase">Günlük</h4>
               </div>
-              <div className="flex-1 overflow-y-auto min-h-0 space-y-1 lg:space-y-1.5">
+              <div ref={logContainerRef} className="flex-1 overflow-y-auto min-h-0 space-y-0.5 scroll-smooth">
                 {/* Show game events in chronological order */}
                 {gameState.revealHistory.length === 0 && !gameState.currentClue ? (
                   <div className="text-[9px] lg:text-[10px] xl:text-xs text-gray-500 italic p-2">
@@ -860,20 +868,11 @@ export default function Game() {
                   <>
                     {/* Current clue if exists */}
                     {gameState.currentClue && (
-                      <div className="p-1.5 lg:p-2 bg-amber-600/20 rounded border border-amber-500/30">
-                        <div className="flex items-start gap-1 lg:gap-2">
-                          <Lightbulb className="w-3 h-3 text-amber-400 mt-0.5" />
-                          <div className="flex-1">
-                            <div className="text-[8px] lg:text-[9px] xl:text-[10px] text-amber-300">
-                              {gameState.currentTeam === "dark" ? 
-                                `${gameState.darkTeamName} İpucu Verdi` : 
-                                `${gameState.lightTeamName} İpucu Verdi`}
-                            </div>
-                            <div className="text-[10px] lg:text-xs xl:text-sm font-bold text-amber-100">
-                              "{gameState.currentClue.word}" - {gameState.currentClue.count} kelime
-                            </div>
-                          </div>
-                        </div>
+                      <div className="p-1 bg-amber-600/20 rounded text-[8px] border border-amber-500/30 flex items-center gap-1">
+                        <Lightbulb className="w-2 h-2 text-amber-400" />
+                        <span className="font-bold text-amber-100">
+                          {gameState.currentClue.word} ({gameState.currentClue.count})
+                        </span>
                       </div>
                     )}
                     
@@ -929,35 +928,25 @@ export default function Game() {
                       return (
                         <div 
                           key={idx} 
-                          className={`p-1.5 lg:p-2 rounded border ${bgClass} ${borderClass}`}
+                          className={`px-1 py-0.5 rounded text-[8px] ${bgClass} ${borderClass} border flex items-center gap-1`}
                         >
-                          <div className="flex items-start gap-1 lg:gap-2">
-                            <div className={`w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full mt-0.5 ${
-                              entry.type === "dark" ? "bg-blue-500" :
-                              entry.type === "light" ? "bg-red-500" :
-                              entry.type === "neutral" ? "bg-gray-400" :
-                              "bg-red-700"
-                            }`} />
-                            <div className="flex-1">
-                              <div className="text-[8px] lg:text-[9px] xl:text-[10px] text-gray-400">
-                                <span className="font-semibold text-gray-300">{playerName}</span> tahmin etti
-                              </div>
-                              <div className="text-[10px] lg:text-xs xl:text-sm font-semibold text-gray-200">
-                                "{entry.word}" kelimesine bastı
-                              </div>
-                              <div className="text-[8px] lg:text-[9px] xl:text-[10px] mt-0.5">
-                                {isAssassin ? (
-                                  <span className="text-red-400 font-bold">❌ Suikastçı! Oyun bitti!</span>
-                                ) : isNeutral ? (
-                                  <span className="text-gray-400">➖ Tarafsız kart, tur sona erdi</span>
-                                ) : isCorrect ? (
-                                  <span className="text-green-400">✓ Doğru tahmin!</span>
-                                ) : (
-                                  <span className="text-orange-400">✗ Yanlış tahmin, tur değişti</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            entry.type === "dark" ? "bg-blue-500" :
+                            entry.type === "light" ? "bg-red-500" :
+                            entry.type === "neutral" ? "bg-gray-400" :
+                            "bg-red-700"
+                          }`} />
+                          <span className="font-semibold">{entry.word}</span>
+                          <span className="text-gray-400">-</span>
+                          {isAssassin ? (
+                            <span className="text-red-400">❌ Suikastçı!</span>
+                          ) : isNeutral ? (
+                            <span className="text-gray-400">➖ Tarafsız</span>
+                          ) : isCorrect ? (
+                            <span className="text-green-400">✓</span>
+                          ) : (
+                            <span className="text-orange-400">✗</span>
+                          )}
                         </div>
                       );
                     })}
@@ -966,20 +955,18 @@ export default function Game() {
               </div>
               
               {/* Quick stats at bottom */}
-              <div className="mt-2 lg:mt-3 pt-2 lg:pt-3 border-t border-slate-700/50">
-                <div className="grid grid-cols-3 gap-1 text-center">
-                  <div>
-                    <div className="text-[8px] lg:text-[9px] text-gray-500">Açılan</div>
-                    <div className="text-[10px] lg:text-xs font-bold text-gray-300">{gameState.revealHistory.length}/25</div>
-                  </div>
-                  <div>
-                    <div className="text-[8px] lg:text-[9px] text-gray-500">Koyu</div>
-                    <div className="text-[10px] lg:text-xs font-bold text-blue-400">{gameState.darkCardsRemaining}</div>
-                  </div>
-                  <div>
-                    <div className="text-[8px] lg:text-[9px] text-gray-500">Açık</div>
-                    <div className="text-[10px] lg:text-xs font-bold text-red-400">{gameState.lightCardsRemaining}</div>
-                  </div>
+              <div className="mt-1 pt-1 border-t border-slate-700/50 flex justify-around text-[8px]">
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-500">Açılan:</span>
+                  <span className="font-bold text-gray-300">{gameState.revealHistory.length}/25</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-500">Koyu:</span>
+                  <span className="font-bold text-blue-400">{gameState.darkCardsRemaining}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-500">Açık:</span>
+                  <span className="font-bold text-red-400">{gameState.lightCardsRemaining}</span>
                 </div>
               </div>
             </Card>
