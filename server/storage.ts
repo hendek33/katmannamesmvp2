@@ -20,6 +20,7 @@ export interface IStorage {
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null;
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
   updateTeamName(roomCode: string, team: Team, name: string): GameState | null;
+  updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
   startGame(roomCode: string): GameState | null;
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null;
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
@@ -170,6 +171,10 @@ export class MemStorage implements IStorage {
       lightTeamName: "Kırmızı Takım",
       hasPassword: !!password,
       createdAt: Date.now(),
+      timedMode: false,
+      spymasterTime: 120, // Default 2 minutes for Intelligence Chiefs
+      guesserTime: 180, // Default 3 minutes for Agents
+      currentTurnStartTime: null,
     };
 
     this.rooms.set(roomCode, { 
@@ -369,6 +374,21 @@ export class MemStorage implements IStorage {
     return room;
   }
 
+  updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow timer settings to be changed in lobby
+    if (room.phase !== "lobby") return null;
+
+    room.timedMode = timedMode;
+    room.spymasterTime = spymasterTime;
+    room.guesserTime = guesserTime;
+
+    return room;
+  }
+
   startGame(roomCode: string): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
@@ -397,6 +417,11 @@ export class MemStorage implements IStorage {
     // Reset guess tracking
     roomData.guessesRemaining = 0;
     roomData.maxGuesses = 0;
+    
+    // Start timer if timed mode is enabled
+    if (room.timedMode) {
+      room.currentTurnStartTime = Date.now();
+    }
 
     return room;
   }
@@ -421,6 +446,11 @@ export class MemStorage implements IStorage {
     // Set guess limit to clue count + 1
     roomData.maxGuesses = count + 1;
     roomData.guessesRemaining = count + 1;
+    
+    // Reset timer for guessing phase if timed mode is enabled
+    if (room.timedMode) {
+      room.currentTurnStartTime = Date.now();
+    }
 
     return room;
   }
@@ -513,6 +543,11 @@ export class MemStorage implements IStorage {
       roomData.maxGuesses = 0;
       // Clear votes when turn ends
       roomData.cardVotes.clear();
+      
+      // Reset timer for new team's turn if timed mode is enabled
+      if (room.timedMode) {
+        room.currentTurnStartTime = Date.now();
+      }
     }
 
     return room;
@@ -544,6 +579,11 @@ export class MemStorage implements IStorage {
     roomData.maxGuesses = 0;
     // Clear votes on restart
     roomData.cardVotes.clear();
+    
+    // Reset timer if timed mode is enabled
+    if (room.timedMode) {
+      room.currentTurnStartTime = Date.now();
+    }
 
     return room;
   }
@@ -567,6 +607,9 @@ export class MemStorage implements IStorage {
     roomData.maxGuesses = 0;
     // Clear votes on return to lobby
     roomData.cardVotes.clear();
+    
+    // Clear timer when returning to lobby
+    room.currentTurnStartTime = null;
 
     return room;
   }
@@ -608,6 +651,11 @@ export class MemStorage implements IStorage {
     roomData.maxGuesses = 0;
     // Clear votes when turn ends
     roomData.cardVotes.clear();
+    
+    // Reset timer for new team's turn if timed mode is enabled
+    if (room.timedMode) {
+      room.currentTurnStartTime = Date.now();
+    }
     
     return room;
   }

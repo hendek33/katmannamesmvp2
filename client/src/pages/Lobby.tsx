@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft, Eye, EyeOff, Timer } from "lucide-react";
 import type { Team } from "@shared/schema";
 
 export default function Lobby() {
@@ -20,6 +22,9 @@ export default function Lobby() {
   const [copied, setCopied] = useState(false);
   const [username, setUsername] = useState("");
   const [showRoomCode, setShowRoomCode] = useState(false);
+  const [timedMode, setTimedMode] = useState(false);
+  const [spymasterTime, setSpymasterTime] = useState(120); // 2 minutes default
+  const [guesserTime, setGuesserTime] = useState(180); // 3 minutes default
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("katmannames_username");
@@ -45,6 +50,15 @@ export default function Lobby() {
       setLocation("/game");
     }
   }, [gameState, setLocation]);
+
+  useEffect(() => {
+    // Sync timer settings from gameState
+    if (gameState) {
+      setTimedMode(gameState.timedMode);
+      setSpymasterTime(gameState.spymasterTime);
+      setGuesserTime(gameState.guesserTime);
+    }
+  }, [gameState]);
 
   const handleCreateRoom = () => {
     if (username) {
@@ -98,6 +112,14 @@ export default function Lobby() {
     if (team === "dark" || team === "light") {
       send("update_team_name", { team, name });
     }
+  };
+
+  const handleTimerSettingsUpdate = (mode: boolean, spyTime: number, guessTime: number) => {
+    send("update_timer_settings", { 
+      timedMode: mode,
+      spymasterTime: spyTime,
+      guesserTime: guessTime 
+    });
   };
 
   if (!isConnected) {
@@ -470,6 +492,80 @@ export default function Lobby() {
                     </div>
                   </div>
                 </div>
+              </Card>
+            )}
+
+            {/* Timer Settings - Compact */}
+            {currentPlayer?.isRoomOwner && (
+              <Card className="p-3 sm:p-4 space-y-3 border-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-4 h-4 text-purple-600" />
+                    <h3 className="text-sm font-bold">Zamanlayıcı Ayarları</h3>
+                  </div>
+                  <Switch
+                    checked={timedMode}
+                    onCheckedChange={(checked) => {
+                      setTimedMode(checked);
+                      handleTimerSettingsUpdate(checked, spymasterTime, guesserTime);
+                    }}
+                    data-testid="switch-timed-mode"
+                  />
+                </div>
+                
+                {timedMode && (
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-xs">İstihbarat Şefi Süresi</Label>
+                        <span className="text-xs font-mono text-muted-foreground">
+                          {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[spymasterTime]}
+                        onValueChange={([value]) => {
+                          setSpymasterTime(value);
+                        }}
+                        onValueCommit={([value]) => {
+                          handleTimerSettingsUpdate(timedMode, value, guesserTime);
+                        }}
+                        min={30}
+                        max={600}
+                        step={30}
+                        className="w-full"
+                        data-testid="slider-spymaster-time"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-xs">Ajan Süresi</Label>
+                        <span className="text-xs font-mono text-muted-foreground">
+                          {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[guesserTime]}
+                        onValueChange={([value]) => {
+                          setGuesserTime(value);
+                        }}
+                        onValueCommit={([value]) => {
+                          handleTimerSettingsUpdate(timedMode, spymasterTime, value);
+                        }}
+                        min={30}
+                        max={600}
+                        step={30}
+                        className="w-full"
+                        data-testid="slider-guesser-time"
+                      />
+                    </div>
+                    
+                    <div className="text-[10px] text-muted-foreground text-center">
+                      Süre bittiğinde tur otomatik bitmez, sadece görsel olarak gösterilir
+                    </div>
+                  </div>
+                )}
               </Card>
             )}
 

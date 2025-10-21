@@ -50,6 +50,10 @@ export interface GameState {
   lightTeamName: string;
   hasPassword: boolean;
   createdAt: number;
+  timedMode: boolean;
+  spymasterTime: number; // Time in seconds for Intelligence Chiefs
+  guesserTime: number; // Time in seconds for Agents
+  currentTurnStartTime: number | null; // Timestamp when current turn started
 }
 
 export interface RoomListItem {
@@ -99,6 +103,12 @@ export const updateTeamNameSchema = z.object({
   name: z.string().min(1).max(20),
 });
 
+export const updateTimerSettingsSchema = z.object({
+  timedMode: z.boolean(),
+  spymasterTime: z.number().min(30).max(600), // 30 seconds to 10 minutes
+  guesserTime: z.number().min(30).max(600), // 30 seconds to 10 minutes
+});
+
 export type JoinRoomInput = z.infer<typeof joinRoomSchema>;
 export type CreateRoomInput = z.infer<typeof createRoomSchema>;
 export type TeamSelectInput = z.infer<typeof teamSelectSchema>;
@@ -107,3 +117,4 @@ export type GiveClueInput = z.infer<typeof giveClueSchema>;
 export type RevealCardInput = z.infer<typeof revealCardSchema>;
 export type AddBotInput = z.infer<typeof addBotSchema>;
 export type UpdateTeamNameInput = z.infer<typeof updateTeamNameSchema>;
+export type UpdateTimerSettingsInput = z.infer<typeof updateTimerSettingsSchema>;

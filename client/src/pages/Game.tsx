@@ -7,6 +7,7 @@ import { ClueDisplay } from "@/components/ClueDisplay";
 import { PlayerList } from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
+import { GameTimer } from "@/components/GameTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -987,6 +988,22 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
+            {/* Timer Display - Positioned at top */}
+            {gameState.phase === "playing" && gameState.timedMode && (
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2" style={{ zIndex: 50 }}>
+                <GameTimer
+                  isActive={gameState.phase === "playing" && !!gameState.currentTurnStartTime}
+                  startTime={gameState.currentTurnStartTime}
+                  duration={
+                    !gameState.currentClue
+                      ? gameState.spymasterTime  // Time for Intelligence Chief to give clue
+                      : gameState.guesserTime     // Time for Agents to guess
+                  }
+                  label={!gameState.currentClue ? "İstihbarat Şefi Süresi" : "Ajan Süresi"}
+                />
+              </div>
+            )}
+            
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers - Positioned to the left */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && gameState.phase !== "ended" && (

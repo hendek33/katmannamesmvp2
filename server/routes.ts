@@ -13,6 +13,7 @@ import {
   revealCardSchema,
   addBotSchema,
   updateTeamNameSchema,
+  updateTimerSettingsSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -321,6 +322,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const gameState = storage.updateTeamName(ws.roomCode, validation.data.team, validation.data.name);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Takım ismi güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
+          case "update_timer_settings": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi zamanlayıcı ayarlarını değiştirebilir" } });
+              return;
+            }
+
+            const validation = updateTimerSettingsSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz zamanlayıcı ayarları" } });
+              return;
+            }
+
+            const gameState = storage.updateTimerSettings(
+              ws.roomCode,
+              validation.data.timedMode,
+              validation.data.spymasterTime,
+              validation.data.guesserTime
+            );
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Zamanlayıcı ayarları güncellenemedi" } });
               return;
             }
 
