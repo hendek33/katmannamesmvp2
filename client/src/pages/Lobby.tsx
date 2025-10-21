@@ -89,6 +89,10 @@ export default function Lobby() {
     send("add_bot", { team, role });
   };
 
+  const handleRemoveBot = (botId: string) => {
+    send("remove_bot", { botId });
+  };
+
   const handleTeamNameChange = (team: Team, name: string) => {
     if (team === "dark" || team === "light") {
       send("update_team_name", { team, name });
