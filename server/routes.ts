@@ -368,6 +368,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
             }
+            
+            // Send updated votes (empty after turn change)
+            const votes = storage.getCardVotes(ws.roomCode);
+            broadcastToRoom(ws.roomCode, {
+              type: "votes_updated", 
+              payload: { votes: votes ? Object.fromEntries(votes) : {} },
+            });
             break;
           }
 
@@ -494,6 +501,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             broadcastToRoom(ws.roomCode, {
               type: "game_updated",
               payload: { gameState },
+            });
+            
+            // Send updated votes (empty after turn change)
+            const votes = storage.getCardVotes(ws.roomCode);
+            broadcastToRoom(ws.roomCode, {
+              type: "votes_updated",
+              payload: { votes: votes ? Object.fromEntries(votes) : {} },
             });
             break;
           }
