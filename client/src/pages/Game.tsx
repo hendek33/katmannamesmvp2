@@ -917,7 +917,12 @@ export default function Game() {
                               }`} />
                               <span className="font-semibold text-gray-200">{playerName}</span>
                               <span className="text-gray-400">→</span>
-                              <span className="font-bold text-white">{entry.word}</span>
+                              <span className={`font-bold ${
+                                entry.type === "dark" ? "text-blue-400" :
+                                entry.type === "light" ? "text-red-400" :
+                                entry.type === "neutral" ? "text-gray-100" :
+                                "text-red-950"
+                              }`}>{entry.word}</span>
                               {isAssassin ? (
                                 <span className="text-red-400 ml-auto font-bold">❌ Suikastçı!</span>
                               ) : isNeutral ? (
