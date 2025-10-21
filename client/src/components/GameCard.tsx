@@ -26,28 +26,28 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           return {
             bg: "bg-gradient-to-br from-blue-500 to-blue-600",
             border: "border-blue-400",
-            panel: "bg-transparent",
+            panel: "bg-black",
             shadow: "shadow-xl shadow-blue-900/50",
           };
         case "light":
           return {
             bg: "bg-gradient-to-br from-red-500 to-red-600",
             border: "border-red-400",
-            panel: "bg-transparent",
+            panel: "bg-black",
             shadow: "shadow-xl shadow-red-900/50",
           };
         case "neutral":
           return {
             bg: "bg-gradient-to-br from-stone-200 to-stone-300",
             border: "border-stone-100",
-            panel: "bg-transparent",
+            panel: "bg-black",
             shadow: "shadow-lg shadow-stone-700/30",
           };
         case "assassin":
           return {
             bg: "bg-gradient-to-br from-gray-800 to-gray-900",
             border: "border-gray-700",
-            panel: "bg-transparent",
+            panel: "bg-black",
             shadow: "shadow-2xl shadow-black/70",
           };
       }
@@ -56,7 +56,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     return {
       bg: "bg-gradient-to-br from-slate-300 to-slate-400",
       border: "border-slate-200",
-      panel: "bg-transparent",
+      panel: "bg-black",
       shadow: "shadow-lg shadow-slate-800/40",
     };
   };
