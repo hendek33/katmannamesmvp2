@@ -349,7 +349,12 @@ export class MemStorage implements IStorage {
       team: room.currentTeam,
       timestamp: Date.now(),
       playerId: player.id,
-      playerUsername: player.username
+      playerUsername: player.username,
+      // Add clue information for this guess
+      clue: room.currentClue ? {
+        word: room.currentClue.word,
+        count: room.currentClue.count
+      } : null
     };
     room.revealHistory.push(historyEntry);
     

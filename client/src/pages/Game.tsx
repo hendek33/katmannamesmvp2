@@ -866,47 +866,55 @@ export default function Game() {
                   </div>
                 ) : (
                   <>
-                    {/* Current clue if exists */}
-                    {gameState.currentClue && (
-                      <div className={`p-1.5 rounded text-[11px] border flex items-center gap-1.5 mb-2 ${
-                        gameState.currentTeam === "dark" ? 
-                          "bg-blue-800/40 border-blue-600/50" : 
-                          "bg-red-800/40 border-red-600/50"
-                      }`}>
-                        <Lightbulb className="w-3 h-3 text-amber-400" />
-                        <span className="font-bold text-amber-100">
-                          {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} İpucu: 
-                        </span>
-                        <span className="font-bold text-white">
-                          {gameState.currentClue.word} ({gameState.currentClue.count})
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Reveal history with better formatting */}
-                    {gameState.revealHistory.slice().map((entry: any, idx) => {
-                      const isCorrect = entry.type === entry.team;
-                      const isNeutral = entry.type === "neutral";
-                      const isAssassin = entry.type === "assassin";
-                      const isWrong = !isCorrect && !isNeutral && !isAssassin;
+                    {/* Reveal history grouped by turns with clues */}
+                    {(() => {
+                      let currentClueKey: string | null = null;
+                      const groupedEntries: JSX.Element[] = [];
                       
-                      // Get player name from entry if available, fallback to team name
-                      const playerName = entry.playerUsername || 
-                        (entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName);
-                      
-                      // Check if team changed (new turn)
-                      const prevEntry = idx > 0 ? gameState.revealHistory[idx - 1] : null;
-                      const isNewTurn = idx > 0 && prevEntry && prevEntry.team !== entry.team;
-                      
-                      return (
-                        <div key={idx}>
-                          {/* Add separator for new turns */}
-                          {isNewTurn && (
-                            <div className="my-1.5 border-t-2 border-gray-600/70"></div>
-                          )}
+                      gameState.revealHistory.forEach((entry: any, idx: number) => {
+                        const isCorrect = entry.type === entry.team;
+                        const isNeutral = entry.type === "neutral";
+                        const isAssassin = entry.type === "assassin";
+                        
+                        // Get player name from entry if available, fallback to team name
+                        const playerName = entry.playerUsername || 
+                          (entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName);
+                        
+                        // Check if this is a new clue/turn
+                        const clueKey = entry.clue ? `${entry.clue.word}-${entry.clue.count}` : 'no-clue';
+                        const isNewClue = clueKey !== currentClueKey;
+                        
+                        if (isNewClue && entry.clue) {
+                          currentClueKey = clueKey;
                           
-                          {/* Guess entry */}
-                          <div className={`p-1.5 rounded text-[11px] border mb-1 ${
+                          // Add turn separator
+                          if (idx > 0) {
+                            groupedEntries.push(
+                              <div key={`sep-${idx}`} className="my-2 border-t-2 border-amber-600/50"></div>
+                            );
+                          }
+                          
+                          // Add clue header
+                          groupedEntries.push(
+                            <div key={`clue-${idx}`} className={`p-1.5 rounded text-[11px] border flex items-center gap-1.5 mb-1 ${
+                              entry.team === "dark" ? 
+                                "bg-blue-800/40 border-blue-600/50" : 
+                                "bg-red-800/40 border-red-600/50"
+                            }`}>
+                              <Lightbulb className="w-3 h-3 text-amber-400" />
+                              <span className="font-bold text-amber-100">
+                                {entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName} İpucu:
+                              </span>
+                              <span className="font-bold text-white">
+                                {entry.clue.word} ({entry.clue.count})
+                              </span>
+                            </div>
+                          );
+                        }
+                        
+                        // Add guess entry
+                        groupedEntries.push(
+                          <div key={`entry-${idx}`} className={`p-1.5 rounded text-[11px] border mb-1 ml-2 ${
                             entry.team === "dark" ? 
                               "bg-blue-900/30 border-blue-600/50" : 
                               "bg-red-900/30 border-red-600/50"
@@ -934,9 +942,40 @@ export default function Game() {
                               )}
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      });
+                      
+                      // Add current clue if exists and no moves yet for this clue
+                      const lastEntry = gameState.revealHistory[gameState.revealHistory.length - 1] as any;
+                      if (gameState.currentClue && (
+                        gameState.revealHistory.length === 0 || 
+                        !lastEntry?.clue ||
+                        lastEntry.clue.word !== gameState.currentClue.word
+                      )) {
+                        if (gameState.revealHistory.length > 0) {
+                          groupedEntries.push(
+                            <div key="sep-current" className="my-2 border-t-2 border-amber-600/50"></div>
+                          );
+                        }
+                        groupedEntries.push(
+                          <div key="clue-current" className={`p-1.5 rounded text-[11px] border flex items-center gap-1.5 mb-1 ${
+                            gameState.currentTeam === "dark" ? 
+                              "bg-blue-800/40 border-blue-600/50" : 
+                              "bg-red-800/40 border-red-600/50"
+                          }`}>
+                            <Lightbulb className="w-3 h-3 text-amber-400" />
+                            <span className="font-bold text-amber-100">
+                              {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} İpucu:
+                            </span>
+                            <span className="font-bold text-white">
+                              {gameState.currentClue.word} ({gameState.currentClue.count})
+                            </span>
+                          </div>
+                        );
+                      }
+                      
+                      return groupedEntries;
+                    })()}
                   </>
                 )}
               </div>
