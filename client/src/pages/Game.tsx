@@ -584,24 +584,55 @@ export default function Game() {
                     
                     {/* Reveal history with better formatting */}
                     {gameState.revealHistory.slice().reverse().map((entry: any, idx) => {
-                      const isCorrect = entry.type === entry.team || 
-                                      (entry.type === "dark" && entry.team === "dark") ||
-                                      (entry.type === "light" && entry.team === "light");
+                      const isCorrect = entry.type === entry.team;
                       const isNeutral = entry.type === "neutral";
                       const isAssassin = entry.type === "assassin";
+                      const isWrong = !isCorrect && !isNeutral && !isAssassin;
                       
                       // Get player name from entry if available, fallback to team name
                       const playerName = entry.playerUsername || 
                         (entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName);
                       
+                      // Determine background based on team and result
+                      let bgClass = "";
+                      let borderClass = "";
+                      
+                      if (entry.team === "dark") {
+                        // Dark team move
+                        if (isCorrect) {
+                          bgClass = "bg-blue-900/40";
+                          borderClass = "border-blue-600/70";
+                        } else if (isAssassin) {
+                          bgClass = "bg-red-950/60";
+                          borderClass = "border-red-600";
+                        } else if (isNeutral) {
+                          bgClass = "bg-blue-950/30";
+                          borderClass = "border-gray-600/50";
+                        } else {
+                          bgClass = "bg-blue-950/30";
+                          borderClass = "border-orange-700/50";
+                        }
+                      } else {
+                        // Light team move
+                        if (isCorrect) {
+                          bgClass = "bg-red-900/40";
+                          borderClass = "border-red-600/70";
+                        } else if (isAssassin) {
+                          bgClass = "bg-red-950/60";
+                          borderClass = "border-red-600";
+                        } else if (isNeutral) {
+                          bgClass = "bg-red-950/30";
+                          borderClass = "border-gray-600/50";
+                        } else {
+                          bgClass = "bg-red-950/30";
+                          borderClass = "border-orange-700/50";
+                        }
+                      }
+                      
                       return (
                         <div 
                           key={idx} 
-                          className={`p-1.5 lg:p-2 rounded border ${
-                            entry.team === "dark" 
-                              ? "bg-blue-950/40 border-blue-700/50" 
-                              : "bg-red-950/40 border-red-700/50"
-                          }`}
+                          className={`p-1.5 lg:p-2 rounded border ${bgClass} ${borderClass}`}
                         >
                           <div className="flex items-start gap-1 lg:gap-2">
                             <div className={`w-2 h-2 lg:w-2.5 lg:h-2.5 rounded-full mt-0.5 ${
