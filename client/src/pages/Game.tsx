@@ -23,8 +23,6 @@ export default function Game() {
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
-  const [scale, setScale] = useState(1);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (error) {
@@ -41,18 +39,6 @@ export default function Game() {
       setLocation("/end");
     }
   }, [gameState, setLocation]);
-
-  // Dynamic scaling disabled - using CSS flexbox
-  useEffect(() => {
-    const calculateScale = () => {
-      setScale(1); // Always scale 1
-    };
-
-    calculateScale();
-    window.addEventListener('resize', calculateScale);
-    
-    return () => window.removeEventListener('resize', calculateScale);
-  }, []);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -148,17 +134,7 @@ export default function Game() {
       {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      <div 
-        ref={containerRef}
-        style={{ 
-          transform: `scale(${scale})`,
-          transformOrigin: 'top center',
-          width: scale < 1 ? `${100 / scale}%` : '100%',
-          marginLeft: scale < 1 ? `${-(100 / scale - 100) / 2}%` : '0',
-          height: scale < 1 ? `${100 / scale}%` : '100%',
-        }}
-        className="relative z-10 p-2 md:p-3 animate-in fade-in duration-500 transition-transform"
-      >
+      <div className="relative z-10 p-2 md:p-3 animate-in fade-in duration-500">
         <div className="w-full h-full flex flex-col gap-2 overflow-hidden">
         {/* Modern Header */}
         <Card className="p-1.5 md:p-2 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
