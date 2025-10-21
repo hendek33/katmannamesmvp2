@@ -27,7 +27,6 @@ export default function Game() {
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
-  const [showClueOverlay, setShowClueOverlay] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
@@ -51,7 +50,7 @@ export default function Game() {
     }
   }, [gameState?.revealHistory, gameState?.currentClue]);
 
-  // Detect clue changes and show overlay
+  // Detect clue changes
   useEffect(() => {
     if (!gameState?.currentClue) {
       previousClueRef.current = null;
@@ -59,20 +58,7 @@ export default function Game() {
     }
 
     const clueKey = `${gameState.currentClue.word}-${gameState.currentClue.count}`;
-    
-    // Check if clue is new
-    if (previousClueRef.current !== clueKey) {
-      setShowClueOverlay(true);
-      
-      // Hide overlay after 2 seconds
-      const timer = setTimeout(() => {
-        setShowClueOverlay(false);
-      }, 2000);
-
-      previousClueRef.current = clueKey;
-      
-      return () => clearTimeout(timer);
-    }
+    previousClueRef.current = clueKey;
   }, [gameState?.currentClue]);
 
   // Detect turn changes and show video
@@ -211,15 +197,6 @@ export default function Game() {
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       
-      {/* Clue Overlay - Darkens background when clue appears */}
-      {showClueOverlay && (
-        <div 
-          className="fixed inset-0 z-[45] bg-black/40 pointer-events-none"
-          style={{
-            animation: 'fadeInOut 2s ease-in-out forwards'
-          }}
-        />
-      )}
 
       {/* Turn Change Video */}
       {showTurnVideo && currentTurn && gameState && (
@@ -1047,10 +1024,7 @@ export default function Game() {
                 </Card>
               ) : gameState.currentClue ? (
                 <Card 
-                  className={cn(
-                    "px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up",
-                    showClueOverlay && "animate-clue-glow"
-                  )}
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up"
                   style={{ zIndex: 50, position: 'relative' }}
                 >
                   <div className="text-center">

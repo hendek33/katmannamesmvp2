@@ -468,23 +468,19 @@
   animation: clueAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
 
-/* Clue slide from center animation - synchronized with overlay */
+/* Clue slide from center animation */
 @keyframes clueSlideFromCenter {
   0% {
     opacity: 0;
-    transform: translateY(-300px) scale(1.5);
+    transform: translateY(-250px) scale(1.4);
   }
-  15% {
+  20% {
     opacity: 1;
-    transform: translateY(-300px) scale(1.5);
+    transform: translateY(-250px) scale(1.4);
   }
-  50% {
+  40% {
     opacity: 1;
-    transform: translateY(-300px) scale(1.5);
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(-250px) scale(1.4);
   }
   100% {
     opacity: 1;
@@ -493,7 +489,7 @@
 }
 
 .animate-clue-slide-up {
-  animation: clueSlideFromCenter 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: clueSlideFromCenter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* Text glow animation */
@@ -528,41 +524,6 @@
   animation: bounceSlow 2s ease-in-out infinite;
 }
 
-/* Fade in and out animation for overlay */
-@keyframes fadeInOut {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-/* Clue glow animation */
-@keyframes clueGlow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.8),
-                0 0 40px rgba(251, 191, 36, 0.6),
-                0 0 60px rgba(251, 191, 36, 0.4),
-                inset 0 0 20px rgba(251, 191, 36, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(251, 191, 36, 1),
-                0 0 60px rgba(251, 191, 36, 0.8),
-                0 0 90px rgba(251, 191, 36, 0.6),
-                inset 0 0 25px rgba(251, 191, 36, 0.2);
-  }
-}
-
-.animate-clue-glow {
-  animation: clueGlow 0.8s ease-in-out infinite;
-}
 
 /* Card drop animation */
 @keyframes cardDrop {
