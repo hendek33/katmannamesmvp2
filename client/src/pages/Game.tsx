@@ -337,7 +337,7 @@ export default function Game() {
 
           {/* Center - Grid */}
           <div className="flex flex-col min-h-0 flex-1 gap-3 items-center justify-center">
-            <div className="grid grid-cols-5 gap-2" data-testid="game-grid">
+            <div className="grid grid-cols-5 gap-2 w-full max-w-[1200px]" data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
                   key={`pos-${index}`}
