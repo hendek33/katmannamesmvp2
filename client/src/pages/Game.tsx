@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { RotateCcw, Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Lobby from "./Lobby";
 
@@ -23,7 +23,6 @@ export default function Game() {
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
-  const [suppressAnim, setSuppressAnim] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -64,16 +63,6 @@ export default function Game() {
 
   const handleRevealCard = (cardId: number) => {
     send("reveal_card", { cardId });
-  };
-
-  const handleRestart = () => {
-    setSuppressAnim(true);
-    send("restart_game", {});
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setSuppressAnim(false);
-      });
-    });
   };
 
   useEffect(() => {
@@ -245,18 +234,6 @@ export default function Game() {
             
             {/* Right Side - Actions */}
             <div className="flex items-center gap-2">
-              {currentPlayer?.isRoomOwner && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleRestart}
-                  data-testid="button-restart"
-                  className="h-7 border-2 hover:border-amber-500 hover:bg-amber-500/10"
-                >
-                  <RotateCcw className="w-3 h-3 mr-1" />
-                  Yenile
-                </Button>
-              )}
               <Button
                 size="sm"
                 variant="outline"
@@ -343,7 +320,7 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className={`flex flex-col min-h-0 flex-1 gap-2 md:gap-3 items-center justify-center ${suppressAnim ? 'no-anim' : ''}`}>
+          <div className="flex flex-col min-h-0 flex-1 gap-2 md:gap-3 items-center justify-center">
             <div className="grid grid-cols-5 gap-1.5 md:gap-2" data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
