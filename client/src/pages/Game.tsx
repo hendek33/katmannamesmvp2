@@ -5,6 +5,7 @@ import { GameCard } from "@/components/GameCard";
 import { GameStatus } from "@/components/GameStatus";
 import { ClueDisplay } from "@/components/ClueDisplay";
 import { PlayerList } from "@/components/PlayerList";
+import { TurnVideo } from "@/components/TurnVideo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -24,7 +25,10 @@ export default function Game() {
   const [clueCount, setClueCount] = useState("1");
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
+  const [showTurnVideo, setShowTurnVideo] = useState(false);
+  const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const previousTurnRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (error) {
@@ -44,6 +48,25 @@ export default function Game() {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [gameState?.revealHistory, gameState?.currentClue]);
+
+  // Detect turn changes and show video
+  useEffect(() => {
+    if (!gameState || gameState.phase !== "playing") return;
+
+    // Use currentTeam and revealHistory length as unique turn identifier
+    const turnKey = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
+    
+    // Check if turn has changed (team switch detected)
+    if (previousTurnRef.current && previousTurnRef.current !== turnKey) {
+      const prevTeam = previousTurnRef.current.split('-')[0];
+      if (prevTeam !== gameState.currentTeam) {
+        setCurrentTurn(gameState.currentTeam);
+        setShowTurnVideo(true);
+      }
+    }
+    
+    previousTurnRef.current = turnKey;
+  }, [gameState?.currentTeam, gameState?.revealHistory?.length, gameState?.phase]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -149,6 +172,15 @@ export default function Game() {
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       
+      {/* Turn Change Video */}
+      {showTurnVideo && currentTurn && gameState && (
+        <TurnVideo
+          team={currentTurn}
+          teamName={currentTurn === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          onComplete={() => setShowTurnVideo(false)}
+        />
+      )}
+
       {/* Game End Notification - Auto disappears */}
       {gameState.phase === "ended" && gameState.winner && (
         <div 

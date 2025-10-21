@@ -376,6 +376,53 @@
   animation: assassinParticle 2s ease-out forwards;
 }
 
+/* Turn video animations */
+@keyframes zoomInRotate {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(-90deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateX(-50%) translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(cos(var(--particle-angle)) * var(--particle-distance)),
+      calc(sin(var(--particle-angle)) * var(--particle-distance))
+    ) scale(0);
+    opacity: 0;
+  }
+}
+
 /* Card drop animation */
 @keyframes cardDrop {
   0% {
