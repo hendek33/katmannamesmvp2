@@ -914,10 +914,7 @@ export default function Game() {
                           }`}>
                             <div className="flex items-center gap-1.5">
                               <div className={`w-2.5 h-2.5 rounded-full ${
-                                entry.type === "dark" ? "bg-blue-500" :
-                                entry.type === "light" ? "bg-red-500" :
-                                entry.type === "neutral" ? "bg-gray-400" :
-                                "bg-red-700"
+                                entry.team === "dark" ? "bg-blue-500" : "bg-red-500"
                               }`} />
                               <span className="font-semibold text-gray-200">{playerName}</span>
                               <span className="text-gray-400">→</span>
