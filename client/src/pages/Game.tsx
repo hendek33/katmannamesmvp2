@@ -336,7 +336,7 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="flex flex-col min-h-0 flex-1 gap-1 items-center justify-between p-1 lg:p-2">
+          <div className="flex flex-col min-h-0 flex-1 gap-1 items-center justify-center p-1 lg:p-2 relative">
             {/* Mobile Score Display */}
             <div className="lg:hidden w-full flex-shrink-0">
               <div className="grid grid-cols-2 gap-2">
@@ -361,7 +361,7 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 gap-[1px] sm:gap-[2px] md:gap-1 w-full max-w-[750px] lg:max-w-[850px] flex-1 min-h-0 overflow-hidden" 
+            <div className="grid grid-cols-5 gap-[1px] sm:gap-[2px] md:gap-1 w-full max-w-[750px] lg:max-w-[850px] min-h-0 overflow-hidden" 
                  data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
@@ -374,10 +374,10 @@ export default function Game() {
               ))}
             </div>
 
-            {/* Clue Input/Display at Bottom */}
-            <div className="flex justify-center flex-shrink-0">
+            {/* Clue Input/Display - Overlay at Bottom */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-2 z-10">
               {canGiveClue ? (
-                <Card className="p-2 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
+                <Card className="p-2 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all backdrop-blur-sm">
                   <div className="space-y-1">
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1.5 text-amber-900">
@@ -417,7 +417,7 @@ export default function Game() {
                   </div>
                 </Card>
               ) : gameState.currentClue ? (
-                <Card className="px-3 py-1.5 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group">
+                <Card className="px-3 py-1.5 border-2 shadow-2xl bg-gradient-to-br from-amber-100 to-orange-100 border-amber-600/50 hover:shadow-amber-500/50 transition-all relative overflow-hidden group backdrop-blur-sm">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shimmer" />
                   <div className="relative text-center">
                     <div className="flex items-center justify-center gap-1.5 text-amber-900/60">
@@ -438,6 +438,7 @@ export default function Game() {
                 </Card>
               ) : null}
             </div>
+
           </div>
 
           {/* Right Side - Light Team */}
