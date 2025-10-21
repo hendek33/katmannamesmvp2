@@ -303,9 +303,9 @@ export default function Game() {
         {/* Main Game Area */}
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(150px,15vw)_1fr_minmax(150px,15vw)] xl:grid-cols-[minmax(180px,14vw)_1fr_minmax(180px,14vw)] 2xl:grid-cols-[minmax(200px,12vw)_1fr_minmax(200px,12vw)] gap-2 flex-1 min-h-0">
           {/* Left Side - Dark Team */}
-          <div className="hidden lg:flex lg:flex-col lg:gap-2">
+          <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score Card */}
-            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
+            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group flex-shrink-0">
               <div className="text-center space-y-0.5 lg:space-y-1">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
@@ -324,7 +324,7 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-2 lg:p-3 xl:p-4 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl">
+            <Card className="p-2 lg:p-3 xl:p-4 border-2 bg-blue-950/80 border-blue-800/30 backdrop-blur-sm shadow-xl flex-shrink-0">
               <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
                 <Users className="w-3 h-3 lg:w-4 lg:h-4 text-blue-400" />
                 <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-blue-100 uppercase tracking-wide">Oyuncular</h4>
@@ -402,7 +402,7 @@ export default function Game() {
                  min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
                  min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
                  max-w-[1000px]
-                 mb-16 sm:mb-20 lg:mb-24" 
+                 mb-2" 
                  data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
@@ -491,9 +491,9 @@ export default function Game() {
           </div>
 
           {/* Right Side - Light Team */}
-          <div className="hidden lg:flex lg:flex-col lg:gap-2">
+          <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score Card */}
-            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
+            <Card className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group flex-shrink-0">
               <div className="text-center space-y-0.5 lg:space-y-1">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-red-600 animate-pulse" />
@@ -512,7 +512,7 @@ export default function Game() {
             </Card>
             
             {/* Players Card */}
-            <Card className="p-2 lg:p-3 xl:p-4 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl">
+            <Card className="p-2 lg:p-3 xl:p-4 border-2 bg-red-950/80 border-red-900/30 backdrop-blur-sm shadow-xl flex-shrink-0">
               <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
                 <Users className="w-3 h-3 lg:w-4 lg:h-4 text-red-500" />
                 <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-red-100 uppercase tracking-wide">Oyuncular</h4>
@@ -550,12 +550,12 @@ export default function Game() {
             </Card>
 
             {/* Game Log Card */}
-            <Card className="p-2 lg:p-3 xl:p-4 2xl:p-5 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-amber-700/50 backdrop-blur-md shadow-xl flex flex-col min-h-0">
+            <Card className="p-2 lg:p-3 xl:p-4 2xl:p-5 border-2 bg-gradient-to-br from-slate-900/95 to-slate-800/95 border-amber-700/50 backdrop-blur-md shadow-xl flex flex-col flex-1 min-h-0 overflow-hidden">
               <div className="flex items-center gap-1 lg:gap-2 mb-2 lg:mb-3 xl:mb-4">
                 <Clock className="w-3 h-3 lg:w-4 lg:h-4 text-amber-400" />
                 <h4 className="text-[10px] lg:text-xs xl:text-sm font-bold text-amber-300 uppercase tracking-wide">Oyun Günlüğü</h4>
               </div>
-              <div className="flex-1 overflow-y-auto min-h-0 max-h-[200px] lg:max-h-[250px] xl:max-h-[300px] space-y-1 lg:space-y-1.5">
+              <div className="flex-1 overflow-y-auto min-h-0 space-y-1 lg:space-y-1.5">
                 {/* Show game events in chronological order */}
                 {gameState.revealHistory.length === 0 && !gameState.currentClue ? (
                   <div className="text-[9px] lg:text-[10px] xl:text-xs text-gray-500 italic p-2">
