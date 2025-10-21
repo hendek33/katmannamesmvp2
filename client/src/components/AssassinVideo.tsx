@@ -65,7 +65,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
             }}
           >
             {/* Video with rounded corners */}
-            <div className="relative w-[90vw] max-w-2xl rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative w-[60vw] max-w-lg rounded-xl overflow-hidden shadow-2xl">
               <video
                 src="/siyah kelime seçme.mp4"
                 autoPlay
