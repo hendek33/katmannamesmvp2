@@ -598,10 +598,9 @@ export default function Game() {
                         <div 
                           key={idx} 
                           className={`p-1.5 lg:p-2 rounded border ${
-                            isAssassin ? "bg-red-900/30 border-red-700/50" :
-                            isNeutral ? "bg-gray-800/30 border-gray-700/30" :
-                            isCorrect ? "bg-green-900/20 border-green-700/30" :
-                            "bg-orange-900/20 border-orange-700/30"
+                            entry.team === "dark" 
+                              ? "bg-blue-950/40 border-blue-700/50" 
+                              : "bg-red-950/40 border-red-700/50"
                           }`}
                         >
                           <div className="flex items-start gap-1 lg:gap-2">
