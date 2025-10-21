@@ -899,12 +899,41 @@ export default function Game() {
                 </div>
               </div>
             </Card>
+            
+            {/* Timer Display - In Left Sidebar */}
+            {gameState.phase === "playing" && gameState.timedMode && (
+              <GameTimer
+                isActive={gameState.phase === "playing" && !!gameState.currentTurnStartTime}
+                startTime={gameState.currentTurnStartTime}
+                duration={
+                  !gameState.currentClue
+                    ? gameState.spymasterTime  // Time for Intelligence Chief to give clue
+                    : gameState.guesserTime     // Time for Agents to guess
+                }
+                label={!gameState.currentClue ? "İstihbarat Şefi Süresi" : "Ajan Süresi"}
+              />
+            )}
           </div>
 
           {/* Center - Grid */}
           <div className="flex flex-col min-h-0 flex-1 gap-1 items-center justify-start p-1 lg:p-2 pb-0 relative pt-4">
             {/* Mobile Score Display */}
             <div className="lg:hidden w-full flex-shrink-0">
+              {/* Timer Display - Mobile */}
+              {gameState.phase === "playing" && gameState.timedMode && (
+                <div className="mb-2">
+                  <GameTimer
+                    isActive={gameState.phase === "playing" && !!gameState.currentTurnStartTime}
+                    startTime={gameState.currentTurnStartTime}
+                    duration={
+                      !gameState.currentClue
+                        ? gameState.spymasterTime  // Time for Intelligence Chief to give clue
+                        : gameState.guesserTime     // Time for Agents to guess
+                    }
+                    label={!gameState.currentClue ? "İstihbarat Şefi Süresi" : "Ajan Süresi"}
+                  />
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-2">
                 <Card 
                   className="p-1.5 border-2 border-blue-700/50 relative overflow-hidden"
@@ -988,22 +1017,6 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            {/* Timer Display - Positioned at top */}
-            {gameState.phase === "playing" && gameState.timedMode && (
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2" style={{ zIndex: 50 }}>
-                <GameTimer
-                  isActive={gameState.phase === "playing" && !!gameState.currentTurnStartTime}
-                  startTime={gameState.currentTurnStartTime}
-                  duration={
-                    !gameState.currentClue
-                      ? gameState.spymasterTime  // Time for Intelligence Chief to give clue
-                      : gameState.guesserTime     // Time for Agents to guess
-                  }
-                  label={!gameState.currentClue ? "İstihbarat Şefi Süresi" : "Ajan Süresi"}
-                />
-              </div>
-            )}
-            
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers - Positioned to the left */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && gameState.phase !== "ended" && (
