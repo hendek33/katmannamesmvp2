@@ -319,11 +319,6 @@ export default function Game() {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-[8px] lg:text-[10px] xl:text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
-                  {gameState.currentTeam === "dark" && (
-                    <div className="inline-block px-1 lg:px-2 py-0.5 bg-blue-600/30 rounded-full">
-                      <p className="text-[7px] lg:text-[9px] xl:text-[10px] text-blue-100 font-bold">● SIRA SIZDE</p>
-                    </div>
-                  )}
                 </div>
               </div>
             </Card>
@@ -505,11 +500,6 @@ export default function Game() {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-[8px] lg:text-[10px] xl:text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
-                  {gameState.currentTeam === "light" && (
-                    <div className="inline-block px-1 lg:px-2 py-0.5 bg-red-700/30 rounded-full">
-                      <p className="text-[7px] lg:text-[9px] xl:text-[10px] text-red-100 font-bold">● SIRA SIZDE</p>
-                    </div>
-                  )}
                 </div>
               </div>
             </Card>
