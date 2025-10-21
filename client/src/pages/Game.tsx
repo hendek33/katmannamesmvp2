@@ -138,7 +138,7 @@ export default function Game() {
         {/* Modern Header - 3 Separate Sections */}
         <div className="grid grid-cols-3 gap-2 flex-shrink-0">
           {/* Left Section - Room Code */}
-          <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30 hover:shadow-blue-500/20 transition-all">
+          <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30 hover:shadow-blue-500/20 transition-all">
             <div className="flex items-center justify-start gap-1 h-full">
               <div className="flex items-center gap-2">
                 <div className="text-xs text-muted-foreground">Oda Kodu:</div>
@@ -175,8 +175,8 @@ export default function Game() {
           </Card>
           
           {/* Center Section - Game Status and Players */}
-          <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-amber-900/30 hover:shadow-amber-500/20 transition-all">
-            <div className="flex justify-center items-center gap-2 h-full">
+          <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-amber-900/30 hover:shadow-amber-500/20 transition-all">
+            <div className="flex justify-center items-center gap-1 h-full">
               {/* Players Dialog */}
               <Dialog>
                 <DialogTrigger asChild>
@@ -271,7 +271,7 @@ export default function Game() {
           </Card>
           
           {/* Right Section - Actions */}
-          <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
+          <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
             <div className="flex items-center gap-1 justify-end h-full">
               {currentPlayer?.isRoomOwner && (
                 <>
@@ -608,19 +608,34 @@ export default function Game() {
                 <div className="space-y-0.5">
                   <p className="text-[8px] lg:text-[10px] xl:text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
-                {/* Minimal Player List */}
-                <div className="mt-2 pt-2 border-t border-blue-700/30 flex flex-wrap justify-center gap-1 lg:gap-1.5">
-                  {darkPlayers.map((player, idx) => (
-                    <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-blue-200/80 flex items-center gap-0.5">
-                      <span className={player.id === playerId ? "font-bold text-blue-100" : ""}>
-                        {player.username}
-                      </span>
-                      {player.role === "spymaster" && (
-                        <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
-                      )}
-                      {idx < darkPlayers.length - 1 && <span className="text-blue-500/50">•</span>}
+                {/* Player List - Separated by Role */}
+                <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-1">
+                  {/* Spymaster */}
+                  {darkPlayers.filter(p => p.role === "spymaster").length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {darkPlayers.filter(p => p.role === "spymaster").map(player => (
+                        <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
+                          <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
+                          <span className={player.id === playerId ? "font-bold" : ""}>
+                            {player.username}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {/* Guessers */}
+                  {darkPlayers.filter(p => p.role === "guesser").length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {darkPlayers.filter(p => p.role === "guesser").map((player, idx, arr) => (
+                        <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-blue-200/80 flex items-center">
+                          <span className={player.id === playerId ? "font-bold text-blue-100" : ""}>
+                            {player.username}
+                          </span>
+                          {idx < arr.length - 1 && <span className="text-blue-500/50 ml-2">•</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
@@ -710,17 +725,17 @@ export default function Game() {
                       <Button
                         type="button"
                         onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                        className="h-5 sm:h-6 w-5 sm:w-6 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs"
+                        className="h-4 sm:h-5 w-4 sm:w-5 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px]"
                       >
                         -
                       </Button>
-                      <div className="h-5 sm:h-6 w-8 sm:w-10 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded">
-                        <span className="text-xs sm:text-sm font-black text-amber-400">{clueCount}</span>
+                      <div className="h-4 sm:h-5 w-7 sm:w-8 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded">
+                        <span className="text-[10px] sm:text-xs font-black text-amber-400">{clueCount}</span>
                       </div>
                       <Button
                         type="button"
                         onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                        className="h-5 sm:h-6 w-5 sm:w-6 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs"
+                        className="h-4 sm:h-5 w-4 sm:w-5 p-0 bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-[10px]"
                       >
                         +
                       </Button>
@@ -779,19 +794,34 @@ export default function Game() {
                 <div className="space-y-0.5">
                   <p className="text-[8px] lg:text-[10px] xl:text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
-                {/* Minimal Player List */}
-                <div className="mt-2 pt-2 border-t border-red-700/30 flex flex-wrap justify-center gap-1 lg:gap-1.5">
-                  {lightPlayers.map((player, idx) => (
-                    <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-red-200/80 flex items-center gap-0.5">
-                      <span className={player.id === playerId ? "font-bold text-red-100" : ""}>
-                        {player.username}
-                      </span>
-                      {player.role === "spymaster" && (
-                        <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
-                      )}
-                      {idx < lightPlayers.length - 1 && <span className="text-red-500/50">•</span>}
+                {/* Player List - Separated by Role */}
+                <div className="mt-2 pt-2 border-t border-red-700/30 space-y-1">
+                  {/* Spymaster */}
+                  {lightPlayers.filter(p => p.role === "spymaster").length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {lightPlayers.filter(p => p.role === "spymaster").map(player => (
+                        <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
+                          <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
+                          <span className={player.id === playerId ? "font-bold" : ""}>
+                            {player.username}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {/* Guessers */}
+                  {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {lightPlayers.filter(p => p.role === "guesser").map((player, idx, arr) => (
+                        <div key={player.id} className="text-[9px] lg:text-[10px] xl:text-xs text-red-200/80 flex items-center">
+                          <span className={player.id === playerId ? "font-bold text-red-100" : ""}>
+                            {player.username}
+                          </span>
+                          {idx < arr.length - 1 && <span className="text-red-500/50 ml-2">•</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
