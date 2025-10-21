@@ -418,7 +418,7 @@ export default function Game() {
                         {darkPlayers.map(player => (
                           <div key={player.id} className="flex items-center justify-between p-2 rounded bg-blue-950/50 border border-blue-800/30">
                             <span className="text-sm text-blue-100">{player.username}</span>
-                            <span className="text-xs text-blue-300">{player.role === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
+                            <span className="text-xs text-blue-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
                           </div>
                         ))}
                       </div>
@@ -431,7 +431,7 @@ export default function Game() {
                         {lightPlayers.map(player => (
                           <div key={player.id} className="flex items-center justify-between p-2 rounded bg-red-950/50 border border-red-800/30">
                             <span className="text-sm text-red-100">{player.username}</span>
-                            <span className="text-xs text-red-300">{player.role === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
+                            <span className="text-xs text-red-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
                           </div>
                         ))}
                       </div>
