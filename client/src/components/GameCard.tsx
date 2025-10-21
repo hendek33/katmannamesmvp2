@@ -40,11 +40,11 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           };
         case "neutral":
           return {
-            bg: "bg-gradient-to-br from-stone-200 to-stone-300",
-            border: "border-stone-100",
+            bg: "bg-gradient-to-br from-[#f0dbb9] to-[#e5d0a8]",
+            border: "border-[#d9c4a2]",
             panel: "bg-white",
             textColor: "text-black",
-            shadow: "shadow-lg shadow-stone-700/30",
+            shadow: "shadow-lg shadow-[#c9b492]/30",
           };
         case "assassin":
           return {

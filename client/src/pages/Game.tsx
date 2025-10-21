@@ -317,7 +317,8 @@ export default function Game() {
           </Card>
           
           {/* Right Section - Actions */}
-          <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
+          <div className="lg:w-[250px] xl:w-[280px] 2xl:w-[320px]">
+            <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
             <div className="flex items-center gap-1 justify-end h-full">
               {currentPlayer?.isRoomOwner && (
                 <>
@@ -634,61 +635,6 @@ export default function Game() {
           </Card>
             </div>
           </div>
-
-          {/* Right Section - Controls */}
-          <div className="lg:w-[250px] xl:w-[280px] 2xl:w-[320px]">
-            <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
-              <div className="flex items-center justify-end gap-1 h-full">
-                {currentPlayer?.isRoomOwner && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        send("restart_game", {});
-                        toast({
-                          title: "Oyun Yenilendi",
-                          description: "Yeni kelimeler atandı",
-                        });
-                      }}
-                      data-testid="button-restart"
-                      className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
-                    >
-                      <RotateCcw className="w-2.5 h-2.5 mr-0.5" />
-                      <span className="text-[10px]">Yenile</span>
-                    </Button>
-                  </>
-                )}
-                {/* Team/Role Change Dialog - duplicate from center for consistency */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      data-testid="button-change-team"
-                      className="h-6 px-2 border hover:border-green-500 hover:bg-green-500/10"
-                    >
-                      <Users className="w-2.5 h-2.5 mr-0.5" />
-                      <span className="text-[10px]">Takım</span>
-                    </Button>
-                  </DialogTrigger>
-                </Dialog>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    send("leave_room", {});
-                    localStorage.removeItem("katmannames_room_code");
-                    localStorage.removeItem("katmannames_player_id");
-                    setLocation("/rooms");
-                  }}
-                  className="h-6 px-2 border hover:border-red-600 hover:bg-red-600/10"
-                >
-                  <ArrowLeft className="w-2.5 h-2.5 mr-0.5" />
-                  <span className="text-[10px]">Çık</span>
-                </Button>
-              </div>
-            </Card>
           </div>
         </div>
 
