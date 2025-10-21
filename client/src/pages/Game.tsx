@@ -124,7 +124,7 @@ export default function Game() {
   const lightPlayers = gameState.players.filter(p => p.team === "light");
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-900 relative">
+    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
