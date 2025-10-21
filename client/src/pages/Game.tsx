@@ -868,10 +868,17 @@ export default function Game() {
                   <>
                     {/* Current clue if exists */}
                     {gameState.currentClue && (
-                      <div className="p-1 bg-amber-600/20 rounded text-[9px] border border-amber-500/30 flex items-center gap-1">
-                        <Lightbulb className="w-2.5 h-2.5 text-amber-400" />
+                      <div className={`p-1.5 rounded text-[11px] border flex items-center gap-1.5 mb-2 ${
+                        gameState.currentTeam === "dark" ? 
+                          "bg-blue-800/40 border-blue-600/50" : 
+                          "bg-red-800/40 border-red-600/50"
+                      }`}>
+                        <Lightbulb className="w-3 h-3 text-amber-400" />
                         <span className="font-bold text-amber-100">
-                          İpucu: {gameState.currentClue.word} ({gameState.currentClue.count} kelime)
+                          {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} İpucu: 
+                        </span>
+                        <span className="font-bold text-white">
+                          {gameState.currentClue.word} ({gameState.currentClue.count})
                         </span>
                       </div>
                     )}
@@ -887,68 +894,44 @@ export default function Game() {
                       const playerName = entry.playerUsername || 
                         (entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName);
                       
-                      // Determine background based on team and result
-                      let bgClass = "";
-                      let borderClass = "";
-                      
-                      if (entry.team === "dark") {
-                        // Dark team move
-                        if (isCorrect) {
-                          bgClass = "bg-blue-900/40";
-                          borderClass = "border-blue-600/70";
-                        } else if (isAssassin) {
-                          bgClass = "bg-red-950/60";
-                          borderClass = "border-red-600";
-                        } else if (isNeutral) {
-                          bgClass = "bg-blue-950/30";
-                          borderClass = "border-gray-600/50";
-                        } else {
-                          // Wrong guess - opponent's card
-                          bgClass = "bg-blue-900/50";
-                          borderClass = "border-orange-600/60";
-                        }
-                      } else {
-                        // Light team move
-                        if (isCorrect) {
-                          bgClass = "bg-red-900/40";
-                          borderClass = "border-red-600/70";
-                        } else if (isAssassin) {
-                          bgClass = "bg-red-950/60";
-                          borderClass = "border-red-600";
-                        } else if (isNeutral) {
-                          bgClass = "bg-red-950/30";
-                          borderClass = "border-gray-600/50";
-                        } else {
-                          // Wrong guess - opponent's card
-                          bgClass = "bg-red-900/50";
-                          borderClass = "border-orange-600/60";
-                        }
-                      }
+                      // Check if team changed (new turn)
+                      const prevEntry = idx > 0 ? gameState.revealHistory[idx - 1] : null;
+                      const isNewTurn = idx > 0 && prevEntry && prevEntry.team !== entry.team;
                       
                       return (
-                        <div 
-                          key={idx} 
-                          className={`p-1 rounded text-[9px] ${bgClass} ${borderClass} border`}
-                        >
-                          <div className="flex items-center gap-1">
-                            <div className={`w-2 h-2 rounded-full ${
-                              entry.type === "dark" ? "bg-blue-500" :
-                              entry.type === "light" ? "bg-red-500" :
-                              entry.type === "neutral" ? "bg-gray-400" :
-                              "bg-red-700"
-                            }`} />
-                            <span className="font-semibold text-gray-200">{playerName}</span>
-                            <span className="text-gray-400">→</span>
-                            <span className="font-bold text-white">{entry.word}</span>
-                            {isAssassin ? (
-                              <span className="text-red-400 ml-auto">❌ Suikastçı!</span>
-                            ) : isNeutral ? (
-                              <span className="text-gray-400 ml-auto">➖ Tarafsız</span>
-                            ) : isCorrect ? (
-                              <span className="text-green-400 ml-auto">✓ Doğru</span>
-                            ) : (
-                              <span className="text-orange-400 ml-auto">✗ Yanlış</span>
-                            )}
+                        <div key={idx}>
+                          {/* Add separator for new turns */}
+                          {isNewTurn && (
+                            <div className="my-1.5 border-t-2 border-gray-600/70"></div>
+                          )}
+                          
+                          {/* Guess entry */}
+                          <div className={`p-1.5 rounded text-[11px] border mb-1 ${
+                            isCorrect ? (entry.team === "dark" ? "bg-blue-900/30 border-blue-600/50" : "bg-red-900/30 border-red-600/50") :
+                            isAssassin ? "bg-red-950/60 border-red-600" :
+                            isNeutral ? "bg-gray-800/30 border-gray-600/50" :
+                            "bg-orange-900/30 border-orange-600/50"
+                          }`}>
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-2.5 h-2.5 rounded-full ${
+                                entry.type === "dark" ? "bg-blue-500" :
+                                entry.type === "light" ? "bg-red-500" :
+                                entry.type === "neutral" ? "bg-gray-400" :
+                                "bg-red-700"
+                              }`} />
+                              <span className="font-semibold text-gray-200">{playerName}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="font-bold text-white">{entry.word}</span>
+                              {isAssassin ? (
+                                <span className="text-red-400 ml-auto font-bold">❌ Suikastçı!</span>
+                              ) : isNeutral ? (
+                                <span className="text-gray-400 ml-auto">➖ Tarafsız</span>
+                              ) : isCorrect ? (
+                                <span className="text-green-400 ml-auto">✓ Doğru</span>
+                              ) : (
+                                <span className="text-orange-400 ml-auto">✗ Yanlış</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
