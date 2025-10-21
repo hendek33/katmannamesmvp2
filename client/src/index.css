@@ -293,6 +293,53 @@
   animation: fadeIn 0.5s ease-in-out forwards;
 }
 
+/* Slide in with bounce animation for winner notification */
+@keyframes slideInBounce {
+  0% {
+    transform: translateY(-200px) scale(0.8);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(20px) scale(1.05);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-10px) scale(0.98);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Slide out with fade animation */
+@keyframes slideOutFade {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Confetti animation */
+@keyframes confetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti linear infinite;
+}
+
 /* Card drop animation */
 @keyframes cardDrop {
   0% {

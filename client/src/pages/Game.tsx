@@ -149,109 +149,68 @@ export default function Game() {
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       
-      {/* Game End Overlay */}
+      {/* Game End Notification - Auto disappears */}
       {gameState.phase === "ended" && gameState.winner && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-          <Card className="relative max-w-2xl w-full p-8 border-4 bg-gradient-to-br from-slate-900 to-slate-800 shadow-2xl overflow-hidden">
-            {/* Animated background pattern */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 animate-pulse" />
-            </div>
-            
-            {/* Content */}
-            <div className="relative z-10 space-y-6 text-center">
-              {/* Winner announcement */}
-              <div className="space-y-4">
-                <h1 className="text-4xl md:text-6xl font-black animate-bounce">
-                  {wasAssassinRevealed ? (
-                    <span className="text-red-500">💀 SUİKASTÇI BULUNDU! 💀</span>
-                  ) : (
-                    <span className="text-yellow-400">🎉 OYUN BİTTİ! 🎉</span>
-                  )}
-                </h1>
+        <div 
+          className="fixed inset-x-0 top-20 z-50 flex justify-center px-4 pointer-events-none"
+          style={{
+            animation: 'slideInBounce 1s ease-out forwards, slideOutFade 1s ease-in 4s forwards'
+          }}
+        >
+          <div className="relative">
+            {/* Main notification card */}
+            <Card className={cn(
+              "relative px-12 py-8 border-4 shadow-2xl",
+              gameState.winner === "dark" 
+                ? "bg-gradient-to-br from-blue-900 to-blue-800 border-blue-500" 
+                : "bg-gradient-to-br from-red-900 to-red-800 border-red-500"
+            )}>
+              {/* Animated glow effect */}
+              <div className="absolute -inset-4 rounded-lg opacity-50 blur-xl animate-pulse"
+                style={{
+                  background: gameState.winner === "dark" 
+                    ? 'radial-gradient(circle, rgba(59,130,246,0.8) 0%, transparent 70%)'
+                    : 'radial-gradient(circle, rgba(239,68,68,0.8) 0%, transparent 70%)'
+                }}
+              />
+              
+              {/* Content */}
+              <div className="relative z-10 text-center space-y-4">
+                {/* Winner text */}
+                <div className="text-5xl md:text-7xl font-black text-white animate-pulse tracking-wider">
+                  {gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                </div>
                 
-                <div className="text-2xl md:text-4xl font-bold">
-                  <span className="text-white">Kazanan: </span>
-                  <span className={cn(
-                    "animate-pulse font-black",
-                    gameState.winner === "dark" ? "text-blue-400" : "text-red-400"
-                  )}>
-                    {gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                  </span>
+                <div className="text-3xl md:text-4xl font-bold text-white/90">
+                  KAZANDI!
                 </div>
                 
                 {wasAssassinRevealed && (
-                  <div className="text-lg text-red-300 animate-pulse">
-                    {lastRevealedCard.playerUsername} suikastçı kartını açtı!
+                  <div className="text-xl text-white/80 mt-2">
+                    Suikastçı kartı açıldı!
                   </div>
                 )}
               </div>
               
-              {/* Final scores */}
-              <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                <Card className="p-4 bg-blue-900/50 border-2 border-blue-600">
-                  <h3 className="text-lg font-bold text-blue-200">{gameState.darkTeamName}</h3>
-                  <p className="text-3xl font-black text-blue-100">{gameState.darkCardsRemaining}</p>
-                  <p className="text-sm text-blue-300">Kalan Kart</p>
-                </Card>
-                
-                <Card className="p-4 bg-red-900/50 border-2 border-red-600">
-                  <h3 className="text-lg font-bold text-red-200">{gameState.lightTeamName}</h3>
-                  <p className="text-3xl font-black text-red-100">{gameState.lightCardsRemaining}</p>
-                  <p className="text-sm text-red-300">Kalan Kart</p>
-                </Card>
-              </div>
-              
-              {/* Game stats */}
-              <div className="space-y-2 text-gray-300">
-                <p>Açılan Kart: {gameState.revealHistory.filter((e: any) => e.word).length} / 25</p>
-                <p>Oyun Süresi: {Math.floor((Date.now() - gameState.createdAt) / 60000)} dakika</p>
-              </div>
-              
-              {/* Action buttons */}
-              <div className="flex justify-center gap-4 pt-4">
-                {currentPlayer?.isRoomOwner && (
-                  <Button
-                    onClick={handleRestart}
-                    size="lg"
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold animate-pulse"
-                  >
-                    <RotateCcw className="w-5 h-5 mr-2" />
-                    Yeni Oyun
-                  </Button>
-                )}
-                <Button
-                  onClick={() => {
-                    send("return_to_lobby", {});
-                  }}
-                  size="lg"
-                  variant="outline"
-                  className="border-2"
-                >
-                  <ArrowLeft className="w-5 h-5 mr-2" />
-                  Lobiye Dön
-                </Button>
-              </div>
-            </div>
-            
-            {/* Confetti effect */}
-            {!wasAssassinRevealed && (
-              <div className="absolute inset-0 pointer-events-none">
-                {[...Array(20)].map((_, i) => (
+              {/* Confetti particles for winner */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
+                {[...Array(30)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-2 h-2 bg-gradient-to-br from-yellow-400 to-orange-400 animate-bounce"
+                    className="absolute w-1 h-3 animate-confetti"
                     style={{
                       left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      animationDelay: `${Math.random() * 2}s`,
-                      animationDuration: `${2 + Math.random() * 2}s`
+                      background: `linear-gradient(${Math.random() * 360}deg, 
+                        hsl(${Math.random() * 360}, 100%, 50%), 
+                        hsl(${Math.random() * 360}, 100%, 70%))`,
+                      animationDelay: `${Math.random() * 0.5}s`,
+                      animationDuration: `${2 + Math.random()}s`
                     }}
                   />
                 ))}
               </div>
-            )}
-          </Card>
+            </Card>
+          </div>
         </div>
       )}
       
@@ -394,7 +353,42 @@ export default function Game() {
                   </div>
                 </DialogContent>
               </Dialog>
-              {gameState.currentClue ? (
+              {/* Game End Controls */}
+              {gameState.phase === "ended" ? (
+                <div className="flex items-center gap-2">
+                  {currentPlayer?.isRoomOwner && (
+                    <Button
+                      onClick={handleRestart}
+                      size="sm"
+                      className="h-7 bg-green-600 hover:bg-green-700 text-white font-bold"
+                    >
+                      <RotateCcw className="w-3 h-3 mr-1" />
+                      <span className="text-xs">Tekrar Oyna</span>
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => send("return_to_lobby", {})}
+                    size="sm"
+                    variant="outline"
+                    className="h-7 border-2"
+                  >
+                    <ArrowLeft className="w-3 h-3 mr-1" />
+                    <span className="text-xs">Lobiye Dön</span>
+                  </Button>
+                  <Button
+                    onClick={() => toast({
+                      title: "Yakında Gelecek",
+                      description: "Oyun düzenleme özelliği yakında eklenecek.",
+                    })}
+                    size="sm"
+                    variant="secondary"
+                    className="h-7"
+                  >
+                    <Settings className="w-3 h-3 mr-1" />
+                    <span className="text-xs">Oyunu Düzenle</span>
+                  </Button>
+                </div>
+              ) : gameState.currentClue ? (
                 <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30">
                   <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
                   <span className="text-xs font-medium text-amber-300">İpucu:</span>
