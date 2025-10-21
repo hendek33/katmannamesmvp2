@@ -21,11 +21,11 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     ];
     const redCards = [
       "alik kırmızı.png", "begüm kırmızı.png", "dobby kırmızı.png", "karaman kırmızı.png",
-      "neswin kırmızı.png", "noeldayı kırmızı.png", "perver kırmızı.png", "triel kırmızı.png"
+      "neswin kırmızı.png", "noeldayı kırmızı.png", "perver kırmızı.png", "triel kırmızı.png", "şinasi kırmızı.png"
     ];
     const whiteCards = [
       "blush beyaz.png", "hasan beyaz.png", "mami beyaz.png", "perver beyaz.png",
-      "çağrı normal beyaz.png", "çağrı sigara beyaz.png", "şinasi beyaz.png", "şinasi su beyaz.png"
+      "çağrı normal beyaz.png", "çağrı sigara beyaz.png", "şinasi su beyaz.png"
     ];
     const blackCard = "arda siyah.png";
 
