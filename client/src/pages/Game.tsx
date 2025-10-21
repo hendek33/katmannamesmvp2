@@ -147,8 +147,38 @@ export default function Game() {
       ))}
       <div className="relative z-10 h-full flex flex-col p-2">
         <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
-        {/* Modern Header - 3 Separate Sections */}
-        <div className="grid grid-cols-3 gap-2 flex-shrink-0">
+        {/* Mobile Header */}
+        <div className="lg:hidden flex justify-between gap-2 flex-shrink-0 mb-2">
+          <Card className="flex-1 px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30">
+            <div className="flex items-center justify-between gap-1">
+              <div className="flex items-center gap-1">
+                <div className="text-[10px] text-muted-foreground">Oda:</div>
+                <div className="text-xs font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
+                  {showRoomCode ? roomCode : "••••"}
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowRoomCode(!showRoomCode)}
+                  className="h-5 w-5 p-0"
+                >
+                  {showRoomCode ? (
+                    <EyeOff className="w-2.5 h-2.5" />
+                  ) : (
+                    <Eye className="w-2.5 h-2.5" />
+                  )}
+                </Button>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="w-3 h-3 text-muted-foreground" />
+                <span className="text-xs">{gameState.players.length}</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Desktop Header - Aligned with panels below */}
+        <div className="hidden lg:grid lg:grid-cols-[minmax(250px,20vw)_1fr_minmax(250px,20vw)] xl:grid-cols-[minmax(280px,18vw)_1fr_minmax(280px,18vw)] 2xl:grid-cols-[minmax(320px,16vw)_1fr_minmax(320px,16vw)] gap-2 flex-shrink-0">
           {/* Left Section - Room Code */}
           <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30 hover:shadow-blue-500/20 transition-all">
             <div className="flex items-center justify-start gap-1 h-full">
@@ -608,7 +638,7 @@ export default function Game() {
             <Card 
               className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-hidden"
               style={{
-                backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.95), rgba(30, 58, 138, 0.95)), url('/mavi takım.png')`,
+                backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.png')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
@@ -668,7 +698,7 @@ export default function Game() {
                 <Card 
                   className="p-1.5 border-2 border-blue-700/50 relative overflow-hidden"
                   style={{
-                    backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.9), rgba(30, 58, 138, 0.9)), url('/mavi takım.png')`,
+                    backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.6), rgba(30, 58, 138, 0.6)), url('/mavi takım.png')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -684,7 +714,7 @@ export default function Game() {
                 <Card 
                   className="p-1.5 border-2 border-red-800/50 relative overflow-hidden"
                   style={{
-                    backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.9), rgba(127, 29, 29, 0.9)), url('/kırmızı takım.png')`,
+                    backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.6), rgba(127, 29, 29, 0.6)), url('/kırmızı takım.png')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -837,7 +867,7 @@ export default function Game() {
             <Card 
               className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-hidden"
               style={{
-                backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.95), rgba(127, 29, 29, 0.95)), url('/kırmızı takım.png')`,
+                backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.7), rgba(127, 29, 29, 0.7)), url('/kırmızı takım.png')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
