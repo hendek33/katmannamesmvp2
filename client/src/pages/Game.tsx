@@ -911,6 +911,24 @@ export default function Game() {
                           return;
                         }
                         
+                        if (entry.type === "role_change") {
+                          // Role change log
+                          groupedEntries.push(
+                            <div key={`role-change-${idx}`} className="p-1 rounded text-[10px] bg-green-800/20 border border-green-600/30 mb-1 italic">
+                              <div className="flex items-center gap-1">
+                                <Eye className="w-2.5 h-2.5 text-green-400" />
+                                <span className="text-green-300">
+                                  {entry.playerUsername} rol değiştirdi: 
+                                  <span className="text-gray-300"> {entry.fromRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
+                                  <span className="text-gray-400"> → </span>
+                                  <span className="text-gray-100">{entry.toRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
+                                </span>
+                              </div>
+                            </div>
+                          );
+                          return;
+                        }
+                        
                         // Regular card reveal entries
                         const isCorrect = entry.type === entry.team;
                         const isNeutral = entry.type === "neutral";

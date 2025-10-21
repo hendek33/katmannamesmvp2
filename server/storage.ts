@@ -260,6 +260,8 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player || !player.team) return null;
 
+    const oldRole = player.role;
+
     if (role === "spymaster") {
       const teamPlayers = room.players.filter(p => p.team === player.team);
       const currentSpymaster = teamPlayers.find(p => p.role === "spymaster");
@@ -267,6 +269,20 @@ export class MemStorage implements IStorage {
       if (currentSpymaster && currentSpymaster.id !== playerId) {
         currentSpymaster.role = "guesser";
       }
+    }
+    
+    // Add role change log if during game and role actually changed (runtime extension)
+    if (room.phase === "playing" && oldRole && oldRole !== role) {
+      const roleChangeEntry: any = {
+        type: "role_change",
+        playerId: player.id,
+        playerUsername: player.username,
+        team: player.team,
+        fromRole: oldRole,
+        toRole: role,
+        timestamp: Date.now()
+      };
+      room.revealHistory.push(roleChangeEntry);
     }
 
     player.role = role;
