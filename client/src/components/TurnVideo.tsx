@@ -10,6 +10,7 @@ interface TurnVideoProps {
 export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
   const [videoEnded, setVideoEnded] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
 
   const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
@@ -18,8 +19,11 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   useEffect(() => {
     // Auto hide after 4 seconds
     const timer = setTimeout(() => {
-      setShow(false);
-      onComplete?.();
+      setIsClosing(true);
+      setTimeout(() => {
+        setShow(false);
+        onComplete?.();
+      }, 600);
     }, 4000);
 
     return () => clearTimeout(timer);
@@ -27,10 +31,11 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
 
   const handleVideoEnd = () => {
     setVideoEnded(true);
+    setIsClosing(true);
     setTimeout(() => {
       setShow(false);
       onComplete?.();
-    }, 1000);
+    }, 600);
   };
 
   if (!show) return null;
@@ -39,7 +44,9 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
     <div 
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-none"
       style={{
-        animation: 'fadeIn 0.5s ease-in-out forwards',
+        animation: isClosing 
+          ? 'fadeOut 0.6s ease-in-out forwards' 
+          : 'fadeIn 0.5s ease-in-out forwards',
       }}
     >
       <div className="relative">
@@ -47,7 +54,9 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
         <div 
           className="relative"
           style={{
-            animation: 'zoomInRotate 0.8s ease-out forwards',
+            animation: isClosing 
+              ? 'zoomOutRotate 0.6s ease-in forwards'
+              : 'zoomInRotate 0.8s ease-out forwards',
           }}
         >
           {/* Glow effect */}
