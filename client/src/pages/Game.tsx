@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -135,11 +135,11 @@ export default function Game() {
       ))}
       <div className="relative z-10 h-full flex flex-col p-2">
         <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
-        {/* Modern Header */}
-        <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
-          <div className="grid grid-cols-3 items-center">
-            {/* Left Side - Room Code */}
-            <div className="flex items-center justify-start gap-1">
+        {/* Modern Header - 3 Separate Sections */}
+        <div className="grid grid-cols-3 gap-2 flex-shrink-0">
+          {/* Left Section - Room Code */}
+          <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30 hover:shadow-blue-500/20 transition-all">
+            <div className="flex items-center justify-start gap-1 h-full">
               <div className="flex items-center gap-2">
                 <div className="text-xs text-muted-foreground">Oda Kodu:</div>
                 <div className="text-sm font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
@@ -171,11 +171,12 @@ export default function Game() {
                   )}
                 </Button>
               </div>
-              
             </div>
-            
-            {/* Center - Game Status and Players */}
-            <div className="flex justify-center items-center gap-2">
+          </Card>
+          
+          {/* Center Section - Game Status and Players */}
+          <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-amber-900/30 hover:shadow-amber-500/20 transition-all">
+            <div className="flex justify-center items-center gap-2 h-full">
               {/* Players Dialog */}
               <Dialog>
                 <DialogTrigger asChild>
@@ -267,21 +268,308 @@ export default function Game() {
                 </div>
               )}
             </div>
-            
-            {/* Right Side - Actions */}
-            <div className="flex items-center gap-1 justify-end">
+          </Card>
+          
+          {/* Right Section - Actions */}
+          <Card className="p-1 md:p-1.5 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
+            <div className="flex items-center gap-1 justify-end h-full">
               {currentPlayer?.isRoomOwner && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleRestart}
-                  data-testid="button-restart"
-                  className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
-                >
-                  <RotateCcw className="w-2.5 h-2.5 mr-0.5" />
-                  <span className="text-[10px]">Yenile</span>
-                </Button>
+                <>
+                  {/* Game Settings Dialog */}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        data-testid="button-settings"
+                        className="h-6 px-2 border hover:border-purple-500 hover:bg-purple-500/10"
+                      >
+                        <Settings className="w-2.5 h-2.5 mr-0.5" />
+                        <span className="text-[10px]">Düzenle</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-slate-900/95 border-2 border-orange-900/30 max-w-md">
+                      <DialogHeader>
+                        <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                          Oyun Ayarları
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        {/* Return to Lobby */}
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-slate-300">Oyun Kontrolü</Label>
+                          <Button
+                            onClick={() => {
+                              send("return_to_lobby", {});
+                              toast({
+                                title: "Lobiye Dönülüyor",
+                                description: "Tüm oyuncular lobiye yönlendiriliyor...",
+                              });
+                            }}
+                            variant="outline"
+                            className="w-full border-2 hover:border-orange-500 hover:bg-orange-500/10"
+                          >
+                            <ArrowLeft className="w-4 h-4 mr-2" />
+                            Lobiye Dön
+                          </Button>
+                        </div>
+                        
+                        {/* Add Bot */}
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-slate-300">Bot Ekle</Label>
+                          <Button
+                            onClick={() => {
+                              send("add_bot", {});
+                              toast({
+                                title: "Bot Eklendi",
+                                description: "Yapay zeka oyuncu oyuna katıldı",
+                              });
+                            }}
+                            variant="outline"
+                            className="w-full border-2 hover:border-cyan-500 hover:bg-cyan-500/10"
+                          >
+                            <Users className="w-4 h-4 mr-2" />
+                            Bot Oyuncu Ekle
+                          </Button>
+                        </div>
+                        
+                        {/* Change Team Names */}
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-slate-300">Takım İsimleri</Label>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Input
+                                id="dark-team-name"
+                                placeholder={gameState.darkTeamName}
+                                className="flex-1 h-8 text-xs bg-slate-800/50 border-blue-700/50 focus:border-blue-500"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    const input = e.target as HTMLInputElement;
+                                    if (input.value.trim()) {
+                                      send("update_team_name", { team: "dark", name: input.value.trim() });
+                                      toast({
+                                        title: "İsim Değiştirildi",
+                                        description: `Koyu takım ismi: ${input.value.trim()}`,
+                                      });
+                                      input.value = "";
+                                    }
+                                  }
+                                }}
+                              />
+                              <Button
+                                onClick={() => {
+                                  const input = document.getElementById("dark-team-name") as HTMLInputElement;
+                                  if (input?.value.trim()) {
+                                    send("update_team_name", { team: "dark", name: input.value.trim() });
+                                    toast({
+                                      title: "İsim Değiştirildi",
+                                      description: `Koyu takım ismi: ${input.value.trim()}`,
+                                    });
+                                    input.value = "";
+                                  }
+                                }}
+                                size="sm"
+                                className="h-8 px-3 bg-blue-600 hover:bg-blue-700"
+                              >
+                                Değiştir
+                              </Button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                id="light-team-name"
+                                placeholder={gameState.lightTeamName}
+                                className="flex-1 h-8 text-xs bg-slate-800/50 border-red-700/50 focus:border-red-500"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    const input = e.target as HTMLInputElement;
+                                    if (input.value.trim()) {
+                                      send("update_team_name", { team: "light", name: input.value.trim() });
+                                      toast({
+                                        title: "İsim Değiştirildi",
+                                        description: `Açık takım ismi: ${input.value.trim()}`,
+                                      });
+                                      input.value = "";
+                                    }
+                                  }
+                                }}
+                              />
+                              <Button
+                                onClick={() => {
+                                  const input = document.getElementById("light-team-name") as HTMLInputElement;
+                                  if (input?.value.trim()) {
+                                    send("update_team_name", { team: "light", name: input.value.trim() });
+                                    toast({
+                                      title: "İsim Değiştirildi",
+                                      description: `Açık takım ismi: ${input.value.trim()}`,
+                                    });
+                                    input.value = "";
+                                  }
+                                }}
+                                size="sm"
+                                className="h-8 px-3 bg-red-600 hover:bg-red-700"
+                              >
+                                Değiştir
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Info */}
+                        <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                          <p className="text-xs text-slate-400">
+                            Sadece oda sahibi bu ayarları değiştirebilir. Değişiklikler anında tüm oyunculara yansıtılır.
+                          </p>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRestart}
+                    data-testid="button-restart"
+                    className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
+                  >
+                    <RotateCcw className="w-2.5 h-2.5 mr-0.5" />
+                    <span className="text-[10px]">Yenile</span>
+                  </Button>
+                </>
               )}
+              {/* Team/Role Change Dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    data-testid="button-change-team"
+                    className="h-6 px-2 border hover:border-green-500 hover:bg-green-500/10"
+                  >
+                    <Users className="w-2.5 h-2.5 mr-0.5" />
+                    <span className="text-[10px]">Takım</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900/95 border-2 border-orange-900/30 max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                      Takım ve Rol Değiştir
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {/* Team Selection */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-300">Takım Seç</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          onClick={() => {
+                            send("select_team", { team: "dark" });
+                            toast({
+                              title: "Takım Değiştirildi",
+                              description: `${gameState.darkTeamName} takımına katıldınız`,
+                            });
+                          }}
+                          variant={currentPlayer?.team === "dark" ? "default" : "outline"}
+                          className={cn(
+                            "border-2",
+                            currentPlayer?.team === "dark"
+                              ? "bg-blue-600 hover:bg-blue-700 border-blue-500"
+                              : "hover:border-blue-500 hover:bg-blue-500/10"
+                          )}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="font-bold">{gameState.darkTeamName}</span>
+                            <span className="text-xs opacity-80">({darkPlayers.length} oyuncu)</span>
+                          </div>
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            send("select_team", { team: "light" });
+                            toast({
+                              title: "Takım Değiştirildi",
+                              description: `${gameState.lightTeamName} takımına katıldınız`,
+                            });
+                          }}
+                          variant={currentPlayer?.team === "light" ? "default" : "outline"}
+                          className={cn(
+                            "border-2",
+                            currentPlayer?.team === "light"
+                              ? "bg-red-600 hover:bg-red-700 border-red-500"
+                              : "hover:border-red-500 hover:bg-red-500/10"
+                          )}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="font-bold">{gameState.lightTeamName}</span>
+                            <span className="text-xs opacity-80">({lightPlayers.length} oyuncu)</span>
+                          </div>
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Role Selection */}
+                    {currentPlayer?.team && (
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-300">Rol Seç</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            onClick={() => {
+                              send("select_role", { role: "guesser" });
+                              toast({
+                                title: "Rol Değiştirildi",
+                                description: "Tahminci rolünü aldınız",
+                              });
+                            }}
+                            variant={currentPlayer?.role === "guesser" ? "default" : "outline"}
+                            className={cn(
+                              "border-2",
+                              currentPlayer?.role === "guesser"
+                                ? "bg-green-600 hover:bg-green-700 border-green-500"
+                                : "hover:border-green-500 hover:bg-green-500/10"
+                            )}
+                          >
+                            <Target className="w-4 h-4 mr-2" />
+                            Tahminci
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              send("select_role", { role: "spymaster" });
+                              toast({
+                                title: "Rol Değiştirildi",
+                                description: "İpucu veren rolünü aldınız",
+                              });
+                            }}
+                            variant={currentPlayer?.role === "spymaster" ? "default" : "outline"}
+                            className={cn(
+                              "border-2",
+                              currentPlayer?.role === "spymaster"
+                                ? "bg-amber-600 hover:bg-amber-700 border-amber-500"
+                                : "hover:border-amber-500 hover:bg-amber-500/10"
+                            )}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            İpucu Veren
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Current Status */}
+                    <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                      <div className="text-xs text-slate-400 space-y-1">
+                        <div>Mevcut Takım: <span className={cn(
+                          "font-bold",
+                          currentPlayer?.team === "dark" ? "text-blue-400" : currentPlayer?.team === "light" ? "text-red-400" : "text-gray-400"
+                        )}>
+                          {currentPlayer?.team === "dark" ? gameState.darkTeamName :
+                           currentPlayer?.team === "light" ? gameState.lightTeamName : "Seçilmedi"}
+                        </span></div>
+                        <div>Mevcut Rol: <span className="font-bold text-green-400">
+                          {currentPlayer?.role === "spymaster" ? "İpucu Veren" :
+                           currentPlayer?.role === "guesser" ? "Tahminci" : "Seçilmedi"}
+                        </span></div>
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Button
                 size="sm"
                 variant="outline"
@@ -297,8 +585,8 @@ export default function Game() {
                 <span className="text-[10px]">Çık</span>
               </Button>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
 
         {/* Main Game Area */}
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,20vw)_1fr_minmax(250px,20vw)] xl:grid-cols-[minmax(280px,18vw)_1fr_minmax(280px,18vw)] 2xl:grid-cols-[minmax(320px,16vw)_1fr_minmax(320px,16vw)] gap-2 flex-1 min-h-0">
