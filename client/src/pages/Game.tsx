@@ -337,7 +337,7 @@ export default function Game() {
 
           {/* Center - Grid */}
           <div className="flex flex-col min-h-0 flex-1 gap-2 md:gap-3 items-center justify-center">
-            <div className="grid grid-cols-5 gap-1.5 md:gap-2" style={{ transform: 'scale(0.92)', transformOrigin: 'center' }} data-testid="game-grid">
+            <div className="grid grid-cols-5 gap-1.5 md:gap-2 game-grid-scaled" data-testid="game-grid">
               {gameState.cards.map((card) => (
                 <GameCard
                   key={card.id}
