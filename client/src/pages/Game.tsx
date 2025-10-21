@@ -28,7 +28,7 @@ export default function Game() {
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
-  const [showAssassinVideo, setShowAssassinVideo] = useState(false);
+  const [showAssassinVideo, setShowAssassinVideo] = useState<{ show: boolean; x?: number; y?: number }>({ show: false });
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
@@ -105,8 +105,19 @@ export default function Game() {
       : null;
     
     if (lastReveal?.type === "assassin") {
-      assassinShownRef.current = true;
-      setShowAssassinVideo(true);
+      // Find the assassin card position
+      const assassinCardIndex = gameState.cards.findIndex(c => c.type === "assassin");
+      if (assassinCardIndex !== -1) {
+        const cardElement = document.querySelector(`[data-testid="card-${gameState.cards[assassinCardIndex].id}"]`);
+        if (cardElement) {
+          const rect = cardElement.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          
+          assassinShownRef.current = true;
+          setShowAssassinVideo({ show: true, x: centerX, y: centerY });
+        }
+      }
     }
   }, [gameState?.revealHistory, gameState?.phase]);
 
@@ -191,8 +202,8 @@ export default function Game() {
 
   const isSpymaster = currentPlayer.role === "spymaster";
   const isCurrentTurn = currentPlayer.team === gameState.currentTeam;
-  const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue;
-  const canRevealCard = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null;
+  const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended";
+  const canRevealCard = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null && gameState.phase !== "ended";
 
   const darkPlayers = gameState.players.filter(p => p.team === "dark");
   const lightPlayers = gameState.players.filter(p => p.team === "light");
@@ -226,11 +237,13 @@ export default function Game() {
       )}
 
       {/* Assassin Video for black card */}
-      {showAssassinVideo && gameState && gameState.winner && (
+      {showAssassinVideo.show && gameState && gameState.winner && (
         <AssassinVideo
           winnerTeam={gameState.winner}
           winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-          onComplete={() => setShowAssassinVideo(false)}
+          startX={showAssassinVideo.x}
+          startY={showAssassinVideo.y}
+          onComplete={() => setShowAssassinVideo({ show: false })}
         />
       )}
 
@@ -976,7 +989,7 @@ export default function Game() {
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers - Positioned to the left */}
-              {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
+              {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && gameState.phase !== "ended" && (
                 <div className="absolute bottom-2 left-4 sm:left-8">
                   <Button
                     onClick={() => {

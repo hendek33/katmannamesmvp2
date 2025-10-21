@@ -4,10 +4,12 @@ import { cn } from "@/lib/utils";
 interface AssassinVideoProps {
   winnerTeam: "dark" | "light";
   winnerTeamName: string;
+  startX?: number;
+  startY?: number;
   onComplete?: () => void;
 }
 
-export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: AssassinVideoProps) {
+export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onComplete }: AssassinVideoProps) {
   const [show, setShow] = useState(true);
   const [videoEnded, setVideoEnded] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
@@ -71,12 +73,20 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
             className="relative"
             style={{
               animation: isClosing 
-                ? 'slideOutLeft 0.6s ease-in forwards'
-                : 'zoomInRotate 0.8s ease-out forwards',
-            }}
+                ? 'shrinkToPoint 0.6s ease-in forwards'
+                : 'expandFromPoint 0.8s ease-out forwards',
+              transformOrigin: startX && startY ? `${startX}px ${startY}px` : 'center',
+              '--start-x': startX ? `${startX}px` : '50vw',
+              '--start-y': startY ? `${startY}px` : '50vh',
+            } as React.CSSProperties}
           >
             {/* Video with rounded corners */}
-            <div className="relative w-[35vw] max-w-sm rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative w-[35vw] max-w-sm rounded-xl overflow-hidden shadow-2xl"
+              style={{
+                clipPath: isClosing ? 'circle(0% at center)' : 'circle(100% at center)',
+                animation: isClosing ? 'circleCollapse 0.6s ease-in forwards' : 'circleExpand 0.8s ease-out forwards'
+              }}
+            >
               <video
                 src="/siyah kelime seçme.mp4"
                 autoPlay

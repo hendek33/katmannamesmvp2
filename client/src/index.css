@@ -439,6 +439,46 @@
   }
 }
 
+@keyframes expandFromPoint {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes shrinkToPoint {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0) rotate(-360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes circleExpand {
+  0% {
+    clip-path: circle(0% at center);
+  }
+  100% {
+    clip-path: circle(100% at center);
+  }
+}
+
+@keyframes circleCollapse {
+  0% {
+    clip-path: circle(100% at center);
+  }
+  100% {
+    clip-path: circle(0% at center);
+  }
+}
+
 @keyframes slideUp {
   0% {
     transform: translateX(-50%) translateY(50px);
