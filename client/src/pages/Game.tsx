@@ -134,8 +134,8 @@ export default function Game() {
       {[...Array(70)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      <div className="relative z-10 p-2 md:p-3 animate-in fade-in duration-500">
-        <div className="w-full h-full flex flex-col gap-2 overflow-hidden">
+      <div className="relative z-10 h-full flex flex-col p-2 md:p-3 animate-in fade-in duration-500">
+        <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Modern Header */}
         <Card className="p-1.5 md:p-2 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:shadow-primary/20 transition-all flex-shrink-0">
           <div className="flex items-center justify-between gap-4">
@@ -269,9 +269,9 @@ export default function Game() {
         </Card>
 
         {/* Main Game Area */}
-        <div className="grid grid-cols-1 xl:grid-cols-[220px_1fr_220px] gap-3 flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 xl:grid-cols-[220px_1fr_220px] gap-3 flex-1 min-h-0 overflow-y-auto">
           {/* Left Side - Dark Team */}
-          <div className="space-y-2 md:space-y-3 overflow-y-auto">
+          <div className="space-y-2 md:space-y-3 xl:overflow-y-auto">
             {/* Score Card */}
             <Card className="p-3 md:p-4 border-2 shadow-2xl bg-gradient-to-br from-blue-950/95 to-blue-900/95 border-blue-700/50 hover:shadow-blue-500/30 transition-all group">
               <div className="text-center space-y-2">
@@ -336,8 +336,8 @@ export default function Game() {
           </div>
 
           {/* Center - Grid */}
-          <div className="flex flex-col min-h-0 flex-1 gap-3 items-center justify-center">
-            <div className="grid grid-cols-5 gap-2 w-full max-w-[1200px]" data-testid="game-grid">
+          <div className="flex flex-col min-h-0 flex-1 gap-3 items-center justify-start overflow-y-auto py-4">
+            <div className="grid grid-cols-5 gap-1 sm:gap-2 w-full max-w-[1000px] px-2" data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
                   key={`pos-${index}`}
@@ -350,7 +350,7 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display at Bottom */}
-            <div className="flex justify-center flex-shrink-0 mt-auto">
+            <div className="flex justify-center flex-shrink-0 mt-4 mb-2">
               {canGiveClue ? (
                 <Card className="p-3 border-2 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-500/50 transition-all">
                   <div className="space-y-2">
@@ -417,7 +417,7 @@ export default function Game() {
           </div>
 
           {/* Right Side - Light Team */}
-          <div className="space-y-2 md:space-y-3 overflow-y-auto">
+          <div className="space-y-2 md:space-y-3 xl:overflow-y-auto">
             {/* Score Card */}
             <Card className="p-3 md:p-4 border-2 shadow-2xl bg-gradient-to-br from-red-950/95 to-red-950/95 border-red-800/50 hover:shadow-red-600/30 transition-all group">
               <div className="text-center space-y-2">
