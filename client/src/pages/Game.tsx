@@ -361,7 +361,7 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 gap-[1px] sm:gap-[2px] md:gap-1 w-full max-w-[750px] lg:max-w-[850px] min-h-0 overflow-hidden" 
+            <div className="grid grid-cols-5 gap-[1px] sm:gap-[2px] md:gap-1 w-full max-w-[650px] lg:max-w-[750px] mb-24" 
                  data-testid="game-grid">
               {gameState.cards.map((card, index) => (
                 <GameCard
