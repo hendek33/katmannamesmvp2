@@ -64,10 +64,10 @@ export default function Game() {
     if (previousClueRef.current !== clueKey) {
       setShowClueOverlay(true);
       
-      // Hide overlay after 1 second
+      // Hide overlay after 2 seconds
       const timer = setTimeout(() => {
         setShowClueOverlay(false);
-      }, 1000);
+      }, 2000);
 
       previousClueRef.current = clueKey;
       
@@ -216,7 +216,7 @@ export default function Game() {
         <div 
           className="fixed inset-0 z-[45] bg-black/40 pointer-events-none"
           style={{
-            animation: 'fadeInOut 1s ease-in-out forwards'
+            animation: 'fadeInOut 2s ease-in-out forwards'
           }}
         />
       )}
@@ -482,7 +482,7 @@ export default function Game() {
                   </Button>
                 </div>
               ) : gameState.currentClue ? (
-                <div className="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30 animate-clue-appear">
+                <div className="relative z-[46] flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30 animate-clue-appear">
                   <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
                   <span className="text-xs font-medium text-amber-300">İpucu:</span>
                   <span className="text-xs font-black text-amber-100">{gameState.currentClue.word}</span>
@@ -981,7 +981,7 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0 z-10">
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0 z-[46]">
               {/* End Turn Button for Guessers */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
                 <Button
