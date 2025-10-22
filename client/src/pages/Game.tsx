@@ -76,11 +76,11 @@ export default function Game() {
     if (gameState.phase === "playing" && !roleAnnouncementShownRef.current) {
       roleAnnouncementShownRef.current = true;
       setShowRoleAnnouncement(true);
-      // Show turn video after role announcement
+      // Show turn video after role announcement completes
       setTimeout(() => {
         setCurrentTurn(gameState.currentTeam);
         setShowTurnVideo(true);
-      }, 4000);
+      }, 2600); // Slightly after role announcement (2500ms) to ensure smooth transition
     }
 
     // Show video when game starts
