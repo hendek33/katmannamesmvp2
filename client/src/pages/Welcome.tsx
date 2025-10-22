@@ -87,15 +87,29 @@ export default function Welcome() {
           <div className="flex flex-col items-center space-y-12">
             {/* Logo */}
             <div className="flex justify-center animate-in fade-in slide-in-from-top-4 duration-700 pointer-events-auto">
-              <div className="relative overflow-hidden">
+              <div className="relative">
                 <img 
                   src="/logo.png" 
                   alt="Katmannames Logo" 
-                  className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.7)] hover:scale-110 cursor-pointer"
+                  className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.7)] hover:scale-110 cursor-pointer relative z-10"
                 />
                 {/* Shine Effect Overlay */}
-                <div className="absolute inset-0 -top-full -left-full w-[200%] h-[200%] animate-shine pointer-events-none">
-                  <div className="h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12" />
+                <div 
+                  className="absolute inset-0 overflow-hidden pointer-events-none z-20"
+                  style={{ 
+                    WebkitMaskImage: 'url(/logo.png)',
+                    WebkitMaskSize: 'contain',
+                    WebkitMaskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'center',
+                    maskImage: 'url(/logo.png)',
+                    maskSize: 'contain',
+                    maskRepeat: 'no-repeat',
+                    maskPosition: 'center'
+                  }}
+                >
+                  <div className="absolute -inset-full w-[200%] h-[200%] animate-shine">
+                    <div className="h-full w-full bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12" />
+                  </div>
                 </div>
               </div>
             </div>
