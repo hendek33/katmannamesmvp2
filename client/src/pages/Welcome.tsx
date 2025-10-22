@@ -112,7 +112,7 @@ export default function Welcome() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 relative overflow-y-auto overflow-x-hidden" 
+    <div className="min-h-screen bg-slate-900 relative overflow-x-hidden" 
          style={{ 
            backgroundImage: 'url(/arkaplan.png)', 
            backgroundSize: 'cover', 
@@ -133,7 +133,7 @@ export default function Welcome() {
       ))}
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden" style={{ minHeight: '640px' }}>
+      <section className="relative overflow-hidden w-full" style={{ minHeight: '640px' }}>
         {/* Physics Cards Background */}
         <HeroPhysicsCards 
           imageNames={[
@@ -213,8 +213,8 @@ export default function Welcome() {
       </section>
 
       {/* Card Showcase Section */}
-      <section className="relative z-10 py-20 px-4 bg-gradient-to-b from-transparent via-slate-900/50 to-transparent">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative z-10 py-20 px-4 bg-gradient-to-b from-transparent via-slate-900/50 to-transparent w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Özel Tasarım Kartlar
@@ -287,8 +287,8 @@ export default function Welcome() {
       </section>
 
       {/* How to Play Section */}
-      <section id="how-to-play" className="relative z-10 py-20 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section id="how-to-play" className="relative z-10 py-20 px-4 w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Nasıl Oynanır?
@@ -338,8 +338,8 @@ export default function Welcome() {
       </section>
 
       {/* Features Section */}
-      <section className="relative z-10 py-20 px-4 bg-gradient-to-t from-transparent via-slate-900/50 to-transparent">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative z-10 py-20 px-4 bg-gradient-to-t from-transparent via-slate-900/50 to-transparent w-full overflow-hidden">
+        <div className="max-w-7xl mx-auto w-full">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Oyun Özellikleri
