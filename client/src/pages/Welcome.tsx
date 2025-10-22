@@ -170,7 +170,7 @@ export default function Welcome() {
         
         {/* Content Overlay */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <Card className="bg-black/60 backdrop-blur-md border-2 border-white/10 p-8 md:p-12 space-y-8 mx-4 max-w-4xl">
+          <Card className="bg-white/10 backdrop-blur-lg border-2 border-white/20 p-8 md:p-12 space-y-8 mx-4 max-w-4xl">
             <div className="flex justify-center">
               <img 
                 src="/logo.png" 
