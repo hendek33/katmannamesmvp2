@@ -170,7 +170,7 @@ export default function Welcome() {
         
         {/* Content Overlay */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="text-center px-4 space-y-8 pointer-events-auto">
+          <div className="text-center px-4 space-y-8">
             <div className="flex justify-center">
               <img 
                 src="/logo.png" 
@@ -193,7 +193,7 @@ export default function Welcome() {
               <Button
                 onClick={() => setShowUsernameInput(true)}
                 size="lg"
-                className="group relative px-8 py-6 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all"
+                className="group relative px-8 py-6 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all pointer-events-auto"
               >
                 <Play className="w-5 h-5 mr-2" />
                 Hemen Başla
@@ -203,7 +203,7 @@ export default function Welcome() {
                 onClick={() => document.getElementById('how-to-play')?.scrollIntoView({ behavior: 'smooth' })}
                 size="lg"
                 variant="outline"
-                className="px-8 py-6 text-lg font-semibold border-2"
+                className="px-8 py-6 text-lg font-semibold border-2 pointer-events-auto"
               >
                 Nasıl Oynanır?
               </Button>

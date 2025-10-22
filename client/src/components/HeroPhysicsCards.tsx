@@ -44,7 +44,7 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
       collisions: false,
     } as const;
 
-    const CARD_W = 120, CARD_H = 75;
+    const CARD_W = 140, CARD_H = 88;
 
     // Küçük ekranlarda kart sayısını düşür (opsiyonel)
     try {
