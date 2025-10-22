@@ -133,7 +133,7 @@ export default function Welcome() {
       ))}
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden w-full" style={{ minHeight: '640px' }}>
+      <section className="relative overflow-hidden w-full" style={{ minHeight: '720px' }}>
         {/* Physics Cards Background */}
         <HeroPhysicsCards 
           imageNames={[
@@ -164,7 +164,7 @@ export default function Welcome() {
             "şinasi kırmızı.png",
             "şinasi su beyaz.png"
           ]}
-          height={640}
+          height={720}
           countMobile={24}
         />
         

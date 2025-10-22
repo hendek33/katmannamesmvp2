@@ -44,7 +44,7 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
       collisions: false,
     } as const;
 
-    const CARD_W = 160, CARD_H = 100;
+    const CARD_W = 180, CARD_H = 112;
 
     // Küçük ekranlarda kart sayısını düşür (opsiyonel)
     try {
@@ -181,23 +181,29 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
         ctx.shadowBlur = 14;
         ctx.shadowOffsetY = 6;
         ctx.fillStyle = "#00000040";
-        roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 10);
+        roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 12);
         ctx.fill();
         ctx.restore();
 
+        // Kartı clip et (köşelerin taşmaması için)
+        ctx.save();
+        roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 12);
+        ctx.clip();
+        
         // yüz: görseli karta sığdır (fit)
         ctx.drawImage(c.img, -c.w/2, -c.h/2, c.w, c.h);
+        ctx.restore();
 
         // Daha belirgin kenar (özellikle beyaz kartlar için)
         ctx.lineWidth = 2.5;
         ctx.strokeStyle = "rgba(0,0,0,0.4)";
-        roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 10);
+        roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 12);
         ctx.stroke();
         
         // İkinci ince kenar (parlaklık için)
         ctx.lineWidth = 1;
         ctx.strokeStyle = "rgba(255,255,255,0.3)";
-        roundRect(ctx, -c.w/2+1, -c.h/2+1, c.w-2, c.h-2, 10);
+        roundRect(ctx, -c.w/2+1, -c.h/2+1, c.w-2, c.h-2, 12);
         ctx.stroke();
 
         ctx.restore();
