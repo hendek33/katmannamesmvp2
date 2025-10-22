@@ -1,115 +1,24 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Logo } from "@/components/Logo";
-import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Users, Clock, Bot, Zap, Target, Eye, Shield, Sparkles, Play, ChevronRight } from "lucide-react";
+import { Play, ChevronRight, Shield, Users, Trophy, Eye, Timer, Bot } from "lucide-react";
+import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
 
 export default function Welcome() {
-  const [, setLocation] = useLocation();
-  const [username, setUsername] = useState("");
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [, navigate] = useLocation();
   const [showUsernameInput, setShowUsernameInput] = useState(false);
+  const [username, setUsername] = useState("");
 
   const handleContinue = () => {
     if (username.trim().length >= 2) {
-      localStorage.setItem("katmannames_username", username.trim());
-      setLocation("/rooms");
+      localStorage.setItem("username", username.trim());
+      navigate("/");
     }
   };
-
-  const cardTypes = [
-    {
-      title: "Katman Koyu",
-      color: "blue",
-      gradient: "from-blue-600 to-blue-800",
-      borderColor: "border-blue-500",
-      glowColor: "shadow-blue-500/50",
-      count: "9",
-      description: "Başlangıç takımı",
-      icon: <Shield className="w-6 h-6" />
-    },
-    {
-      title: "Katman Açık",
-      color: "red",
-      gradient: "from-red-600 to-red-800",
-      borderColor: "border-red-500",
-      glowColor: "shadow-red-500/50",
-      count: "8",
-      description: "İkinci takım",
-      icon: <Target className="w-6 h-6" />
-    },
-    {
-      title: "Tarafsız",
-      color: "gray",
-      gradient: "from-gray-500 to-gray-700",
-      borderColor: "border-gray-400",
-      glowColor: "shadow-gray-400/50",
-      count: "7",
-      description: "Nötr kartlar",
-      icon: <Sparkles className="w-6 h-6" />
-    },
-    {
-      title: "Suikastçı",
-      color: "black",
-      gradient: "from-purple-900 to-black",
-      borderColor: "border-purple-600",
-      glowColor: "shadow-purple-600/50",
-      count: "1",
-      description: "Oyunu bitirir!",
-      icon: <Zap className="w-6 h-6" />
-    }
-  ];
-
-  const features = [
-    {
-      icon: <Users className="w-8 h-8" />,
-      title: "Çok Oyunculu",
-      description: "2-20 kişiyle oyna"
-    },
-    {
-      icon: <Clock className="w-8 h-8" />,
-      title: "Zamanlayıcı",
-      description: "Opsiyonel süre limiti"
-    },
-    {
-      icon: <Bot className="w-8 h-8" />,
-      title: "Bot Desteği",
-      description: "Eksik oyuncular için"
-    },
-    {
-      icon: <Eye className="w-8 h-8" />,
-      title: "İki Rol",
-      description: "İstihbarat Şefi & Ajan"
-    }
-  ];
-
-  const gameSteps = [
-    {
-      number: "1",
-      title: "Takım Seç",
-      description: "Mavi veya kırmızı takıma katıl"
-    },
-    {
-      number: "2",
-      title: "Rol Al",
-      description: "İstihbarat Şefi ipucu verir, Ajanlar tahmin eder"
-    },
-    {
-      number: "3",
-      title: "İpucu Ver",
-      description: "Tek kelime ve sayı ile yönlendir"
-    },
-    {
-      number: "4",
-      title: "Kazan",
-      description: "Tüm takım kartlarını bul"
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-slate-900 relative overflow-x-hidden" 
@@ -170,207 +79,35 @@ export default function Welcome() {
         
         {/* Content Overlay */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="flex flex-col items-center space-y-8">
-            {/* Logo Outside Card */}
+          <div className="flex flex-col items-center space-y-12">
+            {/* Logo */}
             <div className="flex justify-center animate-in fade-in slide-in-from-top-4 duration-700">
               <img 
                 src="/logo.png" 
                 alt="Katmannames Logo" 
-                className="w-72 md:w-80 lg:w-96 h-auto object-contain"
+                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain"
               />
             </div>
 
-            {/* Card Content */}
-            <Card className="bg-white/5 backdrop-blur-lg border-2 border-white/15 p-8 md:p-10 space-y-8 mx-4 max-w-3xl">
-              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 text-center">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-800 to-red-800 bg-clip-text text-transparent uppercase tracking-wider" 
-                    style={{ 
-                      fontFamily: "'Bebas Neue', 'Oswald', 'Impact', sans-serif",
-                      WebkitTextStroke: '2px rgba(0,0,0,0.8)',
-                      textShadow: '3px 3px 6px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.1)'
-                    }}>
-                  KATMANIN DİBİ
-                </h1>
-                <p className="text-lg md:text-xl text-white max-w-3xl mx-auto font-semibold tracking-wide text-center"
-                   style={{ 
-                     fontFamily: "'Rajdhani', 'Orbitron', 'Exo 2', sans-serif",
-                     textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
-                   }}>
-                  İki takım, gizli kelimeler, stratejik ipuçları. Takım arkadaşlarınla birlikte 
-                  25 kartlık grid'de kendi takımının kartlarını bul!
-                </p>
-              </div>
-
-              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
-                <button
-                  onClick={() => setShowUsernameInput(true)}
-                  className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-4 border-white/30 flex items-center justify-center"
-                  style={{
-                    background: 'radial-gradient(circle at 30% 30%, #1e40af, #991b1b)',
-                    fontFamily: "'Orbitron', 'Exo 2', sans-serif"
-                  }}
-                >
-                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                       style={{ 
-                         background: 'radial-gradient(circle at 30% 30%, #1e3a8a, #7f1d1d)'
-                       }} />
-                  <span className="relative z-10 text-white text-2xl md:text-3xl font-black uppercase tracking-wider">
-                    Başla
-                  </span>
-                </button>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Card Showcase Section */}
-      <section className="relative z-10 py-20 px-4 bg-gradient-to-b from-transparent via-slate-900/50 to-transparent w-full overflow-hidden">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Özel Tasarım Kartlar
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Her kart tipinin benzersiz görünümü ve katmanlı tasarımı
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {cardTypes.map((card, index) => (
-              <div
-                key={index}
-                className="group relative"
-                onMouseEnter={() => setHoveredCard(index)}
-                onMouseLeave={() => setHoveredCard(null)}
+            {/* Start Button */}
+            <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+              <button
+                onClick={() => setShowUsernameInput(true)}
+                className="group relative w-36 h-36 md:w-40 md:h-40 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-4 border-white/30 flex items-center justify-center"
+                style={{
+                  background: 'radial-gradient(circle at 30% 30%, #1e40af, #991b1b)',
+                  fontFamily: "'Orbitron', 'Exo 2', sans-serif"
+                }}
               >
-                <div className={cn(
-                  "absolute inset-0 rounded-xl blur-xl opacity-50 transition-all duration-500",
-                  `bg-gradient-to-br ${card.gradient}`,
-                  hoveredCard === index && "opacity-80 blur-2xl"
-                )} />
-                
-                <Card className={cn(
-                  "relative p-6 border-2 backdrop-blur-sm transition-all duration-500",
-                  card.borderColor,
-                  "bg-gradient-to-br from-slate-900/90 to-slate-800/90",
-                  "hover:scale-105 hover:shadow-2xl",
-                  hoveredCard === index && card.glowColor
-                )}>
-                  <div className="aspect-[3/2] rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 p-4 mb-4 flex flex-col justify-between">
-                    <div className="flex justify-between items-start">
-                      <div className={cn(
-                        "p-2 rounded-lg",
-                        `bg-gradient-to-br ${card.gradient}`
-                      )}>
-                        {card.icon}
-                      </div>
-                      <div className={cn(
-                        "text-3xl font-black",
-                        card.color === "blue" && "text-blue-400",
-                        card.color === "red" && "text-red-400",
-                        card.color === "gray" && "text-gray-400",
-                        card.color === "black" && "text-purple-400"
-                      )}>
-                        {card.count}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className={cn(
-                        "h-2 rounded-full",
-                        `bg-gradient-to-r ${card.gradient}`
-                      )} />
-                      <div className={cn(
-                        "h-1 rounded-full w-3/4",
-                        `bg-gradient-to-r ${card.gradient}`,
-                        "opacity-50"
-                      )} />
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-xl font-bold mb-1">{card.title}</h3>
-                  <p className="text-sm text-muted-foreground">{card.description}</p>
-                </Card>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How to Play Section */}
-      <section id="how-to-play" className="relative z-10 py-20 px-4 w-full overflow-hidden">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Nasıl Oynanır?
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              4 basit adımda oyuna başla
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {gameSteps.map((step, index) => (
-              <Card key={index} className="p-6 border-2 bg-slate-900/80 backdrop-blur-sm hover:bg-slate-900/90 transition-all">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-2xl font-black">
-                    {step.number}
-                  </div>
-                  {index < gameSteps.length - 1 && (
-                    <div className="hidden lg:block absolute right-0 top-12 w-full">
-                      <ChevronRight className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                <p className="text-muted-foreground">{step.description}</p>
-              </Card>
-            ))}
-          </div>
-
-          <div className="mt-12 bg-gradient-to-r from-blue-900/30 via-purple-900/30 to-red-900/30 rounded-xl p-8 border border-purple-500/30">
-            <h3 className="text-2xl font-bold mb-4 text-center">Oyunun Amacı</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <div className="text-3xl font-black text-blue-400 mb-2">25</div>
-                <p className="text-muted-foreground">Toplam Kart</p>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-purple-400 mb-2">2</div>
-                <p className="text-muted-foreground">Takım</p>
-              </div>
-              <div>
-                <div className="text-3xl font-black text-red-400 mb-2">1</div>
-                <p className="text-muted-foreground">Kazanan</p>
-              </div>
+                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                     style={{ 
+                       background: 'radial-gradient(circle at 30% 30%, #1e3a8a, #7f1d1d)'
+                     }} />
+                <span className="relative z-10 text-white text-3xl md:text-4xl font-black uppercase tracking-wider">
+                  Başla
+                </span>
+              </button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="relative z-10 py-20 px-4 bg-gradient-to-t from-transparent via-slate-900/50 to-transparent w-full overflow-hidden">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Oyun Özellikleri
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Gelişmiş özelliklerle daha eğlenceli deneyim
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} className="p-6 text-center border-2 bg-slate-900/80 backdrop-blur-sm hover:bg-slate-900/90 hover:scale-105 transition-all">
-                <div className="flex justify-center mb-4 text-purple-400">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground text-sm">{feature.description}</p>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
@@ -407,33 +144,23 @@ export default function Welcome() {
                 onClick={() => setShowUsernameInput(false)}
                 variant="outline"
                 className="flex-1"
+                data-testid="button-cancel"
               >
                 İptal
               </Button>
               <Button
                 onClick={handleContinue}
                 disabled={username.trim().length < 2}
-                className="flex-1"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 data-testid="button-continue"
               >
-                Oyuna Başla
+                Devam Et
+                <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </Card>
         </div>
       )}
-
-      {/* Footer */}
-      <footer className="relative z-10 py-8 px-4 text-center border-t border-slate-800">
-        <div className="max-w-7xl mx-auto space-y-4">
-          <p className="text-sm text-muted-foreground">
-            250+ Türkçe kelime • Gerçek zamanlı çok oyunculu • WebSocket bağlantısı
-          </p>
-          <p className="text-xs text-muted-foreground italic">
-            Bu oyun resmi Codenames değildir. Hype ve topluluğu için özel olarak hazırlanmıştır.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -175,12 +175,13 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
         ctx.translate(cx, cy);
         ctx.rotate(c.a);
 
-        // gölge
+        // gölge - daha belirgin
         ctx.save();
-        ctx.shadowColor = "#0009";
-        ctx.shadowBlur = 14;
-        ctx.shadowOffsetY = 6;
-        ctx.fillStyle = "#00000040";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 10;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 12);
         ctx.fill();
         ctx.restore();
