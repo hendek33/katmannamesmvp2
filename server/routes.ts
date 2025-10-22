@@ -80,6 +80,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { type, payload } = message;
 
         switch (type) {
+          case "ping": {
+            // Simple ping-pong to keep connection alive
+            sendToClient(ws, {
+              type: "pong",
+              payload: {},
+            });
+            break;
+          }
+          
           case "list_rooms": {
             const roomList = storage.listRooms();
             sendToClient(ws, {
@@ -751,7 +760,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return ws.terminate();
       }
       ws.isAlive = false;
-      ws.ping();
+      ws.ping(() => {}); // Add empty callback to prevent errors
     });
   }, 30000);
 
