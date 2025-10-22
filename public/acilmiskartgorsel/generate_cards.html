@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Card Images</title>
+</head>
+<body>
+  <h1>Kart Görselleri Oluşturucu</h1>
+  <canvas id="canvas" width="92" height="58"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const words = [
+      { word: "KALE", type: "dark" },
+      { word: "KÖPRÜ", type: "light" },
+      { word: "ORMAN", type: "neutral" },
+      { word: "DENIZ", type: "dark" },
+      { word: "GÜNEŞ", type: "light" },
+      { word: "BULUT", type: "neutral" },
+      { word: "DAĞ", type: "dark" },
+      { word: "YILDIZ", type: "light" },
+      { word: "KAPI", type: "neutral" },
+      { word: "PENCERE", type: "dark" },
+      { word: "GÖL", type: "light" },
+      { word: "ŞEHİR", type: "neutral" },
+      { word: "ROBOT", type: "assassin" },
+      { word: "MARS", type: "dark" },
+      { word: "AY", type: "light" },
+      { word: "IŞIK", type: "neutral" },
+      { word: "GÖLGE", type: "dark" },
+      { word: "ATEŞ", type: "light" },
+      { word: "BARIŞ", type: "neutral" },
+      { word: "SAVAŞ", type: "dark" },
+      { word: "ZEHİR", type: "assassin" },
+      { word: "UMUT", type: "light" },
+      { word: "KORKU", type: "dark" },
+      { word: "SEVINÇ", type: "light" }
+    ];
+
+    const cardColors = {
+      dark: { bg: "#1e3a8a", border: "#3b82f6", text: "#dbeafe" },
+      light: { bg: "#991b1b", border: "#ef4444", text: "#fee2e2" },
+      neutral: { bg: "#374151", border: "#6b7280", text: "#e5e7eb" },
+      assassin: { bg: "#581c87", border: "#a855f7", text: "#f3e8ff" }
+    };
+
+    function createCard(word, type, index) {
+      ctx.clearRect(0, 0, 92, 58);
+      
+      const colors = cardColors[type];
+      
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, 92, 58);
+      gradient.addColorStop(0, colors.bg);
+      gradient.addColorStop(0.5, colors.border);
+      gradient.addColorStop(1, colors.bg);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 92, 58);
+      
+      // Border
+      ctx.strokeStyle = colors.border;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(1, 1, 90, 56);
+      
+      // Inner border
+      ctx.strokeStyle = colors.text + '30';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(4, 4, 84, 50);
+      
+      // Text
+      ctx.fillStyle = colors.text;
+      ctx.font = 'bold 14px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(word, 46, 29);
+      
+      // Download link
+      const link = document.createElement('a');
+      link.download = `${index + 1}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    // Generate all cards
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < words.length) {
+        createCard(words[index].word, words[index].type, index);
+        index++;
+      } else {
+        clearInterval(interval);
+        document.body.innerHTML += '<p>Tüm kartlar oluşturuldu!</p>';
+      }
+    }, 100);
+  </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
-import { HeroPhysicsCards } from "@/components/HeroPhysicsCards";
+import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -133,14 +133,42 @@ export default function Welcome() {
       ))}
 
       {/* Hero Section */}
-      <section className="relative pt-12 pb-20 px-4 overflow-hidden" style={{ minHeight: '640px' }}>
+      <section className="relative overflow-hidden" style={{ minHeight: '640px' }}>
         {/* Physics Cards Background */}
-        <div className="absolute inset-0 z-0">
-          <HeroPhysicsCards height={640} />
-        </div>
+        <HeroPhysicsCards 
+          imageNames={[
+            "1.png",
+            "2.png", 
+            "3.png",
+            "4.png",
+            "5.png",
+            "6.png",
+            "7.png",
+            "8.png",
+            "9.png",
+            "10.png",
+            "11.png",
+            "12.png",
+            "13.png",
+            "14.png",
+            "15.png",
+            "16.png",
+            "17.png",
+            "18.png",
+            "19.png",
+            "20.png",
+            "21.png",
+            "22.png",
+            "23.png",
+            "24.png"
+          ]}
+          height={640}
+          countMobile={16}
+        />
         
-        <div className="max-w-7xl mx-auto relative z-20">
-          <div className="text-center space-y-8">
+        {/* Content Overlay */}
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="text-center px-4 space-y-8 pointer-events-auto">
             <div className="flex justify-center">
               <img 
                 src="/logo.png" 
