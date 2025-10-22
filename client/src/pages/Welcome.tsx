@@ -87,11 +87,17 @@ export default function Welcome() {
           <div className="flex flex-col items-center space-y-12">
             {/* Logo */}
             <div className="flex justify-center animate-in fade-in slide-in-from-top-4 duration-700 pointer-events-auto">
-              <img 
-                src="/logo.png" 
-                alt="Katmannames Logo" 
-                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.7)] hover:scale-110 cursor-pointer"
-              />
+              <div className="relative overflow-hidden">
+                <img 
+                  src="/logo.png" 
+                  alt="Katmannames Logo" 
+                  className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.7)] hover:scale-110 cursor-pointer"
+                />
+                {/* Shine Effect Overlay */}
+                <div className="absolute inset-0 -top-full -left-full w-[200%] h-[200%] animate-shine pointer-events-none">
+                  <div className="h-full w-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12" />
+                </div>
+              </div>
             </div>
 
             {/* Start Button */}
