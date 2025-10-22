@@ -133,59 +133,97 @@ export function PlayerList({
         </div>
       )}
       
-      <div className="grid grid-cols-3 gap-1">
-        {teamPlayers.map(player => (
-          <div 
-            key={player.id}
-            data-testid={`player-${player.id}`}
-            className={`flex flex-col items-center p-1.5 rounded transition-all ${
-              player.id === currentPlayerId 
-                ? 'bg-accent/20 border border-accent/30 shadow-sm' 
-                : 'bg-black/20 hover:bg-black/30'
-            }`}
-          >
-            {/* Owner Crown */}
-            {player.isRoomOwner && (
-              <Crown className="w-3 h-3 text-yellow-500 mb-0.5" />
-            )}
-            
-            {/* Username */}
-            <span className="text-[10px] font-medium text-center truncate w-full">
-              {player.username}
-            </span>
-            
-            {/* Role Badge */}
-            <div className="flex flex-col items-center gap-0.5">
-              {player.role === "spymaster" ? (
-                <Eye className="w-3 h-3 text-amber-500" />
-              ) : (
-                <Target className="w-3 h-3 text-muted-foreground" />
-              )}
-              
-              {/* Role Toggle for Current Player */}
-              {isLobby && player.id === currentPlayerId && onRoleToggle && (
-                <button 
-                  onClick={onRoleToggle}
-                  className="text-[8px] text-muted-foreground hover:text-white underline"
-                  data-testid="button-toggle-role"
-                >
-                  değiştir
-                </button>
-              )}
-              
-              {/* Remove Bot Button */}
-              {isLobby && player.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
-                <button 
-                  onClick={() => onRemoveBot(player.id)}
-                  className="text-[8px] text-red-500 hover:text-red-700"
-                  data-testid={`button-remove-bot-${player.id}`}
-                >
-                  kaldır
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-4 gap-1">
+        {/* First cell - Spymaster spot */}
+        {(() => {
+          const spymaster = teamPlayers.find(p => p.role === "spymaster");
+          const agents = teamPlayers.filter(p => p.role === "guesser");
+          const allSlots = [];
+          
+          // First slot is always for spymaster
+          if (spymaster) {
+            allSlots.push(
+              <div 
+                key={spymaster.id}
+                data-testid={`player-${spymaster.id}`}
+                className={`flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/40 to-amber-800/30 border border-amber-600/50 ${
+                  spymaster.id === currentPlayerId ? 'ring-2 ring-accent' : ''
+                }`}
+              >
+                {spymaster.isRoomOwner && (
+                  <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
+                )}
+                <Eye className="w-4 h-4 text-amber-500 mb-0.5" />
+                <span className="text-xs font-bold text-center truncate w-full text-amber-200">
+                  {spymaster.username}
+                </span>
+                {isLobby && spymaster.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
+                  <button 
+                    onClick={() => onRemoveBot(spymaster.id)}
+                    className="text-[9px] text-red-400 hover:text-red-300 mt-0.5"
+                    data-testid={`button-remove-bot-${spymaster.id}`}
+                  >
+                    kaldır
+                  </button>
+                )}
+              </div>
+            );
+          } else {
+            // Empty spymaster slot - clickable for current player to become spymaster
+            allSlots.push(
+              <div 
+                key="empty-spymaster"
+                className="flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/20 to-amber-800/10 border-2 border-dashed border-amber-600/30 hover:border-amber-500/50 transition-all cursor-pointer"
+                onClick={() => {
+                  if (isLobby && currentPlayer?.team === team && currentPlayer?.role !== "spymaster" && onRoleToggle) {
+                    onRoleToggle();
+                  }
+                }}
+              >
+                <Eye className="w-4 h-4 text-amber-600/50 mb-0.5" />
+                <span className="text-[10px] text-amber-600/70 text-center">
+                  {isLobby && currentPlayer?.team === team && currentPlayer?.role !== "spymaster" 
+                    ? "İstihbarat\nŞefi Ol" 
+                    : "İstihbarat\nŞefi Yok"}
+                </span>
+              </div>
+            );
+          }
+          
+          // Add agents to remaining slots
+          agents.forEach(agent => {
+            allSlots.push(
+              <div 
+                key={agent.id}
+                data-testid={`player-${agent.id}`}
+                className={`flex flex-col items-center p-2 rounded transition-all ${
+                  agent.id === currentPlayerId 
+                    ? 'bg-accent/20 border border-accent/30 shadow-sm' 
+                    : 'bg-black/20 hover:bg-black/30'
+                }`}
+              >
+                {agent.isRoomOwner && (
+                  <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
+                )}
+                <Target className="w-3.5 h-3.5 text-muted-foreground mb-0.5" />
+                <span className="text-xs font-medium text-center truncate w-full">
+                  {agent.username}
+                </span>
+                {isLobby && agent.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
+                  <button 
+                    onClick={() => onRemoveBot(agent.id)}
+                    className="text-[9px] text-red-400 hover:text-red-300 mt-0.5"
+                    data-testid={`button-remove-bot-${agent.id}`}
+                  >
+                    kaldır
+                  </button>
+                )}
+              </div>
+            );
+          });
+          
+          return allSlots;
+        })()}
       </div>
     </Card>
     );
