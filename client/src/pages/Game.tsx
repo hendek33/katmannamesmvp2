@@ -8,6 +8,7 @@ import { PlayerList } from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { GameTimer } from "@/components/GameTimer";
+import { RoleAnnouncement } from "@/components/RoleAnnouncement";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -30,10 +31,12 @@ export default function Game() {
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
   const [showAssassinVideo, setShowAssassinVideo] = useState<{ show: boolean; x?: number; y?: number }>({ show: false });
+  const [showRoleAnnouncement, setShowRoleAnnouncement] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
   const assassinShownRef = useRef<boolean>(false);
+  const roleAnnouncementShownRef = useRef<boolean>(false);
 
   useEffect(() => {
     if (error) {
@@ -69,10 +72,19 @@ export default function Game() {
   useEffect(() => {
     if (!gameState) return;
 
+    // Show role announcement when game starts
+    if (gameState.phase === "playing" && !roleAnnouncementShownRef.current) {
+      roleAnnouncementShownRef.current = true;
+      setShowRoleAnnouncement(true);
+      // Show turn video after role announcement
+      setTimeout(() => {
+        setCurrentTurn(gameState.currentTeam);
+        setShowTurnVideo(true);
+      }, 4000);
+    }
+
     // Show video when game starts
     if (gameState.phase === "playing" && !previousTurnRef.current) {
-      setCurrentTurn(gameState.currentTeam);
-      setShowTurnVideo(true);
       previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
       return;
     }
@@ -154,6 +166,7 @@ export default function Game() {
   const handleRestart = () => {
     send("restart_game", {});
     assassinShownRef.current = false;
+    roleAnnouncementShownRef.current = false; // Reset role announcement for new game
   };
 
   useEffect(() => {
@@ -231,6 +244,19 @@ export default function Game() {
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       
+      {/* Role Announcement at game start */}
+      {gameState && currentPlayer && (
+        <RoleAnnouncement
+          show={showRoleAnnouncement}
+          playerTeam={currentPlayer.team}
+          playerRole={currentPlayer.role}
+          teamName={currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          currentTurn={gameState.currentTeam}
+          currentTurnTeamName={gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          secretRole={currentPlayer.secretRole}
+          onComplete={() => setShowRoleAnnouncement(false)}
+        />
+      )}
 
       {/* Turn Change Video */}
       {showTurnVideo && currentTurn && gameState && (

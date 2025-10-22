@@ -654,6 +654,17 @@ export class MemStorage implements IStorage {
     if (room.timedMode) {
       room.currentTurnStartTime = Date.now();
     }
+    
+    // Reassign secret roles for Chaos Mode on restart
+    if (room.chaosMode) {
+      this.assignSecretRoles(room);
+    }
+
+    // Reset prophet guess tracking for new game
+    room.prophetGuessUsed = undefined;
+    room.prophetGuessResult = undefined;
+    room.doubleAgentGuessUsed = undefined;
+    room.doubleAgentGuessResult = undefined;
 
     return room;
   }
