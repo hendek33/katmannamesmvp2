@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Play, ChevronRight, Shield, Users, Trophy, Eye, Timer, Bot } from "lucide-react";
+import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot } from "lucide-react";
 import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
 
@@ -90,7 +90,19 @@ export default function Welcome() {
             </div>
 
             {/* Start Button */}
-            <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+            <div className="relative flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+              {/* Animated Arrows */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {/* Top Arrow */}
+                <ChevronDown className="absolute -top-8 left-1/2 -translate-x-1/2 text-white w-6 h-6 animate-bounce" style={{ animationDelay: '0s' }} />
+                {/* Right Arrow */}
+                <ChevronLeft className="absolute -right-8 top-1/2 -translate-y-1/2 text-white w-6 h-6 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                {/* Bottom Arrow */}
+                <ChevronUp className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-white w-6 h-6 animate-bounce" style={{ animationDelay: '0.4s' }} />
+                {/* Left Arrow */}
+                <ChevronRight className="absolute -left-8 top-1/2 -translate-y-1/2 text-white w-6 h-6 animate-bounce" style={{ animationDelay: '0.6s' }} />
+              </div>
+              
               <button
                 onClick={() => setShowUsernameInput(true)}
                 className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-8 flex items-center justify-center overflow-hidden"
@@ -108,6 +120,10 @@ export default function Welcome() {
                   alt="Başla" 
                   className="relative z-10 w-full h-full object-cover"
                 />
+                {/* Semi-transparent Play Icon */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                  <Play className="w-16 h-16 md:w-20 md:h-20 text-white opacity-50 fill-white" />
+                </div>
               </button>
             </div>
           </div>
