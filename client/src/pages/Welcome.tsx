@@ -27,20 +27,33 @@ export default function Welcome() {
   }, []);
   
   // Memoize props for HeroPhysicsCards to prevent re-initialization
-  // Geçici olarak placeholder görsel kullanıyoruz
   const cardImageNames = useMemo(() => [
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png",
-    "kartlar.png"
+    "ali mavi.png",
+    "alik kırmızı.png",
+    "arda siyah.png",
+    "begüm kırmızı.png",
+    "blush beyaz.png",
+    "blush mavi.png",
+    "dobby kırmızı.png",
+    "hasan beyaz.png",
+    "hasan mavi.png",
+    "karaman kırmızı.png",
+    "kasım mavi.png",
+    "mami beyaz.png",
+    "mami mavi.png",
+    "neswin kırmızı.png",
+    "noeldayı kırmızı.png",
+    "noeldayı mavi.png",
+    "nuriben mavi.png",
+    "perver beyaz.png",
+    "perver kırmızı.png",
+    "triel kırmızı.png",
+    "triel2 mavi.png",
+    "çağrı mavi.png",
+    "çağrı normal beyaz.png",
+    "çağrı sigara beyaz.png",
+    "şinasi kırmızı.png",
+    "şinasi su beyaz.png"
   ], []);
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
@@ -50,16 +63,11 @@ export default function Welcome() {
     const loadImages = async () => {
       try {
         const imagePromises = cardImageNames.map(imageName => {
-          return new Promise((resolve) => {
+          return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = resolve;
-            // Hata durumunda da resolve et, böylece uygulama çalışmaya devam eder
-            img.onerror = () => {
-              console.warn(`Could not load image: ${imageName}`);
-              resolve(null);
-            };
-            // Direkt root'tan yüklüyoruz çünkü görsel public klasörünün kendisinde
-            img.src = `/${imageName}`;
+            img.onerror = reject;
+            img.src = `/açılmış kelime kartları/${imageName}`;
           });
         });
         

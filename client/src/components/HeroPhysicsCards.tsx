@@ -83,8 +83,8 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
 
     function buildPaths(names?: string[]) {
       const safe = Array.isArray(names) ? names : [];
-      // Görseller direkt public klasöründe, root'tan yüklüyoruz
-      return safe.map((n) => `/${n}`);
+      // public altında olduğundan, runtime yolu "/acilmiskartgorsel/<name>"
+      return safe.map((n) => `/acilmiskartgorsel/${n}`);
     }
 
     function loadImages(paths: string[]) {
