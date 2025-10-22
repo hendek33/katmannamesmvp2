@@ -8,6 +8,16 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft, Eye, EyeOff, Timer } from "lucide-react";
@@ -96,7 +106,19 @@ export default function Lobby() {
     }
   };
 
+  const [showTeamNameWarning, setShowTeamNameWarning] = useState(false);
+
   const handleStartGame = () => {
+    // Check if team names are still default
+    if (gameState?.darkTeamName === "Katman Koyu" && gameState?.lightTeamName === "Katman Açık") {
+      setShowTeamNameWarning(true);
+    } else {
+      send("start_game", {});
+    }
+  };
+  
+  const handleConfirmStartWithDefaultNames = () => {
+    setShowTeamNameWarning(false);
     send("start_game", {});
   };
 
@@ -572,6 +594,25 @@ export default function Lobby() {
           </div>
         </div>
       </div>
+      
+      {/* Team Name Warning Dialog */}
+      <AlertDialog open={showTeamNameWarning} onOpenChange={setShowTeamNameWarning}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Takım İsimlerini Değiştirmek İster Misiniz?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Takım isimleri hala varsayılan değerlerde: "Katman Koyu" ve "Katman Açık".<br />
+              Özel takım isimleri belirlemek ister misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>İsimleri Değiştir</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmStartWithDefaultNames}>
+              Varsayılan İsimlerle Devam Et
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
