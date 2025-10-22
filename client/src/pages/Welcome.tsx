@@ -136,7 +136,34 @@ export default function Welcome() {
       <section className="relative overflow-hidden" style={{ minHeight: '640px' }}>
         {/* Physics Cards Background */}
         <HeroPhysicsCards 
-          imageNames={[]} // Görsel dosyaları /public/acilmiskartgorsel/ klasörüne eklendiğinde buraya dosya adlarını yazın
+          imageNames={[
+            "ali mavi.png",
+            "alik kırmızı.png",
+            "arda siyah.png",
+            "begüm kırmızı.png",
+            "blush beyaz.png",
+            "blush mavi.png",
+            "dobby kırmızı.png",
+            "hasan beyaz.png",
+            "hasan mavi.png",
+            "karaman kırmızı.png",
+            "kasım mavi.png",
+            "mami beyaz.png",
+            "mami mavi.png",
+            "neswin kırmızı.png",
+            "noeldayı kırmızı.png",
+            "noeldayı mavi.png",
+            "nuriben mavi.png",
+            "perver beyaz.png",
+            "perver kırmızı.png",
+            "triel kırmızı.png",
+            "triel2 mavi.png",
+            "çağrı mavi.png",
+            "çağrı normal beyaz.png",
+            "çağrı sigara beyaz.png",
+            "şinasi kırmızı.png",
+            "şinasi su beyaz.png"
+          ]}
           height={640}
           countMobile={16}
         />
