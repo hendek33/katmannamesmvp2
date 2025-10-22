@@ -37,6 +37,7 @@ export default function Lobby() {
   const [spymasterTime, setSpymasterTime] = useState(120); // 2 minutes default
   const [guesserTime, setGuesserTime] = useState(180); // 3 minutes default
   const [chaosMode, setChaosMode] = useState(false);
+  const [showChaosDetails, setShowChaosDetails] = useState(false);
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("katmannames_username");
@@ -429,8 +430,8 @@ export default function Lobby() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex-1 overflow-hidden">
-        <div className="max-w-7xl mx-auto h-full p-4 flex flex-col">
+      <div className="relative z-10 flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto h-full p-3 flex flex-col">
           {/* Team Selection Area */}
           <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
             {/* Left Side - Team Cards */}
@@ -530,16 +531,15 @@ export default function Lobby() {
                 </Button>
 
               {/* Compact How to Play */}
-              <div className="border-t pt-3 space-y-2">
+              <div className="border-t pt-2 space-y-1">
                 <h3 className="text-xs font-bold flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-purple-500" />
-                  Nasıl Oynanır?
+                  Hızlı Başlangıç
                 </h3>
-                <ul className="text-[10px] sm:text-xs space-y-1 text-muted-foreground">
-                  <li>1. Takım seçin</li>
-                  <li>2. Rol seçin (İstihbarat Şefi / Ajan)</li>
-                  <li>3. Her takımda en az bir İstihbarat Şefi olmalı</li>
-                  <li>4. Oyunu başlatın!</li>
+                <ul className="text-[10px] space-y-0.5 text-muted-foreground">
+                  <li>• Takım ve rol seç</li>
+                  <li>• Her takımda 1 İstihbarat Şefi olmalı</li>
+                  <li>• Hazırsan başlat!</li>
                 </ul>
               </div>
             </Card>
@@ -613,30 +613,25 @@ export default function Lobby() {
           
           {/* Bottom Settings Section - Only for Room Owner */}
           {currentPlayer?.isRoomOwner && (
-            <div className="mt-6 space-y-4">
-              {/* Chaos Mode - Prominent Section */}
-              <Card className="p-6 border-4 bg-gradient-to-br from-red-950/90 via-purple-950/90 to-orange-950/90 border-red-600/70 relative overflow-hidden">
-                {/* Experimental Badge */}
-                <div className="absolute top-3 right-3">
-                  <Badge className="bg-amber-600 text-white text-xs px-2 py-1">
-                    🧪 DENEYSEL
-                  </Badge>
-                </div>
+            <div className="mt-4 grid md:grid-cols-2 gap-3">
+              {/* Chaos Mode - Compact */}
+              <Card className="p-3 border-2 bg-slate-800 border-red-600/50 relative">
+                <Badge className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] px-1.5 py-0.5">
+                  🧪 DENEYSEL
+                </Badge>
                 
-                <div className="flex items-start justify-between mb-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <Sparkles className="w-8 h-8 text-red-500 animate-pulse" />
-                        <Sparkles className="w-8 h-8 text-purple-500 absolute top-0 left-0 animate-pulse animation-delay-200" />
-                      </div>
-                      <h2 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-                        KAOS MODU
-                      </h2>
-                    </div>
-                    <p className="text-sm text-muted-foreground max-w-lg">
-                      Klasik Codenames'e heyecanlı bir twist! Gizli roller ile oyuna stratejik derinlik ve belirsizlik katın.
-                    </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-red-500" />
+                    <h3 className="text-base font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
+                      KAOS MODU
+                    </h3>
+                    <button
+                      onClick={() => setShowChaosDetails(!showChaosDetails)}
+                      className="text-xs text-muted-foreground hover:text-white transition-colors"
+                    >
+                      (Bu nedir?)
+                    </button>
                   </div>
                   <Switch
                     checked={chaosMode}
@@ -644,78 +639,23 @@ export default function Lobby() {
                       setChaosMode(checked);
                       handleChaosModeUpdate(checked);
                     }}
-                    className="scale-125"
                     data-testid="switch-chaos-mode"
                   />
                 </div>
                 
-                {/* Detailed Explanation */}
-                <div className={`space-y-4 transition-all duration-500 ${chaosMode ? 'opacity-100 max-h-96' : 'opacity-50 max-h-32 overflow-hidden'}`}>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">🔮</span>
-                        <h3 className="font-bold text-yellow-500">Kahin Ajan</h3>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Her takımda 1 tane. Kendi takımının 3 kartını oyun başında bilir. 
-                        Bu bilgiyi ipuçları ile takımına aktarmalı.
-                      </p>
-                    </div>
-                    
-                    <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">💀</span>
-                        <h3 className="font-bold text-red-500">Dodo Ajanı</h3>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Gizli hain! Takımını kaybettirmeye çalışır. 
-                        Suikastçı kartı seçtirmeye çalışır. Sadece oy verebilir.
-                      </p>
-                    </div>
-                    
-                    <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">🎭</span>
-                        <h3 className="font-bold text-purple-500">Çift Ajan</h3>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Karşı takım için çalışır! Yanlış kartlara yönlendirir. 
-                        Sadece oy verebilir, kart seçemez.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {chaosMode && (
-                    <div className="mt-4 p-3 bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-lg">
-                      <div className="text-sm space-y-1">
-                        <p className="font-semibold text-amber-400">⚡ Önemli Kurallar:</p>
-                        <ul className="text-xs text-muted-foreground space-y-0.5 ml-4">
-                          <li>• Dodo ve Çift Ajan her zaman zıt takımlarda olur</li>
-                          <li>• Gizli roller oyun başladığında atanır ve sadece size gösterilir</li>
-                          <li>• Kahin'in bildiği kartlar mor ışıltı ile gösterilir</li>
-                          <li>• Takımlar birbirlerinin Kahin'ini tahmin edebilir (1 hak)</li>
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <button
-                    onClick={() => setChaosMode(!chaosMode)}
-                    className="text-xs text-muted-foreground hover:text-white transition-colors flex items-center gap-1"
-                  >
-                    {chaosMode ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                    {chaosMode ? 'Daha az göster' : 'Daha fazla bilgi'}
-                  </button>
-                </div>
+                {chaosMode && (
+                  <p className="text-[10px] text-amber-400 mt-2">
+                    ⚡ Gizli roller aktif - Oyun başladığında atanacak
+                  </p>
+                )}
               </Card>
               
-              {/* Timer Settings - Simpler Design */}
-              <Card className="p-4 border-2 bg-slate-800 border-purple-600/50">
-                <div className="flex items-center justify-between mb-3">
+              {/* Timer Settings - Compact */}
+              <Card className="p-3 border-2 bg-slate-800 border-purple-600/50">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Timer className="w-5 h-5 text-purple-500" />
-                    <h3 className="text-base font-bold">Zamanlayıcı Ayarları</h3>
+                    <h3 className="text-base font-bold">Zamanlayıcı</h3>
                   </div>
                   <Switch
                     checked={timedMode}
@@ -728,59 +668,12 @@ export default function Lobby() {
                 </div>
                 
                 {timedMode && (
-                  <div className="grid md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <Label className="text-sm">İstihbarat Şefi</Label>
-                        <span className="text-sm font-mono text-purple-400">
-                          {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}
-                        </span>
-                      </div>
-                      <Slider
-                        value={[spymasterTime]}
-                        onValueChange={([value]) => {
-                          setSpymasterTime(value);
-                        }}
-                        onValueCommit={([value]) => {
-                          handleTimerSettingsUpdate(timedMode, value, guesserTime);
-                        }}
-                        min={30}
-                        max={600}
-                        step={30}
-                        className="w-full"
-                        data-testid="slider-spymaster-time"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <Label className="text-sm">Ajanlar</Label>
-                        <span className="text-sm font-mono text-purple-400">
-                          {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}
-                        </span>
-                      </div>
-                      <Slider
-                        value={[guesserTime]}
-                        onValueChange={([value]) => {
-                          setGuesserTime(value);
-                        }}
-                        onValueCommit={([value]) => {
-                          handleTimerSettingsUpdate(timedMode, spymasterTime, value);
-                        }}
-                        min={30}
-                        max={600}
-                        step={30}
-                        className="w-full"
-                        data-testid="slider-guesser-time"
-                      />
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span>Şef: {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}</span>
+                      <span>Ajan: {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}</span>
                     </div>
                   </div>
-                )}
-                
-                {timedMode && (
-                  <p className="text-xs text-muted-foreground text-center mt-3">
-                    ⏱️ Süre bittiğinde tur otomatik bitmez, sadece görsel uyarı verilir
-                  </p>
                 )}
               </Card>
             </div>
@@ -803,6 +696,80 @@ export default function Lobby() {
             <AlertDialogAction onClick={handleConfirmStartWithDefaultNames}>
               Varsayılan İsimlerle Devam Et
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      {/* Chaos Mode Details Dialog */}
+      <AlertDialog open={showChaosDetails} onOpenChange={setShowChaosDetails}>
+        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
+              🎯 KAOS MODU NEDİR?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 pt-4">
+                <p className="text-sm">
+                  Kaos Modu, klasik Codenames oyununa gizli roller ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
+                  Her oyuncuya gizlice atanan bu roller, oyunun dinamiğini tamamen değiştirir!
+                </p>
+                
+                <div className="space-y-3">
+                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🔮</span>
+                      <h4 className="font-bold text-yellow-500">Kahin Ajan</h4>
+                    </div>
+                    <p className="text-xs">
+                      Her takımda 1 tane bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
+                      Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">💀</span>
+                      <h4 className="font-bold text-red-500">Dodo Ajanı</h4>
+                    </div>
+                    <p className="text-xs">
+                      Takımının içindeki hain! Görevi takımını kaybettirmektir. 
+                      Özellikle suikastçı kartını seçtirmeye çalışır. Kart seçemez, sadece oy verebilir.
+                      Kimliğini belli etmeden takımını yanlış yönlendirmelidir.
+                    </p>
+                  </div>
+                  
+                  <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🎭</span>
+                      <h4 className="font-bold text-purple-500">Çift Ajan</h4>
+                    </div>
+                    <p className="text-xs">
+                      Karşı takım için çalışan casus! Takımını yanlış kartlara yönlendirmeye çalışır.
+                      Kart seçemez, sadece oy verebilir. Karşı takımın kartlarını seçtirerek onların kazanmasını sağlar.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                  <h4 className="font-semibold text-amber-400 mb-2">⚡ Önemli Kurallar</h4>
+                  <ul className="text-xs space-y-1">
+                    <li>• Dodo ve Çift Ajan her zaman zıt takımlarda olur (denge için)</li>
+                    <li>• Gizli roller oyun başladığında rastgele atanır</li>
+                    <li>• Rolünüz sadece size gösterilir, başkaları göremez</li>
+                    <li>• Kahin'in bildiği kartlar sadece ona mor renkte gösterilir</li>
+                    <li>• Her takım karşı takımın Kahin'ini tahmin edebilir (1 hak)</li>
+                    <li>• Doğru tahmin oyunu kazandırır, yanlış tahmin hakkı bitirir</li>
+                  </ul>
+                </div>
+                
+                <p className="text-xs text-muted-foreground italic">
+                  💡 İpucu: Gizli rolünüzü saklamak oyunun en önemli parçası! Çok bariz davranırsanız takımınız sizi fark edebilir.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Anladım</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
