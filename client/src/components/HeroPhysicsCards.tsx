@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, memo } from "react";
 
 /**
  * HeroPhysicsCards
@@ -21,7 +21,7 @@ type Props = {
   countMobile?: number;
 };
 
-export default function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: Props) {
+function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const runningRef = useRef<boolean>(true);
 
@@ -324,3 +324,5 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
     </div>
   );
 }
+
+export default memo(HeroPhysicsCards);
