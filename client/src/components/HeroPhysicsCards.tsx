@@ -31,7 +31,7 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
 
     // ---- Parametreler (Arda'nın sevdiği his) ----
     const params = {
-      count: 24,
+      count: 40,
       pushStrength: 0.7,
       pushRadius: 90,
       drag: 0.96,

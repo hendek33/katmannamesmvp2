@@ -165,7 +165,7 @@ export default function Welcome() {
             "şinasi su beyaz.png"
           ]}
           height={640}
-          countMobile={16}
+          countMobile={24}
         />
         
         {/* Content Overlay */}
