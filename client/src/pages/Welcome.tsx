@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot } from "lucide-react";
+import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot, Loader2 } from "lucide-react";
 import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ export default function Welcome() {
   const [, navigate] = useLocation();
   const [showUsernameInput, setShowUsernameInput] = useState(false);
   const [username, setUsername] = useState("");
+  const [cardsLoaded, setCardsLoaded] = useState(false);
   
   // Clear any old/invalid localStorage keys on mount
   useEffect(() => {
@@ -56,6 +57,31 @@ export default function Welcome() {
   ], []);
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
+  
+  // Track when all card images are loaded
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        const imagePromises = cardImageNames.map(imageName => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = `/açılmış kelime kartları/${imageName}`;
+          });
+        });
+        
+        await Promise.all(imagePromises);
+        setCardsLoaded(true);
+      } catch (error) {
+        console.error("Error loading card images:", error);
+        // Still allow button to be clickable even if some images fail
+        setCardsLoaded(true);
+      }
+    };
+    
+    loadImages();
+  }, [cardImageNames]);
 
   const handleContinue = () => {
     if (username.trim().length >= 2) {
@@ -117,8 +143,12 @@ export default function Welcome() {
               </div>
               
               <button
-                onClick={() => setShowUsernameInput(true)}
-                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform transition-all duration-500 pointer-events-auto flex items-center justify-center overflow-hidden hover:scale-125 hover:rotate-12 active:scale-110"
+                onClick={() => cardsLoaded && setShowUsernameInput(true)}
+                disabled={!cardsLoaded}
+                className={cn(
+                  "group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform transition-all duration-500 pointer-events-auto flex items-center justify-center overflow-hidden",
+                  cardsLoaded ? "hover:scale-125 hover:rotate-12 active:scale-110" : "opacity-75 cursor-not-allowed"
+                )}
                 style={{
                   borderColor: 'rgba(67, 23, 9, 1)',
                   backgroundColor: 'rgba(0, 116, 176, 1)',
@@ -128,12 +158,16 @@ export default function Welcome() {
                   transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.filter = 'drop-shadow(0 20px 50px rgba(0, 116, 176, 1)) drop-shadow(0 10px 30px rgba(67, 23, 9, 0.8))';
-                  e.currentTarget.style.backgroundColor = 'rgba(0, 150, 200, 1)';
+                  if (cardsLoaded) {
+                    e.currentTarget.style.filter = 'drop-shadow(0 20px 50px rgba(0, 116, 176, 1)) drop-shadow(0 10px 30px rgba(67, 23, 9, 0.8))';
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 150, 200, 1)';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.filter = 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))';
-                  e.currentTarget.style.backgroundColor = 'rgba(0, 116, 176, 1)';
+                  if (cardsLoaded) {
+                    e.currentTarget.style.filter = 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))';
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 116, 176, 1)';
+                  }
                 }}
               >
                 {/* Inner pulse effect */}
@@ -146,14 +180,31 @@ export default function Welcome() {
                        animation: 'spin 2s linear infinite',
                      }} />
                 
-                {/* Play Icon with hover animation */}
+                {/* Play Icon or Loading Spinner with hover animation */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                  <Play className="w-16 h-16 md:w-20 md:h-20 transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12" 
-                        style={{ 
-                          color: 'rgba(67, 23, 9, 1)',
-                          fill: 'rgba(67, 23, 9, 1)',
-                          filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
-                        }} />
+                  {cardsLoaded ? (
+                    <Play className="w-16 h-16 md:w-20 md:h-20 transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12" 
+                          style={{ 
+                            color: 'rgba(67, 23, 9, 1)',
+                            fill: 'rgba(67, 23, 9, 1)',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
+                          }} />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="w-12 h-12 md:w-16 md:h-16 animate-spin" 
+                               style={{ 
+                                 color: 'rgba(67, 23, 9, 1)',
+                                 filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
+                               }} />
+                      <span className="text-xs font-medium"
+                            style={{ 
+                              color: 'rgba(67, 23, 9, 1)',
+                              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
+                            }}>
+                        Yükleniyor...
+                      </span>
+                    </div>
+                  )}
                 </div>
               </button>
             </div>
