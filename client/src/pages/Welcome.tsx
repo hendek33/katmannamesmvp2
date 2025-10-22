@@ -105,7 +105,7 @@ export default function Welcome() {
                 <img 
                   src="/başla.png" 
                   alt="Başla" 
-                  className="relative z-10 w-20 h-20 md:w-24 md:h-24 object-contain"
+                  className="relative z-10 w-full h-full object-cover"
                 />
               </button>
             </div>
