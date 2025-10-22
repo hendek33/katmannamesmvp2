@@ -72,7 +72,15 @@ export default function Game() {
   useEffect(() => {
     if (!gameState) return;
 
-    // Show role announcement when game starts
+    // Detect if game was just restarted (revealHistory is empty and we had a previous turn)
+    if (gameState.phase === "playing" && gameState.revealHistory.length === 0 && previousTurnRef.current) {
+      // Game was restarted, reset refs
+      roleAnnouncementShownRef.current = false;
+      previousTurnRef.current = null;
+      assassinShownRef.current = false;
+    }
+
+    // Show role announcement when game starts or restarts
     if (gameState.phase === "playing" && !roleAnnouncementShownRef.current) {
       roleAnnouncementShownRef.current = true;
       setShowRoleAnnouncement(true);
@@ -80,13 +88,10 @@ export default function Game() {
       setTimeout(() => {
         setCurrentTurn(gameState.currentTeam);
         setShowTurnVideo(true);
+        // Set the initial turn reference after showing first turn video
+        previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
       }, 2600); // Slightly after role announcement (2500ms) to ensure smooth transition
-    }
-
-    // Show video when game starts
-    if (gameState.phase === "playing" && !previousTurnRef.current) {
-      previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
-      return;
+      return; // Exit early to prevent turn video logic from running
     }
 
     if (gameState.phase !== "playing") {
@@ -167,6 +172,7 @@ export default function Game() {
     send("restart_game", {});
     assassinShownRef.current = false;
     roleAnnouncementShownRef.current = false; // Reset role announcement for new game
+    previousTurnRef.current = null; // Reset turn tracking for new game
   };
 
   useEffect(() => {
