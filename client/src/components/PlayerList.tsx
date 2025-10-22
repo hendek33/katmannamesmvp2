@@ -133,61 +133,55 @@ export function PlayerList({
         </div>
       )}
       
-      <div className="space-y-1">
+      <div className="grid grid-cols-3 gap-1">
         {teamPlayers.map(player => (
           <div 
             key={player.id}
             data-testid={`player-${player.id}`}
-            className={`flex items-center gap-2 p-1.5 rounded transition-all ${
+            className={`flex flex-col items-center p-1.5 rounded transition-all ${
               player.id === currentPlayerId 
                 ? 'bg-accent/20 border border-accent/30 shadow-sm' 
                 : 'bg-black/20 hover:bg-black/30'
             }`}
           >
-            <div className="flex items-center gap-1 flex-1 min-w-0">
-              {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
-              <span className="text-xs font-medium truncate">{player.username}</span>
-            </div>
+            {/* Owner Crown */}
+            {player.isRoomOwner && (
+              <Crown className="w-3 h-3 text-yellow-500 mb-0.5" />
+            )}
             
-            <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Username */}
+            <span className="text-[10px] font-medium text-center truncate w-full">
+              {player.username}
+            </span>
+            
+            {/* Role Badge */}
+            <div className="flex flex-col items-center gap-0.5">
               {player.role === "spymaster" ? (
-                <Badge 
-                  variant="default" 
-                  className="text-[10px] gap-0.5 px-1.5 py-0 h-5 bg-gradient-to-r from-amber-600 to-yellow-600 border-amber-400"
-                >
-                  <Eye className="w-2.5 h-2.5" />
-                  <span className="font-semibold">Şef</span>
-                </Badge>
+                <Eye className="w-3 h-3 text-amber-500" />
               ) : (
-                <Badge variant="secondary" className="text-[10px] gap-0.5 px-1.5 py-0 h-5">
-                  <Target className="w-2.5 h-2.5" />
-                  <span>Ajan</span>
-                </Badge>
+                <Target className="w-3 h-3 text-muted-foreground" />
               )}
               
+              {/* Role Toggle for Current Player */}
               {isLobby && player.id === currentPlayerId && onRoleToggle && (
-                <Button 
-                  size="sm" 
-                  variant="ghost"
-                  className="h-5 px-1 text-[10px]"
+                <button 
                   onClick={onRoleToggle}
+                  className="text-[8px] text-muted-foreground hover:text-white underline"
                   data-testid="button-toggle-role"
                 >
-                  Değiştir
-                </Button>
+                  değiştir
+                </button>
               )}
               
-              {/* Remove button for bots */}
+              {/* Remove Bot Button */}
               {isLobby && player.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-5 w-5 p-0 text-red-500 hover:text-red-700"
+                <button 
                   onClick={() => onRemoveBot(player.id)}
+                  className="text-[8px] text-red-500 hover:text-red-700"
                   data-testid={`button-remove-bot-${player.id}`}
                 >
-                  <X className="w-3 h-3" />
-                </Button>
+                  kaldır
+                </button>
               )}
             </div>
           </div>
