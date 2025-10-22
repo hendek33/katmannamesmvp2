@@ -35,6 +35,7 @@ export default function Lobby() {
   const [timedMode, setTimedMode] = useState(false);
   const [spymasterTime, setSpymasterTime] = useState(120); // 2 minutes default
   const [guesserTime, setGuesserTime] = useState(180); // 3 minutes default
+  const [chaosMode, setChaosMode] = useState(false);
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("katmannames_username");
@@ -62,11 +63,12 @@ export default function Lobby() {
   }, [gameState, setLocation]);
 
   useEffect(() => {
-    // Sync timer settings from gameState
+    // Sync timer and chaos mode settings from gameState
     if (gameState) {
       setTimedMode(gameState.timedMode);
       setSpymasterTime(gameState.spymasterTime);
       setGuesserTime(gameState.guesserTime);
+      setChaosMode(gameState.chaosMode || false);
     }
   }, [gameState]);
 
@@ -142,6 +144,10 @@ export default function Lobby() {
       spymasterTime: spyTime,
       guesserTime: guessTime 
     });
+  };
+
+  const handleChaosModeUpdate = (enabled: boolean) => {
+    send("update_chaos_mode", { chaosMode: enabled });
   };
 
   if (!isConnected) {
@@ -514,6 +520,48 @@ export default function Lobby() {
                     </div>
                   </div>
                 </div>
+              </Card>
+            )}
+
+            {/* Chaos Mode Settings - Compact */}
+            {currentPlayer?.isRoomOwner && (
+              <Card className="p-3 sm:p-4 space-y-3 border-2 bg-gradient-to-br from-red-500/20 to-orange-500/20 backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-red-600" />
+                    <h3 className="text-sm font-bold">🎯 KAOS MODU</h3>
+                  </div>
+                  <Switch
+                    checked={chaosMode}
+                    onCheckedChange={(checked) => {
+                      setChaosMode(checked);
+                      handleChaosModeUpdate(checked);
+                    }}
+                    data-testid="switch-chaos-mode"
+                  />
+                </div>
+                
+                {chaosMode && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-yellow-500">🔮 Kahin Ajan:</span>
+                        <span>Her takımda 1, kendi kartlarından 3 tanesini bilir</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-red-500">💀 Dodo Ajanı:</span>
+                        <span>Takımını suikastçıya yönlendirir, sadece oy verir</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-purple-500">🎭 Çift Ajan:</span>
+                        <span>Takımını yanlış kartlara yönlendirir, sadece oy verir</span>
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-amber-500 text-center font-semibold">
+                      ⚠️ Dikkat: Gizli roller oyun başladığında atanır!
+                    </div>
+                  </div>
+                )}
               </Card>
             )}
 

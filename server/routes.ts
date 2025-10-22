@@ -14,6 +14,8 @@ import {
   addBotSchema,
   updateTeamNameSchema,
   updateTimerSettingsSchema,
+  updateChaosModeSchema,
+  guessProphetSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -359,6 +361,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
             );
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Zamanlayıcı ayarları güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
+          case "update_chaos_mode": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi Kaos Modunu değiştirebilir" } });
+              return;
+            }
+
+            const validation = updateChaosModeSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz Kaos Modu ayarları" } });
+              return;
+            }
+
+            const gameState = storage.updateChaosMode(ws.roomCode, validation.data.chaosMode);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Kaos Modu güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
+          case "guess_prophet": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = guessProphetSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz tahmin" } });
+              return;
+            }
+
+            const gameState = storage.guessProphet(ws.roomCode, ws.playerId, validation.data.targetPlayerId);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Tahmin yapılamadı. Belki takımınız tahmin hakkını kullandı." } });
               return;
             }
 

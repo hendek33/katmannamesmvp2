@@ -14,7 +14,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -204,7 +204,11 @@ export default function Game() {
   const isSpymaster = currentPlayer.role === "spymaster";
   const isCurrentTurn = currentPlayer.team === gameState.currentTeam;
   const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended";
-  const canRevealCard = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null && gameState.phase !== "ended";
+  
+  // In Chaos Mode, Dodo and Double Agents can only vote, not reveal cards
+  const canRevealCardBase = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null && gameState.phase !== "ended";
+  const canRevealCard = canRevealCardBase && (!gameState.chaosMode || 
+    (currentPlayer.secretRole !== "dodo" && currentPlayer.secretRole !== "double_agent"));
 
   const darkPlayers = gameState.players.filter(p => p.team === "dark");
   const lightPlayers = gameState.players.filter(p => p.team === "light");
@@ -818,11 +822,94 @@ export default function Game() {
                           {currentPlayer?.role === "spymaster" ? "İstihbarat Şefi" :
                            currentPlayer?.role === "guesser" ? "Ajan" : "Seçilmedi"}
                         </span></div>
+                        {gameState.chaosMode && currentPlayer.secretRole && (
+                          <div className="mt-2 pt-2 border-t border-slate-700/50">
+                            <div className="text-purple-400 font-bold">
+                              Gizli Rol: {
+                                currentPlayer.secretRole === "prophet" ? "🔮 Peygamber" :
+                                currentPlayer.secretRole === "dodo" ? "💀 Dodo Ajanı" :
+                                currentPlayer.secretRole === "double_agent" ? "🎭 Çift Ajan" : ""
+                              }
+                            </div>
+                            <div className="text-[10px] mt-1 text-slate-500">
+                              {currentPlayer.secretRole === "prophet" && "3 takım kartını biliyorsun"}
+                              {currentPlayer.secretRole === "dodo" && "Takımını Suikastçıya yönlendir (sadece oy)"}
+                              {currentPlayer.secretRole === "double_agent" && "Kendi takımına karşı çalış (sadece oy)"}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 </DialogContent>
               </Dialog>
+              {/* Prophet Guess Button - Only show in Chaos Mode during play */}
+              {gameState.chaosMode && gameState.phase === "playing" && 
+               currentPlayer.role === "guesser" && 
+               (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) && (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      data-testid="button-guess-prophet"
+                      className="h-6 px-2 border hover:border-purple-500 hover:bg-purple-500/10"
+                    >
+                      <Sparkles className="w-2.5 h-2.5 mr-0.5" />
+                      <span className="text-[10px]">Peygamber Tahmini</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-slate-900/95 border-2 border-purple-900/30 max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        Peygamber Tahmini
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="p-3 bg-purple-950/30 rounded-lg border border-purple-700/50">
+                        <p className="text-xs text-purple-300">
+                          Rakip takımın Peygamberini doğru tahmin ederseniz oyunu kazanırsınız! 
+                          Yanlış tahmin yaparsanız bu hakkınızı kaybedersiniz.
+                        </p>
+                      </div>
+                      
+                      {/* Opponent Team Players */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-300">
+                          {currentPlayer.team === "dark" ? gameState.lightTeamName : gameState.darkTeamName} Takımı Oyuncuları
+                        </Label>
+                        <div className="space-y-2">
+                          {(currentPlayer.team === "dark" ? lightPlayers : darkPlayers)
+                            .filter(p => p.role === "guesser")
+                            .map(player => (
+                              <Button
+                                key={player.id}
+                                onClick={() => {
+                                  send("guess_prophet", { targetPlayerId: player.id });
+                                  toast({
+                                    title: "Tahmin Gönderildi",
+                                    description: `${player.username} oyuncusunun Peygamber olduğunu tahmin ettiniz`,
+                                  });
+                                }}
+                                variant="outline"
+                                className="w-full border-2 hover:border-purple-500 hover:bg-purple-500/10 justify-start"
+                              >
+                                <Target className="w-4 h-4 mr-2 text-purple-400" />
+                                {player.username}
+                              </Button>
+                            ))}
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                        <p className="text-xs text-amber-400">
+                          ⚠️ Dikkat: Bu tahmin sadece bir kez yapılabilir!
+                        </p>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
               <Button
                 size="sm"
                 variant="outline"
@@ -1017,6 +1104,7 @@ export default function Game() {
                     isLastCard={card.id === lastCardId && gameState.phase === "ended"}
                     isAssassinCard={card.type === "assassin" && card.revealed && gameState.phase === "ended"}
                     gameEnded={gameState.phase === "ended"}
+                    isKnownCard={currentPlayer.secretRole === "prophet" && currentPlayer.knownCards?.includes(card.id)}
                   />
                 </div>
               ))}

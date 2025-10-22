@@ -17,9 +17,10 @@ interface GameCardProps {
   isLastCard?: boolean;
   isAssassinCard?: boolean;
   gameEnded?: boolean;
+  isKnownCard?: boolean;
 }
 
-export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false }: GameCardProps) {
+export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false, isKnownCard = false }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
 
@@ -110,6 +111,18 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         overflow: card.revealed ? 'visible' : 'hidden'
       }}
     >
+      {/* Prophet indicator - shows which cards they know */}
+      {isKnownCard && !card.revealed && (
+        <div className="absolute inset-0 pointer-events-none rounded-lg" style={{ zIndex: 15 }}>
+          <div className="absolute inset-0 rounded-lg border-2 border-purple-500/50 animate-pulse" />
+          <div className="absolute top-0.5 right-0.5">
+            <div className="bg-purple-600/80 backdrop-blur-sm rounded px-1 py-0.5">
+              <span className="text-[8px] text-white font-bold">🔮</span>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Logo watermark */}
       <div 
         className="absolute inset-0 pointer-events-none"

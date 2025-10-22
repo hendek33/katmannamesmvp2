@@ -21,6 +21,8 @@ export interface IStorage {
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
   updateTeamName(roomCode: string, team: Team, name: string): GameState | null;
   updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
+  updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
+  guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   startGame(roomCode: string): GameState | null;
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null;
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
@@ -175,6 +177,8 @@ export class MemStorage implements IStorage {
       spymasterTime: 120, // Default 2 minutes for Intelligence Chiefs
       guesserTime: 180, // Default 3 minutes for Agents
       currentTurnStartTime: null,
+      chaosMode: false,
+      prophetGuessUsed: { dark: false, light: false },
     };
 
     this.rooms.set(roomCode, { 
@@ -389,6 +393,71 @@ export class MemStorage implements IStorage {
     return room;
   }
 
+  updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow chaos mode settings to be changed in lobby
+    if (room.phase !== "lobby") return null;
+
+    room.chaosMode = chaosMode;
+
+    return room;
+  }
+
+  private assignSecretRoles(room: GameState): void {
+    // Clear any existing secret roles
+    room.players.forEach(p => {
+      p.secretRole = null;
+      p.knownCards = undefined;
+    });
+
+    // Only assign roles to human players (not bots) who are guessers
+    const darkGuessers = room.players.filter(p => !p.isBot && p.team === "dark" && p.role === "guesser");
+    const lightGuessers = room.players.filter(p => !p.isBot && p.team === "light" && p.role === "guesser");
+    
+    // Assign Prophet to one player from each team (if there are guessers)
+    if (darkGuessers.length > 0) {
+      const darkProphet = darkGuessers[Math.floor(Math.random() * darkGuessers.length)];
+      darkProphet.secretRole = "prophet";
+      // Give prophet 3 random cards from their team
+      const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
+      const shuffled = darkCards.sort(() => Math.random() - 0.5);
+      darkProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
+    }
+    
+    if (lightGuessers.length > 0) {
+      const lightProphet = lightGuessers[Math.floor(Math.random() * lightGuessers.length)];
+      lightProphet.secretRole = "prophet";
+      // Give prophet 3 random cards from their team
+      const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
+      const shuffled = lightCards.sort(() => Math.random() - 0.5);
+      lightProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
+    }
+    
+    // Assign Dodo and Double Agent to remaining players
+    const remainingDarkGuessers = darkGuessers.filter(p => p.secretRole !== "prophet");
+    const remainingLightGuessers = lightGuessers.filter(p => p.secretRole !== "prophet");
+    
+    // Randomly decide which team gets Dodo
+    const allRemainingGuessers = [...remainingDarkGuessers, ...remainingLightGuessers];
+    if (allRemainingGuessers.length >= 2) {
+      // Shuffle and pick first for Dodo
+      const shuffled = allRemainingGuessers.sort(() => Math.random() - 0.5);
+      const dodo = shuffled[0];
+      dodo.secretRole = "dodo";
+      
+      // Pick from opposite team for Double Agent
+      const oppositeTeam = dodo.team === "dark" ? "light" : "dark";
+      const oppositeTeamGuessers = shuffled.filter(p => p.team === oppositeTeam && p.secretRole !== "prophet");
+      if (oppositeTeamGuessers.length > 0) {
+        const doubleAgent = oppositeTeamGuessers[0];
+        doubleAgent.secretRole = "double_agent";
+      }
+    }
+  }
+
   startGame(roomCode: string): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
@@ -413,6 +482,11 @@ export class MemStorage implements IStorage {
     room.currentClue = null;
     room.winner = null;
     room.revealHistory = [];
+
+    // Assign secret roles for Chaos Mode
+    if (room.chaosMode) {
+      this.assignSecretRoles(room);
+    }
     
     // Reset guess tracking
     roomData.guessesRemaining = 0;
@@ -655,6 +729,56 @@ export class MemStorage implements IStorage {
     // Reset timer for new team's turn if timed mode is enabled
     if (room.timedMode) {
       room.currentTurnStartTime = Date.now();
+    }
+    
+    return room;
+  }
+
+  guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Check if game is in playing phase and chaos mode is enabled
+    if (room.phase !== "playing" || !room.chaosMode) return null;
+    
+    // Check if player is a guesser on the current team
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || player.team !== room.currentTeam || player.role !== "guesser") {
+      return null;
+    }
+    
+    // Check if the team hasn't used their prophet guess yet
+    if (room.prophetGuessUsed && room.prophetGuessUsed[room.currentTeam as "dark" | "light"]) {
+      return null;
+    }
+    
+    // Get the target player
+    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+    if (!targetPlayer || targetPlayer.team === room.currentTeam) {
+      return null; // Can't guess your own team
+    }
+    
+    // Mark the guess as used
+    if (!room.prophetGuessUsed) {
+      room.prophetGuessUsed = { dark: false, light: false };
+    }
+    room.prophetGuessUsed[room.currentTeam as "dark" | "light"] = true;
+    
+    // Check if the guess is correct
+    const isCorrect = targetPlayer.secretRole === "prophet";
+    
+    // Store the result
+    room.prophetGuessResult = {
+      team: room.currentTeam,
+      success: isCorrect,
+      targetId: targetPlayerId
+    };
+    
+    // If the guess is correct, the guessing team wins immediately
+    if (isCorrect) {
+      room.winner = room.currentTeam;
+      room.phase = "ended";
     }
     
     return room;
