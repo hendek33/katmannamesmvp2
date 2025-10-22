@@ -401,6 +401,22 @@ export default function Lobby() {
                   <Copy className="w-4 h-4" />
                 )}
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  send("leave_room", {});
+                  localStorage.removeItem("katmannames_room_code");
+                  localStorage.removeItem("katmannames_player_id");
+                  setLocation("/rooms");
+                }}
+                className="h-10 px-4 border-2 border-red-600/50 hover:border-red-600 hover:bg-red-600/10 transition-all text-red-500 hover:text-red-400"
+                data-testid="button-leave-room"
+                title="Odadan Çık"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1.5" />
+                <span className="text-sm font-medium">Çık</span>
+              </Button>
             </div>
           </div>
         </Card>
