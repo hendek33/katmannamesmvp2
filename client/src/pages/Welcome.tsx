@@ -85,7 +85,7 @@ export default function Welcome() {
               <img 
                 src="/logo.png" 
                 alt="Katmannames Logo" 
-                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain"
+                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:scale-105 cursor-pointer"
               />
             </div>
 
@@ -95,15 +95,15 @@ export default function Welcome() {
                 onClick={() => setShowUsernameInput(true)}
                 className="group relative w-36 h-36 md:w-40 md:h-40 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-8 border-black flex items-center justify-center"
                 style={{
-                  background: 'radial-gradient(circle at 30% 30%, #1e40af, #991b1b)',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
                   fontFamily: "'Orbitron', 'Exo 2', sans-serif"
                 }}
               >
                 <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                      style={{ 
-                       background: 'radial-gradient(circle at 30% 30%, #1e3a8a, #7f1d1d)'
+                       background: 'linear-gradient(135deg, #764ba2 0%, #8e5bb3 50%, #f4a0ff 100%)'
                      }} />
-                <span className="relative z-10 text-black text-3xl md:text-4xl font-black uppercase tracking-wider">
+                <span className="relative z-10 text-black text-xl md:text-2xl font-black uppercase tracking-wider">
                   Başla
                 </span>
               </button>
