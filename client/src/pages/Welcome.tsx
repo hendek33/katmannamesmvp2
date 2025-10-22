@@ -21,7 +21,7 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 relative overflow-x-hidden" 
+    <div className="h-screen bg-slate-900 relative overflow-hidden" 
          style={{ 
            backgroundImage: 'url(/arkaplan.png)', 
            backgroundSize: 'cover', 
@@ -42,7 +42,7 @@ export default function Welcome() {
       ))}
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden w-full" style={{ minHeight: '720px' }}>
+      <section className="relative overflow-hidden w-full h-full">
         {/* Physics Cards Background */}
         <HeroPhysicsCards 
           imageNames={[
@@ -73,7 +73,7 @@ export default function Welcome() {
             "şinasi kırmızı.png",
             "şinasi su beyaz.png"
           ]}
-          height={720}
+          height={window.innerHeight || 720}
           countMobile={24}
         />
         
@@ -93,7 +93,7 @@ export default function Welcome() {
             <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
               <button
                 onClick={() => setShowUsernameInput(true)}
-                className="group relative w-36 h-36 md:w-40 md:h-40 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-4 border-black flex items-center justify-center"
+                className="group relative w-36 h-36 md:w-40 md:h-40 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-8 border-black flex items-center justify-center"
                 style={{
                   background: 'radial-gradient(circle at 30% 30%, #1e40af, #991b1b)',
                   fontFamily: "'Orbitron', 'Exo 2', sans-serif"
@@ -103,7 +103,7 @@ export default function Welcome() {
                      style={{ 
                        background: 'radial-gradient(circle at 30% 30%, #1e3a8a, #7f1d1d)'
                      }} />
-                <span className="relative z-10 text-white text-3xl md:text-4xl font-black uppercase tracking-wider">
+                <span className="relative z-10 text-black text-3xl md:text-4xl font-black uppercase tracking-wider">
                   Başla
                 </span>
               </button>
