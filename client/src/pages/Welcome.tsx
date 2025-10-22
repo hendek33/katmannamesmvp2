@@ -170,46 +170,57 @@ export default function Welcome() {
         
         {/* Content Overlay */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <Card className="bg-white/10 backdrop-blur-lg border-2 border-white/20 p-8 md:p-12 space-y-8 mx-4 max-w-4xl">
-            <div className="flex justify-center">
+          <div className="flex flex-col items-center space-y-8">
+            {/* Logo Outside Card */}
+            <div className="flex justify-center animate-in fade-in slide-in-from-top-4 duration-700">
               <img 
                 src="/logo.png" 
                 alt="Katmannames Logo" 
-                className="w-80 md:w-96 lg:w-[32rem] h-auto object-contain animate-in fade-in slide-in-from-top-4 duration-700"
+                className="w-72 md:w-80 lg:w-96 h-auto object-contain"
               />
             </div>
-            
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 text-center">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-800 to-red-800 bg-clip-text text-transparent uppercase tracking-wider" 
-                  style={{ 
-                    fontFamily: "'Bebas Neue', 'Oswald', 'Impact', sans-serif",
-                    WebkitTextStroke: '2px rgba(0,0,0,0.8)',
-                    textShadow: '3px 3px 6px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.1)'
-                  }}>
-                KATMANIN DİBİ
-              </h1>
-              <p className="text-lg md:text-xl text-white max-w-3xl mx-auto font-semibold tracking-wide text-center"
-                 style={{ 
-                   fontFamily: "'Rajdhani', 'Orbitron', 'Exo 2', sans-serif",
-                   textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
-                 }}>
-                İki takım, gizli kelimeler, stratejik ipuçları. Takım arkadaşlarınla birlikte 
-                25 kartlık grid'de kendi takımının kartlarını bul!
-              </p>
-            </div>
 
-            <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
-              <Button
-                onClick={() => setShowUsernameInput(true)}
-                size="lg"
-                className="group relative px-10 py-7 text-xl font-bold bg-gradient-to-r from-blue-800 to-red-800 hover:from-blue-900 hover:to-red-900 transform hover:scale-105 transition-all pointer-events-auto shadow-2xl border-2 border-white/20"
-              >
-                <Play className="w-6 h-6 mr-3" />
-                Hemen Başla
-                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </div>
-          </Card>
+            {/* Card Content */}
+            <Card className="bg-white/5 backdrop-blur-lg border-2 border-white/15 p-8 md:p-10 space-y-8 mx-4 max-w-3xl">
+              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 text-center">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-800 to-red-800 bg-clip-text text-transparent uppercase tracking-wider" 
+                    style={{ 
+                      fontFamily: "'Bebas Neue', 'Oswald', 'Impact', sans-serif",
+                      WebkitTextStroke: '2px rgba(0,0,0,0.8)',
+                      textShadow: '3px 3px 6px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.1)'
+                    }}>
+                  KATMANIN DİBİ
+                </h1>
+                <p className="text-lg md:text-xl text-white max-w-3xl mx-auto font-semibold tracking-wide text-center"
+                   style={{ 
+                     fontFamily: "'Rajdhani', 'Orbitron', 'Exo 2', sans-serif",
+                     textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                   }}>
+                  İki takım, gizli kelimeler, stratejik ipuçları. Takım arkadaşlarınla birlikte 
+                  25 kartlık grid'de kendi takımının kartlarını bul!
+                </p>
+              </div>
+
+              <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+                <button
+                  onClick={() => setShowUsernameInput(true)}
+                  className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-4 border-white/30 flex items-center justify-center"
+                  style={{
+                    background: 'radial-gradient(circle at 30% 30%, #1e40af, #991b1b)',
+                    fontFamily: "'Orbitron', 'Exo 2', sans-serif"
+                  }}
+                >
+                  <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                       style={{ 
+                         background: 'radial-gradient(circle at 30% 30%, #1e3a8a, #7f1d1d)'
+                       }} />
+                  <span className="relative z-10 text-white text-2xl md:text-3xl font-black uppercase tracking-wider">
+                    Başla
+                  </span>
+                </button>
+              </div>
+            </Card>
+          </div>
         </div>
       </section>
 
