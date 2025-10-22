@@ -108,33 +108,51 @@ export default function Welcome() {
 
             {/* Start Button */}
             <div className="relative flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400 ml-6">
+              {/* Outer glow rings */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="absolute w-32 h-32 md:w-36 md:h-36 rounded-full animate-ping opacity-30" 
+                     style={{ backgroundColor: 'rgba(0, 116, 176, 0.6)' }} />
+                <div className="absolute w-36 h-36 md:w-40 md:h-40 rounded-full animate-ping opacity-20 animation-delay-200" 
+                     style={{ backgroundColor: 'rgba(0, 116, 176, 0.4)' }} />
+              </div>
+              
               <button
                 onClick={() => setShowUsernameInput(true)}
-                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto flex items-center justify-center overflow-hidden animate-pulse-glow hover:filter-none"
+                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform transition-all duration-500 pointer-events-auto flex items-center justify-center overflow-hidden hover:scale-125 hover:rotate-12 active:scale-110"
                 style={{
                   borderColor: 'rgba(67, 23, 9, 1)',
                   backgroundColor: 'rgba(0, 116, 176, 1)',
                   borderWidth: '12px',
                   borderStyle: 'solid',
                   filter: 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))',
+                  transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.filter = 'drop-shadow(0 15px 40px rgba(0, 116, 176, 0.8)) drop-shadow(0 8px 25px rgba(67, 23, 9, 0.6))';
+                  e.currentTarget.style.filter = 'drop-shadow(0 20px 50px rgba(0, 116, 176, 1)) drop-shadow(0 10px 30px rgba(67, 23, 9, 0.8))';
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 150, 200, 1)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.filter = 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))';
+                  e.currentTarget.style.backgroundColor = 'rgba(0, 116, 176, 1)';
                 }}
               >
-                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                     style={{ 
-                       backgroundColor: 'rgba(0, 116, 176, 0.8)'
+                {/* Inner pulse effect */}
+                <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-pulse" />
+                
+                {/* Rotating border effect */}
+                <div className="absolute inset-[-2px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                     style={{
+                       background: 'conic-gradient(from 0deg, transparent, rgba(255,255,255,0.4), transparent)',
+                       animation: 'spin 2s linear infinite',
                      }} />
-                {/* Opaque Play Icon */}
+                
+                {/* Play Icon with hover animation */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                  <Play className="w-16 h-16 md:w-20 md:h-20" 
+                  <Play className="w-16 h-16 md:w-20 md:h-20 transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12" 
                         style={{ 
                           color: 'rgba(67, 23, 9, 1)',
-                          fill: 'rgba(67, 23, 9, 1)' 
+                          fill: 'rgba(67, 23, 9, 1)',
+                          filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
                         }} />
                 </div>
               </button>

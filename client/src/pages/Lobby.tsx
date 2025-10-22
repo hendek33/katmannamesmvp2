@@ -336,11 +336,21 @@ export default function Lobby() {
   }
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
+  
+  // Team filtering
+  const darkTeam = gameState.players.filter(p => p.team === "dark");
+  const lightTeam = gameState.players.filter(p => p.team === "light");
+  const noTeam = gameState.players.filter(p => p.team === null);
+  
+  // Check for spymasters
+  const darkHasSpymaster = darkTeam.some(p => p.role === "spymaster");
+  const lightHasSpymaster = lightTeam.some(p => p.role === "spymaster");
+  
   const canStartGame = currentPlayer?.isRoomOwner && 
-    gameState.players.filter(p => p.team === "dark").some(p => p.role === "spymaster") &&
-    gameState.players.filter(p => p.team === "light").some(p => p.role === "spymaster") &&
-    gameState.players.filter(p => p.team === "dark").length > 0 &&
-    gameState.players.filter(p => p.team === "light").length > 0;
+    darkHasSpymaster &&
+    lightHasSpymaster &&
+    darkTeam.length > 0 &&
+    lightTeam.length > 0;
 
   const playerCount = gameState.players.length;
 

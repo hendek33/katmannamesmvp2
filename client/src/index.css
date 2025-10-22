@@ -1088,3 +1088,18 @@
   animation: shine 3s ease-in-out infinite;
   animation-delay: 2s; /* Initial delay before first shine */
 }
+
+/* Spin animation for rotating borders */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation delay utility */
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
