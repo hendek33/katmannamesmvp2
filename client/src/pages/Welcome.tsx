@@ -208,22 +208,6 @@ export default function Welcome() {
                 Nasıl Oynanır?
               </Button>
             </div>
-
-            {/* Interactive Instructions */}
-            <div className="flex flex-wrap gap-4 justify-center text-xs text-muted-foreground animate-in fade-in duration-700 delay-600">
-              <div className="flex items-center gap-2 bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
-                <div className="w-4 h-4 rounded bg-slate-700 flex items-center justify-center">🖱️</div>
-                <span>Mouse ile kartları it</span>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
-                <kbd className="px-2 py-0.5 bg-slate-800 rounded text-[10px]">Space</kbd>
-                <span>Kartları savur</span>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
-                <kbd className="px-2 py-0.5 bg-slate-800 rounded text-[10px]">Shift</kbd>
-                <span>Güçlü itme</span>
-              </div>
-            </div>
           </div>
         </div>
       </section>

@@ -44,7 +44,7 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
       collisions: false,
     } as const;
 
-    const CARD_W = 92, CARD_H = 58;
+    const CARD_W = 120, CARD_H = 75;
 
     // Küçük ekranlarda kart sayısını düşür (opsiyonel)
     try {
@@ -197,9 +197,7 @@ export default function HeroPhysicsCards({ imageNames = [], height = 560, countM
         ctx.restore();
       }
 
-      // hafif çerçeve
-      ctx.strokeStyle = "rgba(255,255,255,0.05)";
-      ctx.lineWidth = 20; ctx.strokeRect(10,10,bounds.w-20,bounds.h-20);
+      // Çerçeve kaldırıldı
 
       // Bilgi mesajı: görsel bulunamadıysa köşeye ipucu yaz
       if (images.length === 0) {
