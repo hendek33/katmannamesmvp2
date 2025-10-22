@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface AssassinVideoProps {
@@ -16,25 +16,46 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onCo
   const [showWinnerText, setShowWinnerText] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [fadeOutWinner, setFadeOutWinner] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
+
+  useEffect(() => {
+    // Cleanup function
+    return () => {
+      // Clear all timers on unmount
+      timersRef.current.forEach(t => clearTimeout(t));
+      // Cleanup video
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.src = '';
+        videoRef.current.load();
+      }
+    };
+  }, []);
 
   const handleVideoEnd = () => {
     setVideoEnded(true);
     // Flash effect
     setShowFlash(true);
-    setTimeout(() => {
+    const flashTimer = setTimeout(() => {
       setShowFlash(false);
       // Start closing animation and show winner text immediately
       setIsClosing(true);
       setShowWinnerText(true);
       // Start fade out after 4 seconds
-      setTimeout(() => {
+      const fadeTimer = setTimeout(() => {
         setFadeOutWinner(true);
         // Complete after fade out animation
-        setTimeout(() => {
+        const completeTimer = setTimeout(() => {
           onComplete?.();
         }, 800);
+        timersRef.current.push(completeTimer);
       }, 4000);
+      timersRef.current.push(fadeTimer);
     }, 300);
+    timersRef.current.push(flashTimer);
   };
 
   if (!show && !showWinnerText) return null;
@@ -88,12 +109,22 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onCo
               }}
             >
               <video
+                ref={videoRef}
                 src="/siyah kelime seçme.mp4"
                 autoPlay
                 muted
                 playsInline
+                preload="auto"
+                onLoadedData={() => setVideoReady(true)}
+                onError={() => {
+                  console.error("Assassin videosu yüklenemedi");
+                  setVideoError(true);
+                  // Hata durumunda direkt kazanan göster
+                  handleVideoEnd();
+                }}
                 onEnded={handleVideoEnd}
                 className="w-full h-auto"
+                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.3s ease' }}
               />
               
               {/* Dark gradient overlay for better blending */}

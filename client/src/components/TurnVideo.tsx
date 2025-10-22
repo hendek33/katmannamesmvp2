@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface TurnVideoProps {
@@ -11,6 +11,10 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
   const [videoEnded, setVideoEnded] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
 
   const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
@@ -20,13 +24,25 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
     // Auto hide after 4 seconds
     const timer = setTimeout(() => {
       setIsClosing(true);
-      setTimeout(() => {
+      const closeTimer = setTimeout(() => {
         setShow(false);
         onComplete?.();
       }, 600);
+      timersRef.current.push(closeTimer);
     }, 4000);
+    
+    timersRef.current.push(timer);
 
-    return () => clearTimeout(timer);
+    return () => {
+      // Clear all timers on unmount
+      timersRef.current.forEach(t => clearTimeout(t));
+      // Cleanup video
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.src = '';
+        videoRef.current.load();
+      }
+    };
   }, [onComplete]);
 
   const handleVideoEnd = () => {
@@ -81,12 +97,30 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
             }}
           >
             <video
+              ref={videoRef}
               src={videoSrc}
               autoPlay
               muted
               playsInline
+              preload="auto"
+              onLoadedData={() => setVideoReady(true)}
+              onError={() => {
+                console.error("Video yüklenemedi:", videoSrc);
+                setVideoError(true);
+                // Hata durumunda yine de devam et
+                const errorTimer = setTimeout(() => {
+                  setIsClosing(true);
+                  const errorCloseTimer = setTimeout(() => {
+                    setShow(false);
+                    onComplete?.();
+                  }, 600);
+                  timersRef.current.push(errorCloseTimer);
+                }, 1000);
+                timersRef.current.push(errorTimer);
+              }}
               onEnded={handleVideoEnd}
               className="w-full h-full object-cover"
+              style={{ opacity: videoReady ? 1 : 0 }}
             />
             
             {/* Gradient overlay for better blending */}
