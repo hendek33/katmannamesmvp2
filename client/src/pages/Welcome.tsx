@@ -93,7 +93,7 @@ export default function Welcome() {
             <div className="relative flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400 ml-6">
               <button
                 onClick={() => setShowUsernameInput(true)}
-                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl flex items-center justify-center overflow-hidden"
+                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl flex items-center justify-center overflow-hidden animate-pulse-glow"
                 style={{
                   borderColor: 'rgba(67, 23, 9, 1)',
                   backgroundColor: 'rgba(0, 116, 176, 1)',
