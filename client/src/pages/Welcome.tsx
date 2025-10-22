@@ -46,9 +46,14 @@ export default function Welcome() {
     "noeldayı mavi.png",
     "nuriben mavi.png",
     "perver beyaz.png",
+    "perver kırmızı.png",
+    "triel kırmızı.png",
+    "triel2 mavi.png",
     "çağrı mavi.png",
     "çağrı normal beyaz.png",
-    "çağrı sigara beyaz.png"
+    "çağrı sigara beyaz.png",
+    "şinasi kırmızı.png",
+    "şinasi su beyaz.png"
   ], []);
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
@@ -62,7 +67,7 @@ export default function Welcome() {
             const img = new Image();
             img.onload = resolve;
             img.onerror = reject;
-            img.src = `/acilmiskartgorselküçültülmüş/${imageName}`;
+            img.src = `/açılmış kelime kartları/${imageName}`;
           });
         });
         

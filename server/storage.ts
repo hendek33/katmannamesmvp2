@@ -59,32 +59,37 @@ export class MemStorage implements IStorage {
     // Image pools for each card type - using actual file names
     const imagePools = {
       dark: [
-        '/acilmiskartgorselküçültülmüş/ali mavi.png',
-        '/acilmiskartgorselküçültülmüş/blush mavi.png',
-        '/acilmiskartgorselküçültülmüş/hasan mavi.png',
-        '/acilmiskartgorselküçültülmüş/kasım mavi.png',
-        '/acilmiskartgorselküçültülmüş/mami mavi.png',
-        '/acilmiskartgorselküçültülmüş/noeldayı mavi.png',
-        '/acilmiskartgorselküçültülmüş/nuriben mavi.png',
-        '/acilmiskartgorselküçültülmüş/çağrı mavi.png'
+        '/açılmış kelime kartları/ali mavi.png',
+        '/açılmış kelime kartları/blush mavi.png',
+        '/açılmış kelime kartları/hasan mavi.png',
+        '/açılmış kelime kartları/kasım mavi.png',
+        '/açılmış kelime kartları/mami mavi.png',
+        '/açılmış kelime kartları/noeldayı mavi.png',
+        '/açılmış kelime kartları/nuriben mavi.png',
+        '/açılmış kelime kartları/triel2 mavi.png',
+        '/açılmış kelime kartları/çağrı mavi.png'
       ],
       light: [
-        '/acilmiskartgorselküçültülmüş/alik kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/begüm kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/dobby kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/karaman kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/neswin kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/noeldayı kırmızı.png'
+        '/açılmış kelime kartları/alik kırmızı.png',
+        '/açılmış kelime kartları/begüm kırmızı.png',
+        '/açılmış kelime kartları/dobby kırmızı.png',
+        '/açılmış kelime kartları/karaman kırmızı.png',
+        '/açılmış kelime kartları/neswin kırmızı.png',
+        '/açılmış kelime kartları/noeldayı kırmızı.png',
+        '/açılmış kelime kartları/perver kırmızı.png',
+        '/açılmış kelime kartları/triel kırmızı.png',
+        '/açılmış kelime kartları/şinasi kırmızı.png'
       ],
       neutral: [
-        '/acilmiskartgorselküçültülmüş/blush beyaz.png',
-        '/acilmiskartgorselküçültülmüş/hasan beyaz.png',
-        '/acilmiskartgorselküçültülmüş/mami beyaz.png',
-        '/acilmiskartgorselküçültülmüş/perver beyaz.png',
-        '/acilmiskartgorselküçültülmüş/çağrı normal beyaz.png',
-        '/acilmiskartgorselküçültülmüş/çağrı sigara beyaz.png'
+        '/açılmış kelime kartları/blush beyaz.png',
+        '/açılmış kelime kartları/hasan beyaz.png',
+        '/açılmış kelime kartları/mami beyaz.png',
+        '/açılmış kelime kartları/perver beyaz.png',
+        '/açılmış kelime kartları/çağrı normal beyaz.png',
+        '/açılmış kelime kartları/çağrı sigara beyaz.png',
+        '/açılmış kelime kartları/şinasi su beyaz.png'
       ],
-      assassin: ['/acilmiskartgorselküçültülmüş/arda siyah.png']
+      assassin: ['/açılmış kelime kartları/arda siyah.png']
     };
 
     // Shuffle each pool
