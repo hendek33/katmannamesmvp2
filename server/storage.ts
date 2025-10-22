@@ -23,6 +23,7 @@ export interface IStorage {
   updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
+  guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   startGame(roomCode: string): GameState | null;
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null;
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
@@ -436,25 +437,20 @@ export class MemStorage implements IStorage {
       lightProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
     }
     
-    // Assign Dodo and Double Agent to remaining players
+    // Assign Double Agent to one remaining player from each team
     const remainingDarkGuessers = darkGuessers.filter(p => p.secretRole !== "prophet");
     const remainingLightGuessers = lightGuessers.filter(p => p.secretRole !== "prophet");
     
-    // Randomly decide which team gets Dodo
-    const allRemainingGuessers = [...remainingDarkGuessers, ...remainingLightGuessers];
-    if (allRemainingGuessers.length >= 2) {
-      // Shuffle and pick first for Dodo
-      const shuffled = allRemainingGuessers.sort(() => Math.random() - 0.5);
-      const dodo = shuffled[0];
-      dodo.secretRole = "dodo";
-      
-      // Pick from opposite team for Double Agent
-      const oppositeTeam = dodo.team === "dark" ? "light" : "dark";
-      const oppositeTeamGuessers = shuffled.filter(p => p.team === oppositeTeam && p.secretRole !== "prophet");
-      if (oppositeTeamGuessers.length > 0) {
-        const doubleAgent = oppositeTeamGuessers[0];
-        doubleAgent.secretRole = "double_agent";
-      }
+    // Assign Double Agent to one player from Dark team
+    if (remainingDarkGuessers.length > 0) {
+      const darkDoubleAgent = remainingDarkGuessers[Math.floor(Math.random() * remainingDarkGuessers.length)];
+      darkDoubleAgent.secretRole = "double_agent";
+    }
+    
+    // Assign Double Agent to one player from Light team  
+    if (remainingLightGuessers.length > 0) {
+      const lightDoubleAgent = remainingLightGuessers[Math.floor(Math.random() * remainingLightGuessers.length)];
+      lightDoubleAgent.secretRole = "double_agent";
     }
   }
 
@@ -739,7 +735,7 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     
-    // Check if game is in playing phase and chaos mode is enabled
+    // Prophet guessing only works during the game, not after it ends
     if (room.phase !== "playing" || !room.chaosMode) return null;
     
     // Check if player is a guesser on the current team
@@ -779,6 +775,52 @@ export class MemStorage implements IStorage {
     if (isCorrect) {
       room.winner = room.currentTeam;
       room.phase = "ended";
+    }
+    
+    return room;
+  }
+
+  guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Double agent guessing only works after the game ends, in chaos mode
+    if (room.phase !== "ended" || !room.chaosMode) return null;
+    
+    // Check if there's a winner already (a team won normally)
+    if (!room.winner) return null;
+    
+    // Check if double agent guess hasn't been used yet
+    if (room.doubleAgentGuessUsed) return null;
+    
+    // Check if player is on the losing team
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || player.team === room.winner) {
+      return null; // Only losing team can guess
+    }
+    
+    // Get the target player
+    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+    if (!targetPlayer || targetPlayer.team !== room.winner) {
+      return null; // Can only guess players on the winning team
+    }
+    
+    // Mark the guess as used
+    room.doubleAgentGuessUsed = true;
+    
+    // Check if the guess is correct
+    const isCorrect = targetPlayer.secretRole === "double_agent";
+    
+    // Store the result
+    room.doubleAgentGuessResult = {
+      success: isCorrect,
+      targetId: targetPlayerId
+    };
+    
+    // If the guess is correct, the losing team steals the win
+    if (isCorrect) {
+      room.winner = player.team;
     }
     
     return room;

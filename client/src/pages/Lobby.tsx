@@ -764,18 +764,7 @@ export default function Lobby() {
                     <p className="text-xs">
                       Her takımda 1 tane bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
                       Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                    </p>
-                  </div>
-                  
-                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">💀</span>
-                      <h4 className="font-bold text-red-500">Dodo Ajanı</h4>
-                    </div>
-                    <p className="text-xs">
-                      Takımının içindeki hain! Görevi takımını kaybettirmektir. 
-                      Özellikle suikastçı kartını seçtirmeye çalışır. Kart seçemez, sadece oy verebilir.
-                      Kimliğini belli etmeden takımını yanlış yönlendirmelidir.
+                      <span className="text-amber-400 font-bold"> Karşı takımın Kahini oyun sırasında doğru tahmin edilirse, anında oyunu kazanırsınız!</span>
                     </p>
                   </div>
                   
@@ -785,8 +774,9 @@ export default function Lobby() {
                       <h4 className="font-bold text-purple-500">Çift Ajan</h4>
                     </div>
                     <p className="text-xs">
-                      Karşı takım için çalışan casus! Takımını yanlış kartlara yönlendirmeye çalışır.
-                      Kart seçemez, sadece oy verebilir. Karşı takımın kartlarını seçtirerek onların kazanmasını sağlar.
+                      <span className="text-purple-400 font-bold">Her takımda 1 tane bulunur.</span> Karşı takım için gizlice çalışan casus! 
+                      Takımını yanlış kartlara yönlendirmeye çalışır. Kart seçemez, sadece oy verebilir. 
+                      <span className="text-red-400 font-bold">Oyun bittiğinde: Kaybeden takım, kazanan takımın Çift Ajanını doğru tahmin ederse oyunu tersine çevirir!</span>
                     </p>
                   </div>
                 </div>
@@ -794,12 +784,12 @@ export default function Lobby() {
                 <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                   <h4 className="font-semibold text-amber-400 mb-2">⚡ Önemli Kurallar</h4>
                   <ul className="text-xs space-y-1">
-                    <li>• Dodo ve Çift Ajan her zaman zıt takımlarda olur (denge için)</li>
+                    <li>• Her takımda 1 Kahin ve 1 Çift Ajan bulunur</li>
                     <li>• Gizli roller oyun başladığında rastgele atanır</li>
                     <li>• Rolünüz sadece size gösterilir, başkaları göremez</li>
                     <li>• Kahin'in bildiği kartlar sadece ona mor renkte gösterilir</li>
-                    <li>• Her takım karşı takımın Kahin'ini tahmin edebilir (1 hak)</li>
-                    <li>• Doğru tahmin oyunu kazandırır, yanlış tahmin hakkı bitirir</li>
+                    <li>• <span className="text-yellow-400">Oyun sırasında:</span> Her takım karşı takımın Kahin'ini tahmin edebilir (1 hak) - Doğru tahmin anında kazandırır!</li>
+                    <li>• <span className="text-red-400">Oyun bittiğinde:</span> Kaybeden takım, kazanan takımın Çift Ajanını tahmin edebilir (1 hak) - Doğru tahmin oyunu tersine çevirir!</li>
                   </ul>
                 </div>
                 

@@ -16,6 +16,7 @@ import {
   updateTimerSettingsSchema,
   updateChaosModeSchema,
   guessProphetSchema,
+  guessDoubleAgentSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -418,6 +419,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const gameState = storage.guessProphet(ws.roomCode, ws.playerId, validation.data.targetPlayerId);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Tahmin yapılamadı. Belki takımınız tahmin hakkını kullandı." } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
+          case "guess_double_agent": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = guessDoubleAgentSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz tahmin" } });
+              return;
+            }
+
+            const gameState = storage.guessDoubleAgent(ws.roomCode, ws.playerId, validation.data.targetPlayerId);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Çift ajan tahmini yapılamadı" } });
               return;
             }
 

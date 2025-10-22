@@ -205,10 +205,10 @@ export default function Game() {
   const isCurrentTurn = currentPlayer.team === gameState.currentTeam;
   const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended";
   
-  // In Chaos Mode, Dodo and Double Agents can only vote, not reveal cards
+  // In Chaos Mode, Double Agents can only vote, not reveal cards
   const canRevealCardBase = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null && gameState.phase !== "ended";
   const canRevealCard = canRevealCardBase && (!gameState.chaosMode || 
-    (currentPlayer.secretRole !== "dodo" && currentPlayer.secretRole !== "double_agent"));
+    currentPlayer.secretRole !== "double_agent");
 
   const darkPlayers = gameState.players.filter(p => p.team === "dark");
   const lightPlayers = gameState.players.filter(p => p.team === "light");
@@ -826,15 +826,13 @@ export default function Game() {
                           <div className="mt-2 pt-2 border-t border-slate-700/50">
                             <div className="text-purple-400 font-bold">
                               Gizli Rol: {
-                                currentPlayer.secretRole === "prophet" ? "🔮 Peygamber" :
-                                currentPlayer.secretRole === "dodo" ? "💀 Dodo Ajanı" :
+                                currentPlayer.secretRole === "prophet" ? "🔮 Kahin" :
                                 currentPlayer.secretRole === "double_agent" ? "🎭 Çift Ajan" : ""
                               }
                             </div>
                             <div className="text-[10px] mt-1 text-slate-500">
                               {currentPlayer.secretRole === "prophet" && "3 takım kartını biliyorsun"}
-                              {currentPlayer.secretRole === "dodo" && "Takımını Suikastçıya yönlendir (sadece oy)"}
-                              {currentPlayer.secretRole === "double_agent" && "Kendi takımına karşı çalış (sadece oy)"}
+                              {currentPlayer.secretRole === "double_agent" && "Karşı takım için çalış (sadece oy)"}
                             </div>
                           </div>
                         )}
@@ -846,6 +844,7 @@ export default function Game() {
               {/* Prophet Guess Button - Only show in Chaos Mode during play */}
               {gameState.chaosMode && gameState.phase === "playing" && 
                currentPlayer.role === "guesser" && 
+               currentPlayer.team === gameState.currentTeam &&
                (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) && (
                 <Dialog>
                   <DialogTrigger asChild>
@@ -910,6 +909,74 @@ export default function Game() {
                   </DialogContent>
                 </Dialog>
               )}
+              
+              {/* Double Agent Guess Button - Only show after game ends for losing team */}
+              {gameState.chaosMode && gameState.phase === "ended" && gameState.winner &&
+               currentPlayer.team !== gameState.winner && !gameState.doubleAgentGuessUsed && (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      data-testid="button-guess-double-agent"
+                      className="h-6 px-2 border border-red-500 hover:border-red-400 hover:bg-red-500/20 animate-pulse"
+                    >
+                      <Sparkles className="w-2.5 h-2.5 mr-0.5 text-red-500" />
+                      <span className="text-[10px] text-red-400 font-bold">Son Şans: Çift Ajan Tahmini</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-slate-900/95 border-2 border-red-900/30 max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-bold bg-gradient-to-r from-red-600 to-purple-600 bg-clip-text text-transparent">
+                        🎭 Son Şans - Çift Ajan Tahmini
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="p-3 bg-red-950/30 rounded-lg border border-red-700/50">
+                        <p className="text-xs text-red-300">
+                          Kaybettiniz ama oyunu tersine çevirebilirsiniz! 
+                          Kazanan takımın Çift Ajanını doğru tahmin ederseniz, oyunu kazanırsınız!
+                        </p>
+                      </div>
+                      
+                      {/* Winning Team Players */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-300">
+                          {gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName} Takımı Oyuncuları
+                        </Label>
+                        <div className="space-y-2">
+                          {(gameState.winner === "dark" ? darkPlayers : lightPlayers)
+                            .filter(p => p.role === "guesser")
+                            .map(player => (
+                              <Button
+                                key={player.id}
+                                onClick={() => {
+                                  send("guess_double_agent", { targetPlayerId: player.id });
+                                  toast({
+                                    title: "Tahmin Gönderildi",
+                                    description: `${player.username} oyuncusunun Çift Ajan olduğunu tahmin ettiniz`,
+                                  });
+                                }}
+                                variant="outline"
+                                className="w-full border-2 hover:border-red-500 hover:bg-red-500/10 justify-start"
+                              >
+                                <Target className="w-4 h-4 mr-2 text-red-400" />
+                                {player.username}
+                              </Button>
+                            ))}
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                        <p className="text-xs text-amber-400">
+                          ⚠️ Dikkat: Bu tahmin sadece bir kez yapılabilir! Doğru tahmin oyunu kazandırır.
+                        </p>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+              
               <Button
                 size="sm"
                 variant="outline"
