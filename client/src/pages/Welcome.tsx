@@ -1,14 +1,12 @@
-import { useState, useMemo, useEffect, lazy, Suspense } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot, Loader2 } from "lucide-react";
+import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
-
-// Lazy load HeroPhysicsCards for better performance
-const HeroPhysicsCards = lazy(() => import("@/components/HeroPhysicsCards"));
 
 export default function Welcome() {
   const [, navigate] = useLocation();
@@ -60,33 +58,24 @@ export default function Welcome() {
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
   
-  // Track when all card images are loaded - optimized version
+  // Track when all card images are loaded
   useEffect(() => {
     const loadImages = async () => {
       try {
-        // Only load first 10 images initially for faster startup
-        const priorityImages = cardImageNames.slice(0, 10);
-        const imagePromises = priorityImages.map(imageName => {
+        const imagePromises = cardImageNames.map(imageName => {
           return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = resolve;
-            img.onerror = resolve; // Don't fail on single image error
+            img.onerror = reject;
             img.src = `/açılmış kelime kartları/${imageName}`;
           });
         });
         
         await Promise.all(imagePromises);
         setCardsLoaded(true);
-        
-        // Load remaining images in background
-        setTimeout(() => {
-          cardImageNames.slice(10).forEach(imageName => {
-            const img = new Image();
-            img.src = `/açılmış kelime kartları/${imageName}`;
-          });
-        }, 1000);
       } catch (error) {
         console.error("Error loading card images:", error);
+        // Still allow button to be clickable even if some images fail
         setCardsLoaded(true);
       }
     };
@@ -110,28 +99,26 @@ export default function Welcome() {
            backgroundRepeat: 'no-repeat',
            backgroundAttachment: 'fixed'
          }}>
-      {/* Light Effects - Reduced for performance */}
-      <div className="light-effect light-1" style={{ willChange: 'opacity' }} />
-      <div className="light-effect light-2" style={{ willChange: 'opacity' }} />
-      <div className="light-effect light-3" style={{ willChange: 'opacity' }} />
+      {/* Light Effects */}
+      <div className="light-effect light-1" />
+      <div className="light-effect light-2" />
+      <div className="light-effect light-3" />
+      <div className="light-effect light-4" />
+      <div className="light-effect light-5" />
       
-      {/* Particles - Reduced for performance */}
-      {[...Array(15)].map((_, i) => (
-        <div key={i} className={`particle particle-${i + 1}`} style={{ willChange: 'transform' }} />
+      {/* Particles */}
+      {[...Array(30)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1}`} />
       ))}
 
       {/* Hero Section */}
       <section className="relative overflow-hidden w-full h-full">
-        {/* Physics Cards Background - Lazy Loaded */}
-        <Suspense fallback={
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 to-slate-800" />
-        }>
-          <HeroPhysicsCards 
-            imageNames={cardImageNames.slice(0, 15)} // Reduced cards for performance
-            height={canvasHeight}
-            countMobile={12} // Reduced mobile cards
-          />
-        </Suspense>
+        {/* Physics Cards Background */}
+        <HeroPhysicsCards 
+          imageNames={cardImageNames}
+          height={canvasHeight}
+          countMobile={24}
+        />
         
         {/* Content Overlay */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
