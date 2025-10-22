@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,18 @@ export default function Welcome() {
   const [, navigate] = useLocation();
   const [showUsernameInput, setShowUsernameInput] = useState(false);
   const [username, setUsername] = useState("");
+  
+  // Clear any old/invalid localStorage keys on mount
+  useEffect(() => {
+    // Remove old key format if it exists
+    localStorage.removeItem("username");
+    // Clear form autocomplete cache
+    const storedUsername = localStorage.getItem("katmannames_username");
+    if (storedUsername === "arda" || storedUsername === "Arda") {
+      // Clear if it's the problematic default value
+      localStorage.removeItem("katmannames_username");
+    }
+  }, []);
   
   // Memoize props for HeroPhysicsCards to prevent re-initialization
   const cardImageNames = useMemo(() => [
@@ -47,7 +59,7 @@ export default function Welcome() {
 
   const handleContinue = () => {
     if (username.trim().length >= 2) {
-      localStorage.setItem("username", username.trim());
+      localStorage.setItem("katmannames_username", username.trim());
       navigate("/rooms");
     }
   };
@@ -145,6 +157,7 @@ export default function Welcome() {
                 className="text-base"
                 maxLength={20}
                 autoFocus
+                autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
                 En az 2 karakter giriniz
