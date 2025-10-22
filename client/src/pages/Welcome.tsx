@@ -170,7 +170,7 @@ export default function Welcome() {
         
         {/* Content Overlay */}
         <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="text-center px-4 space-y-8">
+          <Card className="bg-black/60 backdrop-blur-md border-2 border-white/10 p-8 md:p-12 space-y-8 mx-4 max-w-4xl">
             <div className="flex justify-center">
               <img 
                 src="/logo.png" 
@@ -180,35 +180,27 @@ export default function Welcome() {
             </div>
             
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-red-400 bg-clip-text text-transparent">
-                Türkçe Kelime Tahmin Oyunu
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-800 to-red-800 bg-clip-text text-transparent">
+                KATMANIN DİBİ
               </h1>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-lg md:text-xl text-white max-w-3xl mx-auto">
                 İki takım, gizli kelimeler, stratejik ipuçları. Takım arkadaşlarınla birlikte 
                 25 kartlık grid'de kendi takımının kartlarını bul!
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
+            <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
               <Button
                 onClick={() => setShowUsernameInput(true)}
                 size="lg"
-                className="group relative px-8 py-6 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all pointer-events-auto"
+                className="group relative px-10 py-7 text-xl font-bold bg-gradient-to-r from-blue-800 to-red-800 hover:from-blue-900 hover:to-red-900 transform hover:scale-105 transition-all pointer-events-auto shadow-2xl border-2 border-white/20"
               >
-                <Play className="w-5 h-5 mr-2" />
+                <Play className="w-6 h-6 mr-3" />
                 Hemen Başla
-                <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button
-                onClick={() => document.getElementById('how-to-play')?.scrollIntoView({ behavior: 'smooth' })}
-                size="lg"
-                variant="outline"
-                className="px-8 py-6 text-lg font-semibold border-2 pointer-events-auto"
-              >
-                Nasıl Oynanır?
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
