@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Logo } from "@/components/Logo";
 import { PlayerList } from "@/components/PlayerList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -369,19 +368,16 @@ export default function Lobby() {
       
       {/* Header Bar */}
       <div className="relative z-10 w-full">
-        <div className="bg-slate-900/95 backdrop-blur-lg border-b border-slate-800">
+        <div className="bg-slate-800 backdrop-blur-lg border-b border-slate-700">
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <img src="/logo.png" alt="Katmannames" className="h-10 w-auto" />
-                <div className="flex items-center gap-2">
-                  <div className="px-3 py-1 bg-green-600/20 border border-green-600/50 rounded-full">
-                    <span className="text-xs font-medium text-green-400">Lobide</span>
-                  </div>
-                  <div className="text-sm text-slate-400">
-                    <Users className="inline w-4 h-4 mr-1" />
-                    {playerCount} Oyuncu
-                  </div>
+              <div className="flex items-center gap-2">
+                <div className="px-3 py-1 bg-green-600/20 border border-green-600/50 rounded-full">
+                  <span className="text-xs font-medium text-green-400">Lobide</span>
+                </div>
+                <div className="text-sm text-slate-400">
+                  <Users className="inline w-4 h-4 mr-1" />
+                  {playerCount} Oyuncu
                 </div>
               </div>
               
@@ -452,7 +448,7 @@ export default function Lobby() {
             {/* Right Sidebar */}
             <div className="lg:w-2/5 flex flex-col gap-4">
               {/* Start Game Card */}
-              <Card className="p-4 border-2 bg-slate-800 border-green-600/50">
+              <Card className="p-4 border-2 bg-slate-800 border-green-600/50 mt-0">
                 {/* Game Start Requirements Visual Indicators */}
                 {!canStartGame && currentPlayer?.isRoomOwner && (
                   <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg space-y-2">
