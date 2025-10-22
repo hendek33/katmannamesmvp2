@@ -108,21 +108,20 @@ export default function Welcome() {
                 className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-8 flex items-center justify-center overflow-hidden"
                 style={{
                   borderColor: 'rgba(67, 23, 9, 1)',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
+                  backgroundColor: 'rgba(0, 116, 176, 1)'
                 }}
               >
                 <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                      style={{ 
-                       background: 'linear-gradient(135deg, #764ba2 0%, #8e5bb3 50%, #f4a0ff 100%)'
+                       backgroundColor: 'rgba(0, 116, 176, 0.8)'
                      }} />
-                <img 
-                  src="/başla.png" 
-                  alt="Başla" 
-                  className="relative z-10 w-full h-full object-cover"
-                />
-                {/* Semi-transparent Play Icon */}
+                {/* Opaque Play Icon */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                  <Play className="w-16 h-16 md:w-20 md:h-20 text-white opacity-50 fill-white" />
+                  <Play className="w-16 h-16 md:w-20 md:h-20" 
+                        style={{ 
+                          color: 'rgba(67, 23, 9, 1)',
+                          fill: 'rgba(67, 23, 9, 1)' 
+                        }} />
                 </div>
               </button>
             </div>
