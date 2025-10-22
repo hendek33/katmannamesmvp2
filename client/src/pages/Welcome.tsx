@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
-import { FloatingCards } from "@/components/FloatingCards";
+import { HeroPhysicsCards } from "@/components/HeroPhysicsCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -133,9 +133,11 @@ export default function Welcome() {
       ))}
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-12 pb-20 px-4 overflow-hidden">
-        {/* Floating Cards Background */}
-        <FloatingCards />
+      <section className="relative pt-12 pb-20 px-4 overflow-hidden" style={{ minHeight: '640px' }}>
+        {/* Physics Cards Background */}
+        <div className="absolute inset-0 z-0">
+          <HeroPhysicsCards height={640} />
+        </div>
         
         <div className="max-w-7xl mx-auto relative z-20">
           <div className="text-center space-y-8">
@@ -175,6 +177,22 @@ export default function Welcome() {
               >
                 Nasıl Oynanır?
               </Button>
+            </div>
+
+            {/* Interactive Instructions */}
+            <div className="flex flex-wrap gap-4 justify-center text-xs text-muted-foreground animate-in fade-in duration-700 delay-600">
+              <div className="flex items-center gap-2 bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
+                <div className="w-4 h-4 rounded bg-slate-700 flex items-center justify-center">🖱️</div>
+                <span>Mouse ile kartları it</span>
+              </div>
+              <div className="flex items-center gap-2 bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
+                <kbd className="px-2 py-0.5 bg-slate-800 rounded text-[10px]">Space</kbd>
+                <span>Kartları savur</span>
+              </div>
+              <div className="flex items-center gap-2 bg-slate-900/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-700/50">
+                <kbd className="px-2 py-0.5 bg-slate-800 rounded text-[10px]">Shift</kbd>
+                <span>Güçlü itme</span>
+              </div>
             </div>
           </div>
         </div>

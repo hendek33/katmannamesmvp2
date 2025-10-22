@@ -1,0 +1,58 @@
+Replit Agent’e görev:
+
+Projeme bir “hero” bölümü için etkileşimli bir 2D canvas efekti ekle. Canvas’ta masaya tepeden bakan kartlar olacak. Mouse’un yakınında kartlar mouse’un hareket yönüne doğru itilip dönecek. Aşağıdaki fizik ayarlarını birebir uygula ve kodu bir React bileşeni olarak yaz:
+
+- Parametreler: 
+  count: 24
+  pushStrength: 0.7
+  pushRadius: 90
+  drag: 0.96
+  contactFriction: 0.80
+  wallBounce: 0.20
+  angularDrag: 0.96
+  torqueGain: 1.4
+  falloffPower: 1.6
+  forceClamp: 450
+  collisions: false
+
+- Kart boyutu: w=92, h=58. 
+- Rotasyon açık olsun. Tork formülü: (rx * fy - ry * fx) * 0.00035 * torqueGain. 
+- Açısal hız `av` ±6 aralığında clamp’lensin.
+
+Görseller:
+- Kart yüzlerini public/açılmış_kelime_kartları klasöründen yükle 
+- Her karta sırasıyla bir görsel ata. Çizimde drawImage kullanarak görseli karta sığdır (fit). (İstersen ayrıca “cover” seçeneği bırak.)
+
+Bileşen:
+- Dosya adı: `src/components/HeroPhysicsCards.tsx`
+- Prop’lar: `imagePaths: string[]`, `height?: number` (varsayılan 560).
+- `<canvas>` kullan. `useEffect` içinde:
+  - responsive resize (devicePixelRatio ≤ 2 ile ölçekle)
+  - görselleri preload et
+  - `resetCards()` ile kartları rastgele konum/açıyla üret
+  - `requestAnimationFrame` ile `step(dt)` + `draw()` döngüsünü çalıştır
+  - `visibilitychange` veya IntersectionObserver ile offscreen iken animasyonu durdur
+  - klavye: Space=blower, Shift=boost (boost sadece baseStrength’i 2x yapar)
+
+Fizik:
+- Mouse hız vektörünü `(x - px) / dt` ve `(y - py) / dt` ile hesapla.
+- İtki büyüklüğünü mesafeye göre `falloff = max(0, 1 - dist / pushRadius)` ve `falloff^falloffPower` ile sönümlendir.
+- Kuvvet tavanı `forceClamp` ile sınırla (fMag > forceClamp ise ölçekle).
+- Lineer sürtünme: `vx *= drag`, `vy *= drag`.
+- Açısal sürtünme: `av *= angularDrag`.
+- Duvarlarda hız ve açısal hızı `contactFriction` ile sönümle, `wallBounce` ile geri çevir.
+
+Kullanım örneği:
+- `src/sections/Hero.tsx` içerisinde:
+  - `HeroPhysicsCards` bileşenini import et
+  - `<HeroPhysicsCards imagePaths={["/cards/ace.png","/cards/king.png","/cards/queen.png","/cards/joker.png"]} height={560} />`
+  - Üstüne metin/CTA overlay’i yerleştir (absolute, z-index: 10, pointer-events: none).
+- Erişilebilirlik: `<canvas aria-hidden />` ekle, `prefers-reduced-motion`’da animasyonu kapat.
+
+İş tesliminde:
+- Eklenen/oluşturulan dosyaların tam yollarını, import örneklerini ve kullanım talimatını yaz.
+- Kod tamamlandığında kısa bir README paragrafı ekle (nasıl değiştirileceği: kart sayısı, görsel seti, hero yüksekliği).
+
+Not:
+- Performans için sadece gerekli çizimleri yap, her kare `clearRect` kullan.
+- Küçük ekranlarda (ör. < 768px) kart sayısını otomatik 16’ya düşür (opsiyonel).
