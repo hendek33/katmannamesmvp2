@@ -48,7 +48,7 @@ export default function Welcome() {
   const handleContinue = () => {
     if (username.trim().length >= 2) {
       localStorage.setItem("username", username.trim());
-      navigate("/");
+      navigate("/rooms");
     }
   };
 
@@ -163,7 +163,10 @@ export default function Welcome() {
               <Button
                 onClick={handleContinue}
                 disabled={username.trim().length < 2}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="flex-1"
+                style={{
+                  background: 'linear-gradient(to bottom right, rgba(124, 45, 18, 0.95), rgba(15, 23, 42, 0.95), rgba(23, 37, 84, 0.95))'
+                }}
                 data-testid="button-continue"
               >
                 Devam Et
