@@ -93,7 +93,7 @@ export default function Welcome() {
             <div className="flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
               <button
                 onClick={() => setShowUsernameInput(true)}
-                className="group relative w-36 h-36 md:w-40 md:h-40 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-8 border-black flex items-center justify-center"
+                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl border-8 border-black flex items-center justify-center"
                 style={{
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
                   fontFamily: "'Orbitron', 'Exo 2', sans-serif"
