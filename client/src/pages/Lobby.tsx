@@ -775,7 +775,8 @@ export default function Lobby() {
                     <p className="text-xs">
                       Her takımda 1 tane bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
                       Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Karşı takımın Kahini oyun sırasında doğru tahmin edilirse, anında oyunu kazanırsınız!</span>
+                      <span className="text-amber-400 font-bold"> Karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır!</span>
+                      <span className="text-red-400 font-bold"> DİKKAT: Yanlış tahmin anında kaybedersiniz!</span>
                     </p>
                   </div>
                   
@@ -786,8 +787,9 @@ export default function Lobby() {
                     </div>
                     <p className="text-xs">
                       <span className="text-purple-400 font-bold">Her takımda 1 tane bulunur.</span> Karşı takım için gizlice çalışan casus! 
-                      Takımını yanlış kartlara yönlendirmeye çalışır. Kart seçemez, sadece oy verebilir. 
-                      <span className="text-red-400 font-bold">Oyun bittiğinde: Kaybeden takım, kazanan takımın Çift Ajanını doğru tahmin ederse oyunu tersine çevirir!</span>
+                      Görünüşte kendi takımında ama aslında karşı takım için çalışır. Takımını yanlış kartlara yönlendirmeye çalışır. 
+                      Kart seçemez, sadece oy verebilir. 
+                      <span className="text-red-400 font-bold">Oyun bittiğinde: Kaybeden takım, kendi içlerindeki haini (karşı takım için çalışan Çift Ajanı) bulursa oyunu tersine çevirir!</span>
                     </p>
                   </div>
                 </div>
@@ -799,8 +801,8 @@ export default function Lobby() {
                     <li>• Gizli roller oyun başladığında rastgele atanır</li>
                     <li>• Rolünüz sadece size gösterilir, başkaları göremez</li>
                     <li>• Kahin'in bildiği kartlar sadece ona mor renkte gösterilir</li>
-                    <li>• <span className="text-yellow-400">Oyun sırasında:</span> Her takım karşı takımın Kahin'ini tahmin edebilir (1 hak) - Doğru tahmin anında kazandırır!</li>
-                    <li>• <span className="text-red-400">Oyun bittiğinde:</span> Kaybeden takım, kazanan takımın Çift Ajanını tahmin edebilir (1 hak) - Doğru tahmin oyunu tersine çevirir!</li>
+                    <li>• <span className="text-yellow-400">Kahin Tahmini:</span> Karşı takımın Kahin'ini tahmin edebilirsiniz (1 hak) - Doğru tahmin = anında kazanç, Yanlış tahmin = anında kayıp!</li>
+                    <li>• <span className="text-red-400">Çift Ajan Tahmini:</span> Oyun bittiğinde kaybeden takım, kendi içindeki haini bulabilir (1 hak) - Doğru tahmin oyunu tersine çevirir!</li>
                   </ul>
                 </div>
                 
