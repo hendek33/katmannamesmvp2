@@ -433,9 +433,9 @@ export default function Lobby() {
       <div className="relative z-10 flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto h-full p-3 flex flex-col">
           {/* Team Selection Area */}
-          <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0">
+          <div className="flex-1 flex flex-col lg:flex-row gap-3 min-h-0">
             {/* Left Side - Team Cards */}
-            <div className="flex-1 lg:w-3/5 flex flex-col gap-4">
+            <div className="flex-1 lg:w-3/5 overflow-hidden">
               <PlayerList
                 players={gameState.players}
                 currentPlayerId={playerId}
@@ -652,7 +652,7 @@ export default function Lobby() {
               
               {/* Timer Settings - Compact */}
               <Card className="p-3 border-2 bg-slate-800 border-purple-600/50">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Timer className="w-5 h-5 text-purple-500" />
                     <h3 className="text-base font-bold">Zamanlayıcı</h3>
@@ -668,10 +668,51 @@ export default function Lobby() {
                 </div>
                 
                 {timedMode && (
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span>Şef: {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}</span>
-                      <span>Ajan: {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}</span>
+                  <div className="space-y-2">
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-xs">Şef</Label>
+                        <span className="text-xs font-mono text-purple-400">
+                          {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[spymasterTime]}
+                        onValueChange={([value]) => {
+                          setSpymasterTime(value);
+                        }}
+                        onValueCommit={([value]) => {
+                          handleTimerSettingsUpdate(timedMode, value, guesserTime);
+                        }}
+                        min={30}
+                        max={300}
+                        step={30}
+                        className="w-full h-1"
+                        data-testid="slider-spymaster-time"
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <Label className="text-xs">Ajan</Label>
+                        <span className="text-xs font-mono text-purple-400">
+                          {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}
+                        </span>
+                      </div>
+                      <Slider
+                        value={[guesserTime]}
+                        onValueChange={([value]) => {
+                          setGuesserTime(value);
+                        }}
+                        onValueCommit={([value]) => {
+                          handleTimerSettingsUpdate(timedMode, spymasterTime, value);
+                        }}
+                        min={30}
+                        max={300}
+                        step={30}
+                        className="w-full h-1"
+                        data-testid="slider-guesser-time"
+                      />
                     </div>
                   </div>
                 )}

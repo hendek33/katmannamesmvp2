@@ -61,10 +61,10 @@ export function PlayerList({
     const needsSpymaster = teamPlayers.length > 0 && !hasSpymaster;
     
     return (
-    <Card className={`p-3 sm:p-4 space-y-3 border-2 transition-all ${
+    <Card className={`p-2 space-y-2 border-2 transition-all bg-slate-800 ${
       team === "dark" 
-        ? "border-blue-600/30 bg-blue-950/20 hover:border-blue-500/50" 
-        : "border-red-600/30 bg-red-950/20 hover:border-red-500/50"
+        ? "border-blue-600/50 hover:border-blue-500/70" 
+        : "border-red-600/50 hover:border-red-500/70"
     } ${needsSpymaster && isLobby ? "ring-2 ring-amber-500/20" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-1">
@@ -117,10 +117,10 @@ export function PlayerList({
             size="sm" 
             variant={team === "dark" ? "default" : "destructive"}
             onClick={() => onTeamSelect(team)}
-            className="h-8 px-3"
+            className="h-7 px-2 text-xs"
             data-testid={`button-join-${team}`}
           >
-            Bu Takıma Katıl
+            Katıl
           </Button>
         )}
       </div>
@@ -133,12 +133,12 @@ export function PlayerList({
         </div>
       )}
       
-      <div className="space-y-2">
+      <div className="space-y-1">
         {teamPlayers.map(player => (
           <div 
             key={player.id}
             data-testid={`player-${player.id}`}
-            className={`flex items-center gap-2 p-2 rounded-lg transition-all ${
+            className={`flex items-center gap-2 p-1.5 rounded transition-all ${
               player.id === currentPlayerId 
                 ? 'bg-accent/20 border border-accent/30 shadow-sm' 
                 : 'bg-black/20 hover:bg-black/30'
@@ -153,14 +153,14 @@ export function PlayerList({
               {player.role === "spymaster" ? (
                 <Badge 
                   variant="default" 
-                  className="text-xs gap-1 px-2 py-0 h-6 bg-gradient-to-r from-amber-600 to-yellow-600 border-amber-400"
+                  className="text-[10px] gap-0.5 px-1.5 py-0 h-5 bg-gradient-to-r from-amber-600 to-yellow-600 border-amber-400"
                 >
-                  <Eye className="w-3 h-3" />
-                  <span className="font-semibold">İstihbarat Şefi</span>
+                  <Eye className="w-2.5 h-2.5" />
+                  <span className="font-semibold">Şef</span>
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="text-xs gap-1 px-2 py-0 h-6">
-                  <Target className="w-3 h-3" />
+                <Badge variant="secondary" className="text-[10px] gap-0.5 px-1.5 py-0 h-5">
+                  <Target className="w-2.5 h-2.5" />
                   <span>Ajan</span>
                 </Badge>
               )}
@@ -168,12 +168,12 @@ export function PlayerList({
               {isLobby && player.id === currentPlayerId && onRoleToggle && (
                 <Button 
                   size="sm" 
-                  variant={player.role === "spymaster" ? "secondary" : "default"}
-                  className="h-6 px-2 text-xs ml-1"
+                  variant="ghost"
+                  className="h-5 px-1 text-[10px]"
                   onClick={onRoleToggle}
                   data-testid="button-toggle-role"
                 >
-                  {player.role === "spymaster" ? "Ajan Ol" : "İstihbarat Şefi Ol"}
+                  Değiştir
                 </Button>
               )}
               
@@ -198,21 +198,23 @@ export function PlayerList({
   };
 
   return (
-    <div className="space-y-3 h-full overflow-y-auto">
+    <div className="h-full flex flex-col gap-2">
       <div className="flex items-center gap-2 text-muted-foreground px-1">
-        <Users className="w-4 h-4" />
-        <span className="text-sm font-semibold">Oyuncular ({players.length})</span>
+        <Users className="w-3 h-3" />
+        <span className="text-xs font-semibold">Oyuncular ({players.length})</span>
       </div>
+      
+      <div className="flex-1 overflow-y-auto space-y-2">
 
       {noTeam.length > 0 && (
-        <Card className="p-3 space-y-2 border-2 border-dashed border-amber-500/30 bg-amber-950/10">
-          <h3 className="font-bold text-sm text-amber-600">Takım Seçilmemiş ({noTeam.length})</h3>
+        <Card className="p-2 space-y-1 border-2 border-dashed border-amber-500/30 bg-slate-800">
+          <h3 className="font-bold text-xs text-amber-600">Takım Seçilmemiş ({noTeam.length})</h3>
           <div className="space-y-1">
             {noTeam.map(player => (
               <div 
                 key={player.id}
                 data-testid={`player-${player.id}`}
-                className="flex items-center gap-2 p-2 rounded bg-amber-500/10 border border-amber-500/20"
+                className="flex items-center gap-2 p-1 rounded bg-amber-500/10 border border-amber-500/20"
               >
                 {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500" />}
                 <span className="text-sm font-medium">{player.username}</span>
@@ -232,19 +234,20 @@ export function PlayerList({
         </Card>
       )}
 
-      <TeamSection 
-        team="dark"
-        title={darkTeamName}
-        players={darkTeam}
-        gradient="bg-gradient-to-r from-blue-600 to-blue-400"
-      />
-      
-      <TeamSection 
-        team="light"
-        title={lightTeamName}
-        players={lightTeam}
-        gradient="bg-gradient-to-r from-red-600 to-red-400"
-      />
+        <TeamSection 
+          team="dark"
+          title={darkTeamName}
+          players={darkTeam}
+          gradient="bg-gradient-to-r from-blue-600 to-blue-400"
+        />
+        
+        <TeamSection 
+          team="light"
+          title={lightTeamName}
+          players={lightTeam}
+          gradient="bg-gradient-to-r from-red-600 to-red-400"
+        />
+      </div>
     </div>
   );
 }
