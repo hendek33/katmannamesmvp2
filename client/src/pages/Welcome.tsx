@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,38 @@ export default function Welcome() {
   const [, navigate] = useLocation();
   const [showUsernameInput, setShowUsernameInput] = useState(false);
   const [username, setUsername] = useState("");
+  
+  // Memoize props for HeroPhysicsCards to prevent re-initialization
+  const cardImageNames = useMemo(() => [
+    "ali mavi.png",
+    "alik kırmızı.png",
+    "arda siyah.png",
+    "begüm kırmızı.png",
+    "blush beyaz.png",
+    "blush mavi.png",
+    "dobby kırmızı.png",
+    "hasan beyaz.png",
+    "hasan mavi.png",
+    "karaman kırmızı.png",
+    "kasım mavi.png",
+    "mami beyaz.png",
+    "mami mavi.png",
+    "neswin kırmızı.png",
+    "noeldayı kırmızı.png",
+    "noeldayı mavi.png",
+    "nuriben mavi.png",
+    "perver beyaz.png",
+    "perver kırmızı.png",
+    "triel kırmızı.png",
+    "triel2 mavi.png",
+    "çağrı mavi.png",
+    "çağrı normal beyaz.png",
+    "çağrı sigara beyaz.png",
+    "şinasi kırmızı.png",
+    "şinasi su beyaz.png"
+  ], []);
+  
+  const canvasHeight = useMemo(() => window.innerHeight || 720, []);
 
   const handleContinue = () => {
     if (username.trim().length >= 2) {
@@ -45,35 +77,8 @@ export default function Welcome() {
       <section className="relative overflow-hidden w-full h-full">
         {/* Physics Cards Background */}
         <HeroPhysicsCards 
-          imageNames={[
-            "ali mavi.png",
-            "alik kırmızı.png",
-            "arda siyah.png",
-            "begüm kırmızı.png",
-            "blush beyaz.png",
-            "blush mavi.png",
-            "dobby kırmızı.png",
-            "hasan beyaz.png",
-            "hasan mavi.png",
-            "karaman kırmızı.png",
-            "kasım mavi.png",
-            "mami beyaz.png",
-            "mami mavi.png",
-            "neswin kırmızı.png",
-            "noeldayı kırmızı.png",
-            "noeldayı mavi.png",
-            "nuriben mavi.png",
-            "perver beyaz.png",
-            "perver kırmızı.png",
-            "triel kırmızı.png",
-            "triel2 mavi.png",
-            "çağrı mavi.png",
-            "çağrı normal beyaz.png",
-            "çağrı sigara beyaz.png",
-            "şinasi kırmızı.png",
-            "şinasi su beyaz.png"
-          ]}
-          height={window.innerHeight || 720}
+          imageNames={cardImageNames}
+          height={canvasHeight}
           countMobile={24}
         />
         
