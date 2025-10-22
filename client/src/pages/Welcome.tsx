@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
+import { FloatingCards } from "@/components/FloatingCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -132,8 +133,11 @@ export default function Welcome() {
       ))}
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-12 pb-20 px-4">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative z-10 pt-12 pb-20 px-4 overflow-hidden">
+        {/* Floating Cards Background */}
+        <FloatingCards />
+        
+        <div className="max-w-7xl mx-auto relative z-20">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
               <img 
