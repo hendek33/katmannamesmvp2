@@ -179,11 +179,20 @@ export default function Welcome() {
               />
             </div>
             
-            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-800 to-red-800 bg-clip-text text-transparent">
+            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200 text-center">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r from-blue-800 to-red-800 bg-clip-text text-transparent uppercase tracking-wider" 
+                  style={{ 
+                    fontFamily: "'Bebas Neue', 'Oswald', 'Impact', sans-serif",
+                    WebkitTextStroke: '2px rgba(0,0,0,0.8)',
+                    textShadow: '3px 3px 6px rgba(0,0,0,0.7), -1px -1px 2px rgba(255,255,255,0.1)'
+                  }}>
                 KATMANIN DİBİ
               </h1>
-              <p className="text-lg md:text-xl text-white max-w-3xl mx-auto">
+              <p className="text-lg md:text-xl text-white max-w-3xl mx-auto font-semibold tracking-wide text-center"
+                 style={{ 
+                   fontFamily: "'Rajdhani', 'Orbitron', 'Exo 2', sans-serif",
+                   textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+                 }}>
                 İki takım, gizli kelimeler, stratejik ipuçları. Takım arkadaşlarınla birlikte 
                 25 kartlık grid'de kendi takımının kartlarını bul!
               </p>
