@@ -166,6 +166,16 @@ export function PlayerList({
                     kaldır
                   </button>
                 )}
+                {/* Show "Ajan Ol" button for current player who is spymaster */}
+                {isLobby && spymaster.id === currentPlayerId && onRoleToggle && (
+                  <button 
+                    onClick={onRoleToggle}
+                    className="text-[10px] text-blue-400 hover:text-blue-300 mt-1 font-semibold"
+                    data-testid="button-become-agent"
+                  >
+                    Ajan Ol
+                  </button>
+                )}
               </div>
             );
           } else {
