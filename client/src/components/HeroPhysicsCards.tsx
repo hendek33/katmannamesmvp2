@@ -108,13 +108,43 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
 
     function resetCards() {
       cards = [];
-      const pad = 40;
+      const pad = 20;
       const fallback = images.length === 0 ? [makePlaceholder()] : images;
-      for (let i=0;i<(params as any).count;i++){
-        const x = rand(pad, bounds.w - pad - CARD_W);
-        const y = rand(pad, bounds.h - pad - CARD_H);
+      const count = (params as any).count;
+      
+      // Grid tabanlı dağıtım için kare kök hesapla
+      const cols = Math.ceil(Math.sqrt(count * (bounds.w / bounds.h)));
+      const rows = Math.ceil(count / cols);
+      
+      for (let i=0;i<count;i++){
+        // Grid pozisyonu hesapla
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        
+        // Grid hücresinin merkezi
+        const cellW = (bounds.w - 2 * pad) / cols;
+        const cellH = (bounds.h - 2 * pad) / rows;
+        const cellCenterX = pad + cellW * (col + 0.5);
+        const cellCenterY = pad + cellH * (row + 0.5);
+        
+        // Rastgele sapma ekle (daha geniş dağılım için)
+        const offsetX = (Math.random() - 0.5) * cellW * 0.8;
+        const offsetY = (Math.random() - 0.5) * cellH * 0.8;
+        
+        // Final pozisyon
+        let x = cellCenterX + offsetX - CARD_W / 2;
+        let y = cellCenterY + offsetY - CARD_H / 2;
+        
+        // Sınırları kontrol et
+        x = Math.max(pad, Math.min(bounds.w - pad - CARD_W, x));
+        y = Math.max(pad, Math.min(bounds.h - pad - CARD_H, y));
+        
+        // Hafif başlangıç hızı ekle (dışa doğru)
+        const vx = (x + CARD_W/2 - bounds.w/2) * 0.02;
+        const vy = (y + CARD_H/2 - bounds.h/2) * 0.02;
+        
         const img = fallback[i % fallback.length];
-        cards.push({ x, y, w: CARD_W, h: CARD_H, vx:0, vy:0, a:(Math.random()-0.5)*0.3, av:0, img });
+        cards.push({ x, y, w: CARD_W, h: CARD_H, vx, vy, a:(Math.random()-0.5)*0.3, av:0, img });
       }
     }
 
