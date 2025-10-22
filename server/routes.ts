@@ -418,7 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             const gameState = storage.guessProphet(ws.roomCode, ws.playerId, validation.data.targetPlayerId);
             if (!gameState) {
-              sendToClient(ws, { type: "error", payload: { message: "Tahmin yapılamadı. Belki takımınız tahmin hakkını kullandı." } });
+              sendToClient(ws, { type: "error", payload: { message: "Kahin tahmini yapılamadı. Belki takımınız tahmin hakkını kullandı veya sıra sizde değil." } });
               return;
             }
 

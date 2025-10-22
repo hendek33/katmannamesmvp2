@@ -852,23 +852,27 @@ export default function Game() {
                       size="sm"
                       variant="outline"
                       data-testid="button-guess-prophet"
-                      className="h-6 px-2 border hover:border-purple-500 hover:bg-purple-500/10"
+                      className="h-6 px-2 border-2 border-red-600 hover:border-red-500 hover:bg-red-600/20 text-red-400"
                     >
-                      <Sparkles className="w-2.5 h-2.5 mr-0.5" />
-                      <span className="text-[10px]">Peygamber Tahmini</span>
+                      <Sparkles className="w-2.5 h-2.5 mr-0.5 text-red-500" />
+                      <span className="text-[10px] font-bold">⚠️ Kahin Tahmini (RİSKLİ)</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="bg-slate-900/95 border-2 border-purple-900/30 max-w-md">
                     <DialogHeader>
                       <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        Peygamber Tahmini
+                        Kahin Tahmini
                       </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
-                      <div className="p-3 bg-purple-950/30 rounded-lg border border-purple-700/50">
-                        <p className="text-xs text-purple-300">
-                          Rakip takımın Peygamberini doğru tahmin ederseniz oyunu kazanırsınız! 
-                          Yanlış tahmin yaparsanız bu hakkınızı kaybedersiniz.
+                      <div className="p-3 bg-red-950/30 rounded-lg border-2 border-red-700/50">
+                        <p className="text-xs font-bold text-red-400">
+                          ⚠️ ÇOK ÖNEMLİ UYARI ⚠️
+                        </p>
+                        <p className="text-xs text-red-300 mt-1">
+                          • Doğru tahmin = ANINDA KAZANIRSINIZ! ✅<br/>
+                          • Yanlış tahmin = ANINDA KAYBEDERSİNİZ! ❌<br/>
+                          <span className="font-bold text-red-400">Bu çok riskli bir hamle! Emin değilseniz kullanmayın!</span>
                         </p>
                       </div>
                       
@@ -886,8 +890,9 @@ export default function Game() {
                                 onClick={() => {
                                   send("guess_prophet", { targetPlayerId: player.id });
                                   toast({
-                                    title: "Tahmin Gönderildi",
-                                    description: `${player.username} oyuncusunun Peygamber olduğunu tahmin ettiniz`,
+                                    title: "Kahin Tahmini Gönderildi",
+                                    description: `${player.username} oyuncusunun Kahin olduğunu tahmin ettiniz. Doğruysa kazanırsınız, yanlışsa kaybedersiniz!`,
+                                    variant: "destructive"
                                   });
                                 }}
                                 variant="outline"
@@ -900,9 +905,12 @@ export default function Game() {
                         </div>
                       </div>
                       
-                      <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                        <p className="text-xs text-amber-400">
-                          ⚠️ Dikkat: Bu tahmin sadece bir kez yapılabilir!
+                      <div className="p-3 bg-red-800/50 rounded-lg border-2 border-red-700/50">
+                        <p className="text-xs font-bold text-red-400 animate-pulse">
+                          ☠️ YÜKSEK RİSK: Yanlış tahmin = ANINDA KAYBEDERSINIZ!
+                        </p>
+                        <p className="text-xs text-amber-400 mt-1">
+                          Bu tahmin sadece bir kez yapılabilir. Çok dikkatli olun!
                         </p>
                       </div>
                     </div>

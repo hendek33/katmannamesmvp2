@@ -771,9 +771,14 @@ export class MemStorage implements IStorage {
       targetId: targetPlayerId
     };
     
-    // If the guess is correct, the guessing team wins immediately
+    // If correct, the guessing team wins immediately
+    // If incorrect, the guessing team loses immediately!
     if (isCorrect) {
       room.winner = room.currentTeam;
+      room.phase = "ended";
+    } else {
+      // Wrong guess means instant loss for the guessing team!
+      room.winner = room.currentTeam === "dark" ? "light" : "dark";
       room.phase = "ended";
     }
     
