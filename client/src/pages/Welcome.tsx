@@ -102,7 +102,7 @@ export default function Welcome() {
               <img 
                 src="/logo.png" 
                 alt="Katmannames Logo" 
-                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.7)] hover:scale-110 cursor-pointer"
+                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)] hover:drop-shadow-[0_15px_50px_rgba(255,255,255,0.6)] hover:scale-110 cursor-pointer"
               />
             </div>
 
@@ -110,12 +110,19 @@ export default function Welcome() {
             <div className="relative flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400 ml-6">
               <button
                 onClick={() => setShowUsernameInput(true)}
-                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl flex items-center justify-center overflow-hidden animate-pulse-glow"
+                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto flex items-center justify-center overflow-hidden animate-pulse-glow hover:filter-none"
                 style={{
                   borderColor: 'rgba(67, 23, 9, 1)',
                   backgroundColor: 'rgba(0, 116, 176, 1)',
                   borderWidth: '12px',
-                  borderStyle: 'solid'
+                  borderStyle: 'solid',
+                  filter: 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.filter = 'drop-shadow(0 15px 40px rgba(0, 116, 176, 0.8)) drop-shadow(0 8px 25px rgba(67, 23, 9, 0.6))';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.filter = 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))';
                 }}
               >
                 <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
