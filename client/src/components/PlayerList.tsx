@@ -34,6 +34,10 @@ export function PlayerList({
   const noTeam = players.filter(p => p.team === null);
   
   const currentPlayer = players.find(p => p.id === currentPlayerId);
+  
+  // Check if teams have required roles for game start
+  const darkHasSpymaster = darkTeam.some(p => p.role === "spymaster");
+  const lightHasSpymaster = lightTeam.some(p => p.role === "spymaster");
 
   const TeamSection = ({ team, title, players: teamPlayers, gradient }: { 
     team: Team; 
@@ -53,11 +57,18 @@ export function PlayerList({
       setIsEditing(false);
     };
 
+    const hasSpymaster = teamPlayers.some(p => p.role === "spymaster");
+    const needsSpymaster = teamPlayers.length > 0 && !hasSpymaster;
+    
     return (
-    <Card className="p-2 sm:p-3 space-y-2">
+    <Card className={`p-3 sm:p-4 space-y-3 border-2 transition-all ${
+      team === "dark" 
+        ? "border-blue-600/30 bg-blue-950/20 hover:border-blue-500/50" 
+        : "border-red-600/30 bg-red-950/20 hover:border-red-500/50"
+    } ${needsSpymaster && isLobby ? "ring-2 ring-amber-500/20" : ""}`}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 flex-1">
-          <div className={`w-2 h-2 rounded-full ${gradient}`} />
+        <div className="flex items-center gap-2 flex-1">
+          <div className={`w-3 h-3 rounded-full ${gradient}`} />
           {isLobby && isEditing ? (
             <div className="flex items-center gap-1 flex-1">
               <Input
@@ -81,46 +92,56 @@ export function PlayerList({
             </div>
           ) : (
             <>
-              <h3 className="font-semibold text-xs sm:text-sm">{title}</h3>
+              <h3 className="font-bold text-sm sm:text-base">{title}</h3>
               {isLobby && onTeamNameChange && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-5 w-5 p-0"
+                  className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
                   onClick={() => {
                     setEditedName(title);
                     setIsEditing(true);
                   }}
                 >
-                  <Edit2 className="w-2.5 h-2.5" />
+                  <Edit2 className="w-3 h-3" />
                 </Button>
               )}
             </>
           )}
-          <Badge variant="secondary" className="text-[10px] px-1 h-4">
-            {teamPlayers.length}
+          <Badge variant={needsSpymaster ? "destructive" : "secondary"} className="text-xs px-2 h-5">
+            {teamPlayers.length} oyuncu
           </Badge>
         </div>
         {isLobby && currentPlayer?.team !== team && onTeamSelect && (
           <Button 
             size="sm" 
-            variant="outline"
+            variant={team === "dark" ? "default" : "destructive"}
             onClick={() => onTeamSelect(team)}
-            className="text-[10px] h-6 px-2"
+            className="h-8 px-3"
             data-testid={`button-join-${team}`}
           >
-            Katıl
+            Bu Takıma Katıl
           </Button>
         )}
       </div>
       
-      <div className="space-y-1">
+      {/* Warning if team needs spymaster */}
+      {needsSpymaster && isLobby && teamPlayers.length > 0 && (
+        <div className="text-xs text-amber-500 bg-amber-500/10 p-2 rounded flex items-center gap-1">
+          <Eye className="w-3 h-3" />
+          Bu takıma bir İstihbarat Şefi gerekli!
+        </div>
+      )}
+      
+      <div className="space-y-2">
         {teamPlayers.map(player => (
           <div 
             key={player.id}
             data-testid={`player-${player.id}`}
-            className={`flex items-center gap-1 p-1.5 rounded ${
-              player.id === currentPlayerId ? 'bg-accent/20 border border-accent/30' : 'bg-muted/30'
+            className={`flex items-center gap-2 p-2 rounded-lg transition-all ${
+              player.id === currentPlayerId 
+                ? 'bg-accent/20 border border-accent/30 shadow-sm' 
+                : 'bg-black/20 hover:bg-black/30'
             }`}
           >
             <div className="flex items-center gap-1 flex-1 min-w-0">
@@ -128,28 +149,31 @@ export function PlayerList({
               <span className="text-xs font-medium truncate">{player.username}</span>
             </div>
             
-            <div className="flex items-center gap-0.5 flex-shrink-0">
+            <div className="flex items-center gap-1 flex-shrink-0">
               {player.role === "spymaster" ? (
-                <Badge variant="default" className="text-[10px] gap-0.5 px-1 py-0 h-5">
-                  <Eye className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">İstihbarat</span> Şefi
+                <Badge 
+                  variant="default" 
+                  className="text-xs gap-1 px-2 py-0 h-6 bg-gradient-to-r from-amber-600 to-yellow-600 border-amber-400"
+                >
+                  <Eye className="w-3 h-3" />
+                  <span className="font-semibold">İstihbarat Şefi</span>
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="text-[10px] gap-0.5 px-1 py-0 h-5">
-                  <Target className="w-2.5 h-2.5" />
-                  Ajan
+                <Badge variant="secondary" className="text-xs gap-1 px-2 py-0 h-6">
+                  <Target className="w-3 h-3" />
+                  <span>Ajan</span>
                 </Badge>
               )}
               
               {isLobby && player.id === currentPlayerId && onRoleToggle && (
                 <Button 
                   size="sm" 
-                  variant="ghost" 
-                  className="h-5 px-1 text-[10px]"
+                  variant={player.role === "spymaster" ? "secondary" : "default"}
+                  className="h-6 px-2 text-xs ml-1"
                   onClick={onRoleToggle}
                   data-testid="button-toggle-role"
                 >
-                  Değiştir
+                  {player.role === "spymaster" ? "Ajan Ol" : "İstihbarat Şefi Ol"}
                 </Button>
               )}
               
@@ -174,25 +198,37 @@ export function PlayerList({
   };
 
   return (
-    <div className="space-y-2 h-full overflow-y-auto">
-      <div className="flex items-center gap-1.5 text-muted-foreground px-2">
-        <Users className="w-3 h-3" />
-        <span className="text-xs font-medium">Oyuncular ({players.length})</span>
+    <div className="space-y-3 h-full overflow-y-auto">
+      <div className="flex items-center gap-2 text-muted-foreground px-1">
+        <Users className="w-4 h-4" />
+        <span className="text-sm font-semibold">Oyuncular ({players.length})</span>
       </div>
 
       {noTeam.length > 0 && (
-        <Card className="p-2 space-y-1 border-dashed">
-          <h3 className="font-semibold text-xs text-muted-foreground">Takım Seçilmemiş</h3>
-          {noTeam.map(player => (
-            <div 
-              key={player.id}
-              data-testid={`player-${player.id}`}
-              className="flex items-center gap-1 p-1.5 rounded bg-muted/30"
-            >
-              {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500" />}
-              <span className="text-xs">{player.username}</span>
+        <Card className="p-3 space-y-2 border-2 border-dashed border-amber-500/30 bg-amber-950/10">
+          <h3 className="font-bold text-sm text-amber-600">Takım Seçilmemiş ({noTeam.length})</h3>
+          <div className="space-y-1">
+            {noTeam.map(player => (
+              <div 
+                key={player.id}
+                data-testid={`player-${player.id}`}
+                className="flex items-center gap-2 p-2 rounded bg-amber-500/10 border border-amber-500/20"
+              >
+                {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500" />}
+                <span className="text-sm font-medium">{player.username}</span>
+                {player.id === currentPlayerId && (
+                  <Badge variant="outline" className="text-xs px-2 h-5 ml-auto">
+                    Sen
+                  </Badge>
+                )}
+              </div>
+            ))}
+          </div>
+          {noTeam.some(p => p.id === currentPlayerId) && onTeamSelect && (
+            <div className="text-xs text-amber-600 font-medium">
+              ⬇ Aşağıdaki takımlardan birini seç
             </div>
-          ))}
+          )}
         </Card>
       )}
 
