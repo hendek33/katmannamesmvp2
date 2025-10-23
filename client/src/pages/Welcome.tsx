@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot } from "lucide-react";
+import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot, Loader2 } from "lucide-react";
 import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,19 @@ export default function Welcome() {
   const [, navigate] = useLocation();
   const [showUsernameInput, setShowUsernameInput] = useState(false);
   const [username, setUsername] = useState("");
+  const [cardsLoaded, setCardsLoaded] = useState(false);
+  
+  // Clear any old/invalid localStorage keys on mount
+  useEffect(() => {
+    // Remove old key format if it exists
+    localStorage.removeItem("username");
+    // Clear form autocomplete cache
+    const storedUsername = localStorage.getItem("katmannames_username");
+    if (storedUsername === "arda" || storedUsername === "Arda") {
+      // Clear if it's the problematic default value
+      localStorage.removeItem("katmannames_username");
+    }
+  }, []);
   
   // Memoize props for HeroPhysicsCards to prevent re-initialization
   const cardImageNames = useMemo(() => [
@@ -33,21 +46,41 @@ export default function Welcome() {
     "noeldayı mavi.png",
     "nuriben mavi.png",
     "perver beyaz.png",
-    "perver kırmızı.png",
-    "triel kırmızı.png",
-    "triel2 mavi.png",
     "çağrı mavi.png",
     "çağrı normal beyaz.png",
-    "çağrı sigara beyaz.png",
-    "şinasi kırmızı.png",
-    "şinasi su beyaz.png"
+    "çağrı sigara beyaz.png"
   ], []);
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
+  
+  // Track when all card images are loaded
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        const imagePromises = cardImageNames.map(imageName => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = `/acilmiskartgorselküçültülmüş/${imageName}`;
+          });
+        });
+        
+        await Promise.all(imagePromises);
+        setCardsLoaded(true);
+      } catch (error) {
+        console.error("Error loading card images:", error);
+        // Still allow button to be clickable even if some images fail
+        setCardsLoaded(true);
+      }
+    };
+    
+    loadImages();
+  }, [cardImageNames]);
 
   const handleContinue = () => {
     if (username.trim().length >= 2) {
-      localStorage.setItem("username", username.trim());
+      localStorage.setItem("katmannames_username", username.trim());
       navigate("/rooms");
     }
   };
@@ -90,33 +123,83 @@ export default function Welcome() {
               <img 
                 src="/logo.png" 
                 alt="Katmannames Logo" 
-                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.7)] hover:scale-110 cursor-pointer"
+                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)] hover:drop-shadow-[0_15px_50px_rgba(255,255,255,0.6)] hover:scale-110 cursor-pointer"
               />
             </div>
 
             {/* Start Button */}
             <div className="relative flex justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400 ml-6">
+              {/* Outer glow rings */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="absolute w-32 h-32 md:w-36 md:h-36 rounded-full animate-ping opacity-30" 
+                     style={{ backgroundColor: 'rgba(0, 116, 176, 0.6)' }} />
+                <div className="absolute w-36 h-36 md:w-40 md:h-40 rounded-full animate-ping opacity-20 animation-delay-200" 
+                     style={{ backgroundColor: 'rgba(0, 116, 176, 0.4)' }} />
+              </div>
+              
               <button
-                onClick={() => setShowUsernameInput(true)}
-                className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform hover:scale-110 transition-all pointer-events-auto shadow-2xl flex items-center justify-center overflow-hidden animate-pulse-glow"
+                onClick={() => cardsLoaded && setShowUsernameInput(true)}
+                disabled={!cardsLoaded}
+                className={cn(
+                  "group relative w-32 h-32 md:w-36 md:h-36 rounded-full transform transition-all duration-500 pointer-events-auto flex items-center justify-center overflow-hidden",
+                  cardsLoaded ? "hover:scale-125 hover:rotate-12 active:scale-110" : "opacity-75 cursor-not-allowed"
+                )}
                 style={{
                   borderColor: 'rgba(67, 23, 9, 1)',
                   backgroundColor: 'rgba(0, 116, 176, 1)',
                   borderWidth: '12px',
-                  borderStyle: 'solid'
+                  borderStyle: 'solid',
+                  filter: 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))',
+                  transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                }}
+                onMouseEnter={(e) => {
+                  if (cardsLoaded) {
+                    e.currentTarget.style.filter = 'drop-shadow(0 20px 50px rgba(0, 116, 176, 1)) drop-shadow(0 10px 30px rgba(67, 23, 9, 0.8))';
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 150, 200, 1)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (cardsLoaded) {
+                    e.currentTarget.style.filter = 'drop-shadow(0 10px 25px rgba(0, 116, 176, 0.6)) drop-shadow(0 5px 15px rgba(67, 23, 9, 0.5))';
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 116, 176, 1)';
+                  }
                 }}
               >
-                <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                     style={{ 
-                       backgroundColor: 'rgba(0, 116, 176, 0.8)'
+                {/* Inner pulse effect */}
+                <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-pulse" />
+                
+                {/* Rotating border effect */}
+                <div className="absolute inset-[-2px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                     style={{
+                       background: 'conic-gradient(from 0deg, transparent, rgba(255,255,255,0.4), transparent)',
+                       animation: 'spin 2s linear infinite',
                      }} />
-                {/* Opaque Play Icon */}
+                
+                {/* Play Icon or Loading Spinner with hover animation */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                  <Play className="w-16 h-16 md:w-20 md:h-20" 
-                        style={{ 
-                          color: 'rgba(67, 23, 9, 1)',
-                          fill: 'rgba(67, 23, 9, 1)' 
-                        }} />
+                  {cardsLoaded ? (
+                    <Play className="w-16 h-16 md:w-20 md:h-20 transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-12" 
+                          style={{ 
+                            color: 'rgba(67, 23, 9, 1)',
+                            fill: 'rgba(67, 23, 9, 1)',
+                            filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
+                          }} />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="w-12 h-12 md:w-16 md:h-16 animate-spin" 
+                               style={{ 
+                                 color: 'rgba(67, 23, 9, 1)',
+                                 filter: 'drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3))',
+                               }} />
+                      <span className="text-xs font-medium"
+                            style={{ 
+                              color: 'rgba(67, 23, 9, 1)',
+                              textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)',
+                            }}>
+                        Yükleniyor...
+                      </span>
+                    </div>
+                  )}
                 </div>
               </button>
             </div>
@@ -145,6 +228,7 @@ export default function Welcome() {
                 className="text-base"
                 maxLength={20}
                 autoFocus
+                autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
                 En az 2 karakter giriniz

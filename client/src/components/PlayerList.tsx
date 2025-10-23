@@ -34,6 +34,10 @@ export function PlayerList({
   const noTeam = players.filter(p => p.team === null);
   
   const currentPlayer = players.find(p => p.id === currentPlayerId);
+  
+  // Check if teams have required roles for game start
+  const darkHasSpymaster = darkTeam.some(p => p.role === "spymaster");
+  const lightHasSpymaster = lightTeam.some(p => p.role === "spymaster");
 
   const TeamSection = ({ team, title, players: teamPlayers, gradient }: { 
     team: Team; 
@@ -53,11 +57,18 @@ export function PlayerList({
       setIsEditing(false);
     };
 
+    const hasSpymaster = teamPlayers.some(p => p.role === "spymaster");
+    const needsSpymaster = teamPlayers.length > 0 && !hasSpymaster;
+    
     return (
-    <Card className="p-2 sm:p-3 space-y-2">
+    <Card className={`p-2 space-y-2 border-2 transition-all bg-slate-800 ${
+      team === "dark" 
+        ? "border-blue-600/50 hover:border-blue-500/70" 
+        : "border-red-600/50 hover:border-red-500/70"
+    } ${needsSpymaster && isLobby ? "ring-2 ring-amber-500/20" : ""}`}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 flex-1">
-          <div className={`w-2 h-2 rounded-full ${gradient}`} />
+        <div className="flex items-center gap-2 flex-1">
+          <div className={`w-3 h-3 rounded-full ${gradient}`} />
           {isLobby && isEditing ? (
             <div className="flex items-center gap-1 flex-1">
               <Input
@@ -81,32 +92,32 @@ export function PlayerList({
             </div>
           ) : (
             <>
-              <h3 className="font-semibold text-xs sm:text-sm">{title}</h3>
+              <h3 className="font-bold text-sm sm:text-base">{title}</h3>
               {isLobby && onTeamNameChange && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-5 w-5 p-0"
+                  className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
                   onClick={() => {
                     setEditedName(title);
                     setIsEditing(true);
                   }}
                 >
-                  <Edit2 className="w-2.5 h-2.5" />
+                  <Edit2 className="w-3 h-3" />
                 </Button>
               )}
             </>
           )}
-          <Badge variant="secondary" className="text-[10px] px-1 h-4">
-            {teamPlayers.length}
+          <Badge variant={needsSpymaster ? "destructive" : "secondary"} className="text-xs px-2 h-5">
+            {teamPlayers.length} oyuncu
           </Badge>
         </div>
         {isLobby && currentPlayer?.team !== team && onTeamSelect && (
           <Button 
             size="sm" 
-            variant="outline"
+            variant={team === "dark" ? "default" : "destructive"}
             onClick={() => onTeamSelect(team)}
-            className="text-[10px] h-6 px-2"
+            className="h-7 px-2 text-xs"
             data-testid={`button-join-${team}`}
           >
             Katıl
@@ -114,101 +125,171 @@ export function PlayerList({
         )}
       </div>
       
-      <div className="space-y-1">
-        {teamPlayers.map(player => (
-          <div 
-            key={player.id}
-            data-testid={`player-${player.id}`}
-            className={`flex items-center gap-1 p-1.5 rounded ${
-              player.id === currentPlayerId ? 'bg-accent/20 border border-accent/30' : 'bg-muted/30'
-            }`}
-          >
-            <div className="flex items-center gap-1 flex-1 min-w-0">
-              {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
-              <span className="text-xs font-medium truncate">{player.username}</span>
-            </div>
-            
-            <div className="flex items-center gap-0.5 flex-shrink-0">
-              {player.role === "spymaster" ? (
-                <Badge variant="default" className="text-[10px] gap-0.5 px-1 py-0 h-5">
-                  <Eye className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">İstihbarat</span> Şefi
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="text-[10px] gap-0.5 px-1 py-0 h-5">
-                  <Target className="w-2.5 h-2.5" />
-                  Ajan
-                </Badge>
-              )}
-              
-              {isLobby && player.id === currentPlayerId && onRoleToggle && (
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-5 px-1 text-[10px]"
-                  onClick={onRoleToggle}
-                  data-testid="button-toggle-role"
-                >
-                  Değiştir
-                </Button>
-              )}
-              
-              {/* Remove button for bots */}
-              {isLobby && player.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-5 w-5 p-0 text-red-500 hover:text-red-700"
-                  onClick={() => onRemoveBot(player.id)}
-                  data-testid={`button-remove-bot-${player.id}`}
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-              )}
-            </div>
-          </div>
-        ))}
+      {/* Warning if team needs spymaster */}
+      {needsSpymaster && isLobby && teamPlayers.length > 0 && (
+        <div className="text-xs text-amber-500 bg-amber-500/10 p-2 rounded flex items-center gap-1">
+          <Eye className="w-3 h-3" />
+          Bu takıma bir İstihbarat Şefi gerekli!
+        </div>
+      )}
+      
+      <div className="grid grid-cols-4 gap-1">
+        {/* First cell - Spymaster spot */}
+        {(() => {
+          const spymaster = teamPlayers.find(p => p.role === "spymaster");
+          const agents = teamPlayers.filter(p => p.role === "guesser");
+          const allSlots = [];
+          
+          // First slot is always for spymaster
+          if (spymaster) {
+            allSlots.push(
+              <div 
+                key={spymaster.id}
+                data-testid={`player-${spymaster.id}`}
+                className={`flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/40 to-amber-800/30 border border-amber-600/50 ${
+                  spymaster.id === currentPlayerId ? 'ring-2 ring-accent' : ''
+                }`}
+              >
+                {spymaster.isRoomOwner && (
+                  <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
+                )}
+                <Eye className="w-4 h-4 text-amber-500 mb-0.5" />
+                <span className="text-xs font-bold text-center truncate w-full text-amber-200">
+                  {spymaster.username}
+                </span>
+                {isLobby && spymaster.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
+                  <button 
+                    onClick={() => onRemoveBot(spymaster.id)}
+                    className="text-[9px] text-red-400 hover:text-red-300 mt-0.5"
+                    data-testid={`button-remove-bot-${spymaster.id}`}
+                  >
+                    kaldır
+                  </button>
+                )}
+                {/* Show "Ajan Ol" button for current player who is spymaster */}
+                {isLobby && spymaster.id === currentPlayerId && onRoleToggle && (
+                  <button 
+                    onClick={onRoleToggle}
+                    className="text-[10px] text-blue-400 hover:text-blue-300 mt-1 font-semibold"
+                    data-testid="button-become-agent"
+                  >
+                    Ajan Ol
+                  </button>
+                )}
+              </div>
+            );
+          } else {
+            // Empty spymaster slot - clickable for current player to become spymaster
+            allSlots.push(
+              <div 
+                key="empty-spymaster"
+                className="flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/20 to-amber-800/10 border-2 border-dashed border-amber-600/30 hover:border-amber-500/50 transition-all cursor-pointer"
+                onClick={() => {
+                  if (isLobby && currentPlayer?.team === team && currentPlayer?.role !== "spymaster" && onRoleToggle) {
+                    onRoleToggle();
+                  }
+                }}
+              >
+                <Eye className="w-4 h-4 text-amber-600/50 mb-0.5" />
+                <span className="text-[10px] text-amber-600/70 text-center">
+                  {isLobby && currentPlayer?.team === team && currentPlayer?.role !== "spymaster" 
+                    ? "İstihbarat\nŞefi Ol" 
+                    : "İstihbarat\nŞefi Yok"}
+                </span>
+              </div>
+            );
+          }
+          
+          // Add agents to remaining slots
+          agents.forEach(agent => {
+            allSlots.push(
+              <div 
+                key={agent.id}
+                data-testid={`player-${agent.id}`}
+                className={`flex flex-col items-center p-2 rounded transition-all ${
+                  agent.id === currentPlayerId 
+                    ? 'bg-accent/20 border border-accent/30 shadow-sm' 
+                    : 'bg-black/20 hover:bg-black/30'
+                }`}
+              >
+                {agent.isRoomOwner && (
+                  <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
+                )}
+                <Target className="w-3.5 h-3.5 text-muted-foreground mb-0.5" />
+                <span className="text-xs font-medium text-center truncate w-full">
+                  {agent.username}
+                </span>
+                {isLobby && agent.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
+                  <button 
+                    onClick={() => onRemoveBot(agent.id)}
+                    className="text-[9px] text-red-400 hover:text-red-300 mt-0.5"
+                    data-testid={`button-remove-bot-${agent.id}`}
+                  >
+                    kaldır
+                  </button>
+                )}
+              </div>
+            );
+          });
+          
+          return allSlots;
+        })()}
       </div>
     </Card>
     );
   };
 
   return (
-    <div className="space-y-2 h-full overflow-y-auto">
-      <div className="flex items-center gap-1.5 text-muted-foreground px-2">
+    <div className="h-full flex flex-col gap-2">
+      <div className="flex items-center gap-2 text-muted-foreground px-1">
         <Users className="w-3 h-3" />
-        <span className="text-xs font-medium">Oyuncular ({players.length})</span>
+        <span className="text-xs font-semibold">Oyuncular ({players.length})</span>
       </div>
+      
+      <div className="flex-1 overflow-y-auto space-y-2">
 
       {noTeam.length > 0 && (
-        <Card className="p-2 space-y-1 border-dashed">
-          <h3 className="font-semibold text-xs text-muted-foreground">Takım Seçilmemiş</h3>
-          {noTeam.map(player => (
-            <div 
-              key={player.id}
-              data-testid={`player-${player.id}`}
-              className="flex items-center gap-1 p-1.5 rounded bg-muted/30"
-            >
-              {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500" />}
-              <span className="text-xs">{player.username}</span>
+        <Card className="p-2 space-y-1 border-2 border-dashed border-amber-500/30 bg-slate-800">
+          <h3 className="font-bold text-xs text-amber-600">Takım Seçilmemiş ({noTeam.length})</h3>
+          <div className="space-y-1">
+            {noTeam.map(player => (
+              <div 
+                key={player.id}
+                data-testid={`player-${player.id}`}
+                className="flex items-center gap-2 p-1 rounded bg-amber-500/10 border border-amber-500/20"
+              >
+                {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500" />}
+                <span className="text-sm font-medium">{player.username}</span>
+                {player.id === currentPlayerId && (
+                  <Badge variant="outline" className="text-xs px-2 h-5 ml-auto">
+                    Sen
+                  </Badge>
+                )}
+              </div>
+            ))}
+          </div>
+          {noTeam.some(p => p.id === currentPlayerId) && onTeamSelect && (
+            <div className="text-xs text-amber-600 font-medium">
+              ⬇ Aşağıdaki takımlardan birini seç
             </div>
-          ))}
+          )}
         </Card>
       )}
 
-      <TeamSection 
-        team="dark"
-        title={darkTeamName}
-        players={darkTeam}
-        gradient="bg-gradient-to-r from-blue-600 to-blue-400"
-      />
-      
-      <TeamSection 
-        team="light"
-        title={lightTeamName}
-        players={lightTeam}
-        gradient="bg-gradient-to-r from-red-600 to-red-400"
-      />
+        <TeamSection 
+          team="dark"
+          title={darkTeamName}
+          players={darkTeam}
+          gradient="bg-gradient-to-r from-blue-600 to-blue-400"
+        />
+        
+        <TeamSection 
+          team="light"
+          title={lightTeamName}
+          players={lightTeam}
+          gradient="bg-gradient-to-r from-red-600 to-red-400"
+        />
+      </div>
     </div>
   );
 }
