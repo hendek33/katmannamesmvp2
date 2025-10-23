@@ -717,7 +717,47 @@ export default function Game() {
           {/* Right Section - Actions */}
           <div className="lg:w-[250px] xl:w-[280px] 2xl:w-[320px]">
             <Card className="px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-red-900/30 hover:shadow-red-500/20 transition-all">
-            <div className="flex items-center gap-1 justify-end h-full">
+            <div className="flex items-center gap-1 justify-end h-full flex-wrap">
+              {/* Moderator Controls for Taunt/Insult */}
+              {currentPlayer?.isRoomOwner && gameState.phase === "playing" && (
+                <>
+                  <Button
+                    onClick={() => {
+                      send("toggle_taunt", { enabled: !tauntEnabled });
+                    }}
+                    size="sm"
+                    variant={tauntEnabled ? "default" : "outline"}
+                    className={cn(
+                      "h-6 px-2 text-[10px] font-bold",
+                      tauntEnabled 
+                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500" 
+                        : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
+                    )}
+                    title="Hareket çekme özelliğini aç/kapat"
+                  >
+                    <Zap className="w-2.5 h-2.5 mr-0.5" />
+                    {tauntEnabled ? "H+" : "H-"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      send("toggle_insult", { enabled: !insultEnabled });
+                    }}
+                    size="sm"
+                    variant={insultEnabled ? "default" : "outline"}
+                    className={cn(
+                      "h-6 px-2 text-[10px] font-bold",
+                      insultEnabled 
+                        ? "bg-red-600 hover:bg-red-700 text-white border-red-500" 
+                        : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
+                    )}
+                    title="Laf sokma özelliğini aç/kapat"
+                  >
+                    <MessageCircle className="w-2.5 h-2.5 mr-0.5" />
+                    {insultEnabled ? "L+" : "L-"}
+                  </Button>
+                </>
+              )}
+              
               {currentPlayer?.isRoomOwner && (
                 <>
                   {/* Game Settings Dialog */}
@@ -1458,49 +1498,6 @@ export default function Game() {
               ))}
             </div>
 
-            {/* Moderator Controls - Above Clue Display */}
-            {currentPlayer?.isRoomOwner && gameState.phase === "playing" && (
-              <div className="absolute bottom-16 left-0 right-0 flex justify-center p-0" style={{ zIndex: 45 }}>
-                <Card className="px-3 py-2 border-2 bg-slate-950/95 border-purple-500/60 shadow-2xl backdrop-blur-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] sm:text-xs font-bold text-purple-400 uppercase">Moderatör:</span>
-                    <Button
-                      onClick={() => {
-                        send("toggle_taunt", { enabled: !tauntEnabled });
-                      }}
-                      size="sm"
-                      variant={tauntEnabled ? "default" : "outline"}
-                      className={cn(
-                        "h-7 px-3 text-[10px] sm:text-xs font-bold",
-                        tauntEnabled 
-                          ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500" 
-                          : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
-                      )}
-                    >
-                      <Zap className="w-3 h-3 mr-1" />
-                      Hareket {tauntEnabled ? "Açık" : "Kapalı"}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        send("toggle_insult", { enabled: !insultEnabled });
-                      }}
-                      size="sm"
-                      variant={insultEnabled ? "default" : "outline"}
-                      className={cn(
-                        "h-7 px-3 text-[10px] sm:text-xs font-bold",
-                        insultEnabled 
-                          ? "bg-red-600 hover:bg-red-700 text-white border-red-500" 
-                          : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
-                      )}
-                    >
-                      <MessageCircle className="w-3 h-3 mr-1" />
-                      Laf {insultEnabled ? "Açık" : "Kapalı"}
-                    </Button>
-                  </div>
-                </Card>
-              </div>
-            )}
-            
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers - Positioned to the left */}
