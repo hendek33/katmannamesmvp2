@@ -161,7 +161,7 @@ export function PlayerList({
               <div 
                 key={spymaster.id}
                 data-testid={`player-${spymaster.id}`}
-                className={`flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/40 to-amber-800/30 border border-amber-600/50 hover-card hover-shimmer transition-all cursor-pointer ${
+                className={`flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/40 to-amber-800/30 border border-amber-600/50 ${
                   spymaster.id === currentPlayerId ? 'ring-2 ring-accent' : ''
                 }`}
               >
@@ -221,7 +221,7 @@ export function PlayerList({
               <div 
                 key={agent.id}
                 data-testid={`player-${agent.id}`}
-                className={`flex flex-col items-center p-2 rounded hover-card hover-shimmer transition-all cursor-pointer ${
+                className={`flex flex-col items-center p-2 rounded transition-all ${
                   agent.id === currentPlayerId 
                     ? 'bg-accent/20 border border-accent/30 shadow-sm' 
                     : 'bg-black/20 hover:bg-black/30'
