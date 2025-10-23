@@ -256,7 +256,7 @@ export function PlayerList({
 
   return (
     <div className="h-full flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-muted-foreground px-1">
+      <div className="flex items-center gap-2 text-slate-400 px-1">
         <Users className="w-3 h-3" />
         <span className="text-xs font-semibold">Oyuncular ({players.length})</span>
       </div>
@@ -264,19 +264,19 @@ export function PlayerList({
       <div className="flex-1 overflow-y-auto space-y-2">
 
       {noTeam.length > 0 && (
-        <div className="backdrop-blur-sm bg-amber-50 rounded-xl border-2 border-dashed border-amber-300 p-4 space-y-2">
-          <h3 className="font-bold text-sm text-amber-700">Takım Seçilmemiş ({noTeam.length})</h3>
+        <div className="backdrop-blur-lg bg-black/70 rounded-xl border-2 border-dashed border-amber-600/50 p-4 space-y-2 shadow-2xl">
+          <h3 className="font-bold text-sm text-amber-400">Takım Seçilmemiş ({noTeam.length})</h3>
           <div className="space-y-1">
             {noTeam.map(player => (
               <div 
                 key={player.id}
                 data-testid={`player-${player.id}`}
-                className="flex items-center gap-2 p-1 rounded bg-amber-500/10 border border-amber-500/20"
+                className="flex items-center gap-2 p-1 rounded bg-amber-900/20 border border-amber-700/30"
               >
-                {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-500" />}
-                <span className="text-sm font-medium">{player.username}</span>
+                {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-400" />}
+                <span className="text-sm font-medium text-slate-200">{player.username}</span>
                 {player.id === currentPlayerId && (
-                  <Badge variant="outline" className="text-xs px-2 h-5 ml-auto">
+                  <Badge variant="outline" className="text-xs px-2 h-5 ml-auto border-amber-600/50 text-amber-300">
                     Sen
                   </Badge>
                 )}
@@ -284,7 +284,7 @@ export function PlayerList({
             ))}
           </div>
           {noTeam.some(p => p.id === currentPlayerId) && onTeamSelect && (
-            <div className="text-xs text-amber-600 font-medium">
+            <div className="text-xs text-amber-400 font-medium">
               ⬇ Aşağıdaki takımlardan birini seç
             </div>
           )}
