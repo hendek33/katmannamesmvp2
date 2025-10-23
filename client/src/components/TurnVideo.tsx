@@ -13,53 +13,64 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
   const [isClosing, setIsClosing] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const emergencyTimeoutRef = useRef<NodeJS.Timeout>();
 
   const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
     : "/kırmızı takım video tur.mp4";
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    if (!videoRef.current) return;
     
-    // Wait for video to be ready
-    if (videoRef.current) {
-      const video = videoRef.current;
-      
-      const handleCanPlay = () => {
-        setVideoReady(true);
-        video.play().catch(err => {
+    const video = videoRef.current;
+    
+    // Reset video for new playback
+    video.currentTime = 0;
+    setVideoReady(false);
+    
+    const handleLoadedData = () => {
+      // Video data is loaded and ready to play
+      video.play()
+        .then(() => {
+          setVideoReady(true);
+        })
+        .catch(err => {
           console.error('Video play error:', err);
-          // Still show animation even if video fails
+          // If play fails, still show the overlay
           setVideoReady(true);
         });
-      };
-      
-      video.addEventListener('canplay', handleCanPlay);
-      
-      // Fallback if video takes too long
-      const fallbackTimeout = setTimeout(() => {
-        setVideoReady(true);
+    };
+    
+    const handleVideoEnd = () => {
+      setIsClosing(true);
+      setTimeout(() => {
+        setShow(false);
+        onComplete?.();
       }, 500);
-      
-      // Auto hide after video starts playing
-      timeoutId = setTimeout(() => {
-        setIsClosing(true);
-        setTimeout(() => {
-          setShow(false);
-          onComplete?.();
-        }, 500);
-      }, 2800); // Total display time
+    };
+    
+    // Add event listeners
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('ended', handleVideoEnd);
+    
+    // Load the video
+    video.load();
+    
+    // Emergency timeout (5 seconds) in case video never loads
+    emergencyTimeoutRef.current = setTimeout(() => {
+      console.warn('Emergency timeout triggered for turn video');
+      handleVideoEnd();
+    }, 5000);
 
-      return () => {
-        clearTimeout(timeoutId);
-        clearTimeout(fallbackTimeout);
-        video.removeEventListener('canplay', handleCanPlay);
-        if (video) {
-          video.pause();
-        }
-      };
-    }
-  }, [onComplete]);
+    return () => {
+      if (emergencyTimeoutRef.current) {
+        clearTimeout(emergencyTimeoutRef.current);
+      }
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('ended', handleVideoEnd);
+      video.pause();
+    };
+  }, [team, onComplete]);
 
   if (!show) return null;
 
@@ -140,6 +151,9 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
               playsInline
               preload="auto"
               className="w-full h-full object-cover"
+              style={{
+                opacity: videoReady ? 1 : 0
+              }}
             />
             
             {/* Gradient overlay for better blending */}

@@ -88,25 +88,7 @@ export default function Game() {
     previousClueRef.current = clueKey;
   }, [gameState?.currentClue]);
 
-  // Auto refresh when game starts to fix video stuttering
-  useEffect(() => {
-    if (gameState?.phase === "playing") {
-      // Check if we already refreshed for this game
-      const hasRefreshed = localStorage.getItem("katmannames_game_refreshed");
-      
-      if (!hasRefreshed) {
-        // Mark that we're refreshing
-        localStorage.setItem("katmannames_game_refreshed", "true");
-        // Refresh the page
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
-      }
-    } else if (gameState?.phase === "lobby" || gameState?.phase === "ended") {
-      // Clear the flag when game is not playing
-      localStorage.removeItem("katmannames_game_refreshed");
-    }
-  }, [gameState?.phase]);
+  // Removed auto refresh logic - no longer needed with improved video handling
 
   // Detect turn changes and show video
   useEffect(() => {
