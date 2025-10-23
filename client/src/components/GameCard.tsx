@@ -99,7 +99,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         colors.border,
         colors.bg,
         colors.shadow,
-        !card.revealed && "cursor-pointer",
+        !card.revealed && "cursor-pointer hover-shimmer",
         "ring-2 ring-black/20",
         card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
         isAssassinCard && gameEnded && "animate-assassin-reveal",
