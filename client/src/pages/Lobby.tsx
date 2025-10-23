@@ -611,15 +611,15 @@ export default function Lobby() {
           {/* Game Settings - Visible to all, editable only by owner */}
           <div className="mt-4 grid md:grid-cols-2 gap-3">
             {/* Chaos Mode - Compact */}
-            <Card className={`p-3 border-2 bg-slate-800 border-red-600/50 relative ${!currentPlayer?.isRoomOwner ? 'opacity-75' : ''}`}>
-              <Badge className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] px-1.5 py-0.5">
+            <Card className={`p-3 border-2 bg-slate-800 border-gray-600/50 relative opacity-75`}>
+              <Badge className="absolute -top-2 -right-2 bg-gray-600 text-white text-[10px] px-1.5 py-0.5">
                 🧪 DENEYSEL
               </Badge>
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-red-500" />
-                  <h3 className="text-base font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
+                  <Sparkles className="w-5 h-5 text-gray-500" />
+                  <h3 className="text-base font-bold text-gray-500">
                     KAOS MODU
                   </h3>
                   <button
@@ -630,23 +630,18 @@ export default function Lobby() {
                   </button>
                 </div>
                 <Switch
-                  checked={chaosMode}
-                  disabled={!currentPlayer?.isRoomOwner}
+                  checked={false}
+                  disabled={true}
                   onCheckedChange={(checked) => {
-                    if (currentPlayer?.isRoomOwner) {
-                      setChaosMode(checked);
-                      handleChaosModeUpdate(checked);
-                    }
+                    // Chaos mode is temporarily disabled
                   }}
                   data-testid="switch-chaos-mode"
                 />
               </div>
               
-              {chaosMode && (
-                <p className="text-[10px] text-amber-400 mt-2">
-                  ⚡ Gizli roller aktif - Oyun başladığında atanacak
-                </p>
-              )}
+              <p className="text-[10px] text-gray-400 mt-2">
+                🚧 Geliştirme aşamasında - Yakında aktif olacak!
+              </p>
             </Card>
             
             {/* Timer Settings - Compact */}
