@@ -63,8 +63,8 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
     <div 
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-700 ease-out",
-        isLeftSide ? "left-[10%] lg:left-[15%] xl:left-[18%]" : "right-[10%] lg:right-[15%] xl:right-[18%]",
-        "top-[10vh] lg:top-[12vh] xl:top-[15vh]",
+        isLeftSide ? "left-[8%] lg:left-[12%] xl:left-[15%]" : "right-[8%] lg:right-[12%] xl:right-[15%]",
+        "top-[8vh] lg:top-[10vh] xl:top-[12vh]",
         isVisible && !isLeaving ? "opacity-100" : "opacity-0",
         isLeaving && "animate-fade-out"
       )}
