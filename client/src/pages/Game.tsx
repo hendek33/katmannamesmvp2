@@ -161,12 +161,10 @@ export default function Game() {
       ? gameState.revealHistory[gameState.revealHistory.length - 1] as any
       : null;
     
-    // If last revealed card is NOT assassin, show normal win video
+    // If last revealed card is NOT assassin, show normal win video immediately
     if (lastReveal && lastReveal.type !== "assassin") {
-      // Small delay to let the last card reveal animation finish
-      setTimeout(() => {
-        setShowNormalWinVideo(true);
-      }, 1000);
+      // Show video immediately to prevent duplicate win text
+      setShowNormalWinVideo(true);
     }
   }, [gameState?.phase, gameState?.winner]);
 
