@@ -36,7 +36,7 @@ export interface IStorage {
   cleanupEmptyRooms(): void;
   getCardImages(roomCode: string): Record<number, string> | null;
   triggerTaunt(roomCode: string, playerId: string): any;
-  sendInsult(roomCode: string, playerId: string): any;
+  sendInsult(roomCode: string, playerId: string, targetId?: string): any;
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean } | null;
