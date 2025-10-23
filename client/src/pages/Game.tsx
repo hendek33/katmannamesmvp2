@@ -367,8 +367,8 @@ export default function Game() {
         />
       )}
       
-      {/* Taunt Overlay */}
-      {boardRef.current && (
+      {/* Taunt Overlay - Only visible to guessers, not spymasters */}
+      {boardRef.current && currentPlayer?.role !== "spymaster" && (
         <TauntOverlay 
           taunts={taunts}
           boardRef={boardRef}
