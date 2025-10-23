@@ -109,35 +109,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     setTiltY(0);
   };
   
-  // Separate handlers for revealed image card
-  const handleImageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isLifted) return; // Disable hover when card is lifted
-    
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    // Calculate tilt angles (-15 to 15 degrees)
-    const tiltX = ((y - centerY) / centerY) * -15;
-    const tiltY = ((x - centerX) / centerX) * 15;
-    
-    setTiltX(tiltX);
-    setTiltY(tiltY);
-  };
-  
-  const handleImageMouseEnter = () => {
-    if (!isLifted) { // Only enable hover when card is NOT lifted
-      setIsHovered(true);
-    }
-  };
-  
-  const handleImageMouseLeave = () => {
-    setIsHovered(false);
-    setTiltX(0);
-    setTiltY(0);
-  };
   
   // Preload image when card is revealed
   useEffect(() => {
@@ -295,14 +266,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             onClick={(e) => {
               e.stopPropagation();
               setIsLifted(!isLifted);
-              // Reset hover state when toggling lift
-              setIsHovered(false);
-              setTiltX(0);
-              setTiltY(0);
             }}
-            onMouseMove={handleImageMouseMove}
-            onMouseEnter={handleImageMouseEnter}
-            onMouseLeave={handleImageMouseLeave}
             title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
             style={{
               top: card.type === 'assassin' ? '0px' : '-4px',
@@ -313,15 +277,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
               backgroundSize: card.type === 'assassin' ? 'contain' : 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              boxShadow: isLifted 
-                ? '0 30px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.4)' 
-                : isHovered && !isLifted
-                  ? '0 15px 30px rgba(0,0,0,0.5), 0 0 25px rgba(0,0,0,0.3)'
-                  : '0 4px 8px rgba(0,0,0,0.3)',
-              transform: isHovered && !isLifted
-                ? `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05) translateZ(20px)`
-                : 'none',
-              transformStyle: 'preserve-3d',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
               pointerEvents: 'auto'
             }}
           />
