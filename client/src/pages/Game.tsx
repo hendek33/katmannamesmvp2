@@ -594,12 +594,12 @@ export default function Game() {
                       send("toggle_taunt", { enabled: !tauntEnabled });
                     }}
                     size="sm"
-                    variant="ghost"
+                    variant="outline"
                     className={cn(
-                      "h-6 px-3 text-xs font-medium backdrop-blur-sm transition-all",
+                      "h-6 px-3 text-xs font-medium transition-all",
                       tauntEnabled 
-                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30" 
-                        : "bg-slate-800/30 text-slate-500 border border-slate-700/40 hover:bg-slate-700/40"
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400 hover:border-amber-400 hover:bg-amber-500/20" 
+                        : "border hover:border-amber-500 hover:bg-amber-500/10"
                     )}
                     title="Hareket çekme özelliğini aç/kapat"
                   >
@@ -612,12 +612,12 @@ export default function Game() {
                       send("toggle_insult", { enabled: !insultEnabled });
                     }}
                     size="sm"
-                    variant="ghost"
+                    variant="outline"
                     className={cn(
-                      "h-6 px-3 text-xs font-medium backdrop-blur-sm transition-all",
+                      "h-6 px-3 text-xs font-medium transition-all",
                       insultEnabled 
-                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30" 
-                        : "bg-slate-800/30 text-slate-500 border border-slate-700/40 hover:bg-slate-700/40"
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400 hover:border-amber-400 hover:bg-amber-500/20" 
+                        : "border hover:border-amber-500 hover:bg-amber-500/10"
                     )}
                     title="Laf sokma özelliğini aç/kapat"
                   >
