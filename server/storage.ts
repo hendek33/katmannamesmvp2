@@ -34,15 +34,49 @@ export interface IStorage {
   cleanupEmptyRooms(): void;
   getCardImages(roomCode: string): Record<number, string> | null;
   triggerTaunt(roomCode: string, playerId: string): any;
+  sendInsult(roomCode: string, playerId: string): any;
 }
+
+// Insult templates
+const insultMessages = [
+  "{target} seni pis kokarca!",
+  "{target} sütünü iç de uyu!",
+  "{target} git yat zıbar!",
+  "{target} hadi bye bye!",
+  "{target} beynin mi yok senin?",
+  "{target} git köşende ağla!",
+  "{target} sen kimsin yahu?",
+  "{target} patates kafası!",
+  "{target} limon kafalı!",
+  "{target} uyku vaktin geldi senin!",
+  "{target} hadi yavrum sen oyun oyna!",
+  "{target} seni gidi tembel!",
+  "{target} karga beyinli!",
+  "{target} bak bak nasıl da oynuyor!",
+  "{target} haydi güle güle!",
+  "{target} senin aklın nerede?",
+  "{target} evine dön artık!",
+  "{target} bırak bu işleri!",
+  "{target} seni soğan kafalı!",
+  "{target} hadi bakalım aslanım!",
+  "{target} sen nasıl bir insansın?",
+  "{target} yazık sana yazık!",
+  "{target} ne yapıyorsun sen?",
+  "{target} acemi misin nesin?",
+  "{target} şapşal mısın nesin?"
+];
 
 export class MemStorage implements IStorage {
   private rooms: Map<string, RoomData>;
   private playerToRoom: Map<string, string>;
+  private lastInsultTime: Map<string, number>; // roomCode -> timestamp
+  private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
 
   constructor() {
     this.rooms = new Map();
     this.playerToRoom = new Map();
+    this.lastInsultTime = new Map();
+    this.playerInsultCooldown = new Map();
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
   }
@@ -888,6 +922,60 @@ export class MemStorage implements IStorage {
       videoSrc,
       position,
       expiresAt: now + 3000 // Video lasts 3 seconds
+    };
+  }
+
+  sendInsult(roomCode: string, playerId: string): any {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only during playing phase
+    if (room.phase !== "playing") return null;
+    
+    // Find the player
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || !player.team) return null;
+    
+    // Check global cooldown for room (no overlapping messages)
+    const now = Date.now();
+    const lastInsult = this.lastInsultTime.get(roomCode) || 0;
+    if (now - lastInsult < 4000) { // 3 seconds for message + 1 second buffer
+      return null;
+    }
+    
+    // Check player's personal cooldown (20 seconds)
+    const lastPlayerInsult = this.playerInsultCooldown.get(playerId) || 0;
+    if (now - lastPlayerInsult < 20000) {
+      return null;
+    }
+    
+    // Get random opponent from other team
+    const oppositeTeam = player.team === "dark" ? "light" : "dark";
+    const opponents = room.players.filter(p => p.team === oppositeTeam);
+    
+    if (opponents.length === 0) return null;
+    
+    const target = opponents[Math.floor(Math.random() * opponents.length)];
+    
+    // Get random insult message
+    const message = insultMessages[Math.floor(Math.random() * insultMessages.length)]
+      .replace("{target}", target.username);
+    
+    // Update cooldowns
+    this.playerInsultCooldown.set(playerId, now);
+    this.lastInsultTime.set(roomCode, now);
+    
+    // Return insult data for broadcast
+    return {
+      senderId: player.id,
+      senderUsername: player.username,
+      senderTeam: player.team,
+      targetId: target.id,
+      targetUsername: target.username,
+      targetTeam: target.team,
+      message,
+      timestamp: now
     };
   }
 

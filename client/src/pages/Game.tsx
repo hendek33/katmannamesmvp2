@@ -10,13 +10,14 @@ import { AssassinVideo } from "@/components/AssassinVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { TauntOverlay } from "@/components/TauntOverlay";
+import { InsultBubble } from "@/components/InsultBubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -32,6 +33,8 @@ export default function Game() {
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [taunts, setTaunts] = useState<any[]>([]);
   const [tauntCooldown, setTauntCooldown] = useState<number>(0);
+  const [insultCooldown, setInsultCooldown] = useState<number>(0);
+  const [insults, setInsults] = useState<any[]>([]);
   const boardRef = useRef<HTMLDivElement>(null);
   
   // Close number selector when clicking outside
@@ -232,6 +235,15 @@ export default function Game() {
     setTauntCooldown(20);
   };
 
+  const handleSendInsult = () => {
+    if (insultCooldown > 0 || !playerId) return;
+    
+    send("send_insult", { playerId });
+    
+    // Set 20 second cooldown
+    setInsultCooldown(20);
+  };
+
   // Countdown for taunt cooldown
   useEffect(() => {
     if (tauntCooldown > 0) {
@@ -242,9 +254,19 @@ export default function Game() {
     }
   }, [tauntCooldown]);
 
-  // Listen for taunt events via WebSocket
+  // Countdown for insult cooldown
   useEffect(() => {
-    // Access WebSocket directly to listen for taunt_fired events
+    if (insultCooldown > 0) {
+      const timer = setTimeout(() => {
+        setInsultCooldown(prev => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [insultCooldown]);
+
+  // Listen for taunt and insult events via WebSocket
+  useEffect(() => {
+    // Access WebSocket directly to listen for events
     const ws = (window as any).wsRef?.current;
     if (!ws) return;
     
@@ -253,9 +275,15 @@ export default function Game() {
         const message = JSON.parse(event.data);
         if (message.type === 'taunt_fired') {
           setTaunts(prev => [...prev, message.payload]);
+        } else if (message.type === 'insult_sent') {
+          setInsults(prev => [...prev, message.payload]);
+          // Remove insult after 3 seconds
+          setTimeout(() => {
+            setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
+          }, 3000);
         }
       } catch (err) {
-        console.error('Error handling taunt message:', err);
+        console.error('Error handling message:', err);
       }
     };
     
@@ -367,6 +395,17 @@ export default function Game() {
           boardRef={boardRef}
         />
       )}
+      
+      {/* Insult Bubbles */}
+      {insults.map((insult, index) => (
+        <InsultBubble
+          key={`${insult.timestamp}-${index}`}
+          senderUsername={insult.senderUsername}
+          senderTeam={insult.senderTeam}
+          message={insult.message}
+          timestamp={insult.timestamp}
+        />
+      ))}
 
       {/* Normal Win Video */}
       {showNormalWinVideo && gameState && gameState.winner && (
@@ -1135,11 +1174,13 @@ export default function Game() {
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
-              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-hidden hover-elevate cursor-pointer"
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:rotate-1"
               style={{
                 backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.png')`,
                 backgroundSize: 'cover',
-                backgroundPosition: 'center'
+                backgroundPosition: 'center',
+                transformStyle: 'preserve-3d',
+                transition: 'all 0.3s ease'
               }}
             >
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
@@ -1201,9 +1242,10 @@ export default function Game() {
               />
             )}
             
-            {/* Taunt Button - Below Blue Team Panel */}
+            {/* Action Buttons - Below Blue Team Panel */}
             {currentPlayer && gameState.phase === "playing" && (
-              <div className="mt-4">
+              <div className="mt-4 space-y-2">
+                {/* Taunt Button */}
                 <div className="relative">
                   <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
                     currentPlayer.team === "dark" 
@@ -1232,6 +1274,40 @@ export default function Game() {
                       <span className="flex items-center justify-center gap-1.5">
                         <Zap className="w-4 h-4" />
                         Hareket Çek
+                      </span>
+                    )}
+                  </button>
+                </div>
+                
+                {/* Insult Button */}
+                <div className="relative">
+                  <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
+                    currentPlayer.team === "dark" 
+                      ? "bg-purple-600/40" 
+                      : "bg-orange-600/40"
+                  }`} />
+                  <button
+                    onClick={handleSendInsult}
+                    disabled={insultCooldown > 0}
+                    className={`
+                      relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                      backdrop-blur-md border shadow-lg
+                      ${currentPlayer.team === "dark" 
+                        ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
+                        : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
+                      ${insultCooldown > 0 ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                    `}
+                    data-testid="button-send-insult"
+                  >
+                    {insultCooldown > 0 ? (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <Timer className="w-4 h-4" />
+                        {insultCooldown}s
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <MessageCircle className="w-4 h-4" />
+                        Laf Sok
                       </span>
                     )}
                   </button>
@@ -1509,11 +1585,13 @@ export default function Game() {
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
-              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-hidden hover-elevate cursor-pointer"
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:-rotate-1"
               style={{
                 backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.7), rgba(127, 29, 29, 0.7)), url('/kırmızı takım.png')`,
                 backgroundSize: 'cover',
-                backgroundPosition: 'center'
+                backgroundPosition: 'center',
+                transformStyle: 'preserve-3d',
+                transition: 'all 0.3s ease'
               }}
             >
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">

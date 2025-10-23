@@ -482,6 +482,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "send_insult": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const insultData = storage.sendInsult(ws.roomCode, ws.playerId);
+            if (!insultData) {
+              sendToClient(ws, { type: "error", payload: { message: "Laf sokma yapılamadı! Bekleme süresinde olabilirsin." } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "insult_sent",
+              payload: insultData,
+            });
+            break;
+          }
+
           case "start_game": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
