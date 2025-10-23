@@ -86,7 +86,7 @@ function TauntVideo({ taunt, boardRect }: { taunt: TauntData; boardRect: DOMRect
         width: size,
         height: size,
         zIndex: 200,
-        animation: 'tauntFadeInOut 3s ease-in-out forwards'
+        animation: 'tauntFadeInOut 2s ease-in-out forwards'
       }}
     >
       {/* Player name above video - Enhanced visibility */}
