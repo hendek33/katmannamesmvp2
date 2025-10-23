@@ -1119,6 +1119,80 @@ export class MemStorage implements IStorage {
     return imagesObject;
   }
   
+  // NEW Insult System V2 - Clean implementation
+  sendInsultV2(roomCode: string, senderId: string, targetPlayerId: string | undefined): any {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    
+    const room = roomData.gameState;
+
+    // Check if insult is enabled
+    if (!roomData.insultEnabled) return null;
+
+    // Check cooldown
+    const now = Date.now();
+    const lastInsult = this.insultCooldowns.get(senderId);
+    if (lastInsult && now - lastInsult < 5000) {
+      return null;
+    }
+
+    // Get sender and target
+    const sender = room.players.find(p => p.id === senderId);
+    if (!sender || !sender.team) return null;
+
+    let target: Player | undefined;
+    
+    if (targetPlayerId) {
+      // Use specified target
+      target = room.players.find(p => p.id === targetPlayerId);
+      console.log("[V2] Using specified target:", target?.username, "ID:", targetPlayerId);
+    }
+    
+    if (!target) {
+      // Select random opponent
+      const opponents = room.players.filter(p => 
+        p.team && p.team !== sender.team && !p.isBot
+      );
+      if (opponents.length > 0) {
+        target = opponents[Math.floor(Math.random() * opponents.length)];
+        console.log("[V2] Selected random target:", target.username);
+      }
+    }
+
+    if (!target) return null;
+
+    // Set cooldown
+    this.insultCooldowns.set(senderId, now);
+
+    // Create insult
+    const insults = [
+      `${target.username} kafan mı güzel?`,
+      `${target.username} neyi başardın sen?`,
+      `${target.username} git buradan!`,
+      `${target.username} çok komiksin!`,
+      `${target.username} sus artık!`,
+      `${target.username} beynin nerede?`,
+      `${target.username} ağlama!`,
+      `${target.username} sen kimsin ya!`,
+      `${target.username} seni gidi seni!`,
+      `${target.username} boş yapma!`
+    ];
+
+    const insultData = {
+      senderId: sender.id,
+      senderUsername: sender.username,
+      senderTeam: sender.team,
+      targetId: target.id,
+      targetUsername: target.username,
+      targetTeam: target.team,
+      message: insults[Math.floor(Math.random() * insults.length)],
+      timestamp: now
+    };
+
+    console.log("[V2] Sending insult:", insultData);
+    return insultData;
+  }
+  
   toggleTaunt(roomCode: string, enabled: boolean): any {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;

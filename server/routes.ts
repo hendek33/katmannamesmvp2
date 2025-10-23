@@ -835,6 +835,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
           
+          case "send_insult_v2": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            // NEW V2 SYSTEM - Direct parameter passing
+            const targetId = payload?.targetId;
+            console.log("[V2 ROUTE] Received targetId:", targetId);
+            
+            const insultData = storage.sendInsultV2(ws.roomCode, ws.playerId, targetId);
+            if (!insultData) {
+              sendToClient(ws, { type: "error", payload: { message: "Laf sokma devre dışı veya cooldown'da" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "insult_sent",
+              payload: insultData,
+            });
+            break;
+          }
+          
           case "toggle_insult": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
