@@ -1170,9 +1170,19 @@ export class MemStorage implements IStorage {
     // Set cooldown
     this.insultCooldowns.set(senderId, now);
 
-    // Create insult - use V1 insult messages
-    const insultTemplate = insultMessages[Math.floor(Math.random() * insultMessages.length)];
-    const message = insultTemplate.replace("{target}", target.username);
+    // Create insult
+    const insults = [
+      `${target.username} kafan mı güzel?`,
+      `${target.username} neyi başardın sen?`,
+      `${target.username} git buradan!`,
+      `${target.username} çok komiksin!`,
+      `${target.username} sus artık!`,
+      `${target.username} beynin nerede?`,
+      `${target.username} ağlama!`,
+      `${target.username} sen kimsin ya!`,
+      `${target.username} seni gidi seni!`,
+      `${target.username} boş yapma!`
+    ];
 
     const insultData = {
       senderId: sender.id,
@@ -1181,7 +1191,7 @@ export class MemStorage implements IStorage {
       targetId: target.id,
       targetUsername: target.username,
       targetTeam: target.team,
-      message: message,
+      message: insults[Math.floor(Math.random() * insults.length)],
       timestamp: now
     };
 
