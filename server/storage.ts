@@ -33,6 +33,7 @@ export interface IStorage {
   removePlayer(roomCode: string, playerId: string): void;
   cleanupEmptyRooms(): void;
   getCardImages(roomCode: string): Record<number, string> | null;
+  triggerTaunt(roomCode: string, playerId: string): any;
 }
 
 export class MemStorage implements IStorage {
@@ -847,6 +848,47 @@ export class MemStorage implements IStorage {
     }
     
     return room;
+  }
+
+  triggerTaunt(roomCode: string, playerId: string): any {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only during playing phase
+    if (room.phase !== "playing") return null;
+    
+    // Find the player
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || !player.team) return null;
+    
+    // Check cooldown (20 seconds)
+    const now = Date.now();
+    if (player.lastTauntAt && (now - player.lastTauntAt) < 20000) {
+      return null; // Still on cooldown
+    }
+    
+    // Update last taunt time
+    player.lastTauntAt = now;
+    
+    // Generate random position on board (normalized 0-1)
+    const position = {
+      x: Math.random(),
+      y: Math.random()
+    };
+    
+    // Determine video source based on team
+    const videoSrc = player.team === "dark" ? "/mavi taunt.mp4" : "/kırmızı taunt.mp4";
+    
+    // Return taunt data for broadcast
+    return {
+      playerId: player.id,
+      username: player.username,
+      team: player.team,
+      videoSrc,
+      position,
+      expiresAt: now + 3000 // Video lasts 3 seconds
+    };
   }
 
   removePlayer(roomCode: string, playerId: string): void {

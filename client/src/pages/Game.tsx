@@ -9,13 +9,14 @@ import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
+import { TauntOverlay } from "@/components/TauntOverlay";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -29,6 +30,9 @@ export default function Game() {
   const [showNumberSelector, setShowNumberSelector] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
+  const [taunts, setTaunts] = useState<any[]>([]);
+  const [tauntCooldown, setTauntCooldown] = useState<number>(0);
+  const boardRef = useRef<HTMLDivElement>(null);
   
   // Close number selector when clicking outside
   useEffect(() => {
@@ -223,6 +227,46 @@ export default function Game() {
     setShowNormalWinVideo(false); // Reset normal win video
   };
 
+  const handleTriggerTaunt = () => {
+    if (tauntCooldown > 0 || !playerId) return;
+    
+    send("trigger_taunt", { playerId });
+    
+    // Set 20 second cooldown
+    setTauntCooldown(20);
+  };
+
+  // Countdown for taunt cooldown
+  useEffect(() => {
+    if (tauntCooldown > 0) {
+      const timer = setTimeout(() => {
+        setTauntCooldown(prev => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [tauntCooldown]);
+
+  // Listen for taunt events via WebSocket
+  useEffect(() => {
+    // Access WebSocket directly to listen for taunt_fired events
+    const ws = (window as any).wsRef?.current;
+    if (!ws) return;
+    
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'taunt_fired') {
+          setTaunts(prev => [...prev, message.payload]);
+        }
+      } catch (err) {
+        console.error('Error handling taunt message:', err);
+      }
+    };
+    
+    ws.addEventListener('message', handleMessage);
+    return () => ws.removeEventListener('message', handleMessage);
+  }, []);
+
   useEffect(() => {
     if (!gameState && isConnected) {
       setLocation("/rooms");
@@ -320,6 +364,15 @@ export default function Game() {
           startX={showAssassinVideo.x}
           startY={showAssassinVideo.y}
           onComplete={() => setShowAssassinVideo({ show: false })}
+        />
+      )}
+      
+      {/* Taunt Overlay */}
+      {boardRef.current && (
+        <TauntOverlay 
+          taunts={taunts}
+          setTaunts={setTaunts}
+          boardRef={boardRef}
         />
       )}
 
@@ -1218,7 +1271,7 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
+            <div ref={boardRef} className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
                  overflow-visible
                  w-[calc(min(90vw,55vh*1.5))] 
                  min-[360px]:w-[calc(min(85vw,58vh*1.5))]
@@ -1267,6 +1320,36 @@ export default function Game() {
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
+              {/* Taunt Button - Positioned to the right */}
+              {currentPlayer && gameState.phase === "playing" && (
+                <div className="absolute bottom-2 right-4 sm:right-8">
+                  <Button
+                    onClick={handleTriggerTaunt}
+                    disabled={tauntCooldown > 0}
+                    variant={currentPlayer.team === "dark" ? "default" : "destructive"}
+                    className={`
+                      ${currentPlayer.team === "dark" 
+                        ? "bg-blue-600 hover:bg-blue-700" 
+                        : "bg-red-600 hover:bg-red-700"}
+                      text-white font-bold px-4 py-2
+                    `}
+                    data-testid="button-trigger-taunt"
+                  >
+                    {tauntCooldown > 0 ? (
+                      <span className="flex items-center gap-1">
+                        <Timer className="w-4 h-4" />
+                        {tauntCooldown}s
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <MessageSquare className="w-4 h-4" />
+                        Taunt
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              )}
+              
               {/* End Turn Button for Guessers - Positioned to the left */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && gameState.phase !== "ended" && (
                 <div className="absolute bottom-2 left-4 sm:left-8">

@@ -15,6 +15,7 @@ export interface Player {
   isBot: boolean;
   secretRole?: SecretRole; // Secret role in Chaos Mode
   knownCards?: number[]; // Card IDs known to prophet
+  lastTauntAt?: number; // Timestamp of last taunt for cooldown
 }
 
 export interface Card {
@@ -129,6 +130,20 @@ export const guessDoubleAgentSchema = z.object({
   targetPlayerId: z.string(),
 });
 
+export const triggerTauntSchema = z.object({
+  playerId: z.string(),
+});
+
+// Taunt broadcast payload
+export interface TauntBroadcast {
+  playerId: string;
+  username: string;
+  team: Team;
+  videoSrc: string;
+  position: { x: number; y: number }; // Normalized 0-1 position on board
+  expiresAt: number; // When taunt should disappear
+}
+
 export type JoinRoomInput = z.infer<typeof joinRoomSchema>;
 export type CreateRoomInput = z.infer<typeof createRoomSchema>;
 export type TeamSelectInput = z.infer<typeof teamSelectSchema>;
@@ -141,3 +156,4 @@ export type UpdateTimerSettingsInput = z.infer<typeof updateTimerSettingsSchema>
 export type UpdateChaosModeInput = z.infer<typeof updateChaosModeSchema>;
 export type GuessProphetInput = z.infer<typeof guessProphetSchema>;
 export type GuessDoubleAgentInput = z.infer<typeof guessDoubleAgentSchema>;
+export type TriggerTauntInput = z.infer<typeof triggerTauntSchema>;

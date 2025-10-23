@@ -36,6 +36,9 @@ export function useWebSocket() {
         }
 
         ws.current = new WebSocket(wsUrl);
+        
+        // Expose ws ref globally for taunt handling
+        (window as any).wsRef = ws;
 
         ws.current.onopen = () => {
           setIsConnected(true);

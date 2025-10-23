@@ -323,10 +323,12 @@ export default function Lobby() {
           <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Panel - Team Operations (8 cols on lg) */}
             <div className="lg:col-span-8 flex flex-col gap-4 overflow-hidden">
-              {/* Mission Briefing - Codenames Style */}
+              {/* Mission Briefing - Enhanced Glassmorphism */}
               {currentPlayer && (
-                <div className="backdrop-blur-lg bg-black/70 rounded-xl border border-red-900/40 shadow-2xl p-4">
-                  <div className="flex items-center justify-between">
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
+                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+                    <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-blue-600 blur-md opacity-50" />
@@ -374,6 +376,7 @@ export default function Lobby() {
                       </div>
                     )}
                   </div>
+                  </div>
                 </div>
               )}
               
@@ -395,9 +398,11 @@ export default function Lobby() {
             
             {/* Right Panel - Control Console (4 cols on lg) */}
             <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto">
-              {/* Game Start Panel - Codenames Style */}
-              <div className="backdrop-blur-lg bg-black/70 rounded-xl border border-red-900/40 shadow-2xl p-6">
-                <div className="space-y-4">
+              {/* Game Start Panel - Enhanced Glassmorphism */}
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
+                <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-6">
+                  <div className="space-y-4">
                   {/* Status Indicator */}
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-slate-100">Oyun Durumu</h3>
@@ -455,12 +460,15 @@ export default function Lobby() {
                     </Button>
                   )}
                 </div>
+                </div>
               </div>
               
               {/* Game Settings - Codenames Style */}
               <div className="space-y-4">
-                {/* Timer Settings */}
-                <div className="backdrop-blur-lg bg-black/70 rounded-xl border border-red-900/40 shadow-2xl p-4">
+                {/* Timer Settings - Enhanced Glassmorphism */}
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
+                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Timer className="w-5 h-5 text-purple-400" />
@@ -537,6 +545,7 @@ export default function Lobby() {
                       </div>
                     </div>
                   )}
+                  </div>
                 </div>
                 
                 {/* Chaos Mode - Codenames Style */}
@@ -569,9 +578,11 @@ export default function Lobby() {
                 </div>
               </div>
               
-              {/* Bot Controls - Codenames Style */}
+              {/* Bot Controls - Enhanced Glassmorphism */}
               {currentPlayer?.isRoomOwner && (
-                <div className="backdrop-blur-lg bg-black/70 rounded-xl border border-red-900/40 shadow-2xl p-6">
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
+                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Bot className="w-5 h-5 text-purple-400" />
                     <h3 className="text-lg font-bold text-slate-100">Bot Yönetimi</h3>
@@ -615,6 +626,7 @@ export default function Lobby() {
                     >
                       {gameState.lightTeamName} Ajan
                     </Button>
+                  </div>
                   </div>
                 </div>
               )}
