@@ -961,11 +961,17 @@ export class MemStorage implements IStorage {
       return null;
     }
     
+    console.log(`[INSULT] Received targetId: ${targetId}, from player: ${playerId} (${player.username})`);
+    
     let target;
     if (targetId) {
       // Use specific target if provided
       target = room.players.find(p => p.id === targetId);
-      if (!target || !target.team || target.team === player.team) return null;
+      console.log(`[INSULT] Found target: ${target?.id} (${target?.username}), team: ${target?.team}`);
+      if (!target || !target.team || target.team === player.team) {
+        console.log(`[INSULT] Invalid target - same team or missing`);
+        return null;
+      }
     } else {
       // Get random opponent from other team
       const oppositeTeam = player.team === "dark" ? "light" : "dark";
@@ -974,6 +980,7 @@ export class MemStorage implements IStorage {
       if (opponents.length === 0) return null;
       
       target = opponents[Math.floor(Math.random() * opponents.length)];
+      console.log(`[INSULT] No targetId provided, selected random: ${target.id} (${target.username})`);
     }
     
     // Get random insult message
@@ -985,7 +992,7 @@ export class MemStorage implements IStorage {
     this.lastInsultTime.set(roomCode, now);
     
     // Return insult data for broadcast
-    return {
+    const insultData = {
       senderId: player.id,
       senderUsername: player.username,
       senderTeam: player.team,
@@ -995,6 +1002,9 @@ export class MemStorage implements IStorage {
       message,
       timestamp: now
     };
+    
+    console.log(`[INSULT] Sending insult data:`, insultData);
+    return insultData;
   }
 
   removePlayer(roomCode: string, playerId: string): void {
