@@ -49,10 +49,13 @@ export function PlayerList({
     const [editedName, setEditedName] = useState(title);
 
     const handleSaveName = () => {
-      // Team names are mandatory - ensure there's always a name
-      const finalName = editedName.trim() || (team === "dark" ? "Katman Koyu" : "Katman Açık");
+      // Don't save if empty
+      if (!editedName.trim()) {
+        setIsEditing(false);
+        return;
+      }
       if (onTeamNameChange) {
-        onTeamNameChange(team, finalName);
+        onTeamNameChange(team, editedName.trim());
       }
       setIsEditing(false);
     };
@@ -78,7 +81,7 @@ export function PlayerList({
                 onBlur={handleSaveName}
                 maxLength={20}
                 className="h-6 text-xs font-semibold max-w-[120px]"
-                placeholder="Takım ismi"
+                placeholder="Takım ismi belirle"
                 autoFocus
               />
               <Button
@@ -92,8 +95,20 @@ export function PlayerList({
             </div>
           ) : (
             <>
-              <h3 className="font-bold text-sm sm:text-base">{title}</h3>
-              {isLobby && onTeamNameChange && (
+              {isLobby && onTeamNameChange && (title === "Mavi Takım" || title === "Kırmızı Takım") ? (
+                <button
+                  className="text-sm sm:text-base text-slate-400 italic hover:text-white transition-colors cursor-pointer"
+                  onClick={() => {
+                    setEditedName("");
+                    setIsEditing(true);
+                  }}
+                >
+                  Takım ismi belirle
+                </button>
+              ) : (
+                <h3 className="font-bold text-sm sm:text-base">{title}</h3>
+              )}
+              {isLobby && onTeamNameChange && !(title === "Mavi Takım" || title === "Kırmızı Takım") && (
                 <Button
                   size="sm"
                   variant="ghost"
