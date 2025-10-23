@@ -35,6 +35,8 @@ export default function Game() {
   const [tauntCooldown, setTauntCooldown] = useState<number>(0);
   const [insultCooldown, setInsultCooldown] = useState<number>(0);
   const [insults, setInsults] = useState<any[]>([]);
+  const [tauntEnabled, setTauntEnabled] = useState(true);
+  const [insultEnabled, setInsultEnabled] = useState(true);
   const boardRef = useRef<HTMLDivElement>(null);
   
   // Close number selector when clicking outside
@@ -227,7 +229,7 @@ export default function Game() {
   }, []);
 
   const handleTriggerTaunt = () => {
-    if (tauntCooldown > 0 || !playerId) return;
+    if (tauntCooldown > 0 || !playerId || !tauntEnabled) return;
     
     send("trigger_taunt", { playerId });
     
@@ -236,7 +238,7 @@ export default function Game() {
   };
 
   const handleSendInsult = () => {
-    if (insultCooldown > 0 || !playerId) return;
+    if (insultCooldown > 0 || !playerId || !insultEnabled) return;
     
     send("send_insult", { playerId });
     
@@ -281,6 +283,21 @@ export default function Game() {
           setTimeout(() => {
             setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
           }, 3000);
+        } else if (message.type === 'taunt_toggled') {
+          setTauntEnabled(message.payload.tauntEnabled);
+          toast({
+            title: "Hareket Çekme",
+            description: message.payload.tauntEnabled ? "Aktif" : "Devre dışı",
+          });
+        } else if (message.type === 'insult_toggled') {
+          setInsultEnabled(message.payload.insultEnabled);
+          toast({
+            title: "Laf Sokma",
+            description: message.payload.insultEnabled ? "Aktif" : "Devre dışı",
+          });
+        } else if (message.type === 'room_features') {
+          setTauntEnabled(message.payload.tauntEnabled);
+          setInsultEnabled(message.payload.insultEnabled);
         }
       } catch (err) {
         console.error('Error handling message:', err);
@@ -289,7 +306,14 @@ export default function Game() {
     
     ws.addEventListener('message', handleMessage);
     return () => ws.removeEventListener('message', handleMessage);
-  }, []);
+  }, [toast]);
+  
+  // Get room features on mount
+  useEffect(() => {
+    if (isConnected && gameState) {
+      send("get_room_features", {});
+    }
+  }, [isConnected, gameState, send]);
 
   useEffect(() => {
     if (!gameState && isConnected) {
@@ -1254,18 +1278,23 @@ export default function Game() {
                   }`} />
                   <button
                     onClick={handleTriggerTaunt}
-                    disabled={tauntCooldown > 0}
+                    disabled={tauntCooldown > 0 || !tauntEnabled}
                     className={`
                       relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                       backdrop-blur-md border shadow-lg
                       ${currentPlayer.team === "dark" 
                         ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
                         : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                      ${tauntCooldown > 0 ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                      ${tauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
                     `}
                     data-testid="button-trigger-taunt"
                   >
-                    {tauntCooldown > 0 ? (
+                    {!tauntEnabled ? (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <EyeOff className="w-4 h-4" />
+                        Devre Dışı
+                      </span>
+                    ) : tauntCooldown > 0 ? (
                       <span className="flex items-center justify-center gap-1.5">
                         <Timer className="w-4 h-4" />
                         {tauntCooldown}s
@@ -1288,18 +1317,23 @@ export default function Game() {
                   }`} />
                   <button
                     onClick={handleSendInsult}
-                    disabled={insultCooldown > 0}
+                    disabled={insultCooldown > 0 || !insultEnabled}
                     className={`
                       relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                       backdrop-blur-md border shadow-lg
                       ${currentPlayer.team === "dark" 
                         ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
                         : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
-                      ${insultCooldown > 0 ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                      ${insultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
                     `}
                     data-testid="button-send-insult"
                   >
-                    {insultCooldown > 0 ? (
+                    {!insultEnabled ? (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <EyeOff className="w-4 h-4" />
+                        Devre Dışı
+                      </span>
+                    ) : insultCooldown > 0 ? (
                       <span className="flex items-center justify-center gap-1.5">
                         <Timer className="w-4 h-4" />
                         {insultCooldown}s
@@ -1424,6 +1458,49 @@ export default function Game() {
               ))}
             </div>
 
+            {/* Moderator Controls - Above Clue Display */}
+            {currentPlayer?.isRoomOwner && gameState.phase === "playing" && (
+              <div className="absolute bottom-16 left-0 right-0 flex justify-center p-0" style={{ zIndex: 45 }}>
+                <Card className="px-3 py-2 border-2 bg-slate-950/95 border-purple-500/60 shadow-2xl backdrop-blur-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] sm:text-xs font-bold text-purple-400 uppercase">Moderatör:</span>
+                    <Button
+                      onClick={() => {
+                        send("toggle_taunt", { enabled: !tauntEnabled });
+                      }}
+                      size="sm"
+                      variant={tauntEnabled ? "default" : "outline"}
+                      className={cn(
+                        "h-7 px-3 text-[10px] sm:text-xs font-bold",
+                        tauntEnabled 
+                          ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500" 
+                          : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
+                      )}
+                    >
+                      <Zap className="w-3 h-3 mr-1" />
+                      Hareket {tauntEnabled ? "Açık" : "Kapalı"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        send("toggle_insult", { enabled: !insultEnabled });
+                      }}
+                      size="sm"
+                      variant={insultEnabled ? "default" : "outline"}
+                      className={cn(
+                        "h-7 px-3 text-[10px] sm:text-xs font-bold",
+                        insultEnabled 
+                          ? "bg-red-600 hover:bg-red-700 text-white border-red-500" 
+                          : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
+                      )}
+                    >
+                      <MessageCircle className="w-3 h-3 mr-1" />
+                      Laf {insultEnabled ? "Açık" : "Kapalı"}
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+            )}
+            
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers - Positioned to the left */}

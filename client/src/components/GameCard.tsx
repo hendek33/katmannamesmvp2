@@ -147,9 +147,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         overflow: card.revealed ? 'visible' : 'hidden',
         transform: isHovered 
           ? `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05) translateZ(20px)`
-          : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1) translateZ(0px)',
+          : undefined,
         transformStyle: 'preserve-3d',
-        transition: 'all 0.2s ease-out'
+        transition: 'all 0.2s ease-out',
+        zIndex: isLifted ? 1000 : card.revealed ? 20 : 1
       }}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}

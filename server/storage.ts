@@ -9,6 +9,8 @@ interface RoomData {
   maxGuesses: number;
   cardVotes: Map<number, Set<string>>; // cardId -> Set of playerIds who voted
   cardImages?: Map<number, string>; // cardId -> image path for revealed cards
+  tauntEnabled?: boolean;
+  insultEnabled?: boolean;
 }
 
 export interface IStorage {
@@ -35,6 +37,9 @@ export interface IStorage {
   getCardImages(roomCode: string): Record<number, string> | null;
   triggerTaunt(roomCode: string, playerId: string): any;
   sendInsult(roomCode: string, playerId: string): any;
+  toggleTaunt(roomCode: string, enabled: boolean): any;
+  toggleInsult(roomCode: string, enabled: boolean): any;
+  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean } | null;
 }
 
 // Insult templates
@@ -889,6 +894,9 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     
+    // Check if taunt feature is enabled (defaults to true if not set)
+    if (roomData.tauntEnabled === false) return null;
+    
     // Only during playing phase
     if (room.phase !== "playing") return null;
     
@@ -929,6 +937,9 @@ export class MemStorage implements IStorage {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
     const room = roomData.gameState;
+    
+    // Check if insult feature is enabled (defaults to true if not set)
+    if (roomData.insultEnabled === false) return null;
     
     // Only during playing phase
     if (room.phase !== "playing") return null;
@@ -1087,6 +1098,32 @@ export class MemStorage implements IStorage {
     });
     
     return imagesObject;
+  }
+  
+  toggleTaunt(roomCode: string, enabled: boolean): any {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    
+    roomData.tauntEnabled = enabled;
+    return { tauntEnabled: enabled };
+  }
+  
+  toggleInsult(roomCode: string, enabled: boolean): any {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    
+    roomData.insultEnabled = enabled;
+    return { insultEnabled: enabled };
+  }
+  
+  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean } | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    
+    return {
+      tauntEnabled: roomData.tauntEnabled !== false, // Default to true
+      insultEnabled: roomData.insultEnabled !== false // Default to true
+    };
   }
 }
 

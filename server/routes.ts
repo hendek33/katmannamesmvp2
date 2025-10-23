@@ -748,6 +748,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
             break;
           }
+          
+          case "trigger_taunt": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const tauntData = storage.triggerTaunt(ws.roomCode, ws.playerId);
+            if (!tauntData) {
+              sendToClient(ws, { type: "error", payload: { message: "Hareket çekme devre dışı veya cooldown'da" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "taunt_triggered",
+              payload: tauntData,
+            });
+            break;
+          }
+          
+          case "send_insult": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const insultData = storage.sendInsult(ws.roomCode, ws.playerId);
+            if (!insultData) {
+              sendToClient(ws, { type: "error", payload: { message: "Laf sokma devre dışı veya cooldown'da" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "insult_sent",
+              payload: insultData,
+            });
+            break;
+          }
+          
+          case "toggle_taunt": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+            
+            // Check if player is moderator (room owner)
+            const gameState = storage.getRoom(ws.roomCode);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              return;
+            }
+            
+            const player = gameState.players.find(p => p.id === ws.playerId);
+            if (!player || !player.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece moderatör bu özelliği değiştirebilir" } });
+              return;
+            }
+            
+            const validation = z.object({ enabled: z.boolean() }).safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+            
+            const result = storage.toggleTaunt(ws.roomCode, validation.data.enabled);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Özellik değiştirilemedi" } });
+              return;
+            }
+            
+            broadcastToRoom(ws.roomCode, {
+              type: "taunt_toggled",
+              payload: result,
+            });
+            break;
+          }
+          
+          case "toggle_insult": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+            
+            // Check if player is moderator (room owner)
+            const gameState = storage.getRoom(ws.roomCode);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              return;
+            }
+            
+            const player = gameState.players.find(p => p.id === ws.playerId);
+            if (!player || !player.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece moderatör bu özelliği değiştirebilir" } });
+              return;
+            }
+            
+            const validation = z.object({ enabled: z.boolean() }).safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+            
+            const result = storage.toggleInsult(ws.roomCode, validation.data.enabled);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Özellik değiştirilemedi" } });
+              return;
+            }
+            
+            broadcastToRoom(ws.roomCode, {
+              type: "insult_toggled",
+              payload: result,
+            });
+            break;
+          }
+          
+          case "get_room_features": {
+            if (!ws.roomCode) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+            
+            const features = storage.getRoomFeatures(ws.roomCode);
+            if (!features) {
+              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              return;
+            }
+            
+            sendToClient(ws, {
+              type: "room_features",
+              payload: features,
+            });
+            break;
+          }
 
           default:
             sendToClient(ws, { type: "error", payload: { message: "Bilinmeyen komut" } });
