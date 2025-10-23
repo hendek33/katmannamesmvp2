@@ -588,7 +588,7 @@ export default function Game() {
             <div className="flex justify-center items-center gap-1 h-full">
               {/* Moderator Controls for Taunt/Insult */}
               {currentPlayer?.isRoomOwner && gameState.phase === "playing" && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-900/50 backdrop-blur-md rounded-lg border border-amber-900/30">
+                <>
                   <Button
                     onClick={() => {
                       send("toggle_taunt", { enabled: !tauntEnabled });
@@ -596,7 +596,7 @@ export default function Game() {
                     size="sm"
                     variant="ghost"
                     className={cn(
-                      "h-7 px-3 text-xs font-medium backdrop-blur-sm transition-all",
+                      "h-6 px-3 text-xs font-medium backdrop-blur-sm transition-all",
                       tauntEnabled 
                         ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30" 
                         : "bg-slate-800/30 text-slate-500 border border-slate-700/40 hover:bg-slate-700/40"
@@ -614,7 +614,7 @@ export default function Game() {
                     size="sm"
                     variant="ghost"
                     className={cn(
-                      "h-7 px-3 text-xs font-medium backdrop-blur-sm transition-all",
+                      "h-6 px-3 text-xs font-medium backdrop-blur-sm transition-all",
                       insultEnabled 
                         ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30" 
                         : "bg-slate-800/30 text-slate-500 border border-slate-700/40 hover:bg-slate-700/40"
@@ -624,7 +624,7 @@ export default function Game() {
                     <MessageCircle className={cn("w-3 h-3 mr-1.5", insultEnabled && "animate-pulse")} />
                     <span>{insultEnabled ? "Laf Aktif" : "Laf Pasif"}</span>
                   </Button>
-                </div>
+                </>
               )}
               {/* Players Dialog */}
               <Dialog>
