@@ -934,6 +934,8 @@ export class MemStorage implements IStorage {
   }
 
   sendInsult(roomCode: string, playerId: string, targetId?: string): any {
+    console.log(`[STORAGE.sendInsult] Called with targetId: "${targetId}" (type: ${typeof targetId})`);
+    
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
     const room = roomData.gameState;
@@ -961,7 +963,7 @@ export class MemStorage implements IStorage {
       return null;
     }
     
-    console.log(`[INSULT] Received targetId: ${targetId}, from player: ${playerId} (${player.username})`);
+    console.log(`[INSULT] Processing insult from player: ${playerId} (${player.username}) to target: ${targetId}`);
     
     let target;
     if (targetId) {

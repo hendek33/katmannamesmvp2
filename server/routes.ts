@@ -781,11 +781,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            console.log("[ROUTES] Received send_insult payload:", JSON.stringify(payload));
-            console.log("[ROUTES] Direct access payload.targetId:", payload?.targetId);
-            const targetId = payload?.targetId || undefined;
-            console.log("[ROUTES] Final targetId to send:", targetId);
-            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, targetId);
+            // Pass targetId directly from payload
+            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, payload?.targetId);
             if (!insultData) {
               sendToClient(ws, { type: "error", payload: { message: "Laf sokma devre dışı veya cooldown'da" } });
               return;
