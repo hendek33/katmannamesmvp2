@@ -210,9 +210,8 @@ export default function RoomList() {
                         </button>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -237,13 +236,7 @@ export default function RoomList() {
   );
 }
 
-interface ModalProps {
-  username: string;
-  onClose: () => void;
-  send: (type: string, payload: any) => void;
-}
-
-function CreateRoomModal({ username, onClose, send }: ModalProps) {
+function CreateRoomModal({ username, onClose, send }: any) {
   const [password, setPassword] = useState("");
   const [hasPassword, setHasPassword] = useState(false);
 
@@ -321,7 +314,7 @@ function CreateRoomModal({ username, onClose, send }: ModalProps) {
   );
 }
 
-function JoinRoomModal({ username, onClose, send }: ModalProps) {
+function JoinRoomModal({ username, onClose, send }: any) {
   const [roomCode, setRoomCode] = useState("");
   const [password, setPassword] = useState("");
   const [needsPassword, setNeedsPassword] = useState(false);
