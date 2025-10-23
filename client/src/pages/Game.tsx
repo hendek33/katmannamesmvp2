@@ -596,7 +596,7 @@ export default function Game() {
                     size="sm"
                     variant={tauntEnabled ? "default" : "outline"}
                     className={cn(
-                      "h-8 px-6 text-sm font-bold min-w-[100px]",
+                      "h-8 px-6 text-sm font-bold min-w-[140px]",
                       tauntEnabled 
                         ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500" 
                         : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
@@ -604,7 +604,7 @@ export default function Game() {
                     title="Hareket çekme özelliğini aç/kapat"
                   >
                     <Zap className="w-4 h-4 mr-2" />
-                    <span>{tauntEnabled ? "Hareket +" : "Hareket -"}</span>
+                    <span>{tauntEnabled ? "Hareket Çek Aktif" : "Hareket Çek Pasif"}</span>
                   </Button>
                   <Button
                     onClick={() => {
@@ -613,7 +613,7 @@ export default function Game() {
                     size="sm"
                     variant={insultEnabled ? "default" : "outline"}
                     className={cn(
-                      "h-8 px-6 text-sm font-bold min-w-[100px]",
+                      "h-8 px-6 text-sm font-bold min-w-[140px]",
                       insultEnabled 
                         ? "bg-red-600 hover:bg-red-700 text-white border-red-500" 
                         : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
@@ -621,7 +621,7 @@ export default function Game() {
                     title="Laf sokma özelliğini aç/kapat"
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    <span>{insultEnabled ? "Laf +" : "Laf -"}</span>
+                    <span>{insultEnabled ? "Laf Sok Aktif" : "Laf Sok Pasif"}</span>
                   </Button>
                 </>
               )}
