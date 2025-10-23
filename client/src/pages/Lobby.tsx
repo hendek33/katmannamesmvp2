@@ -230,8 +230,8 @@ export default function Lobby() {
       
       {/* Codenames Header Bar */}
       <header className="relative z-20 backdrop-blur-lg bg-black/50 border-b border-red-900/30">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between gap-4">
             {/* Left Section - Status */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -284,17 +284,28 @@ export default function Lobby() {
             
             {/* Mobile Room Code */}
             <div className="md:hidden flex items-center gap-2">
+              <span className="text-xs font-medium text-slate-400">Oda:</span>
               <span className="text-sm font-mono font-bold text-slate-200" data-testid="room-code-mobile">
                 {showRoomCode ? roomCode : "••••"}
               </span>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowRoomCode(!showRoomCode)}
-                className="h-6 w-6 p-0 text-slate-300"
-              >
-                {showRoomCode ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowRoomCode(!showRoomCode)}
+                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
+                >
+                  {showRoomCode ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCopyRoomCode}
+                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
+                >
+                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                </Button>
+              </div>
             </div>
             
             {/* Right Section - Leave */}
@@ -319,10 +330,10 @@ export default function Lobby() {
       
       {/* Main Content Grid */}
       <div className="flex-1 overflow-hidden relative z-10">
-        <div className="h-full container mx-auto px-4 py-6">
+        <div className="h-full max-w-6xl mx-auto px-4 py-6">
           <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Panel - Team Operations (8 cols on lg) */}
-            <div className="lg:col-span-8 flex flex-col gap-4 overflow-hidden">
+            {/* Left Panel - Team Operations (7 cols on lg) */}
+            <div className="col-span-12 lg:col-span-7 flex flex-col gap-4 overflow-hidden">
               {/* Mission Briefing - Enhanced Glassmorphism */}
               {currentPlayer && (
                 <div className="relative group">
@@ -343,7 +354,7 @@ export default function Lobby() {
                             <p className="text-lg font-bold text-slate-100">{currentPlayer.username}</p>
                           </div>
                           {/* Developer Note */}
-                          <div className="flex-1 max-w-xs">
+                          <div className="ml-auto">
                             <div className="text-xs text-amber-400/80 space-y-0.5">
                               <div className="font-medium flex items-center gap-1">
                                 <Zap className="w-3 h-3" />
@@ -396,8 +407,8 @@ export default function Lobby() {
               </div>
             </div>
             
-            {/* Right Panel - Control Console (4 cols on lg) */}
-            <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto">
+            {/* Right Panel - Control Console (5 cols on lg) */}
+            <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 overflow-y-auto">
               {/* Game Start Panel - Enhanced Glassmorphism */}
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
