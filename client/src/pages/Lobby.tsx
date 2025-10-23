@@ -720,6 +720,17 @@ export default function Lobby() {
                 )}
               </Card>
           </div>
+          
+          {/* Developer Note */}
+          <Card className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30">
+            <div className="text-xs text-amber-400 space-y-1">
+              <div className="font-semibold">💬 Geliştiriciden not:</div>
+              <div className="italic">
+                Çağrı abi Mavi takım olmanız gerekiyor. Bütün tasarımları yaptıktan sonra 
+                sizin kırmızı takım olduğunuz aklıma geldi, kusuruma bakmayın tasarım konseptine bu uyuyor 😔
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
       
