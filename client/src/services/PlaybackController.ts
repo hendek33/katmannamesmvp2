@@ -154,6 +154,7 @@ class PlaybackController {
    * Temizlik
    */
   dispose(): void {
+    console.log('Disposing PlaybackController...');
     // Video elementlerini DOM'dan kaldır
     this.videoElements.forEach(video => {
       if (video.parentNode) {

@@ -29,12 +29,16 @@ function Router() {
 function App() {
   useEffect(() => {
     // Uygulama başladığında videoları yükle
-    playbackController.initialize().catch(err => {
-      console.error('Video initialization failed:', err);
-    });
+    console.log('App mounting, initializing videos...');
+    playbackController.initialize()
+      .then(() => console.log('Videos initialized successfully'))
+      .catch(err => {
+        console.error('Video initialization failed:', err);
+      });
     
     // Cleanup
     return () => {
+      console.log('App unmounting, disposing videos...');
       playbackController.dispose();
     };
   }, []);
