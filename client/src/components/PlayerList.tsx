@@ -64,11 +64,11 @@ export function PlayerList({
     const needsSpymaster = teamPlayers.length > 0 && !hasSpymaster;
     
     return (
-    <div className={`relative backdrop-blur-sm bg-white/80 rounded-xl border transition-all shadow-lg ${
+    <div className={`relative backdrop-blur-lg bg-black/70 rounded-xl border transition-all shadow-2xl ${
       team === "dark" 
-        ? "border-blue-200 hover:border-blue-300" 
-        : "border-red-200 hover:border-red-300"
-    } ${needsSpymaster && isLobby ? "ring-2 ring-amber-400" : ""} p-4`}>
+        ? "border-blue-700/50 hover:border-blue-600/50" 
+        : "border-red-700/50 hover:border-red-600/50"
+    } ${needsSpymaster && isLobby ? "ring-2 ring-amber-500" : ""} p-4`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-1">
           <div className={`w-3 h-3 rounded-full ${gradient}`} />
@@ -97,7 +97,7 @@ export function PlayerList({
             <>
               {isLobby && onTeamNameChange && (title === "Mavi Takım" || title === "Kırmızı Takım") ? (
                 <button
-                  className="text-sm sm:text-base text-slate-500 italic hover:text-slate-800 transition-colors cursor-pointer"
+                  className="text-sm sm:text-base text-slate-400 italic hover:text-slate-200 transition-colors cursor-pointer"
                   onClick={() => {
                     setEditedName("");
                     setIsEditing(true);
@@ -106,7 +106,7 @@ export function PlayerList({
                   Takım ismi belirle
                 </button>
               ) : (
-                <h3 className="font-bold text-sm sm:text-base text-slate-900">{title}</h3>
+                <h3 className="font-bold text-sm sm:text-base text-slate-100">{title}</h3>
               )}
               {isLobby && onTeamNameChange && !(title === "Mavi Takım" || title === "Kırmızı Takım") && (
                 <Button
