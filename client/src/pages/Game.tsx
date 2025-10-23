@@ -1392,71 +1392,8 @@ export default function Game() {
                     </button>
                   </div>
 
-                  {/* Insult Button */}
-                  <div className="relative flex-1 insult-button-container">
-                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      currentPlayer.team === "dark" 
-                        ? "bg-purple-600/40" 
-                        : "bg-orange-600/40"
-                    }`} />
-                    <button
-                      onClick={handleInsultClick}
-                      disabled={insultCooldown > 0 || !insultEnabled}
-                      className={`
-                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
-                        backdrop-blur-md border shadow-lg
-                        ${currentPlayer.team === "dark" 
-                          ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
-                          : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
-                        ${insultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
-                      `}
-                      data-testid="button-send-insult"
-                    >
-                      {!insultEnabled ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <EyeOff className="w-4 h-4" />
-                          Devre Dışı
-                        </span>
-                      ) : insultCooldown > 0 ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Timer className="w-4 h-4" />
-                          {insultCooldown}s
-                        </span>
-                      ) : (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <MessageCircle className="w-4 h-4" />
-                          Laf Sok
-                        </span>
-                      )}
-                    </button>
-                    
-                    {/* Player Selection List */}
-                    {showInsultTargetDialog && insultEnabled && insultCooldown === 0 && (
-                      <div className="absolute top-full mt-2 left-0 right-0 z-50">
-                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
-                          {gameState.players
-                            .filter(p => p.team && p.team !== currentPlayer.team)
-                            .map(player => (
-                              <button
-                                key={player.id}
-                                onClick={() => handleSendInsultToPlayer(player.id)}
-                                className={cn(
-                                  "w-full px-3 py-2 rounded text-xs font-medium transition-all text-left",
-                                  "hover:scale-105",
-                                  player.team === "dark"
-                                    ? "bg-blue-900/50 text-blue-100 hover:bg-blue-800/60 border border-blue-700/30"
-                                    : "bg-red-900/50 text-red-100 hover:bg-red-800/60 border border-red-700/30"
-                                )}
-                              >
-                                {player.username}
-                              </button>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
                   
-                  {/* V2 Insult Button - NEW SYSTEM */}
+                  {/* Insult Button */}
                   <div className="relative">
                     <button
                       onClick={handleInsultV2Click}
@@ -1488,16 +1425,15 @@ export default function Game() {
                       ) : (
                         <span className="flex items-center justify-center gap-1.5">
                           <MessageCircle className="w-4 h-4" />
-                          Laf Sok V2 (Test)
+                          Laf Sok
                         </span>
                       )}
                     </button>
                     
-                    {/* V2 Player Selection List */}
+                    {/* Player Selection List */}
                     {showInsultV2Dialog && insultEnabled && insultV2Cooldown === 0 && (
                       <div className="absolute top-full mt-2 left-0 right-0 z-50">
-                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-green-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
-                          <div className="text-xs text-green-400 mb-1">Yeni Sistem - V2</div>
+                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
                           {gameState.players
                             .filter(p => p.team && p.team !== currentPlayer.team)
                             .map(player => (

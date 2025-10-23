@@ -1172,16 +1172,32 @@ export class MemStorage implements IStorage {
 
     // Create insult
     const insults = [
-      `${target.username} kafan mı güzel?`,
-      `${target.username} neyi başardın sen?`,
-      `${target.username} git buradan!`,
-      `${target.username} çok komiksin!`,
-      `${target.username} sus artık!`,
-      `${target.username} beynin nerede?`,
-      `${target.username} ağlama!`,
-      `${target.username} sen kimsin ya!`,
-      `${target.username} seni gidi seni!`,
-      `${target.username} boş yapma!`
+      `${target.username} seni pis kokarca!`,
+      `${target.username} sütünü iç de uyu!`,
+      `${target.username} git yat zıbar!`,
+      `${target.username} sen SALAKSIN!`,
+      `${target.username} beynin mi yok senin?`,
+      `${target.username} git köşende ağla!`,
+      `${target.username} götüne vururum ha!`,
+      `${target.username} patates kafalı!`,
+      `${target.username} s*ktir git!`,
+      `${target.username} uyku vaktin geldi senin!`,
+      `${target.username} git kumda oyna!`,
+      `${target.username} seni gidi ahmak!`,
+      `${target.username} karga beyinli!`,
+      `${target.username} yazık kafana!`,
+      `${target.username} peş para etmezsin!`,
+      `${target.username} akılsız insan!`,
+      `${target.username} ezan okundu hadi evine!`,
+      `${target.username} haline gülsem mi ağlasam mı?!`,
+      `${target.username} seni soğan kafalı!`,
+      `${target.username} A.M.K!`,
+      `${target.username} sen ne tür bir soytarısın?`,
+      `${target.username} peçete ister misin?`,
+      `${target.username} şinasi bile senden zeki...`,
+      `${target.username} vay gerizekalı vay!`,
+      `${target.username} şapşal mısın nesin?`
+      
     ];
 
     const insultData = {
