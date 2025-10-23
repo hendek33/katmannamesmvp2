@@ -594,14 +594,14 @@ export default function Game() {
                     size="sm"
                     variant={tauntEnabled ? "default" : "outline"}
                     className={cn(
-                      "h-6 px-2 text-[10px] font-bold",
+                      "h-6 px-3 text-[10px] font-bold min-w-[50px]",
                       tauntEnabled 
                         ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500" 
                         : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
                     )}
                     title="Hareket çekme özelliğini aç/kapat"
                   >
-                    <Zap className="w-2.5 h-2.5 mr-0.5" />
+                    <Zap className="w-2.5 h-2.5 mr-1" />
                     {tauntEnabled ? "H+" : "H-"}
                   </Button>
                   <Button
@@ -611,14 +611,14 @@ export default function Game() {
                     size="sm"
                     variant={insultEnabled ? "default" : "outline"}
                     className={cn(
-                      "h-6 px-2 text-[10px] font-bold",
+                      "h-6 px-3 text-[10px] font-bold min-w-[50px]",
                       insultEnabled 
                         ? "bg-red-600 hover:bg-red-700 text-white border-red-500" 
                         : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
                     )}
                     title="Laf sokma özelliğini aç/kapat"
                   >
-                    <MessageCircle className="w-2.5 h-2.5 mr-0.5" />
+                    <MessageCircle className="w-2.5 h-2.5 mr-1" />
                     {insultEnabled ? "L+" : "L-"}
                   </Button>
                 </>
