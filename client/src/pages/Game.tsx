@@ -26,8 +26,24 @@ export default function Game() {
   const { isConnected, gameState, playerId, roomCode, error, send, cardVotes, cardImages } = useWebSocketContext();
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
+  const [showNumberSelector, setShowNumberSelector] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
+  
+  // Close number selector when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.number-selector-container')) {
+        setShowNumberSelector(false);
+      }
+    };
+    
+    if (showNumberSelector) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showNumberSelector]);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
   const [isGameStart, setIsGameStart] = useState(false);
@@ -1285,24 +1301,87 @@ export default function Game() {
                       maxLength={20}
                       className="w-20 sm:w-28 text-center font-bold text-[10px] sm:text-xs uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-6 sm:h-7 text-slate-100 placeholder:text-slate-500"
                     />
-                    <div className="flex items-center gap-0.5">
-                      <button
-                        type="button"
-                        onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                        className="h-6 sm:h-7 w-6 sm:w-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded border border-slate-700"
-                      >
-                        -
-                      </button>
-                      <div className="h-6 sm:h-7 w-8 sm:w-10 flex items-center justify-center bg-slate-900/70 border border-amber-500/60 rounded text-sm font-black text-amber-400">
-                        {clueCount}
+                    <div className="relative number-selector-container">
+                      <div className="flex items-center gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
+                          className="h-6 sm:h-7 w-6 sm:w-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded border border-slate-700"
+                        >
+                          -
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowNumberSelector(!showNumberSelector)}
+                          className="h-6 sm:h-7 w-8 sm:w-10 flex items-center justify-center bg-slate-900/70 hover:bg-slate-800/80 border border-amber-500/60 rounded text-sm font-black text-amber-400 cursor-pointer transition-all"
+                        >
+                          {clueCount}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
+                          className="h-6 sm:h-7 w-6 sm:w-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded border border-slate-700"
+                        >
+                          +
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                        className="h-6 sm:h-7 w-6 sm:w-7 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs rounded border border-slate-700"
-                      >
-                        +
-                      </button>
+                      
+                      {/* Number Selector Dropdown */}
+                      {showNumberSelector && (
+                        <>
+                          <style>{`
+                            @keyframes slideUp {
+                              from {
+                                opacity: 0;
+                                transform: translateY(10px);
+                              }
+                              to {
+                                opacity: 1;
+                                transform: translateY(0);
+                              }
+                            }
+                            @keyframes fadeInScale {
+                              from {
+                                opacity: 0;
+                                transform: scale(0.8);
+                              }
+                              to {
+                                opacity: 1;
+                                transform: scale(1);
+                              }
+                            }
+                          `}</style>
+                          <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 z-50">
+                            <div 
+                              className="flex items-center gap-0.5 p-1 bg-slate-900/95 backdrop-blur-md border border-amber-500/60 rounded-lg shadow-2xl"
+                              style={{
+                                animation: 'slideUp 0.2s ease-out'
+                              }}
+                            >
+                              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                                <button
+                                  key={num}
+                                  type="button"
+                                  onClick={() => {
+                                    setClueCount(String(num));
+                                    setShowNumberSelector(false);
+                                  }}
+                                  className={`w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded font-bold text-xs transition-all ${
+                                    String(num) === clueCount
+                                      ? 'bg-amber-600 text-white'
+                                      : 'bg-slate-800 hover:bg-slate-700 text-amber-400'
+                                  }`}
+                                  style={{
+                                    animation: `fadeInScale 0.3s ease-out ${num * 0.03}s backwards`
+                                  }}
+                                >
+                                  {num}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                     <Button
                       onClick={handleGiveClue}
