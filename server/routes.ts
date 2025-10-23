@@ -78,6 +78,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const message = JSON.parse(data.toString());
         const { type, payload } = message;
+        
+        // Debug logging for all messages
+        if (type === "send_insult") {
+          console.log("[ROUTES] Raw message:", message);
+          console.log("[ROUTES] Message keys:", Object.keys(message));
+          console.log("[ROUTES] Type:", type, "Payload:", payload);
+        }
 
         switch (type) {
           case "ping": {
