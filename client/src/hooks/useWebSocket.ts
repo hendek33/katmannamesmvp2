@@ -114,6 +114,9 @@ export function useWebSocket() {
                 
               case "card_revealed":
                 setGameState(message.payload.gameState);
+                if (message.payload.cardImages) {
+                  setCardImages(message.payload.cardImages);
+                }
                 break;
                 
               case "returned_to_lobby":

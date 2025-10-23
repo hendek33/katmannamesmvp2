@@ -536,13 +536,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            const cardImages = storage.getCardImages(ws.roomCode);
             const clients = roomClients.get(ws.roomCode);
             if (clients) {
               clients.forEach(client => {
                 if (client.playerId) {
                   sendToClient(client, {
                     type: "card_revealed",
-                    payload: { gameState: getFilteredGameState(gameState, client.playerId) },
+                    payload: { 
+                      gameState: getFilteredGameState(gameState, client.playerId),
+                      cardImages: cardImages || {}
+                    },
                   });
                 }
               });

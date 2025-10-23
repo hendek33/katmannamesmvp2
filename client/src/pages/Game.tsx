@@ -30,6 +30,7 @@ export default function Game() {
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
+  const [isGameStart, setIsGameStart] = useState(false);
   const [showAssassinVideo, setShowAssassinVideo] = useState<{ show: boolean; x?: number; y?: number }>({ show: false });
   const [showNormalWinVideo, setShowNormalWinVideo] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
@@ -100,8 +101,9 @@ export default function Game() {
 
     // Show turn video when game starts or restarts
     if (gameState.phase === "playing" && !previousTurnRef.current) {
-      // Store current team for turn video
+      // Store current team for turn video with special flag for game start
       setCurrentTurn(gameState.currentTeam);
+      setIsGameStart(true);
       setShowTurnVideo(true);
       // Set the initial turn reference
       previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
@@ -121,6 +123,7 @@ export default function Game() {
       const prevTeam = previousTurnRef.current.split('-')[0];
       if (prevTeam !== gameState.currentTeam) {
         setCurrentTurn(gameState.currentTeam);
+        setIsGameStart(false);  // Not game start, it's a turn change
         setShowTurnVideo(true);
       }
     }
@@ -284,7 +287,11 @@ export default function Game() {
         <TurnVideo
           team={currentTurn}
           teamName={currentTurn === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-          onComplete={() => setShowTurnVideo(false)}
+          isGameStart={isGameStart}
+          onComplete={() => {
+            setShowTurnVideo(false);
+            setIsGameStart(false);
+          }}
         />
       )}
 

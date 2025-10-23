@@ -4,10 +4,11 @@ import { cn } from "@/lib/utils";
 interface TurnVideoProps {
   team: "dark" | "light";
   teamName: string;
+  isGameStart?: boolean;
   onComplete?: () => void;
 }
 
-export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
+export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
@@ -92,7 +93,7 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
                 : '0 2px 20px rgba(239,68,68,0.8)',
             }}
             >
-              Sıra {teamName} Takımında
+              {isGameStart ? `${teamName} Takımı Oyuna Başlıyor` : `Sıra ${teamName} Takımında`}
             </div>
           </div>
         )}
