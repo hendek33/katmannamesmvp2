@@ -76,14 +76,18 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
         />
       )}
       
-      {/* Dark overlay - persists until everything fades */}
+      {/* Dark overlay with radial fade - persists until everything fades */}
       {(show || showLoserText || showWinnerText) && (
         <div 
-          className="fixed inset-0 z-[99] bg-black/95 backdrop-blur-sm pointer-events-none"
+          className="fixed inset-0 z-[99] pointer-events-none"
           style={{
+            background: fadeOutAll 
+              ? 'radial-gradient(circle at center, transparent 0%, transparent 100%)'
+              : 'radial-gradient(circle at center, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 100%)',
+            backdropFilter: 'blur(4px)',
             animation: fadeOutAll 
-              ? 'fadeOut 0.8s ease-out forwards'
-              : 'fadeIn 0.5s ease-in-out forwards',
+              ? 'radialFadeOut 0.8s ease-out forwards'
+              : 'radialFadeIn 0.5s ease-in-out forwards',
           }}
         />
       )}
@@ -101,8 +105,8 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
             className="w-full h-full object-contain"
             style={{
               animation: isClosing 
-                ? 'zoomOut 0.6s ease-in forwards'
-                : 'zoomIn 0.8s ease-out forwards'
+                ? 'radialZoomOut 0.6s ease-in forwards'
+                : 'radialZoomIn 0.8s ease-out forwards'
             }}
           />
         </div>
@@ -199,25 +203,47 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
           to { opacity: 0; }
         }
         
-        @keyframes zoomIn {
+        @keyframes radialFadeIn {
           from {
-            transform: scale(0);
-            opacity: 0;
+            background: radial-gradient(circle at center, transparent 70%, rgba(0,0,0,0.95) 100%);
           }
           to {
-            transform: scale(1);
-            opacity: 1;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 100%);
           }
         }
         
-        @keyframes zoomOut {
+        @keyframes radialFadeOut {
+          from {
+            background: radial-gradient(circle at center, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 100%);
+          }
+          to {
+            background: radial-gradient(circle at center, transparent 70%, transparent 100%);
+          }
+        }
+        
+        @keyframes radialZoomIn {
+          from {
+            transform: scale(0);
+            opacity: 0;
+            clip-path: circle(0% at center);
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+            clip-path: circle(100% at center);
+          }
+        }
+        
+        @keyframes radialZoomOut {
           from {
             transform: scale(1);
             opacity: 1;
+            clip-path: circle(100% at center);
           }
           to {
             transform: scale(0);
             opacity: 0;
+            clip-path: circle(0% at center);
           }
         }
         
