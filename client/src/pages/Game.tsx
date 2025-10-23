@@ -37,6 +37,7 @@ export default function Game() {
   const [insults, setInsults] = useState<any[]>([]);
   const [tauntEnabled, setTauntEnabled] = useState(true);
   const [insultEnabled, setInsultEnabled] = useState(true);
+  const [showInsultTargetDialog, setShowInsultTargetDialog] = useState(false);
   
   // Close number selector when clicking outside
   useEffect(() => {
@@ -236,10 +237,14 @@ export default function Game() {
     setTauntCooldown(20);
   };
 
-  const handleSendInsult = () => {
+  const handleInsultClick = () => {
     if (insultCooldown > 0 || !playerId || !insultEnabled) return;
-    
-    send("send_insult", { playerId });
+    setShowInsultTargetDialog(true);
+  };
+
+  const handleSendInsultToPlayer = (targetPlayerId: string) => {
+    setShowInsultTargetDialog(false);
+    send("send_insult", { playerId, targetId: targetPlayerId });
     
     // Set 20 second cooldown
     setInsultCooldown(20);
@@ -433,6 +438,40 @@ export default function Game() {
           timestamp={insult.timestamp}
         />
       ))}
+
+      {/* Insult Target Selection Dialog */}
+      {showInsultTargetDialog && currentPlayer && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] flex items-center justify-center">
+          <div className="bg-slate-900/95 border-2 border-amber-500/30 rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-amber-100 mb-4">Kime Laf Sokacaksın?</h3>
+            <div className="space-y-2">
+              {gameState.players
+                .filter(p => p.team && p.team !== currentPlayer.team)
+                .map(player => (
+                  <button
+                    key={player.id}
+                    onClick={() => handleSendInsultToPlayer(player.id)}
+                    className={cn(
+                      "w-full px-4 py-3 rounded-lg font-medium text-sm transition-all",
+                      "backdrop-blur-md border shadow-lg hover:scale-105",
+                      player.team === "dark"
+                        ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60"
+                        : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"
+                    )}
+                  >
+                    {player.username}
+                  </button>
+                ))}
+            </div>
+            <button
+              onClick={() => setShowInsultTargetDialog(false)}
+              className="mt-4 w-full px-4 py-2 rounded-lg bg-slate-800/60 border border-slate-700/50 text-slate-300 hover:bg-slate-700/60 transition-all"
+            >
+              İptal
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Normal Win Video */}
       {showNormalWinVideo && gameState && gameState.winner && (
@@ -1312,45 +1351,6 @@ export default function Game() {
             {/* Action Buttons - Below Blue Team Panel */}
             {currentPlayer && gameState.phase === "playing" && (
               <div className="mt-4 space-y-2">
-                {/* Taunt Button */}
-                <div className="relative">
-                  <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                    currentPlayer.team === "dark" 
-                      ? "bg-blue-600/40" 
-                      : "bg-red-600/40"
-                  }`} />
-                  <button
-                    onClick={handleTriggerTaunt}
-                    disabled={tauntCooldown > 0 || !tauntEnabled}
-                    className={`
-                      relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
-                      backdrop-blur-md border shadow-lg
-                      ${currentPlayer.team === "dark" 
-                        ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
-                        : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                      ${tauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
-                    `}
-                    data-testid="button-trigger-taunt"
-                  >
-                    {!tauntEnabled ? (
-                      <span className="flex items-center justify-center gap-1.5">
-                        <EyeOff className="w-4 h-4" />
-                        Devre Dışı
-                      </span>
-                    ) : tauntCooldown > 0 ? (
-                      <span className="flex items-center justify-center gap-1.5">
-                        <Timer className="w-4 h-4" />
-                        {tauntCooldown}s
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-1.5">
-                        <Zap className="w-4 h-4" />
-                        Hareket Çek
-                      </span>
-                    )}
-                  </button>
-                </div>
-                
                 {/* Action Buttons Container */}
                 <div className="flex gap-2">
                   {/* Taunt Button */}
@@ -1400,7 +1400,7 @@ export default function Game() {
                         : "bg-orange-600/40"
                     }`} />
                     <button
-                      onClick={handleSendInsult}
+                      onClick={handleInsultClick}
                       disabled={insultCooldown > 0 || !insultEnabled}
                       className={`
                         relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all

@@ -10,36 +10,54 @@ interface TauntBubbleProps {
 export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleVideoReady = () => {
-    setIsVideoReady(true);
-    if (videoRef.current) {
-      videoRef.current.play()
-        .catch(err => console.error('Taunt video play error:', err));
-    }
+    setIsVideoLoaded(true);
+    // Show bubble only after video is loaded
+    setTimeout(() => {
+      setIsVisible(true);
+      if (videoRef.current) {
+        videoRef.current.play()
+          .catch(err => console.error('Taunt video play error:', err));
+      }
+    }, 100);
   };
 
   useEffect(() => {
-    // Fade in
-    setTimeout(() => setIsVisible(true), 10);
-    
     // Preload the video
     if (videoRef.current) {
       videoRef.current.load();
     }
     
-    // Start fade out after 2 seconds
+    // Start fade out after 2.5 seconds
     const fadeOutTimer = setTimeout(() => {
       setIsLeaving(true);
-    }, 2000);
+    }, 2500);
 
     return () => clearTimeout(fadeOutTimer);
   }, []);
 
   // Determine position based on team
   const isLeftSide = senderTeam === 'dark';
+
+  // Don't show until video is loaded
+  if (!isVideoLoaded) {
+    return (
+      <div className="hidden">
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          onCanPlay={handleVideoReady}
+          onLoadedData={handleVideoReady}
+          muted
+          playsInline
+          preload="auto"
+        />
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -56,15 +74,15 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
     >
       {/* Speech bubble with video */}
       <div className={cn(
-        "relative backdrop-blur-lg rounded-2xl p-3 shadow-2xl border-2",
-        "w-[180px] h-[180px] animate-bounce-gentle",
+        "relative backdrop-blur-lg rounded-2xl p-2 shadow-2xl border-2",
+        "w-[120px] h-[120px] animate-bounce-gentle",
         senderTeam === 'dark' 
           ? "bg-blue-900/80 border-blue-500/60" 
           : "bg-red-900/80 border-red-500/60"
       )}>
         {/* Sender name */}
         <div className={cn(
-          "absolute -top-8 left-4 text-sm font-black px-3 py-1.5 rounded-lg z-10",
+          "absolute -top-7 left-2 text-xs font-black px-2 py-1 rounded-lg z-10",
           "backdrop-blur-md border",
           senderTeam === 'dark'
             ? "bg-blue-900/80 text-blue-100 border-blue-500/50"
@@ -72,11 +90,11 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
         )}
         style={{
           textShadow: senderTeam === "dark" 
-            ? '0 0 15px rgba(59,130,246,1), 0 2px 4px rgba(0,0,0,0.8)' 
-            : '0 0 15px rgba(239,68,68,1), 0 2px 4px rgba(0,0,0,0.8)',
+            ? '0 0 10px rgba(59,130,246,1), 0 2px 4px rgba(0,0,0,0.8)' 
+            : '0 0 10px rgba(239,68,68,1), 0 2px 4px rgba(0,0,0,0.8)',
           boxShadow: senderTeam === "dark"
-            ? '0 4px 12px rgba(59,130,246,0.5), 0 0 20px rgba(59,130,246,0.3)'
-            : '0 4px 12px rgba(239,68,68,0.5), 0 0 20px rgba(239,68,68,0.3)'
+            ? '0 2px 8px rgba(59,130,246,0.5), 0 0 15px rgba(59,130,246,0.3)'
+            : '0 2px 8px rgba(239,68,68,0.5), 0 0 15px rgba(239,68,68,0.3)'
         }}>
           {senderUsername}
         </div>
@@ -84,33 +102,33 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
         {/* Circular video container */}
         <div 
           className={cn(
-            "relative w-full h-full rounded-xl overflow-hidden",
+            "relative w-full h-full rounded-full overflow-hidden",
             "border-2",
             senderTeam === 'dark' ? "border-blue-400/50" : "border-red-400/50"
           )}
           style={{
             boxShadow: senderTeam === 'dark'
-              ? '0 0 20px rgba(59,130,246,0.4) inset'
-              : '0 0 20px rgba(239,68,68,0.4) inset',
-            opacity: isVideoReady ? 1 : 0.3
+              ? '0 0 15px rgba(59,130,246,0.4) inset'
+              : '0 0 15px rgba(239,68,68,0.4) inset'
           }}
         >
           <video
             ref={videoRef}
             src={videoSrc}
-            onCanPlay={handleVideoReady}
-            onLoadedData={handleVideoReady}
             muted
             playsInline
             className="w-full h-full object-cover"
+            style={{
+              clipPath: 'circle(50%)'
+            }}
           />
         </div>
         
         {/* Tail */}
         <div 
           className={cn(
-            "absolute -bottom-2 w-4 h-4 transform rotate-45",
-            isLeftSide ? "left-8" : "right-8",
+            "absolute -bottom-2 w-3 h-3 transform rotate-45",
+            isLeftSide ? "left-6" : "right-6",
             senderTeam === 'dark'
               ? "bg-blue-900/80 border-r-2 border-b-2 border-blue-500/60"
               : "bg-red-900/80 border-r-2 border-b-2 border-red-500/60"
@@ -135,7 +153,7 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
             transform: translateY(0);
           }
           50% {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
           }
         }
       `}</style>

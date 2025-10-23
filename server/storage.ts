@@ -933,7 +933,7 @@ export class MemStorage implements IStorage {
     };
   }
 
-  sendInsult(roomCode: string, playerId: string): any {
+  sendInsult(roomCode: string, playerId: string, targetId?: string): any {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
     const room = roomData.gameState;
@@ -961,13 +961,20 @@ export class MemStorage implements IStorage {
       return null;
     }
     
-    // Get random opponent from other team
-    const oppositeTeam = player.team === "dark" ? "light" : "dark";
-    const opponents = room.players.filter(p => p.team === oppositeTeam);
-    
-    if (opponents.length === 0) return null;
-    
-    const target = opponents[Math.floor(Math.random() * opponents.length)];
+    let target;
+    if (targetId) {
+      // Use specific target if provided
+      target = room.players.find(p => p.id === targetId);
+      if (!target || !target.team || target.team === player.team) return null;
+    } else {
+      // Get random opponent from other team
+      const oppositeTeam = player.team === "dark" ? "light" : "dark";
+      const opponents = room.players.filter(p => p.team === oppositeTeam);
+      
+      if (opponents.length === 0) return null;
+      
+      target = opponents[Math.floor(Math.random() * opponents.length)];
+    }
     
     // Get random insult message
     const message = insultMessages[Math.floor(Math.random() * insultMessages.length)]
