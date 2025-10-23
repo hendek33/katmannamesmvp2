@@ -88,65 +88,23 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
         />
       )}
       
-      {/* Video */}
+      {/* Video - FULLSCREEN NO FRAME */}
       {show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
-          <div 
-            className="relative"
+          <video
+            ref={videoRef}
+            src="/siyah kelime seçme.mp4"
+            autoPlay
+            muted
+            playsInline
+            onEnded={handleVideoEnd}
+            className="w-full h-full object-contain"
             style={{
               animation: isClosing 
-                ? 'circleCollapse 0.6s ease-in forwards'
-                : 'circleExpand 0.8s ease-out forwards'
+                ? 'zoomOut 0.6s ease-in forwards'
+                : 'zoomIn 0.8s ease-out forwards'
             }}
-          >
-            {/* Glow effect */}
-            <div 
-              className="absolute -inset-12 rounded-full blur-3xl opacity-80 animate-pulse bg-purple-600"
-            />
-            
-            {/* Video in circular frame - BIGGER SIZE */}
-            <div 
-              className="relative w-96 h-96 md:w-[32rem] md:h-[32rem] rounded-full overflow-hidden border-4 shadow-2xl border-purple-600"
-              style={{
-                boxShadow: '0 0 120px rgba(147,51,234,0.8), inset 0 0 80px rgba(147,51,234,0.4)'
-              }}
-            >
-              <video
-                ref={videoRef}
-                src="/siyah kelime seçme.mp4"
-                autoPlay
-                muted
-                playsInline
-                onEnded={handleVideoEnd}
-                className="w-full h-full object-cover"
-              />
-              
-              {/* Dark gradient overlay */}
-              <div 
-                className="absolute inset-0 pointer-events-none rounded-xl"
-                style={{
-                  background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.7) 100%)'
-                }}
-              />
-            </div>
-            
-            {/* Smoke effect particles */}
-            <div className="absolute inset-0 pointer-events-none">
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute w-4 h-4 bg-purple-500 rounded-full blur-md"
-                  style={{
-                    left: `${50 + Math.cos(i * Math.PI / 10) * 40}%`,
-                    top: `${50 + Math.sin(i * Math.PI / 10) * 40}%`,
-                    animation: `smoke ${2 + Math.random()}s ease-out infinite`,
-                    animationDelay: `${Math.random() * 2}s`,
-                    opacity: 0
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          />
         </div>
       )}
       
@@ -241,7 +199,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
           to { opacity: 0; }
         }
         
-        @keyframes circleExpand {
+        @keyframes zoomIn {
           from {
             transform: scale(0);
             opacity: 0;
@@ -252,24 +210,13 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
           }
         }
         
-        @keyframes circleCollapse {
+        @keyframes zoomOut {
           from {
             transform: scale(1);
             opacity: 1;
           }
           to {
             transform: scale(0);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes smoke {
-          0% {
-            transform: translateY(0) scale(0.5);
-            opacity: 0.8;
-          }
-          100% {
-            transform: translateY(-100px) scale(2);
             opacity: 0;
           }
         }
