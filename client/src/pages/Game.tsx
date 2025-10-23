@@ -84,13 +84,10 @@ export default function Game() {
     if (gameState.phase === "playing" && !roleAnnouncementShownRef.current) {
       roleAnnouncementShownRef.current = true;
       setShowRoleAnnouncement(true);
-      // Show turn video after role announcement completes
-      setTimeout(() => {
-        setCurrentTurn(gameState.currentTeam);
-        setShowTurnVideo(true);
-        // Set the initial turn reference after showing first turn video
-        previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
-      }, 2600); // Slightly after role announcement (2500ms) to ensure smooth transition
+      // Store current team for turn video
+      setCurrentTurn(gameState.currentTeam);
+      // Set the initial turn reference
+      previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
       return; // Exit early to prevent turn video logic from running
     }
 
@@ -260,7 +257,13 @@ export default function Game() {
           currentTurn={gameState.currentTeam}
           currentTurnTeamName={gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
           secretRole={currentPlayer.secretRole}
-          onComplete={() => setShowRoleAnnouncement(false)}
+          onComplete={() => {
+            setShowRoleAnnouncement(false);
+            // Show turn video after role announcement
+            if (currentTurn) {
+              setShowTurnVideo(true);
+            }
+          }}
         />
       )}
 

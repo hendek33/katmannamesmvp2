@@ -46,12 +46,16 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   }, [onComplete]);
 
   const handleVideoEnd = () => {
-    setVideoEnded(true);
-    setIsClosing(true);
-    setTimeout(() => {
-      setShow(false);
-      onComplete?.();
-    }, 600);
+    // Only handle video end if we haven't already started closing
+    if (!isClosing) {
+      setVideoEnded(true);
+      setIsClosing(true);
+      const endTimer = setTimeout(() => {
+        setShow(false);
+        onComplete?.();
+      }, 600);
+      timersRef.current.push(endTimer);
+    }
   };
 
   if (!show) return null;

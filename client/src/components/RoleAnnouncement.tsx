@@ -24,7 +24,9 @@ export function RoleAnnouncement({
 }: RoleAnnouncementProps) {
   useEffect(() => {
     if (show) {
-      const timer = setTimeout(onComplete, 2500); // Reduced from 4000ms to 2500ms
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 3000); // Increased to 3 seconds for better visibility
       return () => clearTimeout(timer);
     }
   }, [show, onComplete]);
