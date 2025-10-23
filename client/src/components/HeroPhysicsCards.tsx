@@ -44,7 +44,7 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
       collisions: false,
     } as const;
 
-    const CARD_W = 180, CARD_H = 112;
+    const CARD_W = 180, CARD_H = 120; // 3:2 aspect ratio
 
     // Küçük ekranlarda kart sayısını düşür (opsiyonel)
     try {
