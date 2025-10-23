@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { useVideoContext } from "@/contexts/VideoContext";
 
 interface TurnVideoProps {
   team: "dark" | "light";
@@ -16,13 +15,10 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
-  const { getVideoUrl } = useVideoContext();
 
-  const originalVideoPath = team === "dark" 
+  const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
     : "/kırmızı takım video tur.mp4";
-  
-  const videoSrc = getVideoUrl(originalVideoPath);
 
   useEffect(() => {
     // Auto hide after 4 seconds
