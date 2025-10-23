@@ -69,7 +69,7 @@ function TauntVideo({ taunt, boardRect }: { taunt: TauntData; boardRect: DOMRect
   }, []);
 
   // Calculate position relative to board
-  const size = Math.min(boardRect.width, boardRect.height) * 0.15; // ~15% of board size (half of card size)
+  const size = Math.min(boardRect.width, boardRect.height) * 0.20; // ~20% of board size (increased from 15%)
   const left = boardRect.left + (boardRect.width * taunt.position.x) - (size / 2);
   const top = boardRect.top + (boardRect.height * taunt.position.y) - (size / 2);
   
