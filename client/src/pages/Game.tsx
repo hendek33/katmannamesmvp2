@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
 import { GameCard } from "@/components/GameCard";
@@ -209,6 +209,20 @@ export default function Game() {
     setShowNormalWinVideo(false); // Reset normal win video
   };
 
+  // Memoize the onComplete callbacks to prevent re-renders
+  const handleTurnVideoComplete = useCallback(() => {
+    setShowTurnVideo(false);
+    setIsGameStart(false);
+  }, []);
+
+  const handleAssassinVideoComplete = useCallback(() => {
+    setShowAssassinVideo({ show: false });
+  }, []);
+
+  const handleNormalWinVideoComplete = useCallback(() => {
+    setShowNormalWinVideo(false);
+  }, []);
+
   const handleTriggerTaunt = () => {
     if (tauntCooldown > 0 || !playerId) return;
     
@@ -330,10 +344,7 @@ export default function Game() {
           team={currentTurn}
           teamName={currentTurn === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
           isGameStart={isGameStart}
-          onComplete={() => {
-            setShowTurnVideo(false);
-            setIsGameStart(false);
-          }}
+          onComplete={handleTurnVideoComplete}
         />
       )}
 
@@ -345,7 +356,7 @@ export default function Game() {
           loserTeamName={gameState.winner === "dark" ? gameState.lightTeamName : gameState.darkTeamName}
           startX={showAssassinVideo.x}
           startY={showAssassinVideo.y}
-          onComplete={() => setShowAssassinVideo({ show: false })}
+          onComplete={handleAssassinVideoComplete}
         />
       )}
       
@@ -362,7 +373,7 @@ export default function Game() {
         <NormalWinVideo
           winnerTeam={gameState.winner}
           winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-          onComplete={() => setShowNormalWinVideo(false)}
+          onComplete={handleNormalWinVideoComplete}
         />
       )}
 
