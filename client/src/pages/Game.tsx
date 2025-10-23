@@ -9,7 +9,7 @@ import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
-import { TauntOverlay } from "@/components/TauntOverlay";
+import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,7 +37,6 @@ export default function Game() {
   const [insults, setInsults] = useState<any[]>([]);
   const [tauntEnabled, setTauntEnabled] = useState(true);
   const [insultEnabled, setInsultEnabled] = useState(true);
-  const boardRef = useRef<HTMLDivElement>(null);
   
   // Close number selector when clicking outside
   useEffect(() => {
@@ -412,13 +411,15 @@ export default function Game() {
         />
       )}
       
-      {/* Taunt Overlay - Only visible to guessers, not spymasters */}
-      {boardRef.current && currentPlayer?.role !== "spymaster" && (
-        <TauntOverlay 
-          taunts={taunts}
-          boardRef={boardRef}
+      {/* Taunt Bubbles - Show as speech bubbles */}
+      {taunts.map((taunt, index) => (
+        <TauntBubble
+          key={`${taunt.playerId}-${taunt.expiresAt}-${index}`}
+          senderUsername={taunt.username}
+          senderTeam={taunt.team}
+          videoSrc={taunt.videoSrc}
         />
-      )}
+      ))}
       
       {/* Insult Bubbles */}
       {insults.map((insult, index) => (
@@ -1350,43 +1351,85 @@ export default function Game() {
                   </button>
                 </div>
                 
-                {/* Insult Button */}
-                <div className="relative">
-                  <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                    currentPlayer.team === "dark" 
-                      ? "bg-purple-600/40" 
-                      : "bg-orange-600/40"
-                  }`} />
-                  <button
-                    onClick={handleSendInsult}
-                    disabled={insultCooldown > 0 || !insultEnabled}
-                    className={`
-                      relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
-                      backdrop-blur-md border shadow-lg
-                      ${currentPlayer.team === "dark" 
-                        ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
-                        : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
-                      ${insultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
-                    `}
-                    data-testid="button-send-insult"
-                  >
-                    {!insultEnabled ? (
-                      <span className="flex items-center justify-center gap-1.5">
-                        <EyeOff className="w-4 h-4" />
-                        Devre Dışı
-                      </span>
-                    ) : insultCooldown > 0 ? (
-                      <span className="flex items-center justify-center gap-1.5">
-                        <Timer className="w-4 h-4" />
-                        {insultCooldown}s
-                      </span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-1.5">
-                        <MessageCircle className="w-4 h-4" />
-                        Laf Sok
-                      </span>
-                    )}
-                  </button>
+                {/* Action Buttons Container */}
+                <div className="flex gap-2">
+                  {/* Taunt Button */}
+                  <div className="relative flex-1">
+                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
+                      currentPlayer.team === "dark" 
+                        ? "bg-blue-600/40" 
+                        : "bg-red-600/40"
+                    }`} />
+                    <button
+                      onClick={handleTriggerTaunt}
+                      disabled={tauntCooldown > 0 || !tauntEnabled}
+                      className={`
+                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                        backdrop-blur-md border shadow-lg
+                        ${currentPlayer.team === "dark" 
+                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
+                          : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
+                        ${tauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                      `}
+                      data-testid="button-trigger-taunt"
+                    >
+                      {!tauntEnabled ? (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <EyeOff className="w-4 h-4" />
+                          Devre Dışı
+                        </span>
+                      ) : tauntCooldown > 0 ? (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Timer className="w-4 h-4" />
+                          {tauntCooldown}s
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Zap className="w-4 h-4" />
+                          Hareket Çek
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Insult Button */}
+                  <div className="relative flex-1">
+                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
+                      currentPlayer.team === "dark" 
+                        ? "bg-purple-600/40" 
+                        : "bg-orange-600/40"
+                    }`} />
+                    <button
+                      onClick={handleSendInsult}
+                      disabled={insultCooldown > 0 || !insultEnabled}
+                      className={`
+                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                        backdrop-blur-md border shadow-lg
+                        ${currentPlayer.team === "dark" 
+                          ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
+                          : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
+                        ${insultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                      `}
+                      data-testid="button-send-insult"
+                    >
+                      {!insultEnabled ? (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <EyeOff className="w-4 h-4" />
+                          Devre Dışı
+                        </span>
+                      ) : insultCooldown > 0 ? (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Timer className="w-4 h-4" />
+                          {insultCooldown}s
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <MessageCircle className="w-4 h-4" />
+                          Laf Sok
+                        </span>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -1453,7 +1496,7 @@ export default function Game() {
               </div>
             </div>
             
-            <div ref={boardRef} className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
+            <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
                  overflow-visible
                  w-[calc(min(90vw,55vh*1.5))] 
                  min-[360px]:w-[calc(min(85vw,58vh*1.5))]
