@@ -522,7 +522,29 @@ export default function Lobby() {
                 <div className="backdrop-blur-lg bg-black/60 rounded-xl border border-amber-900/40 p-4 opacity-90">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-amber-600/50" />
+                      {/* Custom Chaos Icon */}
+                      <svg 
+                        className="w-5 h-5 text-amber-500" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path 
+                          d="M12 2L13.5 7L19 7.5L15 11L16.5 17L12 14L7.5 17L9 11L5 7.5L10.5 7L12 2Z" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinejoin="round"
+                          fill="currentColor"
+                          opacity="0.3"
+                        />
+                        <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                        <path 
+                          d="M12 5V8M12 16V19M7 7L9 9M15 15L17 17M5 12H8M16 12H19M7 17L9 15M15 9L17 7" 
+                          stroke="currentColor" 
+                          strokeWidth="1.5" 
+                          strokeLinecap="round"
+                        />
+                      </svg>
                       <h3 className="text-base font-bold text-amber-700/60">KAOS MODU</h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
@@ -531,18 +553,13 @@ export default function Lobby() {
                         ?
                       </button>
                     </div>
-                    <div className="relative">
-                      <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-slate-800 text-amber-400/60 text-xs rounded-full">
-                        🚧
-                      </div>
-                      <Switch
-                        checked={false}
-                        disabled={true}
-                        data-testid="switch-chaos-mode"
-                      />
-                    </div>
+                    <Switch
+                      checked={false}
+                      disabled={true}
+                      data-testid="switch-chaos-mode"
+                    />
                   </div>
-                  <p className="text-xs text-amber-800/50">
+                  <p className="text-xs text-amber-600 font-medium">
                     Geliştirme aşamasında - Yakında!
                   </p>
                 </div>
