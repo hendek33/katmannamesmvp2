@@ -526,9 +526,9 @@ export default function Lobby() {
                       <h3 className="text-base font-bold text-amber-700/60">KAOS MODU</h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
-                        className="text-xs text-amber-700/50 hover:text-amber-600/50 transition-colors"
+                        className="w-6 h-6 rounded-full bg-amber-500/30 border border-amber-400/50 text-amber-300 font-bold text-sm hover:bg-amber-500/40 hover:border-amber-400/70 hover:text-amber-200 hover:scale-110 transition-all flex items-center justify-center"
                       >
-                        (?)
+                        ?
                       </button>
                     </div>
                     <div className="relative">
