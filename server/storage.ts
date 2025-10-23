@@ -56,7 +56,7 @@ export class MemStorage implements IStorage {
   }
 
   private assignCardImages(roomData: RoomData): void {
-    // Image pools for each card type - using actual file names
+    // Image pools for each card type - using ONLY actual file names that exist
     const imagePools = {
       dark: [
         '/acilmiskartgorselküçültülmüş/ali mavi.png',
@@ -87,26 +87,51 @@ export class MemStorage implements IStorage {
       assassin: ['/acilmiskartgorselküçültülmüş/arda siyah.png']
     };
 
-    // Shuffle each pool
-    for (const type in imagePools) {
-      imagePools[type as keyof typeof imagePools] = imagePools[type as keyof typeof imagePools]
-        .sort(() => Math.random() - 0.5);
+    // Duplicate pools to have enough images for all cards
+    // Dark needs 9, we have 8, so add one duplicate
+    const darkPool = [...imagePools.dark];
+    if (darkPool.length < 9) {
+      darkPool.push(darkPool[Math.floor(Math.random() * darkPool.length)]);
+    }
+    
+    // Light needs 9, we have 6, so add three duplicates
+    const lightPool = [...imagePools.light];
+    while (lightPool.length < 9) {
+      lightPool.push(imagePools.light[Math.floor(Math.random() * imagePools.light.length)]);
+    }
+    
+    // Neutral needs 7, we have 6, so add one duplicate
+    const neutralPool = [...imagePools.neutral];
+    if (neutralPool.length < 7) {
+      neutralPool.push(neutralPool[Math.floor(Math.random() * neutralPool.length)]);
     }
 
-    // Create the mapping
+    // Shuffle each pool
+    const shuffledPools = {
+      dark: darkPool.sort(() => Math.random() - 0.5),
+      light: lightPool.sort(() => Math.random() - 0.5),
+      neutral: neutralPool.sort(() => Math.random() - 0.5),
+      assassin: [...imagePools.assassin]
+    };
+
+    // Create the mapping - ensure EVERY card gets an image
     const cardImages = new Map<number, string>();
     const imageIndexes = { dark: 0, light: 0, neutral: 0, assassin: 0 };
 
-    // Assign unique images to each card based on its type
+    // Assign images to each card based on its type
     roomData.gameState.cards.forEach(card => {
       const type = card.type;
-      const pool = imagePools[type];
+      const pool = shuffledPools[type];
       const index = imageIndexes[type];
       
-      if (index < pool.length) {
-        cardImages.set(card.id, pool[index]);
-        imageIndexes[type]++;
+      // This should never happen now, but just in case
+      if (!pool || pool.length === 0) {
+        console.error(`No images available for card type: ${type}`);
+        return;
       }
+      
+      cardImages.set(card.id, pool[index]);
+      imageIndexes[type]++;
     });
 
     roomData.cardImages = cardImages;
