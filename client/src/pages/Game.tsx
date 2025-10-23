@@ -588,42 +588,43 @@ export default function Game() {
             <div className="flex justify-center items-center gap-1 h-full">
               {/* Moderator Controls for Taunt/Insult */}
               {currentPlayer?.isRoomOwner && gameState.phase === "playing" && (
-                <>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-900/50 backdrop-blur-md rounded-lg border border-amber-900/30">
                   <Button
                     onClick={() => {
                       send("toggle_taunt", { enabled: !tauntEnabled });
                     }}
                     size="sm"
-                    variant={tauntEnabled ? "default" : "outline"}
+                    variant="ghost"
                     className={cn(
-                      "h-8 px-6 text-sm font-bold min-w-[140px]",
+                      "h-7 px-3 text-xs font-medium backdrop-blur-sm transition-all",
                       tauntEnabled 
-                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-500" 
-                        : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
+                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30" 
+                        : "bg-slate-800/30 text-slate-500 border border-slate-700/40 hover:bg-slate-700/40"
                     )}
                     title="Hareket çekme özelliğini aç/kapat"
                   >
-                    <Zap className="w-4 h-4 mr-2" />
-                    <span>{tauntEnabled ? "Hareket Çek Aktif" : "Hareket Çek Pasif"}</span>
+                    <Zap className={cn("w-3 h-3 mr-1.5", tauntEnabled && "animate-pulse")} />
+                    <span>{tauntEnabled ? "Hareket Aktif" : "Hareket Pasif"}</span>
                   </Button>
+                  <div className="w-px h-5 bg-amber-900/40" />
                   <Button
                     onClick={() => {
                       send("toggle_insult", { enabled: !insultEnabled });
                     }}
                     size="sm"
-                    variant={insultEnabled ? "default" : "outline"}
+                    variant="ghost"
                     className={cn(
-                      "h-8 px-6 text-sm font-bold min-w-[140px]",
+                      "h-7 px-3 text-xs font-medium backdrop-blur-sm transition-all",
                       insultEnabled 
-                        ? "bg-red-600 hover:bg-red-700 text-white border-red-500" 
-                        : "bg-transparent hover:bg-slate-800 text-slate-400 border-slate-600"
+                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/40 hover:bg-amber-500/30" 
+                        : "bg-slate-800/30 text-slate-500 border border-slate-700/40 hover:bg-slate-700/40"
                     )}
                     title="Laf sokma özelliğini aç/kapat"
                   >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    <span>{insultEnabled ? "Laf Sok Aktif" : "Laf Sok Pasif"}</span>
+                    <MessageCircle className={cn("w-3 h-3 mr-1.5", insultEnabled && "animate-pulse")} />
+                    <span>{insultEnabled ? "Laf Aktif" : "Laf Pasif"}</span>
                   </Button>
-                </>
+                </div>
               )}
               {/* Players Dialog */}
               <Dialog>
