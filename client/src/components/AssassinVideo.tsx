@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useVideoContext } from "@/contexts/VideoContext";
 
 interface AssassinVideoProps {
   winnerTeam: "dark" | "light";
@@ -20,8 +21,10 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onCo
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
+  const { getVideoUrl } = useVideoContext();
   
-  const videoSrc = "/siyah kelime seçme.mp4";
+  const originalVideoPath = "/siyah kelime seçme.mp4";
+  const videoSrc = getVideoUrl(originalVideoPath);
 
   useEffect(() => {
     // Cleanup function
