@@ -325,7 +325,7 @@ export default function Lobby() {
             <div className="lg:col-span-8 flex flex-col gap-4 overflow-hidden">
               {/* Mission Briefing */}
               {currentPlayer && (
-                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-4">
+                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="relative">
@@ -357,6 +357,20 @@ export default function Lobby() {
                         )}
                       </div>
                     )}
+                  </div>
+                  
+                  {/* Developer Note */}
+                  <div className="pt-2 border-t border-slate-800/50">
+                    <div className="text-xs text-amber-400/80 space-y-1">
+                      <div className="font-medium flex items-center gap-1.5">
+                        <Zap className="w-3 h-3" />
+                        Geliştiriciden not:
+                      </div>
+                      <div className="italic pl-4 text-amber-400/60">
+                        Çağrı abi Mavi takım olmanız gerekiyor. Bütün tasarımları yaptıktan sonra 
+                        sizin kırmızı takım olduğunuz aklıma geldi, kusuruma bakmayın tasarım konseptine bu uyuyor 😔
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -600,20 +614,6 @@ export default function Lobby() {
                   <p className="text-xs text-gray-500">
                     Geliştirme aşamasında - Yakında!
                   </p>
-                </div>
-              </div>
-              
-              {/* Developer Note */}
-              <div className="backdrop-blur-xl bg-amber-500/10 rounded-xl border border-amber-500/30 p-4">
-                <div className="text-xs text-amber-400 space-y-1">
-                  <div className="font-semibold flex items-center gap-2">
-                    <Zap className="w-4 h-4" />
-                    Geliştiriciden not:
-                  </div>
-                  <div className="italic pl-6">
-                    Çağrı abi Mavi takım olmanız gerekiyor. Bütün tasarımları yaptıktan sonra 
-                    sizin kırmızı takım olduğunuz aklıma geldi, kusuruma bakmayın tasarım konseptine bu uyuyor 😔
-                  </div>
                 </div>
               </div>
             </div>
