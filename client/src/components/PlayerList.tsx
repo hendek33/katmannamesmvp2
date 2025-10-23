@@ -141,12 +141,6 @@ export function PlayerList({
       </div>
       
       {/* Warning if team needs spymaster */}
-      {needsSpymaster && isLobby && teamPlayers.length > 0 && (
-        <div className="text-xs text-amber-500 bg-amber-500/10 p-2 rounded flex items-center gap-1">
-          <Eye className="w-3 h-3" />
-          Bu takıma bir İstihbarat Şefi gerekli!
-        </div>
-      )}
       
       <div className="grid grid-cols-4 gap-1">
         {/* First cell - Spymaster spot */}
