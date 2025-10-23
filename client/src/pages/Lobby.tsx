@@ -361,7 +361,7 @@ export default function Lobby() {
                                 Geliştiriciden not:
                               </div>
                               <div className="italic text-amber-400/60">
-                                Çağrı abi Mavi takım olmanız gerekiyor, kusuruma bakmayın 😔
+                                Çağrı abi tasarımları yaparken biraz geç fark ettim, senin mavi takım olman gerekecek maalesef :=)
                               </div>
                             </div>
                           </div>
