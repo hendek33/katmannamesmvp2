@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { videoCache } from "@/services/VideoCache";
 
 interface AssassinVideoProps {
   winnerTeam: "dark" | "light";
@@ -10,114 +9,48 @@ interface AssassinVideoProps {
   onComplete?: () => void;
 }
 
-export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onComplete }: AssassinVideoProps) {
+export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: AssassinVideoProps) {
   const [show, setShow] = useState(true);
-  const [videoEnded, setVideoEnded] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
   const [showWinnerText, setShowWinnerText] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [fadeOutWinner, setFadeOutWinner] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
-  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const timersRef = useRef<NodeJS.Timeout[]>([]);
-  const playPromiseRef = useRef<Promise<void> | null>(null);
-  
-  const videoSrc = "/siyah kelime seçme.mp4";
 
   useEffect(() => {
-    let mounted = true;
+    // Simple play logic
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.error('Assassin video play error:', err);
+        // If video fails, still show winner
+        handleVideoEnd();
+      });
+    }
     
-    // Play video with robust retry mechanism
-    const playVideoWithRetry = async () => {
-      if (!videoRef.current || !mounted) return;
-      
-      let retryCount = 0;
-      const maxRetries = 3;
-      
-      while (retryCount < maxRetries && mounted) {
-        try {
-          // Ensure video is ready
-          if (videoRef.current.readyState < 2) {
-            await new Promise(resolve => {
-              const checkReady = () => {
-                if (!videoRef.current || !mounted) {
-                  resolve(undefined);
-                  return;
-                }
-                if (videoRef.current.readyState >= 2) {
-                  resolve(undefined);
-                } else {
-                  setTimeout(checkReady, 50);
-                }
-              };
-              checkReady();
-            });
-          }
-          
-          // Try to play
-          videoRef.current.muted = true;
-          playPromiseRef.current = videoRef.current.play();
-          await playPromiseRef.current;
-          playPromiseRef.current = null;
-          console.log('Assassin video playing successfully');
-          break;
-        } catch (error) {
-          retryCount++;
-          console.error(`Assassin video play attempt ${retryCount} failed:`, error);
-          
-          if (retryCount < maxRetries && mounted) {
-            await new Promise(resolve => setTimeout(resolve, 200 * retryCount));
-          } else {
-            // If all retries fail, still show winner
-            console.error('All assassin video play attempts failed');
-            handleVideoEnd();
-          }
-        }
-      }
-    };
-    
-    // Start playing video
-    playVideoWithRetry();
-    
-    // Cleanup function
     return () => {
-      mounted = false;
-      // Clear all timers on unmount
-      timersRef.current.forEach(t => clearTimeout(t));
-      // Cancel any pending play promise
-      if (playPromiseRef.current) {
-        playPromiseRef.current.catch(() => {});
-      }
-      // Cleanup video
       if (videoRef.current) {
         videoRef.current.pause();
-        videoRef.current.currentTime = 0;
       }
     };
   }, []);
 
   const handleVideoEnd = () => {
-    setVideoEnded(true);
     // Flash effect
     setShowFlash(true);
-    const flashTimer = setTimeout(() => {
+    setTimeout(() => {
       setShowFlash(false);
-      // Start closing animation and show winner text immediately
+      // Start closing animation and show winner text
       setIsClosing(true);
       setShowWinnerText(true);
-      // Start fade out after 4 seconds
-      const fadeTimer = setTimeout(() => {
+      // Fade out after 4 seconds
+      setTimeout(() => {
         setFadeOutWinner(true);
-        // Complete after fade out animation
-        const completeTimer = setTimeout(() => {
+        // Complete after fade out
+        setTimeout(() => {
           onComplete?.();
         }, 800);
-        timersRef.current.push(completeTimer);
       }, 4000);
-      timersRef.current.push(fadeTimer);
     }, 300);
-    timersRef.current.push(flashTimer);
   };
 
   if (!show && !showWinnerText) return null;
@@ -127,10 +60,9 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onCo
       {/* Flash effect overlay */}
       {showFlash && (
         <div 
-          className="fixed inset-0 z-[150] pointer-events-none"
+          className="fixed inset-0 z-[150] pointer-events-none bg-white"
           style={{
-            animation: 'flash 0.3s ease-out forwards',
-            backgroundColor: 'white'
+            animation: 'flash 0.3s ease-out forwards'
           }}
         />
       )}
@@ -149,120 +81,173 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onCo
       
       {/* Video */}
       {show && (
-        <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
-        >
+        <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
           <div 
             className="relative"
             style={{
               animation: isClosing 
-                ? 'shrinkToPoint 0.6s ease-in forwards'
-                : 'expandFromPoint 0.8s ease-out forwards',
-              transformOrigin: startX && startY ? `${startX}px ${startY}px` : 'center',
-              '--start-x': startX ? `${startX}px` : '50vw',
-              '--start-y': startY ? `${startY}px` : '50vh',
-            } as React.CSSProperties}
+                ? 'circleCollapse 0.6s ease-in forwards'
+                : 'circleExpand 0.8s ease-out forwards'
+            }}
           >
-            {/* Video with rounded corners */}
-            <div className="relative w-[35vw] max-w-sm rounded-xl overflow-hidden shadow-2xl"
+            {/* Glow effect */}
+            <div 
+              className="absolute -inset-8 rounded-full blur-3xl opacity-80 animate-pulse bg-purple-600"
+            />
+            
+            {/* Video in circular frame */}
+            <div 
+              className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 shadow-2xl border-purple-600"
               style={{
-                clipPath: isClosing ? 'circle(0% at center)' : 'circle(100% at center)',
-                animation: isClosing ? 'circleCollapse 0.6s ease-in forwards' : 'circleExpand 0.8s ease-out forwards'
+                boxShadow: '0 0 100px rgba(147,51,234,0.8), inset 0 0 50px rgba(147,51,234,0.4)'
               }}
             >
               <video
                 ref={videoRef}
-                src={videoSrc}
+                src="/siyah kelime seçme.mp4"
                 autoPlay
                 muted
                 playsInline
-                preload="auto"
-                onLoadedData={() => setVideoReady(true)}
-                onError={() => {
-                  console.error("Assassin videosu yüklenemedi");
-                  setVideoError(true);
-                  // Hata durumunda direkt kazanan göster
-                  handleVideoEnd();
-                }}
                 onEnded={handleVideoEnd}
-                className="w-full h-auto"
-                style={{ opacity: videoReady ? 1 : 0, transition: 'opacity 0.3s ease' }}
+                className="w-full h-full object-cover"
               />
               
-              {/* Dark gradient overlay for better blending */}
+              {/* Dark gradient overlay */}
               <div 
                 className="absolute inset-0 pointer-events-none rounded-xl"
                 style={{
-                  background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.4) 100%)'
+                  background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.7) 100%)'
                 }}
               />
             </div>
+            
+            {/* Smoke effect particles */}
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-4 h-4 bg-purple-500 rounded-full blur-md"
+                  style={{
+                    left: `${50 + Math.cos(i * Math.PI / 10) * 40}%`,
+                    top: `${50 + Math.sin(i * Math.PI / 10) * 40}%`,
+                    animation: `smoke ${2 + Math.random()}s ease-out infinite`,
+                    animationDelay: `${Math.random() * 2}s`,
+                    opacity: 0
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}
-
+      
       {/* Winner text */}
       {showWinnerText && (
         <div 
-          className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none"
+          className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none"
           style={{
-            animation: fadeOutWinner ? 'fadeOut 0.8s ease-out forwards' : 'fadeIn 0.3s ease-in forwards'
+            animation: fadeOutWinner 
+              ? 'fadeOut 0.8s ease-out forwards'
+              : 'fadeIn 0.5s ease-in forwards'
           }}
         >
-          <div className="text-center space-y-4">
-            <div className="text-2xl md:text-3xl font-bold text-red-500 animate-letter-fall-sequence">
-              {"Siyah Kelime Bulundu!".split('').map((char, index) => (
-                <span
-                  key={index}
-                  className="inline-block"
-                  style={{
-                    animation: 'letterDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-                    animationDelay: `${index * 0.03}s`,
-                    opacity: 0
-                  }}
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              ))}
+          <div className="text-center">
+            <div 
+              className="text-5xl md:text-7xl font-black mb-4"
+              style={{
+                color: winnerTeam === "dark" ? '#3b82f6' : '#ef4444',
+                textShadow: winnerTeam === "dark" 
+                  ? '0 0 60px rgba(59,130,246,0.9), 0 0 120px rgba(59,130,246,0.6)' 
+                  : '0 0 60px rgba(239,68,68,0.9), 0 0 120px rgba(239,68,68,0.6)',
+                animation: 'winnerPulse 1s ease-in-out infinite'
+              }}
+            >
+              {winnerTeamName}
             </div>
-            <div className={cn(
-              "text-4xl md:text-6xl font-black",
-              winnerTeam === "dark" ? "text-blue-400" : "text-red-400"
-            )}>
-              {"Kazanan:".split('').map((char, index) => (
-                <span
-                  key={index}
-                  className="inline-block"
-                  style={{
-                    animation: 'letterDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-                    animationDelay: `${0.5 + index * 0.03}s`,
-                    opacity: 0
-                  }}
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              ))}
-              {' '}
-              {winnerTeamName.split('').map((char, index) => (
-                <span
-                  key={index}
-                  className="inline-block"
-                  style={{
-                    animation: 'letterDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-                    animationDelay: `${0.7 + index * 0.03}s`,
-                    opacity: 0,
-                    textShadow: winnerTeam === "dark" 
-                      ? '0 4px 20px rgba(59,130,246,0.8)' 
-                      : '0 4px 20px rgba(239,68,68,0.8)'
-                  }}
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </span>
-              ))}
+            <div 
+              className="text-3xl md:text-5xl font-bold text-white"
+              style={{
+                textShadow: '0 2px 20px rgba(255,255,255,0.5)',
+                animation: 'fadeInUp 0.8s ease-out forwards 0.3s',
+                opacity: 0
+              }}
+            >
+              KAZANDI!
             </div>
           </div>
         </div>
       )}
+      
+      <style>{`
+        @keyframes flash {
+          0% { opacity: 0; }
+          50% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+        
+        @keyframes circleExpand {
+          from {
+            transform: scale(0);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes circleCollapse {
+          from {
+            transform: scale(1);
+            opacity: 1;
+          }
+          to {
+            transform: scale(0);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes smoke {
+          0% {
+            transform: translateY(0) scale(0.5);
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateY(-100px) scale(2);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes winnerPulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </>
   );
 }

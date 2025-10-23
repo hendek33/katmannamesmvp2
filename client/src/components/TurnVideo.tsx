@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { videoCache } from "@/services/VideoCache";
 
 interface TurnVideoProps {
   team: "dark" | "light";
@@ -10,116 +9,39 @@ interface TurnVideoProps {
 
 export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
-  const [videoEnded, setVideoEnded] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
-  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const timersRef = useRef<NodeJS.Timeout[]>([]);
-  const playPromiseRef = useRef<Promise<void> | null>(null);
 
   const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
     : "/kırmızı takım video tur.mp4";
 
   useEffect(() => {
-    let mounted = true;
+    let timeoutId: NodeJS.Timeout;
     
-    // Play video with robust retry mechanism
-    const playVideoWithRetry = async () => {
-      if (!videoRef.current || !mounted) return;
-      
-      let retryCount = 0;
-      const maxRetries = 3;
-      
-      while (retryCount < maxRetries && mounted) {
-        try {
-          // Ensure video is ready
-          if (videoRef.current.readyState < 2) {
-            await new Promise(resolve => {
-              const checkReady = () => {
-                if (!videoRef.current || !mounted) {
-                  resolve(undefined);
-                  return;
-                }
-                if (videoRef.current.readyState >= 2) {
-                  resolve(undefined);
-                } else {
-                  setTimeout(checkReady, 50);
-                }
-              };
-              checkReady();
-            });
-          }
-          
-          // Try to play
-          videoRef.current.muted = true;
-          playPromiseRef.current = videoRef.current.play();
-          await playPromiseRef.current;
-          playPromiseRef.current = null;
-          console.log('Video playing successfully');
-          break;
-        } catch (error) {
-          retryCount++;
-          console.error(`Video play attempt ${retryCount} failed:`, error);
-          
-          if (retryCount < maxRetries && mounted) {
-            await new Promise(resolve => setTimeout(resolve, 200 * retryCount));
-          } else {
-            // If all retries fail, continue without video
-            console.error('All video play attempts failed');
-            handleVideoEnd();
-          }
-        }
-      }
-    };
-    
-    // Start playing video
-    playVideoWithRetry();
+    // Simple play logic
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.error('Video play error:', err);
+      });
+    }
     
     // Auto hide after 4 seconds
-    const timer = setTimeout(() => {
-      if (!mounted) return;
+    timeoutId = setTimeout(() => {
       setIsClosing(true);
-      const closeTimer = setTimeout(() => {
-        if (mounted) {
-          setShow(false);
-          onComplete?.();
-        }
-      }, 600);
-      timersRef.current.push(closeTimer);
-    }, 4000);
-    
-    timersRef.current.push(timer);
-
-    return () => {
-      mounted = false;
-      // Clear all timers on unmount
-      timersRef.current.forEach(t => clearTimeout(t));
-      // Cancel any pending play promise
-      if (playPromiseRef.current) {
-        playPromiseRef.current.catch(() => {});
-      }
-      // Cleanup video
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
-      }
-    };
-  }, []);
-
-  const handleVideoEnd = () => {
-    // Only handle video end if we haven't already started closing
-    if (!isClosing) {
-      setVideoEnded(true);
-      setIsClosing(true);
-      const endTimer = setTimeout(() => {
+      setTimeout(() => {
         setShow(false);
         onComplete?.();
       }, 600);
-      timersRef.current.push(endTimer);
-    }
-  };
+    }, 4000);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+    };
+  }, [onComplete]);
 
   if (!show) return null;
 
@@ -169,25 +91,7 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
               autoPlay
               muted
               playsInline
-              preload="auto"
-              onLoadedData={() => setVideoReady(true)}
-              onError={() => {
-                console.error("Video yüklenemedi:", videoSrc);
-                setVideoError(true);
-                // Hata durumunda yine de devam et
-                const errorTimer = setTimeout(() => {
-                  setIsClosing(true);
-                  const errorCloseTimer = setTimeout(() => {
-                    setShow(false);
-                    onComplete?.();
-                  }, 600);
-                  timersRef.current.push(errorCloseTimer);
-                }, 1000);
-                timersRef.current.push(errorTimer);
-              }}
-              onEnded={handleVideoEnd}
               className="w-full h-full object-cover"
-              style={{ opacity: videoReady ? 1 : 0 }}
             />
             
             {/* Gradient overlay for better blending */}
@@ -213,22 +117,11 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
           style={{
             textShadow: team === "dark" 
               ? '0 2px 20px rgba(59,130,246,0.8)' 
-              : '0 2px 20px rgba(239,68,68,0.8)'
+              : '0 2px 20px rgba(239,68,68,0.8)',
+            animation: 'fadeInUp 0.6s ease-out forwards'
           }}
           >
-            {`Sıra ${teamName} Takımında`.split('').map((char, index) => (
-              <span
-                key={index}
-                className="inline-block"
-                style={{
-                  animation: 'letterDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-                  animationDelay: `${0.5 + index * 0.025}s`,
-                  opacity: 0
-                }}
-              >
-                {char === ' ' ? '\u00A0' : char}
-              </span>
-            ))}
+            Sıra {teamName} Takımında
           </div>
         </div>
 
@@ -238,21 +131,80 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
             <div
               key={i}
               className={cn(
-                "absolute w-1 h-1 rounded-full",
+                "absolute w-2 h-2 rounded-full",
                 team === "dark" ? "bg-blue-400" : "bg-red-400"
               )}
               style={{
-                left: '50%',
-                top: '50%',
-                animation: `floatParticle ${2 + Math.random() * 2}s ease-out infinite`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
                 animationDelay: `${Math.random() * 2}s`,
-                '--particle-distance': `${100 + Math.random() * 150}px`,
-                '--particle-angle': `${Math.random() * 360}deg`,
-              } as React.CSSProperties}
+                opacity: 0.6
+              }}
             />
           ))}
         </div>
       </div>
+      
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+        
+        @keyframes zoomInRotate {
+          from {
+            transform: scale(0) rotate(-180deg);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes zoomOutRotate {
+          from {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+          }
+          to {
+            transform: scale(0) rotate(180deg);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) translateX(0px);
+          }
+          25% {
+            transform: translateY(-20px) translateX(10px);
+          }
+          50% {
+            transform: translateY(10px) translateX(-10px);
+          }
+          75% {
+            transform: translateY(-10px) translateX(20px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
