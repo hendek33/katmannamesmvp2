@@ -234,7 +234,9 @@ export class MemStorage implements IStorage {
       password,
       guessesRemaining: 0,
       maxGuesses: 0,
-      cardVotes: new Map() // Map of cardId to Set of playerIds who voted
+      cardVotes: new Map(), // Map of cardId to Set of playerIds who voted
+      tauntEnabled: true, // Enable taunt by default
+      insultEnabled: true // Enable insult by default
     });
     this.playerToRoom.set(playerId, roomCode);
 
