@@ -1200,42 +1200,6 @@ export default function Game() {
                 label={!gameState.currentClue ? "İstihbarat Şefi Süresi" : "Ajan Süresi"}
               />
             )}
-            
-            {/* Taunt Button - Moved to Left Panel */}
-            {currentPlayer && gameState.phase === "playing" && currentPlayer.role !== "spymaster" && (
-              <div className="relative">
-                <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                  currentPlayer.team === "dark" 
-                    ? "bg-blue-600/40" 
-                    : "bg-red-600/40"
-                }`} />
-                <button
-                  onClick={handleTriggerTaunt}
-                  disabled={tauntCooldown > 0}
-                  className={`
-                    relative w-full px-4 py-2 rounded-lg font-bold text-sm transition-all
-                    backdrop-blur-md border shadow-lg
-                    ${currentPlayer.team === "dark" 
-                      ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
-                      : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                    ${tauntCooldown > 0 ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
-                  `}
-                  data-testid="button-trigger-taunt"
-                >
-                  {tauntCooldown > 0 ? (
-                    <span className="flex items-center justify-center gap-1.5">
-                      <Timer className="w-4 h-4" />
-                      {tauntCooldown}s
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-1.5">
-                      <Zap className="w-4 h-4" />
-                      Hareket Çek
-                    </span>
-                  )}
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Center - Grid */}
