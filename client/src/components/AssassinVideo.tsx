@@ -50,14 +50,14 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
         setShowLoserText(false);
         setShowWinnerText(true);
         
-        // Fade out everything after 3 more seconds
+        // Fade out everything after 2 seconds (was 3)
         setTimeout(() => {
           setFadeOutAll(true);
-          // Complete after fade out
+          // Complete after fade out - faster
           setTimeout(() => {
             onComplete?.();
-          }, 800);
-        }, 3000);
+          }, 400); // was 800ms
+        }, 2000); // was 3000ms
       }, 2000);
     }, 300);
   };

@@ -168,7 +168,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         </>
       )}
       
-      {/* Logo watermark */}
+      {/* Logo watermark - lower z-index for revealed cards */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -178,7 +178,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           backgroundRepeat: 'no-repeat',
           opacity: 0.15,
           filter: 'grayscale(100%)',
-          zIndex: 10
+          zIndex: card.revealed ? 1 : 10
         }}
       />
       
@@ -211,15 +211,16 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           onClick={() => setIsLifted(!isLifted)}
           title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
           style={{
-            top: '-4px',
-            left: '-4px',
-            right: '-4px', 
-            bottom: '-4px',
+            top: card.type === 'assassin' ? '0px' : '-4px',
+            left: card.type === 'assassin' ? '0px' : '-4px',
+            right: card.type === 'assassin' ? '0px' : '-4px', 
+            bottom: card.type === 'assassin' ? '0px' : '-4px',
             backgroundImage: `url('${revealedImage}')`,
-            backgroundSize: 'cover',
+            backgroundSize: card.type === 'assassin' ? 'contain' : 'cover',
             backgroundPosition: 'center',
-            zIndex: (4 - rowIndex) * 10 + (isLifted ? 5 : 1),
-            boxShadow: isLifted ? '0 20px 40px rgba(0,0,0,0.5)' : '0 4px 8px rgba(0,0,0,0.3)'
+            backgroundRepeat: 'no-repeat',
+            zIndex: (4 - rowIndex) * 10 + (isLifted ? 100 : 20),
+            boxShadow: isLifted ? '0 25px 50px rgba(0,0,0,0.6)' : '0 4px 8px rgba(0,0,0,0.3)'
           }}
         />
       )}
