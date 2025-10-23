@@ -26,14 +26,14 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
       });
     }
     
-    // Auto hide after 4 seconds
+    // Auto hide after 2.5 seconds (reduced from 4)
     timeoutId = setTimeout(() => {
       setIsClosing(true);
       setTimeout(() => {
         setShow(false);
         onComplete?.();
-      }, 600);
-    }, 4000);
+      }, 500); // Reduced from 600
+    }, 2500); // Reduced from 4000
 
     return () => {
       clearTimeout(timeoutId);
@@ -50,17 +50,40 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-none"
       style={{
         animation: isClosing 
-          ? 'fadeOut 0.6s ease-in-out forwards' 
+          ? 'fadeOut 0.5s ease-in-out forwards' 
           : 'fadeIn 0.5s ease-in-out forwards',
       }}
     >
-      <div className="relative">
+      <div className="relative flex flex-col items-center">
+        {/* Turn notification text - ABOVE video and CENTERED */}
+        <div 
+          className="mb-8 text-center"
+          style={{
+            animation: isClosing 
+              ? 'fadeOutUp 0.5s ease-out forwards'
+              : 'fadeInDown 0.6s ease-out forwards'
+          }}
+        >
+          <div className={cn(
+            "text-3xl md:text-4xl font-black tracking-wide",
+            team === "dark" ? "text-blue-400" : "text-red-400"
+          )}
+          style={{
+            textShadow: team === "dark" 
+              ? '0 2px 20px rgba(59,130,246,0.8)' 
+              : '0 2px 20px rgba(239,68,68,0.8)',
+          }}
+          >
+            Sıra {teamName} Takımında
+          </div>
+        </div>
+
         {/* Circular video container with glow */}
         <div 
           className="relative"
           style={{
             animation: isClosing 
-              ? 'zoomOutRotate 0.6s ease-in forwards'
+              ? 'zoomOutRotate 0.5s ease-in forwards'
               : 'zoomInRotate 0.8s ease-out forwards',
           }}
         >
@@ -103,25 +126,6 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
                 } 70%)`
               }}
             />
-          </div>
-        </div>
-
-        {/* Turn notification text */}
-        <div 
-          className="absolute -top-20 left-1/2 transform -translate-x-1/2 text-center whitespace-nowrap"
-        >
-          <div className={cn(
-            "text-3xl md:text-4xl font-black tracking-wide",
-            team === "dark" ? "text-blue-400" : "text-red-400"
-          )}
-          style={{
-            textShadow: team === "dark" 
-              ? '0 2px 20px rgba(59,130,246,0.8)' 
-              : '0 2px 20px rgba(239,68,68,0.8)',
-            animation: 'fadeInUp 0.6s ease-out forwards'
-          }}
-          >
-            Sıra {teamName} Takımında
           </div>
         </div>
 
@@ -179,14 +183,25 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
           }
         }
         
-        @keyframes fadeInUp {
+        @keyframes fadeInDown {
           from {
             opacity: 0;
-            transform: translateX(-50%) translateY(20px);
+            transform: translateY(-20px);
           }
           to {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeOutUp {
+          from {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          to {
+            opacity: 0;
+            transform: translateY(-20px);
           }
         }
         
