@@ -540,7 +540,7 @@ export default function Lobby() {
                 </div>
                 
                 {/* Chaos Mode - Codenames Style */}
-                <div className="backdrop-blur-lg bg-black/40 rounded-xl border border-amber-900/30 p-4 opacity-70">
+                <div className="backdrop-blur-lg bg-black/60 rounded-xl border border-amber-900/40 p-4 opacity-90">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-amber-600/50" />
