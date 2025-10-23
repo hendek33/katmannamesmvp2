@@ -405,6 +405,32 @@ export default function Lobby() {
                   onRemoveBot={handleRemoveBot}
                 />
               </div>
+              
+              {/* Taunt Button - Enhanced Glassmorphism */}
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
+                <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+                  <Button
+                    onClick={() => {
+                      // Visual feedback only in lobby
+                      const btn = document.querySelector('[data-testid="button-taunt-lobby"]') as HTMLElement;
+                      if (btn) {
+                        btn.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                          btn.style.transform = 'scale(1)';
+                        }, 200);
+                      }
+                    }}
+                    className="w-full py-4 text-base font-bold bg-gradient-to-r from-purple-700 to-pink-700 hover:from-purple-600 hover:to-pink-600 text-white shadow-2xl transition-all"
+                    data-testid="button-taunt-lobby"
+                  >
+                    <span className="mr-2">🎭</span>
+                    Hareket Çek
+                    <span className="ml-2 text-xs opacity-70">(Oyun İçi)</span>
+                  </Button>
+                  <p className="text-xs text-slate-400 text-center mt-2">Oyun başladığında rakibini kışkırt!</p>
+                </div>
+              </div>
             </div>
             
             {/* Right Panel - Control Console (5 cols on lg) */}
