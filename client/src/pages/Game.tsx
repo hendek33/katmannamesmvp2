@@ -426,6 +426,8 @@ export default function Game() {
           key={`${insult.timestamp}-${index}`}
           senderUsername={insult.senderUsername}
           senderTeam={insult.senderTeam}
+          targetUsername={insult.targetUsername}
+          targetTeam={insult.targetTeam}
           message={insult.message}
           timestamp={insult.timestamp}
         />
@@ -1625,28 +1627,6 @@ export default function Game() {
                       <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />
                       Gönder
                     </Button>
-                  </div>
-                </Card>
-              ) : gameState.currentClue ? (
-                <Card 
-                  className="px-3 py-1.5 sm:px-4 sm:py-2 border-2 shadow-2xl bg-slate-950/95 border-amber-500/60 backdrop-blur-lg animate-clue-slide-up"
-                  style={{ zIndex: 50, position: 'relative' }}
-                >
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 sm:gap-2 mb-0.5 sm:mb-1">
-                      <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
-                      <span className="text-[9px] sm:text-[10px] font-semibold uppercase text-amber-400 tracking-wider">Aktif İpucu</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="text-lg sm:text-xl font-black text-amber-400 uppercase tracking-wider animate-text-glow">
-                        {gameState.currentClue.word}
-                      </span>
-                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-amber-500 flex items-center justify-center shadow-xl">
-                        <span className="text-base sm:text-lg font-black text-white">
-                          {gameState.currentClue.count}
-                        </span>
-                      </div>
-                    </div>
                   </div>
                 </Card>
               ) : null}

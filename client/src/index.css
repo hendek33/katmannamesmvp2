@@ -1156,3 +1156,19 @@
 .animate-bounce-gentle {
   animation: bounce-gentle 2s ease-in-out infinite;
 }
+
+/* Fade out animation for insult bubble */
+@keyframes fade-out-bubble {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.9);
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out-bubble 0.5s ease-out forwards;
+}

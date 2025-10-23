@@ -4,11 +4,13 @@ import { cn } from '@/lib/utils';
 interface InsultBubbleProps {
   senderUsername: string;
   senderTeam: 'dark' | 'light';
+  targetUsername?: string;
+  targetTeam?: 'dark' | 'light';
   message: string;
   timestamp: number;
 }
 
-export function InsultBubble({ senderUsername, senderTeam, message }: InsultBubbleProps) {
+export function InsultBubble({ senderUsername, senderTeam, targetUsername, targetTeam, message }: InsultBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
@@ -30,14 +32,14 @@ export function InsultBubble({ senderUsername, senderTeam, message }: InsultBubb
   return (
     <div 
       className={cn(
-        "fixed z-[100] pointer-events-none transition-all duration-500",
+        "fixed z-[100] pointer-events-none transition-all duration-700 ease-out",
         isLeftSide ? "left-[10%] lg:left-[15%] xl:left-[18%]" : "right-[10%] lg:right-[15%] xl:right-[18%]",
-        "top-[15vh] lg:top-[18vh] xl:top-[20vh]",
-        isVisible && !isLeaving ? "opacity-100 scale-100" : "opacity-0 scale-75",
-        isLeaving && "opacity-0 scale-110"
+        "top-[10vh] lg:top-[12vh] xl:top-[15vh]",
+        isVisible && !isLeaving ? "opacity-100" : "opacity-0",
+        isLeaving && "animate-fade-out"
       )}
       style={{
-        transform: `${isVisible && !isLeaving ? 'translateX(0)' : isLeftSide ? 'translateX(-100px)' : 'translateX(100px)'} scale(${isVisible && !isLeaving ? 1 : isLeaving ? 1.1 : 0.75})`,
+        transform: `${isVisible && !isLeaving ? 'translateY(0)' : 'translateY(-20px)'}`,
       }}
     >
       {/* Speech bubble */}
@@ -58,9 +60,25 @@ export function InsultBubble({ senderUsername, senderTeam, message }: InsultBubb
           {senderUsername}
         </div>
         
-        {/* Message */}
+        {/* Message with highlighted target */}
         <p className="text-sm font-bold tracking-wide">
-          {message}
+          {targetUsername ? (
+            <>
+              <span 
+                className={cn(
+                  "font-black",
+                  targetTeam === 'dark' 
+                    ? "text-blue-400" 
+                    : "text-red-400"
+                )}
+              >
+                {targetUsername}
+              </span>
+              {message.replace(targetUsername, '')}
+            </>
+          ) : (
+            message
+          )}
         </p>
         
         {/* Tail */}
