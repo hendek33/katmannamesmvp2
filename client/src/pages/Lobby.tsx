@@ -457,56 +457,6 @@ export default function Lobby() {
                 </div>
               </div>
               
-              {/* Bot Controls - Codenames Style */}
-              {currentPlayer?.isRoomOwner && (
-                <div className="backdrop-blur-lg bg-black/70 rounded-xl border border-red-900/40 shadow-2xl p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Bot className="w-5 h-5 text-purple-400" />
-                    <h3 className="text-lg font-bold text-slate-100">Bot Yönetimi</h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      onClick={() => handleAddBot("dark", "spymaster")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-blue-700/50 text-blue-300 hover:bg-blue-900/20"
-                      disabled={darkHasSpymaster}
-                      data-testid="button-add-bot-dark-spymaster"
-                    >
-                      {gameState.darkTeamName} Şef
-                    </Button>
-                    <Button
-                      onClick={() => handleAddBot("dark", "guesser")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-blue-700/50 text-blue-300 hover:bg-blue-900/20"
-                      data-testid="button-add-bot-dark-guesser"
-                    >
-                      {gameState.darkTeamName} Ajan
-                    </Button>
-                    <Button
-                      onClick={() => handleAddBot("light", "spymaster")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-red-700/50 text-red-300 hover:bg-red-900/20"
-                      disabled={lightHasSpymaster}
-                      data-testid="button-add-bot-light-spymaster"
-                    >
-                      {gameState.lightTeamName} Şef
-                    </Button>
-                    <Button
-                      onClick={() => handleAddBot("light", "guesser")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-red-700/50 text-red-300 hover:bg-red-900/20"
-                      data-testid="button-add-bot-light-guesser"
-                    >
-                      {gameState.lightTeamName} Ajan
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
               {/* Game Settings - Codenames Style */}
               <div className="space-y-4">
                 {/* Timer Settings */}
@@ -618,6 +568,56 @@ export default function Lobby() {
                   </p>
                 </div>
               </div>
+              
+              {/* Bot Controls - Codenames Style */}
+              {currentPlayer?.isRoomOwner && (
+                <div className="backdrop-blur-lg bg-black/70 rounded-xl border border-red-900/40 shadow-2xl p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bot className="w-5 h-5 text-purple-400" />
+                    <h3 className="text-lg font-bold text-slate-100">Bot Yönetimi</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      onClick={() => handleAddBot("dark", "spymaster")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs border-blue-700/50 text-blue-300 hover:bg-blue-900/20"
+                      disabled={darkHasSpymaster}
+                      data-testid="button-add-bot-dark-spymaster"
+                    >
+                      {gameState.darkTeamName} Şef
+                    </Button>
+                    <Button
+                      onClick={() => handleAddBot("dark", "guesser")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs border-blue-700/50 text-blue-300 hover:bg-blue-900/20"
+                      data-testid="button-add-bot-dark-guesser"
+                    >
+                      {gameState.darkTeamName} Ajan
+                    </Button>
+                    <Button
+                      onClick={() => handleAddBot("light", "spymaster")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs border-red-700/50 text-red-300 hover:bg-red-900/20"
+                      disabled={lightHasSpymaster}
+                      data-testid="button-add-bot-light-spymaster"
+                    >
+                      {gameState.lightTeamName} Şef
+                    </Button>
+                    <Button
+                      onClick={() => handleAddBot("light", "guesser")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs border-red-700/50 text-red-300 hover:bg-red-900/20"
+                      data-testid="button-add-bot-light-guesser"
+                    >
+                      {gameState.lightTeamName} Ajan
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
