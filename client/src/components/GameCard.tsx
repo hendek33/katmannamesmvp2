@@ -133,7 +133,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         colors.bg,
         colors.shadow,
         !card.revealed && "cursor-pointer",
-        card.revealed && "cursor-pointer hover-shimmer",
+        card.revealed && "cursor-pointer",
         "ring-2 ring-black/20",
         card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
         isAssassinCard && gameEnded && "animate-assassin-reveal",
@@ -250,7 +250,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         <div 
           className="absolute inset-0 card-3d-container"
           style={{
-            zIndex: 15
+            zIndex: isLifted ? 999 : 15
           }}
         >
           <div 
