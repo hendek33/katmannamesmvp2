@@ -4,17 +4,19 @@ import { cn } from "@/lib/utils";
 interface AssassinVideoProps {
   winnerTeam: "dark" | "light";
   winnerTeamName: string;
+  loserTeamName: string;
   startX?: number;
   startY?: number;
   onComplete?: () => void;
 }
 
-export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: AssassinVideoProps) {
+export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onComplete }: AssassinVideoProps) {
   const [show, setShow] = useState(true);
   const [showFlash, setShowFlash] = useState(false);
+  const [showLoserText, setShowLoserText] = useState(false);
   const [showWinnerText, setShowWinnerText] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [fadeOutWinner, setFadeOutWinner] = useState(false);
+  const [fadeOutAll, setFadeOutAll] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -39,21 +41,28 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
     setShowFlash(true);
     setTimeout(() => {
       setShowFlash(false);
-      // Start closing animation and show winner text
+      // Start closing animation and show loser text first
       setIsClosing(true);
-      setShowWinnerText(true);
-      // Fade out after 4 seconds
+      setShowLoserText(true);
+      
+      // After 2 seconds, hide loser text and show winner text
       setTimeout(() => {
-        setFadeOutWinner(true);
-        // Complete after fade out
+        setShowLoserText(false);
+        setShowWinnerText(true);
+        
+        // Fade out everything after 3 more seconds
         setTimeout(() => {
-          onComplete?.();
-        }, 800);
-      }, 4000);
+          setFadeOutAll(true);
+          // Complete after fade out
+          setTimeout(() => {
+            onComplete?.();
+          }, 800);
+        }, 3000);
+      }, 2000);
     }, 300);
   };
 
-  if (!show && !showWinnerText) return null;
+  if (!show && !showLoserText && !showWinnerText) return null;
 
   return (
     <>
@@ -67,12 +76,12 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
         />
       )}
       
-      {/* Dark overlay - persists until winner text fades */}
-      {(show || showWinnerText) && (
+      {/* Dark overlay - persists until everything fades */}
+      {(show || showLoserText || showWinnerText) && (
         <div 
           className="fixed inset-0 z-[99] bg-black/95 backdrop-blur-sm pointer-events-none"
           style={{
-            animation: fadeOutWinner 
+            animation: fadeOutAll 
               ? 'fadeOut 0.8s ease-out forwards'
               : 'fadeIn 0.5s ease-in-out forwards',
           }}
@@ -92,14 +101,14 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
           >
             {/* Glow effect */}
             <div 
-              className="absolute -inset-8 rounded-full blur-3xl opacity-80 animate-pulse bg-purple-600"
+              className="absolute -inset-12 rounded-full blur-3xl opacity-80 animate-pulse bg-purple-600"
             />
             
-            {/* Video in circular frame */}
+            {/* Video in circular frame - BIGGER SIZE */}
             <div 
-              className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden border-4 shadow-2xl border-purple-600"
+              className="relative w-96 h-96 md:w-[32rem] md:h-[32rem] rounded-full overflow-hidden border-4 shadow-2xl border-purple-600"
               style={{
-                boxShadow: '0 0 100px rgba(147,51,234,0.8), inset 0 0 50px rgba(147,51,234,0.4)'
+                boxShadow: '0 0 120px rgba(147,51,234,0.8), inset 0 0 80px rgba(147,51,234,0.4)'
               }}
             >
               <video
@@ -141,12 +150,49 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
         </div>
       )}
       
+      {/* Loser text - who found the assassin */}
+      {showLoserText && (
+        <div 
+          className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none"
+          style={{
+            animation: fadeOutAll 
+              ? 'fadeOut 0.5s ease-out forwards'
+              : 'fadeIn 0.5s ease-in forwards'
+          }}
+        >
+          <div className="text-center">
+            <div 
+              className="text-5xl md:text-7xl font-black mb-4"
+              style={{
+                color: winnerTeam === "dark" ? '#ef4444' : '#3b82f6',
+                textShadow: winnerTeam === "dark" 
+                  ? '0 0 60px rgba(239,68,68,0.9), 0 0 120px rgba(239,68,68,0.6)' 
+                  : '0 0 60px rgba(59,130,246,0.9), 0 0 120px rgba(59,130,246,0.6)',
+                animation: 'assassinPulse 1s ease-in-out infinite'
+              }}
+            >
+              {loserTeamName}
+            </div>
+            <div 
+              className="text-3xl md:text-5xl font-bold text-purple-400"
+              style={{
+                textShadow: '0 2px 20px rgba(147,51,234,0.8)',
+                animation: 'fadeInUp 0.8s ease-out forwards 0.3s',
+                opacity: 0
+              }}
+            >
+              Siyah Kelimeyi Buldu!
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Winner text */}
       {showWinnerText && (
         <div 
           className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none"
           style={{
-            animation: fadeOutWinner 
+            animation: fadeOutAll 
               ? 'fadeOut 0.8s ease-out forwards'
               : 'fadeIn 0.5s ease-in forwards'
           }}
@@ -234,6 +280,17 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
           }
           50% {
             transform: scale(1.05);
+          }
+        }
+        
+        @keyframes assassinPulse {
+          0%, 100% {
+            transform: scale(1);
+            filter: brightness(1);
+          }
+          50% {
+            transform: scale(1.03);
+            filter: brightness(1.2);
           }
         }
         
