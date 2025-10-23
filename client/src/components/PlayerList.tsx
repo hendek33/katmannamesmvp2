@@ -64,11 +64,11 @@ export function PlayerList({
     const needsSpymaster = teamPlayers.length > 0 && !hasSpymaster;
     
     return (
-    <div className={`relative backdrop-blur-xl bg-slate-900/40 rounded-xl border transition-all ${
+    <div className={`relative backdrop-blur-sm bg-white/80 rounded-xl border transition-all shadow-lg ${
       team === "dark" 
-        ? "border-blue-800/50 hover:border-blue-700/70" 
-        : "border-red-800/50 hover:border-red-700/70"
-    } ${needsSpymaster && isLobby ? "ring-2 ring-amber-500/30" : ""} p-4`}>
+        ? "border-blue-200 hover:border-blue-300" 
+        : "border-red-200 hover:border-red-300"
+    } ${needsSpymaster && isLobby ? "ring-2 ring-amber-400" : ""} p-4`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-1">
           <div className={`w-3 h-3 rounded-full ${gradient}`} />
@@ -97,7 +97,7 @@ export function PlayerList({
             <>
               {isLobby && onTeamNameChange && (title === "Mavi Takım" || title === "Kırmızı Takım") ? (
                 <button
-                  className="text-sm sm:text-base text-slate-400 italic hover:text-white transition-colors cursor-pointer"
+                  className="text-sm sm:text-base text-slate-500 italic hover:text-slate-800 transition-colors cursor-pointer"
                   onClick={() => {
                     setEditedName("");
                     setIsEditing(true);
@@ -106,7 +106,7 @@ export function PlayerList({
                   Takım ismi belirle
                 </button>
               ) : (
-                <h3 className="font-bold text-sm sm:text-base">{title}</h3>
+                <h3 className="font-bold text-sm sm:text-base text-slate-900">{title}</h3>
               )}
               {isLobby && onTeamNameChange && !(title === "Mavi Takım" || title === "Kırmızı Takım") && (
                 <Button
@@ -264,8 +264,8 @@ export function PlayerList({
       <div className="flex-1 overflow-y-auto space-y-2">
 
       {noTeam.length > 0 && (
-        <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border-2 border-dashed border-amber-500/30 p-4 space-y-2">
-          <h3 className="font-bold text-sm text-amber-400">Takım Seçilmemiş ({noTeam.length})</h3>
+        <div className="backdrop-blur-sm bg-amber-50 rounded-xl border-2 border-dashed border-amber-300 p-4 space-y-2">
+          <h3 className="font-bold text-sm text-amber-700">Takım Seçilmemiş ({noTeam.length})</h3>
           <div className="space-y-1">
             {noTeam.map(player => (
               <div 

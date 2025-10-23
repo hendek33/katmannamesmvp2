@@ -212,16 +212,16 @@ export default function Lobby() {
   const playerCount = gameState.players.length;
 
   return (
-    <div className="h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 relative overflow-hidden flex flex-col">
+    <div className="h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden flex flex-col">
       {/* Animated Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center opacity-30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/50" />
+        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-white/30" />
       </div>
       
       {/* Ambient Light Effects */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/30 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
       
       {/* Minimal Particles */}
       {[...Array(8)].map((_, i) => (
@@ -229,24 +229,24 @@ export default function Lobby() {
       ))}
       
       {/* Modern Header Bar */}
-      <header className="relative z-20 backdrop-blur-xl bg-slate-950/40 border-b border-slate-800/50">
+      <header className="relative z-20 backdrop-blur-md bg-white/70 border-b border-slate-200">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Left Section - Status */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-green-500 blur-md opacity-50" />
-                  <div className="relative px-3 py-1.5 bg-green-500/20 border border-green-500/50 rounded-full">
+                  <div className="absolute inset-0 bg-green-500 blur-md opacity-30" />
+                  <div className="relative px-3 py-1.5 bg-green-500/10 border border-green-500/30 rounded-full">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-sm font-medium text-green-400">Lobide</span>
+                      <span className="text-sm font-semibold text-green-600">Lobide</span>
                     </div>
                   </div>
                 </div>
-                <div className="text-sm text-slate-300 font-medium">
-                  <Users className="inline w-4 h-4 mr-1.5 text-slate-500" />
-                  <span className="text-white">{playerCount}</span> Oyuncu
+                <div className="text-sm text-slate-600 font-medium">
+                  <Users className="inline w-4 h-4 mr-1.5 text-slate-400" />
+                  <span className="text-slate-800">{playerCount}</span> Oyuncu
                 </div>
               </div>
             </div>
@@ -254,18 +254,18 @@ export default function Lobby() {
             {/* Center Section - Room Code */}
             <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:block">
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity" />
-                <div className="relative flex items-center gap-3 px-6 py-2.5 bg-slate-900/80 backdrop-blur-xl rounded-xl border border-slate-700/50">
-                  <span className="text-sm text-slate-400">Oda:</span>
-                  <span className="text-xl font-bold font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400" data-testid="room-code">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl blur opacity-20 group-hover:opacity-30 transition-opacity" />
+                <div className="relative flex items-center gap-3 px-6 py-2.5 bg-white/90 backdrop-blur-md rounded-xl border border-slate-200 shadow-lg">
+                  <span className="text-sm text-slate-600 font-medium">Oda:</span>
+                  <span className="text-xl font-bold font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" data-testid="room-code">
                     {showRoomCode ? roomCode : "••••••"}
                   </span>
-                  <div className="flex items-center gap-1 ml-2 border-l border-slate-700 pl-2">
+                  <div className="flex items-center gap-1 ml-2 border-l border-slate-300 pl-2">
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => setShowRoomCode(!showRoomCode)}
-                      className="h-7 w-7 p-0 hover:bg-slate-800"
+                      className="h-7 w-7 p-0 hover:bg-slate-100 text-slate-600"
                     >
                       {showRoomCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </Button>
@@ -273,9 +273,9 @@ export default function Lobby() {
                       size="sm"
                       variant="ghost"
                       onClick={handleCopyRoomCode}
-                      className="h-7 w-7 p-0 hover:bg-slate-800"
+                      className="h-7 w-7 p-0 hover:bg-slate-100 text-slate-600"
                     >
-                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                      {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>
@@ -284,14 +284,14 @@ export default function Lobby() {
             
             {/* Mobile Room Code */}
             <div className="md:hidden flex items-center gap-2">
-              <span className="text-sm font-mono font-bold text-white" data-testid="room-code-mobile">
+              <span className="text-sm font-mono font-bold text-slate-800" data-testid="room-code-mobile">
                 {showRoomCode ? roomCode : "••••"}
               </span>
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => setShowRoomCode(!showRoomCode)}
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 text-slate-600"
               >
                 {showRoomCode ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
               </Button>
@@ -307,7 +307,7 @@ export default function Lobby() {
                 localStorage.removeItem("katmannames_player_id");
                 setLocation("/rooms");
               }}
-              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200"
               data-testid="button-leave-room"
             >
               <LogOut className="w-4 h-4 mr-2" />
@@ -325,29 +325,29 @@ export default function Lobby() {
             <div className="lg:col-span-8 flex flex-col gap-4 overflow-hidden">
               {/* Mission Briefing */}
               {currentPlayer && (
-                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-4">
+                <div className="backdrop-blur-sm bg-white/80 rounded-xl border border-slate-200 shadow-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 blur-md opacity-50" />
-                        <div className="relative w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 blur-md opacity-30" />
+                        <div className="relative w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center shadow-md">
                           <User className="w-5 h-5 text-white" />
                         </div>
                       </div>
                       <div className="flex-1">
                         <div className="flex items-start gap-4">
                           <div>
-                            <p className="text-sm text-slate-400">Hoş geldin</p>
-                            <p className="text-lg font-bold text-white">{currentPlayer.username}</p>
+                            <p className="text-sm text-slate-600">Hoş geldin</p>
+                            <p className="text-lg font-bold text-slate-900">{currentPlayer.username}</p>
                           </div>
                           {/* Developer Note */}
                           <div className="flex-1 max-w-xs">
-                            <div className="text-xs text-amber-400/70 space-y-0.5">
+                            <div className="text-xs text-amber-600 space-y-0.5">
                               <div className="font-medium flex items-center gap-1">
                                 <Zap className="w-3 h-3" />
                                 Geliştiriciden not:
                               </div>
-                              <div className="italic text-amber-400/50">
+                              <div className="italic text-amber-700/70">
                                 Çağrı abi Mavi takım olmanız gerekiyor, kusuruma bakmayın 😔
                               </div>
                             </div>
@@ -357,18 +357,18 @@ export default function Lobby() {
                     </div>
                     {currentPlayer.team && (
                       <div className="flex items-center gap-2">
-                        <div className={`px-3 py-1.5 rounded-lg ${
+                        <div className={`px-3 py-1.5 rounded-lg font-medium ${
                           currentPlayer.team === "dark" 
-                            ? "bg-blue-500/20 border border-blue-500/50 text-blue-400"
-                            : "bg-red-500/20 border border-red-500/50 text-red-400"
+                            ? "bg-blue-100 border border-blue-300 text-blue-700"
+                            : "bg-red-100 border border-red-300 text-red-700"
                         }`}>
-                          <span className="text-sm font-medium">
+                          <span className="text-sm">
                             {currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
                           </span>
                         </div>
                         {currentPlayer.role === "spymaster" && (
-                          <div className="px-3 py-1.5 bg-amber-500/20 border border-amber-500/50 rounded-lg">
-                            <Shield className="w-4 h-4 text-amber-400" />
+                          <div className="px-3 py-1.5 bg-amber-100 border border-amber-300 rounded-lg">
+                            <Shield className="w-4 h-4 text-amber-700" />
                           </div>
                         )}
                       </div>
@@ -396,44 +396,44 @@ export default function Lobby() {
             {/* Right Panel - Control Console (4 cols on lg) */}
             <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto">
               {/* Game Start Panel */}
-              <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-6">
+              <div className="backdrop-blur-sm bg-white/80 rounded-xl border border-slate-200 shadow-lg p-6">
                 <div className="space-y-4">
                   {/* Status Indicator */}
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-white">Oyun Durumu</h3>
+                    <h3 className="text-lg font-bold text-slate-900">Oyun Durumu</h3>
                     {canStartGame ? (
-                      <div className="flex items-center gap-2 text-green-400">
+                      <div className="flex items-center gap-2 text-green-600">
                         <CheckCircle2 className="w-5 h-5" />
-                        <span className="text-sm font-medium">Hazır</span>
+                        <span className="text-sm font-semibold">Hazır</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 text-amber-400">
+                      <div className="flex items-center gap-2 text-amber-600">
                         <AlertCircle className="w-5 h-5" />
-                        <span className="text-sm font-medium">Bekliyor</span>
+                        <span className="text-sm font-semibold">Bekliyor</span>
                       </div>
                     )}
                   </div>
                   
                   {/* Requirements Checklist */}
                   <div className="space-y-2">
-                    <div className={`flex items-center gap-2 text-sm ${darkHasSpymaster ? 'text-green-400' : 'text-slate-500'}`}>
-                      {darkHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                    <div className={`flex items-center gap-2 text-sm font-medium ${darkHasSpymaster ? 'text-green-600' : 'text-slate-400'}`}>
+                      {darkHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
                       <span>{gameState.darkTeamName} İstihbarat Şefi</span>
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${lightHasSpymaster ? 'text-green-400' : 'text-slate-500'}`}>
-                      {lightHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                    <div className={`flex items-center gap-2 text-sm font-medium ${lightHasSpymaster ? 'text-green-600' : 'text-slate-400'}`}>
+                      {lightHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
                       <span>{gameState.lightTeamName} İstihbarat Şefi</span>
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${darkTeam.length >= 2 ? 'text-green-400' : 'text-slate-500'}`}>
-                      {darkTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                    <div className={`flex items-center gap-2 text-sm font-medium ${darkTeam.length >= 2 ? 'text-green-600' : 'text-slate-400'}`}>
+                      {darkTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
                       <span>{gameState.darkTeamName}: {darkTeam.length}/2+ Oyuncu</span>
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${lightTeam.length >= 2 ? 'text-green-400' : 'text-slate-500'}`}>
-                      {lightTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                    <div className={`flex items-center gap-2 text-sm font-medium ${lightTeam.length >= 2 ? 'text-green-600' : 'text-slate-400'}`}>
+                      {lightTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
                       <span>{gameState.lightTeamName}: {lightTeam.length}/2+ Oyuncu</span>
                     </div>
-                    <div className={`flex items-center gap-2 text-sm ${noTeam.length === 0 ? 'text-green-400' : 'text-slate-500'}`}>
-                      {noTeam.length === 0 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                    <div className={`flex items-center gap-2 text-sm font-medium ${noTeam.length === 0 ? 'text-green-600' : 'text-slate-400'}`}>
+                      {noTeam.length === 0 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-300" />}
                       <span>Tüm oyuncular takım seçti</span>
                     </div>
                   </div>
@@ -459,10 +459,10 @@ export default function Lobby() {
               
               {/* Bot Controls */}
               {currentPlayer?.isRoomOwner && (
-                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-6">
+                <div className="backdrop-blur-sm bg-white/80 rounded-xl border border-slate-200 shadow-lg p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <Bot className="w-5 h-5 text-purple-400" />
-                    <h3 className="text-lg font-bold text-white">Bot Yönetimi</h3>
+                    <Bot className="w-5 h-5 text-purple-600" />
+                    <h3 className="text-lg font-bold text-slate-900">Bot Yönetimi</h3>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
@@ -510,11 +510,11 @@ export default function Lobby() {
               {/* Game Settings */}
               <div className="space-y-4">
                 {/* Timer Settings */}
-                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-purple-800/30 p-4">
+                <div className="backdrop-blur-sm bg-white/80 rounded-xl border border-purple-200 shadow-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Timer className="w-5 h-5 text-purple-400" />
-                      <h3 className="text-base font-bold text-white">Zamanlayıcı</h3>
+                      <Timer className="w-5 h-5 text-purple-600" />
+                      <h3 className="text-base font-bold text-slate-900">Zamanlayıcı</h3>
                     </div>
                     <Switch
                       checked={timedMode}
@@ -533,8 +533,8 @@ export default function Lobby() {
                     <div className="space-y-3">
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <Label className="text-xs text-slate-400">Şef Süresi</Label>
-                          <span className="text-xs font-mono text-purple-400">
+                          <Label className="text-xs text-slate-600">Şef Süresi</Label>
+                          <span className="text-xs font-mono text-purple-600">
                             {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}
                           </span>
                         </div>
@@ -560,8 +560,8 @@ export default function Lobby() {
                       </div>
                       <div>
                         <div className="flex justify-between items-center mb-1">
-                          <Label className="text-xs text-slate-400">Ajan Süresi</Label>
-                          <span className="text-xs font-mono text-purple-400">
+                          <Label className="text-xs text-slate-600">Ajan Süresi</Label>
+                          <span className="text-xs font-mono text-purple-600">
                             {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}
                           </span>
                         </div>
@@ -590,11 +590,11 @@ export default function Lobby() {
                 </div>
                 
                 {/* Chaos Mode */}
-                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-gray-800/30 p-4 opacity-60">
+                <div className="backdrop-blur-sm bg-gray-100 rounded-xl border border-gray-300 p-4 opacity-60">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-gray-500" />
-                      <h3 className="text-base font-bold text-gray-400">KAOS MODU</h3>
+                      <h3 className="text-base font-bold text-gray-600">KAOS MODU</h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
                         className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
