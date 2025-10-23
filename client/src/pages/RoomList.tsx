@@ -130,12 +130,9 @@ export default function RoomList() {
                   >
                     <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                        <div className="text-xl sm:text-2xl font-bold text-orange-400">
-                          {room.roomCode}
-                        </div>
-                        <div className="flex items-center gap-1 text-slate-300 text-sm">
-                          <Users className="w-4 h-4" />
-                          <span>{room.playerCount}</span>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <Users className="w-4 h-4 text-orange-400" />
+                          <span className="text-lg font-semibold text-white">{room.playerCount} Oyuncu</span>
                         </div>
                         {room.hasPassword && (
                           <div className="flex items-center gap-1 text-yellow-400">
