@@ -153,28 +153,6 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
             />
           </div>
         </div>
-
-        {/* Decorative particles - only show when video is ready */}
-        {videoReady && (
-          <div className="absolute inset-0 pointer-events-none">
-            {[...Array(15)].map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "absolute w-2 h-2 rounded-full",
-                  team === "dark" ? "bg-blue-400" : "bg-red-400"
-                )}
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  opacity: 0.6
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
       
       <style>{`
@@ -229,21 +207,6 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
           to {
             opacity: 0;
             transform: translateY(-20px);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px) translateX(0px);
-          }
-          25% {
-            transform: translateY(-20px) translateX(10px);
-          }
-          50% {
-            transform: translateY(10px) translateX(-10px);
-          }
-          75% {
-            transform: translateY(-10px) translateX(20px);
           }
         }
       `}</style>
