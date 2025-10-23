@@ -201,28 +201,35 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         </div>
       )}
       
-      {/* Revealed card overlay - drops in after image loads */}
+      {/* Revealed card overlay with 3D container - drops in after image loads */}
       {card.revealed && imageLoaded && revealedImage && (
         <div 
-          className={cn(
-            "absolute cursor-pointer animate-card-drop rounded-lg",
-            isLifted ? "card-lifted" : "card-not-lifted"
-          )}
-          onClick={() => setIsLifted(!isLifted)}
-          title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
+          className="absolute inset-0 card-3d-container"
           style={{
-            top: card.type === 'assassin' ? '0px' : '-4px',
-            left: card.type === 'assassin' ? '0px' : '-4px',
-            right: card.type === 'assassin' ? '0px' : '-4px', 
-            bottom: card.type === 'assassin' ? '0px' : '-4px',
-            backgroundImage: `url('${revealedImage}')`,
-            backgroundSize: card.type === 'assassin' ? 'contain' : 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            zIndex: (4 - rowIndex) * 10 + (isLifted ? 100 : 20),
-            boxShadow: isLifted ? '0 25px 50px rgba(0,0,0,0.6)' : '0 4px 8px rgba(0,0,0,0.3)'
+            zIndex: 15
           }}
-        />
+        >
+          <div 
+            className={cn(
+              "absolute cursor-pointer animate-card-drop rounded-lg",
+              isLifted ? "card-lifted" : "card-not-lifted"
+            )}
+            onClick={() => setIsLifted(!isLifted)}
+            title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
+            style={{
+              top: card.type === 'assassin' ? '0px' : '-4px',
+              left: card.type === 'assassin' ? '0px' : '-4px',
+              right: card.type === 'assassin' ? '0px' : '-4px', 
+              bottom: card.type === 'assassin' ? '0px' : '-4px',
+              backgroundImage: `url('${revealedImage}')`,
+              backgroundSize: card.type === 'assassin' ? 'contain' : 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              boxShadow: isLifted ? '0 30px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.4)' : '0 4px 8px rgba(0,0,0,0.3)',
+              pointerEvents: 'auto'
+            }}
+          />
+        </div>
       )}
       
       {/* Reveal button in top-left corner */}
