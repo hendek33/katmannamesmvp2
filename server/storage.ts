@@ -89,7 +89,7 @@ export class MemStorage implements IStorage {
         '/acilmiskartgorsel/çağrı sigara beyaz.png',
         '/acilmiskartgorsel/şinasi su beyaz.png'  // 7 total neutral cards!
       ],
-      assassin: ['/acilmiskartgorsel/arda siyah.png']
+      assassin: ['/ajan siyah.png']
     };
 
     // Shuffle each pool
