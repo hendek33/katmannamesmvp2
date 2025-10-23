@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { videoCache } from "@/services/VideoCache";
 
 interface TurnVideoProps {
   team: "dark" | "light";
@@ -15,6 +16,7 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
+  const playPromiseRef = useRef<Promise<void> | null>(null);
 
   const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
@@ -23,30 +25,57 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   useEffect(() => {
     let mounted = true;
     
-    // Try to play video when component mounts
-    const tryPlayVideo = async () => {
+    // Play video with robust retry mechanism
+    const playVideoWithRetry = async () => {
       if (!videoRef.current || !mounted) return;
       
-      try {
-        await videoRef.current.play();
-      } catch (error) {
-        console.error('Video autoplay failed, retrying:', error);
-        // Try again after a short delay
-        setTimeout(async () => {
-          if (videoRef.current && mounted) {
-            try {
-              videoRef.current.muted = true;
-              await videoRef.current.play();
-            } catch (retryError) {
-              console.error('Video retry failed:', retryError);
-            }
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries && mounted) {
+        try {
+          // Ensure video is ready
+          if (videoRef.current.readyState < 2) {
+            await new Promise(resolve => {
+              const checkReady = () => {
+                if (!videoRef.current || !mounted) {
+                  resolve(undefined);
+                  return;
+                }
+                if (videoRef.current.readyState >= 2) {
+                  resolve(undefined);
+                } else {
+                  setTimeout(checkReady, 50);
+                }
+              };
+              checkReady();
+            });
           }
-        }, 100);
+          
+          // Try to play
+          videoRef.current.muted = true;
+          playPromiseRef.current = videoRef.current.play();
+          await playPromiseRef.current;
+          playPromiseRef.current = null;
+          console.log('Video playing successfully');
+          break;
+        } catch (error) {
+          retryCount++;
+          console.error(`Video play attempt ${retryCount} failed:`, error);
+          
+          if (retryCount < maxRetries && mounted) {
+            await new Promise(resolve => setTimeout(resolve, 200 * retryCount));
+          } else {
+            // If all retries fail, continue without video
+            console.error('All video play attempts failed');
+            handleVideoEnd();
+          }
+        }
       }
     };
     
     // Start playing video
-    tryPlayVideo();
+    playVideoWithRetry();
     
     // Auto hide after 4 seconds
     const timer = setTimeout(() => {
@@ -67,14 +96,17 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
       mounted = false;
       // Clear all timers on unmount
       timersRef.current.forEach(t => clearTimeout(t));
+      // Cancel any pending play promise
+      if (playPromiseRef.current) {
+        playPromiseRef.current.catch(() => {});
+      }
       // Cleanup video
       if (videoRef.current) {
         videoRef.current.pause();
-        videoRef.current.src = '';
-        videoRef.current.load();
+        videoRef.current.currentTime = 0;
       }
     };
-  }, [onComplete]);
+  }, []);
 
   const handleVideoEnd = () => {
     // Only handle video end if we haven't already started closing
