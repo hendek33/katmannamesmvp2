@@ -89,17 +89,23 @@ function TauntVideo({ taunt, boardRect }: { taunt: TauntData; boardRect: DOMRect
         animation: 'tauntFadeInOut 3s ease-in-out forwards'
       }}
     >
-      {/* Player name above video */}
+      {/* Player name above video - Enhanced visibility */}
       <div 
         className={cn(
-          "absolute -top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap",
-          "text-sm font-bold px-2 py-1 rounded",
-          taunt.team === "dark" ? "text-blue-400" : "text-red-400"
+          "absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap",
+          "text-base font-black px-3 py-1.5 rounded-lg",
+          "backdrop-blur-md border",
+          taunt.team === "dark" 
+            ? "bg-blue-900/80 text-blue-100 border-blue-500/50" 
+            : "bg-red-900/80 text-red-100 border-red-500/50"
         )}
         style={{
           textShadow: taunt.team === "dark" 
-            ? '0 0 10px rgba(59,130,246,0.8)' 
-            : '0 0 10px rgba(239,68,68,0.8)'
+            ? '0 0 15px rgba(59,130,246,1), 0 2px 4px rgba(0,0,0,0.8)' 
+            : '0 0 15px rgba(239,68,68,1), 0 2px 4px rgba(0,0,0,0.8)',
+          boxShadow: taunt.team === "dark"
+            ? '0 4px 12px rgba(59,130,246,0.5), 0 0 20px rgba(59,130,246,0.3)'
+            : '0 4px 12px rgba(239,68,68,0.5), 0 0 20px rgba(239,68,68,0.3)'
         }}
       >
         {taunt.username}
