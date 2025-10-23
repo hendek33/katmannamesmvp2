@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
-import { useVideoPreloader } from "@/hooks/useVideoPreloader";
+import { VideoProvider } from "@/contexts/VideoContext";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
@@ -13,14 +13,6 @@ import GameEnd from "@/pages/GameEnd";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  // Preload videos in background
-  const videoStatus = useVideoPreloader();
-  
-  // Log preload status for debugging
-  if (videoStatus.error) {
-    console.warn("Bazı videolar yüklenemedi, ancak uygulama devam ediyor");
-  }
-  
   return (
     <Switch>
       <Route path="/" component={Welcome} />
@@ -36,12 +28,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <WebSocketProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </WebSocketProvider>
+      <VideoProvider>
+        <WebSocketProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </WebSocketProvider>
+      </VideoProvider>
     </QueryClientProvider>
   );
 }

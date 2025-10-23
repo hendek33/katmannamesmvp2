@@ -1,21 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface VideoPreloadStatus {
   isLoading: boolean;
   loaded: number;
   total: number;
   error: boolean;
+  videoBlobUrls: Map<string, string>;
 }
+
+// Global cache for blob URLs to persist across component remounts
+const globalVideoBlobCache = new Map<string, string>();
+let isPreloading = false;
 
 export function useVideoPreloader() {
   const [status, setStatus] = useState<VideoPreloadStatus>({
-    isLoading: true,
-    loaded: 0,
-    total: 0,
-    error: false
+    isLoading: !globalVideoBlobCache.size, // Not loading if already cached
+    loaded: globalVideoBlobCache.size,
+    total: 5,
+    error: false,
+    videoBlobUrls: globalVideoBlobCache
   });
+  
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    // If videos already preloaded, skip
+    if (globalVideoBlobCache.size >= 5 || isPreloading) {
+      setStatus({
+        isLoading: false,
+        loaded: globalVideoBlobCache.size,
+        total: 5,
+        error: false,
+        videoBlobUrls: globalVideoBlobCache
+      });
+      return;
+    }
+
+    isPreloading = true;
+    
     const videoPaths = [
       '/mavi takım video tur.mp4',
       '/kırmızı takım video tur.mp4',
@@ -24,72 +46,110 @@ export function useVideoPreloader() {
       '/kırmızı takım normal kazanma.mp4'
     ];
 
-    setStatus(prev => ({ ...prev, total: videoPaths.length }));
+    setStatus(prev => ({ ...prev, total: videoPaths.length, isLoading: true }));
 
-    const preloadVideo = (src: string): Promise<void> => {
-      return new Promise((resolve, reject) => {
+    const preloadVideo = async (src: string): Promise<void> => {
+      try {
+        // Check if already cached
+        if (globalVideoBlobCache.has(src)) {
+          setStatus(prev => ({ ...prev, loaded: prev.loaded + 1 }));
+          return;
+        }
+
+        // Fetch video as blob
+        const response = await fetch(src);
+        if (!response.ok) throw new Error(`Failed to fetch ${src}`);
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
+        // Test that video can actually play
         const video = document.createElement('video');
-        video.src = src;
-        video.preload = 'auto';
+        video.src = blobUrl;
         video.muted = true;
         
-        // Create a hidden video element
-        video.style.position = 'absolute';
-        video.style.visibility = 'hidden';
-        video.style.width = '1px';
-        video.style.height = '1px';
-        
-        const handleCanPlay = () => {
-          cleanup();
-          setStatus(prev => ({ ...prev, loaded: prev.loaded + 1 }));
-          resolve();
-        };
-        
-        const handleError = () => {
-          console.error('Video preload failed:', src);
-          cleanup();
-          setStatus(prev => ({ ...prev, loaded: prev.loaded + 1, error: true }));
-          resolve(); // Continue even on error
-        };
-
-        const cleanup = () => {
-          video.removeEventListener('canplaythrough', handleCanPlay);
-          video.removeEventListener('error', handleError);
-          // Clean up the video element
-          video.src = '';
+        await new Promise((resolve, reject) => {
+          const handleCanPlay = () => {
+            // Store in global cache
+            globalVideoBlobCache.set(src, blobUrl);
+            video.removeEventListener('canplaythrough', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            resolve(undefined);
+          };
+          
+          const handleError = () => {
+            URL.revokeObjectURL(blobUrl);
+            video.removeEventListener('canplaythrough', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            reject(new Error(`Video cannot play: ${src}`));
+          };
+          
+          video.addEventListener('canplaythrough', handleCanPlay);
+          video.addEventListener('error', handleError);
           video.load();
-        };
-
-        video.addEventListener('canplaythrough', handleCanPlay);
-        video.addEventListener('error', handleError);
+          
+          // Timeout after 15 seconds
+          setTimeout(() => {
+            handleError();
+          }, 15000);
+        });
         
-        // Start loading
-        video.load();
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            loaded: prev.loaded + 1,
+            videoBlobUrls: globalVideoBlobCache
+          }));
+        }
         
-        // Timeout after 10 seconds
-        setTimeout(() => {
-          cleanup();
-          resolve();
-        }, 10000);
-      });
+      } catch (error) {
+        console.error('Video preload failed:', src, error);
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            loaded: prev.loaded + 1, 
+            error: true 
+          }));
+        }
+      }
     };
 
     const preloadAll = async () => {
       try {
-        // Preload videos in parallel but limit to 2 at a time to prevent overload
-        for (let i = 0; i < videoPaths.length; i += 2) {
-          const batch = videoPaths.slice(i, i + 2);
-          await Promise.all(batch.map(preloadVideo));
-        }
+        // Load first 2 videos with high priority
+        const priorityVideos = videoPaths.slice(0, 2);
+        await Promise.all(priorityVideos.map(preloadVideo));
         
-        setStatus(prev => ({ ...prev, isLoading: false }));
+        // Then load the rest
+        const remainingVideos = videoPaths.slice(2);
+        await Promise.all(remainingVideos.map(preloadVideo));
+        
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            videoBlobUrls: globalVideoBlobCache
+          }));
+        }
       } catch (error) {
         console.error('Video preloading error:', error);
-        setStatus(prev => ({ ...prev, isLoading: false, error: true }));
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            isLoading: false, 
+            error: true 
+          }));
+        }
+      } finally {
+        isPreloading = false;
       }
     };
 
     preloadAll();
+    
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   return status;

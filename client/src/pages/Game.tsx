@@ -8,6 +8,7 @@ import { PlayerList } from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { GameTimer } from "@/components/GameTimer";
+import { VideoPreloadIndicator } from "@/components/VideoPreloadIndicator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -1552,6 +1553,9 @@ export default function Game() {
         </div>
         </div>
       </div>
+      
+      {/* Video Preload Indicator */}
+      <VideoPreloadIndicator />
     </div>
   );
 }
