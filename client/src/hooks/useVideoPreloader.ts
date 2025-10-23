@@ -1,26 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface VideoPreloadStatus {
   isLoading: boolean;
   loaded: number;
   total: number;
   error: boolean;
-  preloadedVideos: Set<string>;
+  videoBlobUrls: Map<string, string>;
 }
 
-// Global cache to track which videos have been preloaded
-const globalPreloadedVideos = new Set<string>();
+// Global cache for blob URLs to persist across component remounts
+const globalVideoBlobCache = new Map<string, string>();
+let isPreloading = false;
 
 export function useVideoPreloader() {
   const [status, setStatus] = useState<VideoPreloadStatus>({
-    isLoading: false,
-    loaded: globalPreloadedVideos.size,
+    isLoading: !globalVideoBlobCache.size, // Not loading if already cached
+    loaded: globalVideoBlobCache.size,
     total: 5,
     error: false,
-    preloadedVideos: globalPreloadedVideos
+    videoBlobUrls: globalVideoBlobCache
   });
+  
+  const mountedRef = useRef(true);
 
   useEffect(() => {
+    // If videos already preloaded, skip
+    if (globalVideoBlobCache.size >= 5 || isPreloading) {
+      setStatus({
+        isLoading: false,
+        loaded: globalVideoBlobCache.size,
+        total: 5,
+        error: false,
+        videoBlobUrls: globalVideoBlobCache
+      });
+      return;
+    }
+
+    isPreloading = true;
+    
     const videoPaths = [
       '/mavi takım video tur.mp4',
       '/kırmızı takım video tur.mp4',
@@ -29,99 +46,110 @@ export function useVideoPreloader() {
       '/kırmızı takım normal kazanma.mp4'
     ];
 
-    // Check if already preloaded
-    if (globalPreloadedVideos.size >= videoPaths.length) {
-      setStatus({
-        isLoading: false,
-        loaded: videoPaths.length,
-        total: videoPaths.length,
-        error: false,
-        preloadedVideos: globalPreloadedVideos
-      });
-      return;
-    }
+    setStatus(prev => ({ ...prev, total: videoPaths.length, isLoading: true }));
 
-    setStatus(prev => ({ ...prev, isLoading: true }));
-
-    const preloadVideo = (src: string): Promise<void> => {
-      return new Promise((resolve) => {
-        // If already preloaded, resolve immediately
-        if (globalPreloadedVideos.has(src)) {
-          resolve();
+    const preloadVideo = async (src: string): Promise<void> => {
+      try {
+        // Check if already cached
+        if (globalVideoBlobCache.has(src)) {
+          setStatus(prev => ({ ...prev, loaded: prev.loaded + 1 }));
           return;
         }
 
-        // Create a hidden video element to preload
+        // Fetch video as blob
+        const response = await fetch(src);
+        if (!response.ok) throw new Error(`Failed to fetch ${src}`);
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
+        // Test that video can actually play
         const video = document.createElement('video');
-        video.src = src;
-        video.preload = 'auto';
+        video.src = blobUrl;
         video.muted = true;
-        video.style.position = 'fixed';
-        video.style.top = '-9999px';
-        video.style.left = '-9999px';
-        video.style.width = '1px';
-        video.style.height = '1px';
         
-        const handleLoad = () => {
-          globalPreloadedVideos.add(src);
-          setStatus(prev => ({ 
-            ...prev, 
-            loaded: prev.loaded + 1,
-            preloadedVideos: globalPreloadedVideos
-          }));
-          cleanup();
-          resolve();
-        };
-        
-        const handleError = () => {
-          console.warn('Video preload warning (will retry on play):', src);
-          // Still mark as "loaded" to not block the app
-          globalPreloadedVideos.add(src); 
-          setStatus(prev => ({ 
-            ...prev, 
-            loaded: prev.loaded + 1,
-            error: true,
-            preloadedVideos: globalPreloadedVideos
-          }));
-          cleanup();
-          resolve();
-        };
-
-        const cleanup = () => {
-          video.removeEventListener('canplaythrough', handleLoad);
-          video.removeEventListener('error', handleError);
-          if (video.parentNode) {
-            video.parentNode.removeChild(video);
-          }
-        };
-
-        video.addEventListener('canplaythrough', handleLoad);
-        video.addEventListener('error', handleError);
-        
-        // Add to DOM to trigger loading
-        document.body.appendChild(video);
-        
-        // Force load
-        video.load();
-        
-        // Timeout fallback
-        setTimeout(() => {
-          if (!globalPreloadedVideos.has(src)) {
+        await new Promise((resolve, reject) => {
+          const handleCanPlay = () => {
+            // Store in global cache
+            globalVideoBlobCache.set(src, blobUrl);
+            video.removeEventListener('canplaythrough', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            resolve(undefined);
+          };
+          
+          const handleError = () => {
+            URL.revokeObjectURL(blobUrl);
+            video.removeEventListener('canplaythrough', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            reject(new Error(`Video cannot play: ${src}`));
+          };
+          
+          video.addEventListener('canplaythrough', handleCanPlay);
+          video.addEventListener('error', handleError);
+          video.load();
+          
+          // Timeout after 15 seconds
+          setTimeout(() => {
             handleError();
-          }
-        }, 5000);
-      });
+          }, 15000);
+        });
+        
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            loaded: prev.loaded + 1,
+            videoBlobUrls: globalVideoBlobCache
+          }));
+        }
+        
+      } catch (error) {
+        console.error('Video preload failed:', src, error);
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            loaded: prev.loaded + 1, 
+            error: true 
+          }));
+        }
+      }
     };
 
-    // Preload all videos sequentially for better reliability
     const preloadAll = async () => {
-      for (const path of videoPaths) {
-        await preloadVideo(path);
+      try {
+        // Load first 2 videos with high priority
+        const priorityVideos = videoPaths.slice(0, 2);
+        await Promise.all(priorityVideos.map(preloadVideo));
+        
+        // Then load the rest
+        const remainingVideos = videoPaths.slice(2);
+        await Promise.all(remainingVideos.map(preloadVideo));
+        
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            isLoading: false,
+            videoBlobUrls: globalVideoBlobCache
+          }));
+        }
+      } catch (error) {
+        console.error('Video preloading error:', error);
+        if (mountedRef.current) {
+          setStatus(prev => ({ 
+            ...prev, 
+            isLoading: false, 
+            error: true 
+          }));
+        }
+      } finally {
+        isPreloading = false;
       }
-      setStatus(prev => ({ ...prev, isLoading: false }));
     };
 
     preloadAll();
+    
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   return status;
