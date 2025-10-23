@@ -781,14 +781,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            // Debug log to check payload in case block
-            console.log("[SEND_INSULT CASE] Payload:", payload);
-            console.log("[SEND_INSULT CASE] Payload targetId:", payload?.targetId);
+            // FIX: Properly extract targetId from payload
+            const targetIdFromPayload = payload && payload.targetId ? String(payload.targetId) : undefined;
+            console.log("[FIX] Original payload:", JSON.stringify(payload));
+            console.log("[FIX] Extracted targetId:", targetIdFromPayload);
             
-            // Pass targetId directly from payload
-            const targetId = payload?.targetId;
-            console.log("[SEND_INSULT CASE] Extracted targetId:", targetId);
-            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, targetId);
+            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, targetIdFromPayload);
             if (!insultData) {
               sendToClient(ws, { type: "error", payload: { message: "Laf sokma devre dışı veya cooldown'da" } });
               return;
