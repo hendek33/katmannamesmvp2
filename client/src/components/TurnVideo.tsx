@@ -10,6 +10,7 @@ interface TurnVideoProps {
 export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoSrc = team === "dark" 
@@ -19,28 +20,44 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
-    // Simple play logic
+    // Wait for video to be ready
     if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.error('Video play error:', err);
-      });
-    }
-    
-    // Auto hide after 2.5 seconds (reduced from 4)
-    timeoutId = setTimeout(() => {
-      setIsClosing(true);
-      setTimeout(() => {
-        setShow(false);
-        onComplete?.();
-      }, 500); // Reduced from 600
-    }, 2500); // Reduced from 4000
+      const video = videoRef.current;
+      
+      const handleCanPlay = () => {
+        setVideoReady(true);
+        video.play().catch(err => {
+          console.error('Video play error:', err);
+          // Still show animation even if video fails
+          setVideoReady(true);
+        });
+      };
+      
+      video.addEventListener('canplay', handleCanPlay);
+      
+      // Fallback if video takes too long
+      const fallbackTimeout = setTimeout(() => {
+        setVideoReady(true);
+      }, 500);
+      
+      // Auto hide after video starts playing
+      timeoutId = setTimeout(() => {
+        setIsClosing(true);
+        setTimeout(() => {
+          setShow(false);
+          onComplete?.();
+        }, 500);
+      }, 2800); // Total display time
 
-    return () => {
-      clearTimeout(timeoutId);
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
-    };
+      return () => {
+        clearTimeout(timeoutId);
+        clearTimeout(fallbackTimeout);
+        video.removeEventListener('canplay', handleCanPlay);
+        if (video) {
+          video.pause();
+        }
+      };
+    }
   }, [onComplete]);
 
   if (!show) return null;
@@ -56,41 +73,48 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
     >
       <div className="relative flex flex-col items-center">
         {/* Turn notification text - ABOVE video and CENTERED */}
-        <div 
-          className="mb-8 text-center"
-          style={{
-            animation: isClosing 
-              ? 'fadeOutUp 0.5s ease-out forwards'
-              : 'fadeInDown 0.6s ease-out forwards'
-          }}
-        >
-          <div className={cn(
-            "text-3xl md:text-4xl font-black tracking-wide",
-            team === "dark" ? "text-blue-400" : "text-red-400"
-          )}
-          style={{
-            textShadow: team === "dark" 
-              ? '0 2px 20px rgba(59,130,246,0.8)' 
-              : '0 2px 20px rgba(239,68,68,0.8)',
-          }}
+        {videoReady && (
+          <div 
+            className="mb-8 text-center"
+            style={{
+              animation: isClosing 
+                ? 'fadeOutUp 0.5s ease-out forwards'
+                : 'fadeInDown 0.6s ease-out forwards'
+            }}
           >
-            Sıra {teamName} Takımında
+            <div className={cn(
+              "text-3xl md:text-4xl font-black tracking-wide",
+              team === "dark" ? "text-blue-400" : "text-red-400"
+            )}
+            style={{
+              textShadow: team === "dark" 
+                ? '0 2px 20px rgba(59,130,246,0.8)' 
+                : '0 2px 20px rgba(239,68,68,0.8)',
+            }}
+            >
+              Sıra {teamName} Takımında
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Circular video container with glow */}
+        {/* Circular video container with glow - only show when video is ready */}
         <div 
           className="relative"
           style={{
-            animation: isClosing 
-              ? 'zoomOutRotate 0.5s ease-in forwards'
-              : 'zoomInRotate 0.8s ease-out forwards',
+            opacity: videoReady ? 1 : 0,
+            animation: videoReady
+              ? (isClosing 
+                ? 'zoomOutRotate 0.5s ease-in forwards'
+                : 'zoomInRotate 0.8s ease-out forwards')
+              : 'none',
+            transition: 'opacity 0.3s ease-in-out'
           }}
         >
           {/* Glow effect */}
           <div 
             className={cn(
-              "absolute -inset-8 rounded-full blur-3xl opacity-60 animate-pulse",
+              "absolute -inset-8 rounded-full blur-3xl opacity-60",
+              videoReady ? "animate-pulse" : ""
             )}
             style={{
               background: team === "dark" 
@@ -111,9 +135,9 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
             <video
               ref={videoRef}
               src={videoSrc}
-              autoPlay
               muted
               playsInline
+              preload="auto"
               className="w-full h-full object-cover"
             />
             
@@ -129,25 +153,27 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
           </div>
         </div>
 
-        {/* Decorative particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "absolute w-2 h-2 rounded-full",
-                team === "dark" ? "bg-blue-400" : "bg-red-400"
-              )}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 2}s`,
-                opacity: 0.6
-              }}
-            />
-          ))}
-        </div>
+        {/* Decorative particles - only show when video is ready */}
+        {videoReady && (
+          <div className="absolute inset-0 pointer-events-none">
+            {[...Array(15)].map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "absolute w-2 h-2 rounded-full",
+                  team === "dark" ? "bg-blue-400" : "bg-red-400"
+                )}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  opacity: 0.6
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
       
       <style>{`
