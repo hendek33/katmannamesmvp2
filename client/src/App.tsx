@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { VideoProvider } from "@/contexts/VideoContext";
+import { VideoPreloader } from "@/components/VideoPreloader";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
@@ -32,6 +33,7 @@ function App() {
         <WebSocketProvider>
           <TooltipProvider>
             <Toaster />
+            <VideoPreloader />
             <Router />
           </TooltipProvider>
         </WebSocketProvider>

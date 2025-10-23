@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { useVideoContext } from "@/contexts/VideoContext";
 
 interface AssassinVideoProps {
   winnerTeam: "dark" | "light";
@@ -21,14 +20,42 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, startX, startY, onCo
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
-  const { getVideoUrl } = useVideoContext();
   
-  const originalVideoPath = "/siyah kelime seçme.mp4";
-  const videoSrc = getVideoUrl(originalVideoPath);
+  const videoSrc = "/siyah kelime seçme.mp4";
 
   useEffect(() => {
+    let mounted = true;
+    
+    // Try to play video when component mounts
+    const tryPlayVideo = async () => {
+      if (!videoRef.current || !mounted) return;
+      
+      try {
+        await videoRef.current.play();
+      } catch (error) {
+        console.error('Assassin video autoplay failed, retrying:', error);
+        // Try again after a short delay
+        setTimeout(async () => {
+          if (videoRef.current && mounted) {
+            try {
+              videoRef.current.muted = true;
+              await videoRef.current.play();
+            } catch (retryError) {
+              console.error('Assassin video retry failed:', retryError);
+              // If video fails to play, still show winner
+              handleVideoEnd();
+            }
+          }
+        }, 100);
+      }
+    };
+    
+    // Start playing video
+    tryPlayVideo();
+    
     // Cleanup function
     return () => {
+      mounted = false;
       // Clear all timers on unmount
       timersRef.current.forEach(t => clearTimeout(t));
       // Cleanup video

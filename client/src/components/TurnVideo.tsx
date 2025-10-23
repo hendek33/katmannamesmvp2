@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { useVideoContext } from "@/contexts/VideoContext";
 
 interface TurnVideoProps {
   team: "dark" | "light";
@@ -16,21 +15,48 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
-  const { getVideoUrl } = useVideoContext();
 
-  const originalVideoPath = team === "dark" 
+  const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
     : "/kırmızı takım video tur.mp4";
-  
-  const videoSrc = getVideoUrl(originalVideoPath);
 
   useEffect(() => {
+    let mounted = true;
+    
+    // Try to play video when component mounts
+    const tryPlayVideo = async () => {
+      if (!videoRef.current || !mounted) return;
+      
+      try {
+        await videoRef.current.play();
+      } catch (error) {
+        console.error('Video autoplay failed, retrying:', error);
+        // Try again after a short delay
+        setTimeout(async () => {
+          if (videoRef.current && mounted) {
+            try {
+              videoRef.current.muted = true;
+              await videoRef.current.play();
+            } catch (retryError) {
+              console.error('Video retry failed:', retryError);
+            }
+          }
+        }, 100);
+      }
+    };
+    
+    // Start playing video
+    tryPlayVideo();
+    
     // Auto hide after 4 seconds
     const timer = setTimeout(() => {
+      if (!mounted) return;
       setIsClosing(true);
       const closeTimer = setTimeout(() => {
-        setShow(false);
-        onComplete?.();
+        if (mounted) {
+          setShow(false);
+          onComplete?.();
+        }
       }, 600);
       timersRef.current.push(closeTimer);
     }, 4000);
@@ -38,6 +64,7 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
     timersRef.current.push(timer);
 
     return () => {
+      mounted = false;
       // Clear all timers on unmount
       timersRef.current.forEach(t => clearTimeout(t));
       // Cleanup video
