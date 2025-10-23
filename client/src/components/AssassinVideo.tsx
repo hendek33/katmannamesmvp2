@@ -45,20 +45,20 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
       setIsClosing(true);
       setShowLoserText(true);
       
-      // After 2 seconds, hide loser text and show winner text
+      // After 1.5 seconds, hide loser text and show winner text
       setTimeout(() => {
         setShowLoserText(false);
         setShowWinnerText(true);
         
-        // Fade out everything after 2 seconds (was 3)
+        // Fade out everything after 1.5 seconds - faster
         setTimeout(() => {
           setFadeOutAll(true);
-          // Complete after fade out - faster
+          // Complete after fade out - much faster
           setTimeout(() => {
             onComplete?.();
-          }, 400); // was 800ms
-        }, 2000); // was 3000ms
-      }, 2000);
+          }, 300); // faster fade
+        }, 1500); // reduced from 2000ms
+      }, 1500); // reduced from 2000ms
     }, 300);
   };
 
@@ -86,7 +86,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
               : 'radial-gradient(circle at center, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.95) 100%)',
             backdropFilter: 'blur(4px)',
             animation: fadeOutAll 
-              ? 'radialFadeOut 0.8s ease-out forwards'
+              ? 'radialFadeOut 0.4s ease-out forwards'
               : 'radialFadeIn 0.5s ease-in-out forwards',
           }}
         />
@@ -105,7 +105,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
             className="w-full h-full object-contain"
             style={{
               animation: isClosing 
-                ? 'radialZoomOut 0.6s ease-in forwards'
+                ? 'radialZoomOut 0.3s ease-in forwards'
                 : 'radialZoomIn 0.8s ease-out forwards'
             }}
           />
@@ -118,7 +118,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
           className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none"
           style={{
             animation: fadeOutAll 
-              ? 'fadeOut 0.5s ease-out forwards'
+              ? 'fadeOut 0.3s ease-out forwards'
               : 'fadeIn 0.5s ease-in forwards'
           }}
         >
@@ -155,7 +155,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
           className="fixed inset-0 z-[110] flex items-center justify-center pointer-events-none"
           style={{
             animation: fadeOutAll 
-              ? 'fadeOut 0.8s ease-out forwards'
+              ? 'fadeOut 0.3s ease-out forwards'
               : 'fadeIn 0.5s ease-in forwards'
           }}
         >
