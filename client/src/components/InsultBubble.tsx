@@ -31,8 +31,8 @@ export function InsultBubble({ senderUsername, senderTeam, message }: InsultBubb
     <div 
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-500",
-        isLeftSide ? "left-[18%]" : "right-[18%]",
-        "top-[18%]",
+        isLeftSide ? "left-[10%] lg:left-[15%] xl:left-[18%]" : "right-[10%] lg:right-[15%] xl:right-[18%]",
+        "top-[15vh] lg:top-[18vh] xl:top-[20vh]",
         isVisible && !isLeaving ? "opacity-100 scale-100" : "opacity-0 scale-75",
         isLeaving && "opacity-0 scale-110"
       )}

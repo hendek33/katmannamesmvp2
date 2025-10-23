@@ -23,9 +23,6 @@ interface GameCardProps {
 export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false, isKnownCard = false }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [tiltX, setTiltX] = useState(0);
-  const [tiltY, setTiltY] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const getCardColors = () => {
@@ -79,35 +76,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const canReveal = !card.revealed && !disabled && !isSpymaster && onReveal;
   const colors = getCardColors();
   
-  // Handle mouse movement for 3D tilt effect
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || card.revealed) return; // Disable hover for main card when revealed
-    
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    // Calculate tilt angles (-15 to 15 degrees)
-    const tiltX = ((y - centerY) / centerY) * -15;
-    const tiltY = ((x - centerX) / centerX) * 15;
-    
-    setTiltX(tiltX);
-    setTiltY(tiltY);
-  };
-  
-  const handleMouseEnter = () => {
-    if (!card.revealed) { // Only enable hover for main card if not revealed
-      setIsHovered(true);
-    }
-  };
-  
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setTiltX(0);
-    setTiltY(0);
-  };
   
   
   // Preload image when card is revealed
@@ -144,20 +112,12 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "shadow-inner"
       )}
       style={{
-        boxShadow: isHovered && !card.revealed 
-          ? 'inset 0 2px 8px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.5)'
-          : 'inset 0 2px 8px rgba(0,0,0,0.3)',
+        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
         overflow: card.revealed ? 'visible' : 'hidden',
-        transform: isHovered && !card.revealed 
-          ? `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05) translateZ(20px)`
-          : undefined,
         transformStyle: 'preserve-3d',
         transition: 'all 0.2s ease-out',
         zIndex: isLifted ? 1000 : card.revealed ? 20 : 1
       }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       {/* Prophet indicator - enhanced visual effects */}
       {isKnownCard && !card.revealed && (
