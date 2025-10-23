@@ -246,8 +246,11 @@ export default function Game() {
   };
 
   const handleSendInsultToPlayer = (targetPlayerId: string) => {
+    console.log("[CLIENT] Sending insult to target:", targetPlayerId);
     setShowInsultTargetDialog(false);
-    send("send_insult", { targetId: targetPlayerId });
+    const payload = { targetId: targetPlayerId };
+    console.log("[CLIENT] Payload:", payload);
+    send("send_insult", payload);
     
     // Set 5 second cooldown
     setInsultCooldown(5);

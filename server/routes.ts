@@ -774,7 +774,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            console.log("[ROUTES] Received send_insult payload:", payload);
             const targetId = payload.targetId as string | undefined;
+            console.log("[ROUTES] Extracted targetId:", targetId);
             const insultData = storage.sendInsult(ws.roomCode, ws.playerId, targetId);
             if (!insultData) {
               sendToClient(ws, { type: "error", payload: { message: "Laf sokma devre dışı veya cooldown'da" } });
