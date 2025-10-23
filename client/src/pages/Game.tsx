@@ -1135,7 +1135,7 @@ export default function Game() {
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
-              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-hidden"
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-hidden hover-elevate cursor-pointer"
               style={{
                 backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.png')`,
                 backgroundSize: 'cover',
@@ -1199,6 +1199,44 @@ export default function Game() {
                 }
                 label={!gameState.currentClue ? "İstihbarat Şefi Süresi" : "Ajan Süresi"}
               />
+            )}
+            
+            {/* Taunt Button - Below Blue Team Panel */}
+            {currentPlayer && gameState.phase === "playing" && (
+              <div className="mt-4">
+                <div className="relative">
+                  <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
+                    currentPlayer.team === "dark" 
+                      ? "bg-blue-600/40" 
+                      : "bg-red-600/40"
+                  }`} />
+                  <button
+                    onClick={handleTriggerTaunt}
+                    disabled={tauntCooldown > 0}
+                    className={`
+                      relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                      backdrop-blur-md border shadow-lg
+                      ${currentPlayer.team === "dark" 
+                        ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
+                        : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
+                      ${tauntCooldown > 0 ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                    `}
+                    data-testid="button-trigger-taunt"
+                  >
+                    {tauntCooldown > 0 ? (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <Timer className="w-4 h-4" />
+                        {tauntCooldown}s
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-1.5">
+                        <Zap className="w-4 h-4" />
+                        Hareket Çek
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 
@@ -1312,44 +1350,6 @@ export default function Game() {
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
-              {/* Taunt Button - Positioned to the right */}
-              {currentPlayer && gameState.phase === "playing" && (
-                <div className="absolute bottom-2 right-4 sm:right-8">
-                  <div className="relative">
-                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      currentPlayer.team === "dark" 
-                        ? "bg-blue-600/40" 
-                        : "bg-red-600/40"
-                    }`} />
-                    <button
-                      onClick={handleTriggerTaunt}
-                      disabled={tauntCooldown > 0}
-                      className={`
-                        relative px-4 py-2 rounded-lg font-bold text-sm transition-all
-                        backdrop-blur-md border shadow-lg
-                        ${currentPlayer.team === "dark" 
-                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
-                          : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                        ${tauntCooldown > 0 ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
-                      `}
-                      data-testid="button-trigger-taunt"
-                    >
-                      {tauntCooldown > 0 ? (
-                        <span className="flex items-center gap-1.5">
-                          <Timer className="w-4 h-4" />
-                          {tauntCooldown}s
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5">
-                          <Zap className="w-4 h-4" />
-                          Hareket Çek
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-              
               {/* End Turn Button for Guessers - Positioned to the left */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && gameState.phase !== "ended" && (
                 <div className="absolute bottom-2 left-4 sm:left-8">
@@ -1509,7 +1509,7 @@ export default function Game() {
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
-              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-hidden"
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-hidden hover-elevate cursor-pointer"
               style={{
                 backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.7), rgba(127, 29, 29, 0.7)), url('/kırmızı takım.png')`,
                 backgroundSize: 'cover',

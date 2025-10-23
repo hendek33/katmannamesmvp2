@@ -22,8 +22,9 @@ The project features a dark navy/grey theme with a blue/red color scheme for the
 - **Backend**: Uses Express for the HTTP server and the `ws` library for real-time game rooms. Game state and room management are handled via in-memory storage. A Turkish word list of over 250 words is included.
 - **Shared**: Contains TypeScript schemas and Zod validation for runtime type validation, ensuring consistent data structures between the frontend and backend.
 - **WebSocket Management**: A central `WebSocketContext` manages a single, persistent WebSocket connection across page transitions, handling real-time events like `join_room`, `create_room`, `select_team`, `give_clue`, and `reveal_card`. It includes automatic reconnection, error handling, and stale connection cleanup.
-- **Game Mechanics**: Features a 5x5 card grid with 25 cards total, including a random distribution of 9 cards for the starting team and 8 for the other, 7 neutral cards, and 1 assassin card. The game tracks revealed cards with a chronological history of the last 5.
+- **Game Mechanics**: Features a 5x5 card grid with 25 cards total, including a random distribution of 9 cards for the starting team and 8 for the other, 7 neutral cards, and 1 assassin card. The game tracks revealed cards with a chronological history of the last 5. Cards have 3D hover effects with mouse-tracking tilt animations, shimmer effects on revealed cards.
 - **Room Management**: Supports creating and joining rooms, real-time player lists, team and role selection, bot integration (owner-only), and dynamic team name changes. Password-protected rooms are supported.
+- **UI Enhancements**: Team panels have hover elevation effects. "Hareket Çek" (taunt) button positioned below the blue team panel for better visibility and future button additions.
 
 ### Feature Specifications
 - User onboarding with name input.
