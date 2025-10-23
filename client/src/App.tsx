@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { videoCache } from "@/services/VideoCache";
+import { VideoPreloader } from "@/components/VideoPreloader";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
@@ -41,6 +42,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
         <TooltipProvider>
+          <VideoPreloader />
           <Toaster />
           <Router />
         </TooltipProvider>
