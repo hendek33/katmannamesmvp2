@@ -16,7 +16,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, MessageSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -1133,9 +1133,19 @@ export default function Game() {
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,20vw)_1fr_minmax(250px,20vw)] xl:grid-cols-[minmax(280px,18vw)_1fr_minmax(280px,18vw)] 2xl:grid-cols-[minmax(320px,16vw)_1fr_minmax(320px,16vw)] gap-2 flex-1 min-h-0">
           {/* Left Side - Dark Team */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
-            {/* Score & Players Card Combined */}
+            {/* Game Status with Remaining Cards and Taunt Button */}
+            <GameStatus
+              currentTeam={gameState.currentTeam}
+              darkCardsRemaining={gameState.darkCardsRemaining}
+              lightCardsRemaining={gameState.lightCardsRemaining}
+              onTriggerTaunt={currentPlayer ? handleTriggerTaunt : undefined}
+              tauntCooldown={tauntCooldown}
+              currentPlayerTeam={currentPlayer?.team}
+            />
+            
+            {/* Players Card */}
             <Card 
-              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-hidden"
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all relative overflow-hidden"
               style={{
                 backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.png')`,
                 backgroundSize: 'cover',
@@ -1147,17 +1157,8 @@ export default function Game() {
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
                   <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
                 </div>
-                <div className="relative">
-                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
-                    {gameState.darkCardsRemaining}
-                  </div>
-                  <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-[8px] lg:text-[10px] xl:text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
-                </div>
                 {/* Player List - Separated by Role */}
-                <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-1">
+                <div className="mt-2 space-y-1">
                   {/* Spymaster */}
                   {darkPlayers.filter(p => p.role === "spymaster").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
@@ -1312,43 +1313,6 @@ export default function Game() {
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
-              {/* Taunt Button - Positioned to the right */}
-              {currentPlayer && gameState.phase === "playing" && (
-                <div className="absolute bottom-2 right-4 sm:right-8">
-                  <div className="relative">
-                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      currentPlayer.team === "dark" 
-                        ? "bg-blue-600/40" 
-                        : "bg-red-600/40"
-                    }`} />
-                    <button
-                      onClick={handleTriggerTaunt}
-                      disabled={tauntCooldown > 0}
-                      className={`
-                        relative px-4 py-2 rounded-lg font-bold text-sm transition-all
-                        backdrop-blur-md border shadow-lg
-                        ${currentPlayer.team === "dark" 
-                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
-                          : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                        ${tauntCooldown > 0 ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
-                      `}
-                      data-testid="button-trigger-taunt"
-                    >
-                      {tauntCooldown > 0 ? (
-                        <span className="flex items-center gap-1.5">
-                          <Timer className="w-4 h-4" />
-                          {tauntCooldown}s
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5">
-                          <Zap className="w-4 h-4" />
-                          Hareket Çek
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
               
               {/* End Turn Button for Guessers - Positioned to the left */}
               {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && gameState.phase !== "ended" && (
