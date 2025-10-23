@@ -58,13 +58,20 @@ export function TauntOverlay({ taunts, boardRef }: TauntOverlayProps) {
 
 function TauntVideo({ taunt, boardRect }: { taunt: TauntData; boardRect: DOMRect }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   
-  useEffect(() => {
+  const handleVideoReady = () => {
+    setIsVideoReady(true);
     if (videoRef.current) {
       videoRef.current.play()
-        .then(() => setIsPlaying(true))
         .catch(err => console.error('Taunt video play error:', err));
+    }
+  };
+  
+  useEffect(() => {
+    // Preload the video
+    if (videoRef.current) {
+      videoRef.current.load();
     }
   }, []);
 
@@ -86,7 +93,8 @@ function TauntVideo({ taunt, boardRect }: { taunt: TauntData; boardRect: DOMRect
         width: size,
         height: size,
         zIndex: 200,
-        animation: 'tauntFadeInOut 2s ease-in-out forwards'
+        opacity: isVideoReady ? 1 : 0,
+        animation: isVideoReady ? 'tauntFadeInOut 2s ease-in-out forwards' : 'none'
       }}
     >
       {/* Player name above video - Enhanced visibility */}
@@ -127,7 +135,8 @@ function TauntVideo({ taunt, boardRect }: { taunt: TauntData; boardRect: DOMRect
         <video
           ref={videoRef}
           src={taunt.videoSrc}
-          autoPlay
+          onCanPlay={handleVideoReady}
+          onLoadedData={handleVideoReady}
           muted
           playsInline
           className="w-full h-full object-cover"
