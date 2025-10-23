@@ -260,7 +260,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         >
           <div 
             className={cn(
-              "absolute cursor-pointer animate-card-drop rounded-lg transition-all duration-200",
+              "absolute cursor-pointer animate-card-drop rounded-lg",
               isLifted ? "card-lifted" : "card-not-lifted"
             )}
             onClick={(e) => {
@@ -277,7 +277,9 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
               backgroundSize: card.type === 'assassin' ? 'contain' : 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+              boxShadow: isLifted 
+                ? '0 -20px 40px rgba(0,0,0,0.6), 0 -10px 20px rgba(0,0,0,0.4)'
+                : '0 4px 8px rgba(0,0,0,0.3)',
               pointerEvents: 'auto'
             }}
           />

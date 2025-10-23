@@ -696,29 +696,29 @@
   animation: cardDrop 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-/* Card lift animation - hinge from top with outward expansion */
+/* Card lift animation - hinge from bottom */
 @keyframes cardLift {
   0% {
-    transform: rotateX(0deg) scale(1);
+    transform: rotateX(0deg);
   }
   100% {
-    transform: rotateX(-65deg) translateY(-10px) scale(1.08);
+    transform: rotateX(-75deg) translateZ(20px);
   }
 }
 
 .card-lifted {
-  transform: rotateX(-65deg) translateY(-10px) scale(1.08);
-  transform-origin: top center;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+  transform: rotateX(-75deg) translateZ(20px);
+  transform-origin: bottom center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
   transform-style: preserve-3d;
   will-change: transform;
   backface-visibility: hidden;
 }
 
 .card-not-lifted {
-  transform: rotateX(0deg) scale(1);
-  transform-origin: top center;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
+  transform: rotateX(0deg) translateZ(0);
+  transform-origin: bottom center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
   transform-style: preserve-3d;
   will-change: transform;
   backface-visibility: hidden;
