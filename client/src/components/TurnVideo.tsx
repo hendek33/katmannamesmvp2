@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface TurnVideoProps {
@@ -9,25 +9,16 @@ interface TurnVideoProps {
 
 export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
+  const [videoEnded, setVideoEnded] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoSrc = team === "dark" 
     ? "/mavi takım video tur.mp4"
     : "/kırmızı takım video tur.mp4";
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    // Simple play logic
-    if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.error('Video play error:', err);
-      });
-    }
-    
     // Auto hide after 4 seconds
-    timeoutId = setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsClosing(true);
       setTimeout(() => {
         setShow(false);
@@ -35,13 +26,17 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
       }, 600);
     }, 4000);
 
-    return () => {
-      clearTimeout(timeoutId);
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
-    };
+    return () => clearTimeout(timer);
   }, [onComplete]);
+
+  const handleVideoEnd = () => {
+    setVideoEnded(true);
+    setIsClosing(true);
+    setTimeout(() => {
+      setShow(false);
+      onComplete?.();
+    }, 600);
+  };
 
   if (!show) return null;
 
@@ -86,11 +81,11 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
             }}
           >
             <video
-              ref={videoRef}
               src={videoSrc}
               autoPlay
               muted
               playsInline
+              onEnded={handleVideoEnd}
               className="w-full h-full object-cover"
             />
             
@@ -117,11 +112,22 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
           style={{
             textShadow: team === "dark" 
               ? '0 2px 20px rgba(59,130,246,0.8)' 
-              : '0 2px 20px rgba(239,68,68,0.8)',
-            animation: 'fadeInUp 0.6s ease-out forwards'
+              : '0 2px 20px rgba(239,68,68,0.8)'
           }}
           >
-            Sıra {teamName} Takımında
+            {`Sıra ${teamName} Takımında`.split('').map((char, index) => (
+              <span
+                key={index}
+                className="inline-block"
+                style={{
+                  animation: 'letterDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                  animationDelay: `${0.5 + index * 0.025}s`,
+                  opacity: 0
+                }}
+              >
+                {char === ' ' ? '\u00A0' : char}
+              </span>
+            ))}
           </div>
         </div>
 
@@ -131,80 +137,21 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
             <div
               key={i}
               className={cn(
-                "absolute w-2 h-2 rounded-full",
+                "absolute w-1 h-1 rounded-full",
                 team === "dark" ? "bg-blue-400" : "bg-red-400"
               )}
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animation: `float ${3 + Math.random() * 2}s ease-in-out infinite`,
+                left: '50%',
+                top: '50%',
+                animation: `floatParticle ${2 + Math.random() * 2}s ease-out infinite`,
                 animationDelay: `${Math.random() * 2}s`,
-                opacity: 0.6
-              }}
+                '--particle-distance': `${100 + Math.random() * 150}px`,
+                '--particle-angle': `${Math.random() * 360}deg`,
+              } as React.CSSProperties}
             />
           ))}
         </div>
       </div>
-      
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes fadeOut {
-          from { opacity: 1; }
-          to { opacity: 0; }
-        }
-        
-        @keyframes zoomInRotate {
-          from {
-            transform: scale(0) rotate(-180deg);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes zoomOutRotate {
-          from {
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-          }
-          to {
-            transform: scale(0) rotate(180deg);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0px) translateX(0px);
-          }
-          25% {
-            transform: translateY(-20px) translateX(10px);
-          }
-          50% {
-            transform: translateY(10px) translateX(-10px);
-          }
-          75% {
-            transform: translateY(-10px) translateX(20px);
-          }
-        }
-      `}</style>
     </div>
   );
 }

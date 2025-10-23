@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { Logo } from "@/components/Logo";
 import { PlayerList } from "@/components/PlayerList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft, Eye, EyeOff, Timer, Lock, AlertCircle, X, ChevronUp, ChevronDown } from "lucide-react";
+import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft, Eye, EyeOff, Timer } from "lucide-react";
 import type { Team } from "@shared/schema";
 
 export default function Lobby() {
@@ -35,8 +35,6 @@ export default function Lobby() {
   const [timedMode, setTimedMode] = useState(false);
   const [spymasterTime, setSpymasterTime] = useState(120); // 2 minutes default
   const [guesserTime, setGuesserTime] = useState(180); // 3 minutes default
-  const [chaosMode, setChaosMode] = useState(false);
-  const [showChaosDetails, setShowChaosDetails] = useState(false);
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("katmannames_username");
@@ -64,12 +62,11 @@ export default function Lobby() {
   }, [gameState, setLocation]);
 
   useEffect(() => {
-    // Sync timer and chaos mode settings from gameState
+    // Sync timer settings from gameState
     if (gameState) {
       setTimedMode(gameState.timedMode);
       setSpymasterTime(gameState.spymasterTime);
       setGuesserTime(gameState.guesserTime);
-      setChaosMode(gameState.chaosMode || false);
     }
   }, [gameState]);
 
@@ -145,10 +142,6 @@ export default function Lobby() {
       spymasterTime: spyTime,
       guesserTime: guessTime 
     });
-  };
-
-  const handleChaosModeUpdate = (enabled: boolean) => {
-    send("update_chaos_mode", { chaosMode: enabled });
   };
 
   if (!isConnected) {
@@ -337,26 +330,16 @@ export default function Lobby() {
   }
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
-  
-  // Team filtering
-  const darkTeam = gameState.players.filter(p => p.team === "dark");
-  const lightTeam = gameState.players.filter(p => p.team === "light");
-  const noTeam = gameState.players.filter(p => p.team === null);
-  
-  // Check for spymasters
-  const darkHasSpymaster = darkTeam.some(p => p.role === "spymaster");
-  const lightHasSpymaster = lightTeam.some(p => p.role === "spymaster");
-  
   const canStartGame = currentPlayer?.isRoomOwner && 
-    darkHasSpymaster &&
-    lightHasSpymaster &&
-    darkTeam.length > 0 &&
-    lightTeam.length > 0;
+    gameState.players.filter(p => p.team === "dark").some(p => p.role === "spymaster") &&
+    gameState.players.filter(p => p.team === "light").some(p => p.role === "spymaster") &&
+    gameState.players.filter(p => p.team === "dark").length > 0 &&
+    gameState.players.filter(p => p.team === "light").length > 0;
 
   const playerCount = gameState.players.length;
 
   return (
-    <div className="h-screen bg-slate-900 animate-in fade-in duration-500 relative overflow-hidden flex flex-col" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="h-screen p-2 sm:p-4 bg-slate-900 animate-in fade-in duration-500 relative overflow-hidden flex flex-col" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - Reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
@@ -365,184 +348,114 @@ export default function Lobby() {
       {[...Array(15)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
-      
-      {/* Header Bar */}
-      <div className="relative z-10 w-full">
-        <div className="bg-slate-800 backdrop-blur-lg border-b border-slate-700">
-          <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="px-3 py-1 bg-green-600/20 border border-green-600/50 rounded-full">
-                  <span className="text-xs font-medium text-green-400">Lobide</span>
-                </div>
-                <div className="text-sm text-slate-400">
-                  <Users className="inline w-4 h-4 mr-1" />
-                  {playerCount} Oyuncu
+      <div className="relative z-10 max-w-7xl mx-auto w-full flex flex-col h-full">
+        {/* Room Code Card - Compact Design */}
+        <Card className="p-3 sm:p-4 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-orange-900/30 mb-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" />
+              <h2 className="text-lg sm:text-xl font-bold">Oyun Lobisi</h2>
+              <span className="text-xs sm:text-sm text-muted-foreground">
+                ({playerCount} oyuncu)
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="text-right">
+                <div className="text-[10px] sm:text-xs font-semibold text-muted-foreground">ODA KODU</div>
+                <div className="text-xl sm:text-2xl font-mono font-black tracking-wider bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent" data-testid="room-code">
+                  {showRoomCode ? roomCode : "••••••"}
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                  <span className="text-xs text-slate-400">Oda Kodu:</span>
-                  <span className="text-lg font-mono font-bold text-white tracking-wider" data-testid="room-code">
-                    {showRoomCode ? roomCode : "••••••"}
-                  </span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShowRoomCode(!showRoomCode)}
-                    className="h-6 w-6 p-0"
-                  >
-                    {showRoomCode ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleCopyRoomCode}
-                    className="h-6 w-6 p-0"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                  </Button>
-                </div>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => {
-                    send("leave_room", {});
-                    localStorage.removeItem("katmannames_room_code");
-                    localStorage.removeItem("katmannames_player_id");
-                    setLocation("/rooms");
-                  }}
-                  className="h-9"
-                  data-testid="button-leave-room"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-1.5" />
-                  Odadan Çık
-                </Button>
-              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowRoomCode(!showRoomCode)}
+                className="h-10 w-10 border-2 hover:border-primary hover:bg-primary/10 transition-all"
+                data-testid="button-toggle-code"
+                title={showRoomCode ? "Gizle" : "Göster"}
+              >
+                {showRoomCode ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleCopyRoomCode}
+                className="h-10 w-10 border-2 hover:border-primary hover:bg-primary/10 transition-all"
+                data-testid="button-copy-code"
+                title="Kopyala"
+              >
+                {copied ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </Button>
             </div>
           </div>
-        </div>
-      </div>
+        </Card>
 
-      {/* Main Content */}
-      <div className="relative z-10 flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto h-full p-3 flex flex-col">
-          {/* Team Selection Area */}
-          <div className="flex-1 flex flex-col lg:flex-row gap-3 min-h-0">
-            {/* Left Side - Team Cards */}
-            <div className="flex-1 lg:w-3/5 overflow-hidden">
-              <PlayerList
-                players={gameState.players}
-                currentPlayerId={playerId}
-                onTeamSelect={handleTeamSelect}
-                onRoleToggle={handleRoleToggle}
-                isLobby={true}
-                darkTeamName={gameState.darkTeamName}
-                lightTeamName={gameState.lightTeamName}
-                onTeamNameChange={handleTeamNameChange}
-                onRemoveBot={handleRemoveBot}
-              />
-            </div>
+        {/* Main Content Area - Flex Layout */}
+        <div className="flex flex-col lg:flex-row gap-3 flex-1 min-h-0">
+          {/* Main Player Area */}
+          <div className="flex-1 lg:max-w-[60%] flex flex-col">
+            <PlayerList
+              players={gameState.players}
+              currentPlayerId={playerId}
+              onTeamSelect={handleTeamSelect}
+              onRoleToggle={handleRoleToggle}
+              isLobby={true}
+              darkTeamName={gameState.darkTeamName}
+              lightTeamName={gameState.lightTeamName}
+              onTeamNameChange={handleTeamNameChange}
+              onRemoveBot={handleRemoveBot}
+            />
+          </div>
 
-            {/* Right Sidebar */}
-            <div className="lg:w-2/5 flex flex-col gap-4">
-              {/* Start Game Card */}
-              <Card className="p-4 border-2 bg-slate-800 border-green-600/50 mt-0">
-                {/* Game Start Requirements Visual Indicators */}
-                {!canStartGame && currentPlayer?.isRoomOwner && (
-                  <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg space-y-2">
-                    <div className="text-sm font-bold text-amber-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      Başlatma Gereksinimleri
-                    </div>
-                    <div className="text-xs space-y-1">
-                      {!darkHasSpymaster && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.darkTeamName} takımına İstihbarat Şefi gerekli</span>
-                        </div>
-                      )}
-                      {!lightHasSpymaster && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.lightTeamName} takımına İstihbarat Şefi gerekli</span>
-                        </div>
-                      )}
-                      {darkTeam.length < 2 && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.darkTeamName} takımında en az 2 oyuncu olmalı</span>
-                        </div>
-                      )}
-                      {lightTeam.length < 2 && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.lightTeamName} takımında en az 2 oyuncu olmalı</span>
-                        </div>
-                      )}
-                      {noTeam.length > 0 && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{noTeam.length} oyuncu takım seçmemiş</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                {/* Game Ready Status */}
-                {canStartGame && currentPlayer?.isRoomOwner && (
-                  <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                    <div className="text-sm font-bold text-green-600 flex items-center gap-1">
-                      <Check className="w-4 h-4" />
-                      Oyun başlatmaya hazır!
-                    </div>
-                  </div>
-                )}
+          {/* Sidebar */}
+          <div className="lg:w-[40%] flex flex-col gap-3 pt-[26px]">
+
+            {/* Start Game and Controls */}
+            <Card className="p-3 sm:p-4 border-2 bg-gradient-to-br from-green-500/5 to-emerald-500/5">
+              <Button
+                onClick={handleStartGame}
+                disabled={!canStartGame}
+                className="w-full h-12 text-base font-bold bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed group mb-3"
+                size="lg"
+                data-testid="button-start-game"
+              >
+                <Play className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" />
+                Oyunu Başlat
+              </Button>
               
-                <Button
-                  onClick={handleStartGame}
-                  disabled={!canStartGame}
-                  className={`w-full h-12 text-base font-bold transition-all mb-3 ${
-                    canStartGame 
-                      ? "bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 shadow-lg hover:shadow-xl group"
-                      : "opacity-50"
-                  }`}
-                  size="lg"
-                  variant={canStartGame ? "default" : "secondary"}
-                  data-testid="button-start-game"
-                >
-                  {canStartGame ? (
-                    <>
-                      <Play className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform animate-pulse" />
-                      Oyunu Başlat
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4 mr-2" />
-                      Gereksinimler Karşılanmadı
-                    </>
-                  )}
-                </Button>
+              {!canStartGame && currentPlayer?.isRoomOwner && (
+                <div className="text-xs text-center text-amber-600 font-medium mb-3">
+                  ⚠️ Her takımda en az bir İstihbarat Şefi olmalı
+                </div>
+              )}
 
               {/* Compact How to Play */}
-              <div className="border-t pt-2 space-y-1">
+              <div className="border-t pt-3 space-y-2">
                 <h3 className="text-xs font-bold flex items-center gap-1">
                   <Sparkles className="w-3 h-3 text-purple-500" />
-                  Hızlı Başlangıç
+                  Nasıl Oynanır?
                 </h3>
-                <ul className="text-[10px] space-y-0.5 text-muted-foreground">
-                  <li>• Takım ve rol seç</li>
-                  <li>• Her takımda 1 İstihbarat Şefi olmalı</li>
-                  <li>• Hazırsan başlat!</li>
+                <ul className="text-[10px] sm:text-xs space-y-1 text-muted-foreground">
+                  <li>1. Takım seçin</li>
+                  <li>2. Rol seçin (İstihbarat Şefi / Ajan)</li>
+                  <li>3. Her takımda en az bir İstihbarat Şefi olmalı</li>
+                  <li>4. Oyunu başlatın!</li>
                 </ul>
               </div>
             </Card>
 
             {/* Bot Controls - Compact */}
             {currentPlayer?.isRoomOwner && (
-              <Card className="p-3 sm:p-4 space-y-2 border-2 bg-slate-800 border-amber-600/50">
+              <Card className="p-3 sm:p-4 space-y-2 border-2 bg-gradient-to-br from-amber-500/20 to-orange-500/20 backdrop-blur-sm">
                 <div className="flex items-center gap-2 mb-2">
                   <Bot className="w-4 h-4 text-amber-600" />
                   <h3 className="text-sm font-bold">Test Botları</h3>
@@ -604,131 +517,80 @@ export default function Lobby() {
               </Card>
             )}
 
-            </div>
-          </div>
-          
-          {/* Bottom Settings Section - Only for Room Owner */}
-          {/* Game Settings - Visible to all, editable only by owner */}
-          <div className="mt-4 grid md:grid-cols-2 gap-3">
-            {/* Chaos Mode - Compact */}
-            <Card className={`p-3 border-2 bg-slate-800 border-red-600/50 relative ${!currentPlayer?.isRoomOwner ? 'opacity-75' : ''}`}>
-              <Badge className="absolute -top-2 -right-2 bg-amber-600 text-white text-[10px] px-1.5 py-0.5">
-                🧪 DENEYSEL
-              </Badge>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-red-500" />
-                  <h3 className="text-base font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-                    KAOS MODU
-                  </h3>
-                  <button
-                    onClick={() => setShowChaosDetails(!showChaosDetails)}
-                    className="text-xs text-muted-foreground hover:text-white transition-colors"
-                  >
-                    (Bu nedir?)
-                  </button>
-                </div>
-                <Switch
-                  checked={chaosMode}
-                  disabled={!currentPlayer?.isRoomOwner}
-                  onCheckedChange={(checked) => {
-                    if (currentPlayer?.isRoomOwner) {
-                      setChaosMode(checked);
-                      handleChaosModeUpdate(checked);
-                    }
-                  }}
-                  data-testid="switch-chaos-mode"
-                />
-              </div>
-              
-              {chaosMode && (
-                <p className="text-[10px] text-amber-400 mt-2">
-                  ⚡ Gizli roller aktif - Oyun başladığında atanacak
-                </p>
-              )}
-            </Card>
-            
             {/* Timer Settings - Compact */}
-            <Card className={`p-3 border-2 bg-slate-800 border-purple-600/50 ${!currentPlayer?.isRoomOwner ? 'opacity-75' : ''}`}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Timer className="w-5 h-5 text-purple-500" />
-                  <h3 className="text-base font-bold">Zamanlayıcı</h3>
-                </div>
-                <Switch
-                  checked={timedMode}
-                  disabled={!currentPlayer?.isRoomOwner}
-                  onCheckedChange={(checked) => {
-                    if (currentPlayer?.isRoomOwner) {
+            {currentPlayer?.isRoomOwner && (
+              <Card className="p-3 sm:p-4 space-y-3 border-2 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-4 h-4 text-purple-600" />
+                    <h3 className="text-sm font-bold">Zamanlayıcı Ayarları</h3>
+                  </div>
+                  <Switch
+                    checked={timedMode}
+                    onCheckedChange={(checked) => {
                       setTimedMode(checked);
                       handleTimerSettingsUpdate(checked, spymasterTime, guesserTime);
-                    }
-                  }}
-                  data-testid="switch-timed-mode"
-                />
-              </div>
+                    }}
+                    data-testid="switch-timed-mode"
+                  />
+                </div>
                 
                 {timedMode && (
-                  <div className="space-y-2">
-                    <div className="space-y-1">
+                  <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <Label className="text-xs">Şef</Label>
-                        <span className="text-xs font-mono text-purple-400">
+                        <Label className="text-xs">İstihbarat Şefi Süresi</Label>
+                        <span className="text-xs font-mono text-muted-foreground">
                           {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}
                         </span>
                       </div>
                       <Slider
                         value={[spymasterTime]}
-                        disabled={!currentPlayer?.isRoomOwner}
                         onValueChange={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            setSpymasterTime(value);
-                          }
+                          setSpymasterTime(value);
                         }}
                         onValueCommit={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            handleTimerSettingsUpdate(timedMode, value, guesserTime);
-                          }
+                          handleTimerSettingsUpdate(timedMode, value, guesserTime);
                         }}
                         min={30}
-                        max={300}
+                        max={600}
                         step={30}
-                        className="w-full h-1"
+                        className="w-full"
                         data-testid="slider-spymaster-time"
                       />
                     </div>
                     
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <Label className="text-xs">Ajan</Label>
-                        <span className="text-xs font-mono text-purple-400">
+                        <Label className="text-xs">Ajan Süresi</Label>
+                        <span className="text-xs font-mono text-muted-foreground">
                           {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}
                         </span>
                       </div>
                       <Slider
                         value={[guesserTime]}
-                        disabled={!currentPlayer?.isRoomOwner}
                         onValueChange={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            setGuesserTime(value);
-                          }
+                          setGuesserTime(value);
                         }}
                         onValueCommit={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            handleTimerSettingsUpdate(timedMode, spymasterTime, value);
-                          }
+                          handleTimerSettingsUpdate(timedMode, spymasterTime, value);
                         }}
                         min={30}
-                        max={300}
+                        max={600}
                         step={30}
-                        className="w-full h-1"
+                        className="w-full"
                         data-testid="slider-guesser-time"
                       />
+                    </div>
+                    
+                    <div className="text-[10px] text-muted-foreground text-center">
+                      Süre bittiğinde tur otomatik bitmez, sadece görsel olarak gösterilir
                     </div>
                   </div>
                 )}
               </Card>
+            )}
+
           </div>
         </div>
       </div>
@@ -748,72 +610,6 @@ export default function Lobby() {
             <AlertDialogAction onClick={handleConfirmStartWithDefaultNames}>
               Varsayılan İsimlerle Devam Et
             </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
-      {/* Chaos Mode Details Dialog */}
-      <AlertDialog open={showChaosDetails} onOpenChange={setShowChaosDetails}>
-        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-              🎯 KAOS MODU NEDİR?
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-4 pt-4">
-                <p className="text-sm">
-                  Kaos Modu, klasik Codenames oyununa gizli roller ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
-                  Her oyuncuya gizlice atanan bu roller, oyunun dinamiğini tamamen değiştirir!
-                </p>
-                
-                <div className="space-y-3">
-                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">🔮</span>
-                      <h4 className="font-bold text-yellow-500">Kahin Ajan</h4>
-                    </div>
-                    <p className="text-xs">
-                      Her takımda 1 tane bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
-                      Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır!</span>
-                      <span className="text-red-400 font-bold"> DİKKAT: Yanlış tahmin anında kaybedersiniz!</span>
-                    </p>
-                  </div>
-                  
-                  <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">🎭</span>
-                      <h4 className="font-bold text-purple-500">Çift Ajan</h4>
-                    </div>
-                    <p className="text-xs">
-                      <span className="text-purple-400 font-bold">Her takımda 1 tane bulunur.</span> Karşı takım için gizlice çalışan casus! 
-                      Görünüşte kendi takımında ama aslında karşı takım için çalışır. Takımını yanlış kartlara yönlendirmeye çalışır. 
-                      Kart seçemez, sadece oy verebilir. 
-                      <span className="text-red-400 font-bold">Oyun bittiğinde: Kaybeden takım, kendi içlerindeki haini (karşı takım için çalışan Çift Ajanı) bulursa oyunu tersine çevirir!</span>
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <h4 className="font-semibold text-amber-400 mb-2">⚡ Önemli Kurallar</h4>
-                  <ul className="text-xs space-y-1">
-                    <li>• Her takımda 1 Kahin ve 1 Çift Ajan bulunur</li>
-                    <li>• Gizli roller oyun başladığında rastgele atanır</li>
-                    <li>• Rolünüz sadece size gösterilir, başkaları göremez</li>
-                    <li>• Kahin'in bildiği kartlar sadece ona mor renkte gösterilir</li>
-                    <li>• <span className="text-yellow-400">Kahin Tahmini:</span> Karşı takımın Kahin'ini tahmin edebilirsiniz (1 hak) - Doğru tahmin = anında kazanç, Yanlış tahmin = anında kayıp!</li>
-                    <li>• <span className="text-red-400">Çift Ajan Tahmini:</span> Oyun bittiğinde kaybeden takım, kendi içindeki haini bulabilir (1 hak) - Doğru tahmin oyunu tersine çevirir!</li>
-                  </ul>
-                </div>
-                
-                <p className="text-xs text-muted-foreground italic">
-                  💡 İpucu: Gizli rolünüzü saklamak oyunun en önemli parçası! Çok bariz davranırsanız takımınız sizi fark edebilir.
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction>Anladım</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

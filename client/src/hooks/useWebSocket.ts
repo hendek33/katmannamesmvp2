@@ -19,7 +19,6 @@ export function useWebSocket() {
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
-  const pingInterval = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     let isCleanedUp = false;
@@ -42,16 +41,6 @@ export function useWebSocket() {
           setError("");
           reconnectAttempts.current = 0;
           console.log("WebSocket connected");
-          
-          // Start ping interval to keep connection alive
-          if (pingInterval.current) {
-            clearInterval(pingInterval.current);
-          }
-          pingInterval.current = setInterval(() => {
-            if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-              ws.current.send(JSON.stringify({ type: "ping", payload: {} }));
-            }
-          }, 4000); // Ping every 4 seconds to prevent 5-second timeout
           
           const savedRoomCode = localStorage.getItem("katmannames_room_code");
           const savedPlayerId = localStorage.getItem("katmannames_player_id");
@@ -136,10 +125,6 @@ export function useWebSocket() {
               case "error":
                 setError(message.payload.message);
                 break;
-                
-              case "pong":
-                // Server acknowledged our ping, connection is alive
-                break;
             }
           } catch (err) {
             console.error("Error parsing WebSocket message:", err);
@@ -149,12 +134,6 @@ export function useWebSocket() {
         ws.current.onclose = (event) => {
           console.log(`WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`);
           setIsConnected(false);
-          
-          // Clear ping interval
-          if (pingInterval.current) {
-            clearInterval(pingInterval.current);
-            pingInterval.current = undefined;
-          }
           
           // Don't reconnect if cleaned up or normal closure
           if (isCleanedUp || event.code === 1000) {
@@ -191,9 +170,6 @@ export function useWebSocket() {
       isCleanedUp = true;
       if (reconnectTimeout.current) {
         clearTimeout(reconnectTimeout.current);
-      }
-      if (pingInterval.current) {
-        clearInterval(pingInterval.current);
       }
       if (ws.current && ws.current.readyState === WebSocket.OPEN) {
         ws.current.close(1000, "Component unmounted");

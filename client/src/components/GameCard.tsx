@@ -17,10 +17,9 @@ interface GameCardProps {
   isLastCard?: boolean;
   isAssassinCard?: boolean;
   gameEnded?: boolean;
-  isKnownCard?: boolean;
 }
 
-export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false, isKnownCard = false }: GameCardProps) {
+export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
 
@@ -111,63 +110,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         overflow: card.revealed ? 'visible' : 'hidden'
       }}
     >
-      {/* Prophet indicator - enhanced visual effects */}
-      {isKnownCard && !card.revealed && (
-        <>
-          {/* Team color glow effect */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-lg" 
-            style={{ 
-              zIndex: 14,
-              animation: 'prophetGlow 2s ease-in-out infinite',
-              boxShadow: card.type === "dark" 
-                ? '0 0 20px rgba(59, 130, 246, 0.8), inset 0 0 20px rgba(59, 130, 246, 0.3)'
-                : card.type === "light"
-                ? '0 0 20px rgba(239, 68, 68, 0.8), inset 0 0 20px rgba(239, 68, 68, 0.3)'
-                : 'none'
-            }}
-          />
-          
-          {/* Animated border */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-lg" 
-            style={{ zIndex: 15 }}
-          >
-            <div className={cn(
-              "absolute inset-0 rounded-lg border-2 animate-pulse",
-              card.type === "dark" ? "border-blue-400" : "border-red-400"
-            )} />
-            
-            {/* Prophet badge */}
-            <div className="absolute top-0.5 right-0.5">
-              <div className={cn(
-                "backdrop-blur-sm rounded px-1 py-0.5",
-                card.type === "dark" ? "bg-blue-600/80" : "bg-red-600/80"
-              )}>
-                <span className="text-[8px] text-white font-bold">🔮</span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Particle effects */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg" style={{ zIndex: 16 }}>
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "absolute w-1 h-1 rounded-full animate-prophet-particle",
-                  card.type === "dark" ? "bg-blue-400" : "bg-red-400"
-                )}
-                style={{
-                  left: `${20 + i * 30}%`,
-                  animationDelay: `${i * 0.7}s`
-                }}
-              />
-            ))}
-          </div>
-        </>
-      )}
-      
       {/* Logo watermark */}
       <div 
         className="absolute inset-0 pointer-events-none"

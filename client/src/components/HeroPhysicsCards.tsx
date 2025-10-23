@@ -4,8 +4,8 @@ import { useEffect, useRef, memo } from "react";
  * HeroPhysicsCards
  * Canvas tabanlı kart animasyonu (mouse ile itme + rotasyon)
  *
- * Kart görselleri "client/public/acilmiskartgorselküçültülmüş" klasöründe barınır ve
- * runtime'da "/acilmiskartgorselküçültülmüş/<dosya>" yolundan çekilir.
+ * Kart görselleri "client/public/acilmiskartgorsel" klasöründe barınır ve
+ * runtime'da "/acilmiskartgorsel/<dosya>" yolundan çekilir.
  *
  * Hata düzeltmesi:
  * - imageNames undefined olabildiğinde buildPaths(names.map) TypeError veriyordu.
@@ -83,8 +83,8 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
 
     function buildPaths(names?: string[]) {
       const safe = Array.isArray(names) ? names : [];
-      // public altında olduğundan, runtime yolu "/acilmiskartgorselküçültülmüş/<name>"
-      return safe.map((n) => `/acilmiskartgorselküçültülmüş/${n}`);
+      // public altında olduğundan, runtime yolu "/acilmiskartgorsel/<name>"
+      return safe.map((n) => `/acilmiskartgorsel/${n}`);
     }
 
     function loadImages(paths: string[]) {
@@ -247,7 +247,7 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
         ctx.save();
         ctx.fillStyle = 'rgba(255,255,255,0.75)';
         ctx.font = '12px system-ui, sans-serif';
-        ctx.fillText('Görseller yüklenmedi. imageNames boş olabilir. (/acilmiskartgorselküçültülmüş/...)', 16, bounds.h - 16);
+        ctx.fillText('Görseller yüklenmedi. imageNames boş olabilir. (/acilmiskartgorsel/...)', 16, bounds.h - 16);
         ctx.restore();
       }
     }

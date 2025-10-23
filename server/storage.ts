@@ -21,9 +21,6 @@ export interface IStorage {
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
   updateTeamName(roomCode: string, team: Team, name: string): GameState | null;
   updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
-  updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
-  guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
-  guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   startGame(roomCode: string): GameState | null;
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null;
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
@@ -59,32 +56,37 @@ export class MemStorage implements IStorage {
     // Image pools for each card type - using actual file names
     const imagePools = {
       dark: [
-        '/acilmiskartgorselküçültülmüş/ali mavi.png',
-        '/acilmiskartgorselküçültülmüş/blush mavi.png',
-        '/acilmiskartgorselküçültülmüş/hasan mavi.png',
-        '/acilmiskartgorselküçültülmüş/kasım mavi.png',
-        '/acilmiskartgorselküçültülmüş/mami mavi.png',
-        '/acilmiskartgorselküçültülmüş/noeldayı mavi.png',
-        '/acilmiskartgorselküçültülmüş/nuriben mavi.png',
-        '/acilmiskartgorselküçültülmüş/çağrı mavi.png'
+        '/açılmış kelime kartları/ali mavi.png',
+        '/açılmış kelime kartları/blush mavi.png',
+        '/açılmış kelime kartları/hasan mavi.png',
+        '/açılmış kelime kartları/kasım mavi.png',
+        '/açılmış kelime kartları/mami mavi.png',
+        '/açılmış kelime kartları/noeldayı mavi.png',
+        '/açılmış kelime kartları/nuriben mavi.png',
+        '/açılmış kelime kartları/triel2 mavi.png',
+        '/açılmış kelime kartları/çağrı mavi.png'
       ],
       light: [
-        '/acilmiskartgorselküçültülmüş/alik kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/begüm kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/dobby kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/karaman kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/neswin kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/noeldayı kırmızı.png'
+        '/açılmış kelime kartları/alik kırmızı.png',
+        '/açılmış kelime kartları/begüm kırmızı.png',
+        '/açılmış kelime kartları/dobby kırmızı.png',
+        '/açılmış kelime kartları/karaman kırmızı.png',
+        '/açılmış kelime kartları/neswin kırmızı.png',
+        '/açılmış kelime kartları/noeldayı kırmızı.png',
+        '/açılmış kelime kartları/perver kırmızı.png',
+        '/açılmış kelime kartları/triel kırmızı.png',
+        '/açılmış kelime kartları/şinasi kırmızı.png'
       ],
       neutral: [
-        '/acilmiskartgorselküçültülmüş/blush beyaz.png',
-        '/acilmiskartgorselküçültülmüş/hasan beyaz.png',
-        '/acilmiskartgorselküçültülmüş/mami beyaz.png',
-        '/acilmiskartgorselküçültülmüş/perver beyaz.png',
-        '/acilmiskartgorselküçültülmüş/çağrı normal beyaz.png',
-        '/acilmiskartgorselküçültülmüş/çağrı sigara beyaz.png'
+        '/açılmış kelime kartları/blush beyaz.png',
+        '/açılmış kelime kartları/hasan beyaz.png',
+        '/açılmış kelime kartları/mami beyaz.png',
+        '/açılmış kelime kartları/perver beyaz.png',
+        '/açılmış kelime kartları/çağrı normal beyaz.png',
+        '/açılmış kelime kartları/çağrı sigara beyaz.png',
+        '/açılmış kelime kartları/şinasi su beyaz.png'
       ],
-      assassin: ['/acilmiskartgorselküçültülmüş/arda siyah.png']
+      assassin: ['/açılmış kelime kartları/arda siyah.png']
     };
 
     // Shuffle each pool
@@ -173,8 +175,6 @@ export class MemStorage implements IStorage {
       spymasterTime: 120, // Default 2 minutes for Intelligence Chiefs
       guesserTime: 180, // Default 3 minutes for Agents
       currentTurnStartTime: null,
-      chaosMode: false,
-      prophetGuessUsed: { dark: false, light: false },
     };
 
     this.rooms.set(roomCode, { 
@@ -389,66 +389,6 @@ export class MemStorage implements IStorage {
     return room;
   }
 
-  updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null {
-    const roomData = this.rooms.get(roomCode);
-    if (!roomData) return null;
-    const room = roomData.gameState;
-    
-    // Only allow chaos mode settings to be changed in lobby
-    if (room.phase !== "lobby") return null;
-
-    room.chaosMode = chaosMode;
-
-    return room;
-  }
-
-  private assignSecretRoles(room: GameState): void {
-    // Clear any existing secret roles
-    room.players.forEach(p => {
-      p.secretRole = null;
-      p.knownCards = undefined;
-    });
-
-    // Only assign roles to human players (not bots) who are guessers
-    const darkGuessers = room.players.filter(p => !p.isBot && p.team === "dark" && p.role === "guesser");
-    const lightGuessers = room.players.filter(p => !p.isBot && p.team === "light" && p.role === "guesser");
-    
-    // Assign Prophet to one player from each team (if there are guessers)
-    if (darkGuessers.length > 0) {
-      const darkProphet = darkGuessers[Math.floor(Math.random() * darkGuessers.length)];
-      darkProphet.secretRole = "prophet";
-      // Give prophet 3 random cards from their team
-      const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
-      const shuffled = darkCards.sort(() => Math.random() - 0.5);
-      darkProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
-    }
-    
-    if (lightGuessers.length > 0) {
-      const lightProphet = lightGuessers[Math.floor(Math.random() * lightGuessers.length)];
-      lightProphet.secretRole = "prophet";
-      // Give prophet 3 random cards from their team
-      const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
-      const shuffled = lightCards.sort(() => Math.random() - 0.5);
-      lightProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
-    }
-    
-    // Assign Double Agent to one remaining player from each team
-    const remainingDarkGuessers = darkGuessers.filter(p => p.secretRole !== "prophet");
-    const remainingLightGuessers = lightGuessers.filter(p => p.secretRole !== "prophet");
-    
-    // Assign Double Agent to one player from Dark team
-    if (remainingDarkGuessers.length > 0) {
-      const darkDoubleAgent = remainingDarkGuessers[Math.floor(Math.random() * remainingDarkGuessers.length)];
-      darkDoubleAgent.secretRole = "double_agent";
-    }
-    
-    // Assign Double Agent to one player from Light team  
-    if (remainingLightGuessers.length > 0) {
-      const lightDoubleAgent = remainingLightGuessers[Math.floor(Math.random() * remainingLightGuessers.length)];
-      lightDoubleAgent.secretRole = "double_agent";
-    }
-  }
-
   startGame(roomCode: string): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
@@ -473,11 +413,6 @@ export class MemStorage implements IStorage {
     room.currentClue = null;
     room.winner = null;
     room.revealHistory = [];
-
-    // Assign secret roles for Chaos Mode
-    if (room.chaosMode) {
-      this.assignSecretRoles(room);
-    }
     
     // Reset guess tracking
     roomData.guessesRemaining = 0;
@@ -649,17 +584,6 @@ export class MemStorage implements IStorage {
     if (room.timedMode) {
       room.currentTurnStartTime = Date.now();
     }
-    
-    // Reassign secret roles for Chaos Mode on restart
-    if (room.chaosMode) {
-      this.assignSecretRoles(room);
-    }
-
-    // Reset prophet guess tracking for new game
-    room.prophetGuessUsed = undefined;
-    room.prophetGuessResult = undefined;
-    room.doubleAgentGuessUsed = undefined;
-    room.doubleAgentGuessResult = undefined;
 
     return room;
   }
@@ -731,107 +655,6 @@ export class MemStorage implements IStorage {
     // Reset timer for new team's turn if timed mode is enabled
     if (room.timedMode) {
       room.currentTurnStartTime = Date.now();
-    }
-    
-    return room;
-  }
-
-  guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
-    const roomData = this.rooms.get(roomCode);
-    if (!roomData) return null;
-    const room = roomData.gameState;
-    
-    // Prophet guessing only works during the game, not after it ends
-    if (room.phase !== "playing" || !room.chaosMode) return null;
-    
-    // Check if player is a guesser on the current team
-    const player = room.players.find(p => p.id === playerId);
-    if (!player || player.team !== room.currentTeam || player.role !== "guesser") {
-      return null;
-    }
-    
-    // Check if the team hasn't used their prophet guess yet
-    if (room.prophetGuessUsed && room.prophetGuessUsed[room.currentTeam as "dark" | "light"]) {
-      return null;
-    }
-    
-    // Get the target player
-    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-    if (!targetPlayer || targetPlayer.team === room.currentTeam) {
-      return null; // Can't guess your own team
-    }
-    
-    // Mark the guess as used
-    if (!room.prophetGuessUsed) {
-      room.prophetGuessUsed = { dark: false, light: false };
-    }
-    room.prophetGuessUsed[room.currentTeam as "dark" | "light"] = true;
-    
-    // Check if the guess is correct
-    const isCorrect = targetPlayer.secretRole === "prophet";
-    
-    // Store the result
-    room.prophetGuessResult = {
-      team: room.currentTeam,
-      success: isCorrect,
-      targetId: targetPlayerId
-    };
-    
-    // If correct, the guessing team wins immediately
-    // If incorrect, the guessing team loses immediately!
-    if (isCorrect) {
-      room.winner = room.currentTeam;
-      room.phase = "ended";
-    } else {
-      // Wrong guess means instant loss for the guessing team!
-      room.winner = room.currentTeam === "dark" ? "light" : "dark";
-      room.phase = "ended";
-    }
-    
-    return room;
-  }
-
-  guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
-    const roomData = this.rooms.get(roomCode);
-    if (!roomData) return null;
-    const room = roomData.gameState;
-    
-    // Double agent guessing only works after the game ends, in chaos mode
-    if (room.phase !== "ended" || !room.chaosMode) return null;
-    
-    // Check if there's a winner already (a team won normally)
-    if (!room.winner) return null;
-    
-    // Check if double agent guess hasn't been used yet
-    if (room.doubleAgentGuessUsed) return null;
-    
-    // Check if player is on the losing team
-    const player = room.players.find(p => p.id === playerId);
-    if (!player || player.team === room.winner) {
-      return null; // Only losing team can guess
-    }
-    
-    // Get the target player
-    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-    if (!targetPlayer || targetPlayer.team !== room.winner) {
-      return null; // Can only guess players on the winning team
-    }
-    
-    // Mark the guess as used
-    room.doubleAgentGuessUsed = true;
-    
-    // Check if the guess is correct
-    const isCorrect = targetPlayer.secretRole === "double_agent";
-    
-    // Store the result
-    room.doubleAgentGuessResult = {
-      success: isCorrect,
-      targetId: targetPlayerId
-    };
-    
-    // If the guess is correct, the losing team steals the win
-    if (isCorrect) {
-      room.winner = player.team;
     }
     
     return room;
