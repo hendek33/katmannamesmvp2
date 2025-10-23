@@ -904,9 +904,9 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player || !player.team) return null;
     
-    // Check cooldown (20 seconds)
+    // Check cooldown (5 seconds)
     const now = Date.now();
-    if (player.lastTauntAt && (now - player.lastTauntAt) < 20000) {
+    if (player.lastTauntAt && (now - player.lastTauntAt) < 5000) {
       return null; // Still on cooldown
     }
     
@@ -955,9 +955,9 @@ export class MemStorage implements IStorage {
       return null;
     }
     
-    // Check player's personal cooldown (20 seconds)
+    // Check player's personal cooldown (5 seconds)
     const lastPlayerInsult = this.playerInsultCooldown.get(playerId) || 0;
-    if (now - lastPlayerInsult < 20000) {
+    if (now - lastPlayerInsult < 5000) {
       return null;
     }
     

@@ -34,7 +34,7 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-700 ease-out",
         isLeftSide ? "left-[8%] lg:left-[12%] xl:left-[15%]" : "right-[8%] lg:right-[12%] xl:right-[15%]",
-        "top-[8vh] lg:top-[10vh] xl:top-[12vh]",
+        "top-[9vh] lg:top-[11vh] xl:top-[13vh]",
         isVisible && !isLeaving ? "opacity-100" : "opacity-0",
         isLeaving && "animate-fade-out"
       )}

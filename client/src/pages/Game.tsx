@@ -234,10 +234,10 @@ export default function Game() {
   const handleTriggerTaunt = () => {
     if (tauntCooldown > 0 || !playerId || !tauntEnabled) return;
     
-    send("trigger_taunt", { playerId });
+    send("trigger_taunt", {});
     
-    // Set 20 second cooldown
-    setTauntCooldown(20);
+    // Set 5 second cooldown
+    setTauntCooldown(5);
   };
 
   const handleInsultClick = () => {
@@ -249,8 +249,8 @@ export default function Game() {
     setShowInsultTargetDialog(false);
     send("send_insult", { targetId: targetPlayerId });
     
-    // Set 20 second cooldown
-    setInsultCooldown(20);
+    // Set 5 second cooldown
+    setInsultCooldown(5);
   };
 
   // Countdown for taunt cooldown
