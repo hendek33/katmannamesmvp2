@@ -74,8 +74,8 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
     >
       {/* Speech bubble with video */}
       <div className={cn(
-        "relative backdrop-blur-lg rounded-2xl p-2 shadow-2xl border-2",
-        "w-[120px] h-[120px] animate-bounce-gentle",
+        "relative backdrop-blur-lg rounded-2xl p-1.5 shadow-2xl border-2",
+        "w-[90px] h-[90px] animate-bounce-gentle",
         senderTeam === 'dark' 
           ? "bg-blue-900/80 border-blue-500/60" 
           : "bg-red-900/80 border-red-500/60"
@@ -128,7 +128,7 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
         <div 
           className={cn(
             "absolute -bottom-2 w-3 h-3 transform rotate-45",
-            isLeftSide ? "left-6" : "right-6",
+            isLeftSide ? "left-4" : "right-4",
             senderTeam === 'dark'
               ? "bg-blue-900/80 border-r-2 border-b-2 border-blue-500/60"
               : "bg-red-900/80 border-r-2 border-b-2 border-red-500/60"
