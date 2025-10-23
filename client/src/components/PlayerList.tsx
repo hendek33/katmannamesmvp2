@@ -68,7 +68,7 @@ export function PlayerList({
       team === "dark" 
         ? "border-blue-700/50 hover:border-blue-600/50" 
         : "border-red-700/50 hover:border-red-600/50"
-    } ${needsSpymaster && isLobby ? "ring-2 ring-amber-500" : ""} p-4`}>
+    } p-4`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-1">
           <div className={`w-3 h-3 rounded-full ${gradient}`} />
