@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { videoPreloadManager } from "@/services/VideoPreloadManager";
 
 interface TurnVideoProps {
   team: "dark" | "light";
@@ -11,7 +10,6 @@ interface TurnVideoProps {
 export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoSrc = team === "dark" 
@@ -21,47 +19,19 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
-    // Video yüklenene kadar bekle
-    const checkAndPlay = async () => {
-      // Video cache'de mi kontrol et
-      if (!videoPreloadManager.isVideoLoaded(videoSrc)) {
-        console.log(`Video henüz yüklenmemiş, bekleniyor: ${videoSrc}`);
-        await videoPreloadManager.ensureAllVideosLoaded();
-      }
-      
-      setVideoReady(true);
-      
-      // Video hazırsa oynat
-      if (videoRef.current) {
-        // Küçük bir gecikme ekle (DOM render tamamlansın)
-        requestAnimationFrame(() => {
-          if (videoRef.current) {
-            videoRef.current.play().catch(err => {
-              console.error('Video play error:', err);
-            });
-          }
-        });
-      }
-      
-      // Auto hide after 4 seconds
-      timeoutId = setTimeout(() => {
-        setIsClosing(true);
-        setTimeout(() => {
-          setShow(false);
-          onComplete?.();
-        }, 600);
-      }, 4000);
-    };
-    
-    checkAndPlay();
+    // Auto hide after 4 seconds
+    timeoutId = setTimeout(() => {
+      setIsClosing(true);
+      setTimeout(() => {
+        setShow(false);
+        onComplete?.();
+      }, 600);
+    }, 4000);
 
     return () => {
       clearTimeout(timeoutId);
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
     };
-  }, [onComplete, videoSrc]);
+  }, [onComplete]);
 
   if (!show) return null;
 
@@ -105,21 +75,14 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
                 : '0 0 60px rgba(239,68,68,0.6), inset 0 0 30px rgba(239,68,68,0.3)'
             }}
           >
-            {/* Video yüklenene kadar loading */}
-            {!videoReady ? (
-              <div className="w-full h-full flex items-center justify-center bg-black/50">
-                <div className="text-white animate-pulse">Yükleniyor...</div>
-              </div>
-            ) : (
-              <video
-                ref={videoRef}
-                src={videoSrc}
-                muted
-                playsInline
-                className="w-full h-full object-cover"
-                // Preload auto kaldırıldı çünkü videoPreloadManager hallediyor
-              />
-            )}
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              autoPlay
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
             
             {/* Gradient overlay for better blending */}
             <div 
