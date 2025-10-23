@@ -334,62 +334,21 @@ export default function Lobby() {
           <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Panel - Team Operations (7 cols on lg) */}
             <div className="col-span-12 lg:col-span-7 flex flex-col gap-4 overflow-hidden">
-              {/* Mission Briefing - Enhanced Glassmorphism */}
-              {currentPlayer && (
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
-                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
-                    <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-blue-600 blur-md opacity-50" />
-                        <div className="relative w-10 h-10 rounded-lg bg-gradient-to-r from-red-700 to-blue-700 flex items-center justify-center shadow-lg">
-                          <User className="w-5 h-5 text-white" />
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start gap-4">
-                          <div>
-                            <p className="text-sm text-slate-400">Hoş geldin</p>
-                            <p className="text-lg font-bold text-slate-100">{currentPlayer.username}</p>
-                          </div>
-                          {/* Developer Note */}
-                          <div className="ml-auto">
-                            <div className="text-xs text-amber-400/80 space-y-0.5">
-                              <div className="font-medium flex items-center gap-1">
-                                <Zap className="w-3 h-3" />
-                                Geliştiriciden not:
-                              </div>
-                              <div className="italic text-amber-400/60">
-                                Çağrı abi tasarımları yaparken biraz geç fark ettim, senin mavi takım olman gerekecek maalesef :=)
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+              {/* Developer Notes Card */}
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 to-amber-500/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
+                <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+                  <div className="text-xs text-amber-400/80 space-y-0.5">
+                    <div className="font-medium flex items-center gap-1">
+                      <Zap className="w-3 h-3" />
+                      Geliştiriciden not:
                     </div>
-                    {currentPlayer.team && (
-                      <div className="flex items-center gap-2">
-                        <div className={`px-3 py-1.5 rounded-lg font-medium ${
-                          currentPlayer.team === "dark" 
-                            ? "bg-blue-900/50 border border-blue-700/50 text-blue-300"
-                            : "bg-red-900/50 border border-red-700/50 text-red-300"
-                        }`}>
-                          <span className="text-sm">
-                            {currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                          </span>
-                        </div>
-                        {currentPlayer.role === "spymaster" && (
-                          <div className="px-3 py-1.5 bg-amber-900/50 border border-amber-700/50 rounded-lg">
-                            <Shield className="w-4 h-4 text-amber-400" />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                    <div className="italic text-amber-400/60">
+                      Çağrı abi tasarımları yaparken biraz geç fark ettim, senin mavi takım olman gerekecek maalesef :=)
+                    </div>
                   </div>
                 </div>
-              )}
+              </div>
               
               {/* Team Dashboard */}
               <div className="flex-1 overflow-hidden">
