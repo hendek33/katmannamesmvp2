@@ -7,6 +7,7 @@ import { ClueDisplay } from "@/components/ClueDisplay";
 import { PlayerList } from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
+import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,7 @@ export default function Game() {
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
   const [showAssassinVideo, setShowAssassinVideo] = useState<{ show: boolean; x?: number; y?: number }>({ show: false });
+  const [showNormalWinVideo, setShowNormalWinVideo] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
@@ -151,6 +153,23 @@ export default function Game() {
     }
   }, [gameState?.revealHistory, gameState?.phase]);
 
+  // Detect normal win and show video
+  useEffect(() => {
+    if (!gameState || gameState.phase !== "ended" || !gameState.winner) return;
+    
+    const lastReveal = gameState.revealHistory.length > 0 
+      ? gameState.revealHistory[gameState.revealHistory.length - 1] as any
+      : null;
+    
+    // If last revealed card is NOT assassin, show normal win video
+    if (lastReveal && lastReveal.type !== "assassin") {
+      // Small delay to let the last card reveal animation finish
+      setTimeout(() => {
+        setShowNormalWinVideo(true);
+      }, 1000);
+    }
+  }, [gameState?.phase, gameState?.winner]);
+
   const handleCopyRoomCode = () => {
     if (roomCode) {
       navigator.clipboard.writeText(roomCode);
@@ -184,6 +203,7 @@ export default function Game() {
     send("restart_game", {});
     assassinShownRef.current = false;
     previousTurnRef.current = null; // Reset turn tracking for new game
+    setShowNormalWinVideo(false); // Reset normal win video
   };
 
   useEffect(() => {
@@ -275,14 +295,24 @@ export default function Game() {
         <AssassinVideo
           winnerTeam={gameState.winner}
           winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          loserTeamName={gameState.winner === "dark" ? gameState.lightTeamName : gameState.darkTeamName}
           startX={showAssassinVideo.x}
           startY={showAssassinVideo.y}
           onComplete={() => setShowAssassinVideo({ show: false })}
         />
       )}
 
-      {/* Game End Notification - Auto disappears (only for non-assassin wins) */}
-      {gameState.phase === "ended" && gameState.winner && !wasAssassinRevealed && (
+      {/* Normal Win Video */}
+      {showNormalWinVideo && gameState && gameState.winner && (
+        <NormalWinVideo
+          winnerTeam={gameState.winner}
+          winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          onComplete={() => setShowNormalWinVideo(false)}
+        />
+      )}
+
+      {/* Game End Notification - Auto disappears (only for non-assassin wins, if video is not showing) */}
+      {gameState.phase === "ended" && gameState.winner && !wasAssassinRevealed && !showNormalWinVideo && (
         <div 
           className="fixed inset-x-0 top-32 z-50 flex justify-center px-4 pointer-events-none"
           style={{
