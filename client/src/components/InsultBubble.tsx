@@ -31,19 +31,19 @@ export function InsultBubble({ senderUsername, senderTeam, message }: InsultBubb
     <div 
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-500",
-        isLeftSide ? "left-[20%]" : "right-[20%]",
-        "top-1/2 -translate-y-1/2",
+        isLeftSide ? "left-[22%]" : "right-[22%]",
+        "top-[30%]",
         isVisible && !isLeaving ? "opacity-100 scale-100" : "opacity-0 scale-75",
         isLeaving && "opacity-0 scale-110"
       )}
       style={{
-        transform: `translateY(-50%) ${isVisible && !isLeaving ? 'translateX(0)' : isLeftSide ? 'translateX(-100px)' : 'translateX(100px)'} scale(${isVisible && !isLeaving ? 1 : isLeaving ? 1.1 : 0.75})`,
+        transform: `${isVisible && !isLeaving ? 'translateX(0)' : isLeftSide ? 'translateX(-100px)' : 'translateX(100px)'} scale(${isVisible && !isLeaving ? 1 : isLeaving ? 1.1 : 0.75})`,
       }}
     >
       {/* Speech bubble */}
       <div className={cn(
         "relative backdrop-blur-lg rounded-2xl p-4 shadow-2xl border-2",
-        "max-w-xs animate-bounce-gentle",
+        "max-w-[150px] animate-bounce-gentle",
         senderTeam === 'dark' 
           ? "bg-blue-900/80 border-blue-500/60 text-blue-100" 
           : "bg-red-900/80 border-red-500/60 text-red-100"
