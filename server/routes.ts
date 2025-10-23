@@ -781,8 +781,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            // Extract targetId from payload
-            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, payload?.targetId);
+            // CRITICAL FIX - Pass targetId properly
+            const targetId = payload.targetId;
+            console.log("[CRITICAL] Passing targetId:", targetId);
+            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, targetId);
             if (!insultData) {
               sendToClient(ws, { type: "error", payload: { message: "Laf sokma devre dışı veya cooldown'da" } });
               return;
