@@ -56,81 +56,68 @@ export class MemStorage implements IStorage {
   }
 
   private assignCardImages(roomData: RoomData): void {
-    // Image pools for each card type - using ONLY actual file names that exist
+    // Image pools for each card type - using ALL available images from both folders
     const imagePools = {
       dark: [
-        '/acilmiskartgorselküçültülmüş/ali mavi.png',
-        '/acilmiskartgorselküçültülmüş/blush mavi.png',
-        '/acilmiskartgorselküçültülmüş/hasan mavi.png',
-        '/acilmiskartgorselküçültülmüş/kasım mavi.png',
-        '/acilmiskartgorselküçültülmüş/mami mavi.png',
-        '/acilmiskartgorselküçültülmüş/noeldayı mavi.png',
-        '/acilmiskartgorselküçültülmüş/nuriben mavi.png',
-        '/acilmiskartgorselküçültülmüş/çağrı mavi.png'
+        '/acilmiskartgorsel/ali mavi.png',
+        '/acilmiskartgorsel/blush mavi.png',
+        '/acilmiskartgorsel/hasan mavi.png',
+        '/acilmiskartgorsel/kasım mavi.png',
+        '/acilmiskartgorsel/mami mavi.png',
+        '/acilmiskartgorsel/noeldayı mavi.png',
+        '/acilmiskartgorsel/nuriben mavi.png',
+        '/acilmiskartgorsel/çağrı mavi.png',
+        '/acilmiskartgorsel/triel2 mavi.png'  // 9 total blue/dark cards!
       ],
       light: [
-        '/acilmiskartgorselküçültülmüş/alik kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/begüm kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/dobby kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/karaman kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/neswin kırmızı.png',
-        '/acilmiskartgorselküçültülmüş/noeldayı kırmızı.png'
+        '/acilmiskartgorsel/alik kırmızı.png',
+        '/acilmiskartgorsel/begüm kırmızı.png',
+        '/acilmiskartgorsel/dobby kırmızı.png',
+        '/acilmiskartgorsel/karaman kırmızı.png',
+        '/acilmiskartgorsel/neswin kırmızı.png',
+        '/acilmiskartgorsel/noeldayı kırmızı.png',
+        '/acilmiskartgorsel/perver kırmızı.png',
+        '/acilmiskartgorsel/triel kırmızı.png',
+        '/acilmiskartgorsel/şinasi kırmızı.png'  // 9 total red/light cards!
       ],
       neutral: [
-        '/acilmiskartgorselküçültülmüş/blush beyaz.png',
-        '/acilmiskartgorselküçültülmüş/hasan beyaz.png',
-        '/acilmiskartgorselküçültülmüş/mami beyaz.png',
-        '/acilmiskartgorselküçültülmüş/perver beyaz.png',
-        '/acilmiskartgorselküçültülmüş/çağrı normal beyaz.png',
-        '/acilmiskartgorselküçültülmüş/çağrı sigara beyaz.png'
+        '/acilmiskartgorsel/blush beyaz.png',
+        '/acilmiskartgorsel/hasan beyaz.png',
+        '/acilmiskartgorsel/mami beyaz.png',
+        '/acilmiskartgorsel/perver beyaz.png',
+        '/acilmiskartgorsel/çağrı normal beyaz.png',
+        '/acilmiskartgorsel/çağrı sigara beyaz.png',
+        '/acilmiskartgorsel/şinasi su beyaz.png'  // 7 total neutral cards!
       ],
-      assassin: ['/acilmiskartgorselküçültülmüş/arda siyah.png']
+      assassin: ['/acilmiskartgorsel/arda siyah.png']
     };
-
-    // Duplicate pools to have enough images for all cards
-    // Dark needs 9, we have 8, so add one duplicate
-    const darkPool = [...imagePools.dark];
-    if (darkPool.length < 9) {
-      darkPool.push(darkPool[Math.floor(Math.random() * darkPool.length)]);
-    }
-    
-    // Light needs 9, we have 6, so add three duplicates
-    const lightPool = [...imagePools.light];
-    while (lightPool.length < 9) {
-      lightPool.push(imagePools.light[Math.floor(Math.random() * imagePools.light.length)]);
-    }
-    
-    // Neutral needs 7, we have 6, so add one duplicate
-    const neutralPool = [...imagePools.neutral];
-    if (neutralPool.length < 7) {
-      neutralPool.push(neutralPool[Math.floor(Math.random() * neutralPool.length)]);
-    }
 
     // Shuffle each pool
-    const shuffledPools = {
-      dark: darkPool.sort(() => Math.random() - 0.5),
-      light: lightPool.sort(() => Math.random() - 0.5),
-      neutral: neutralPool.sort(() => Math.random() - 0.5),
-      assassin: [...imagePools.assassin]
-    };
+    for (const type in imagePools) {
+      imagePools[type as keyof typeof imagePools] = imagePools[type as keyof typeof imagePools]
+        .sort(() => Math.random() - 0.5);
+    }
 
-    // Create the mapping - ensure EVERY card gets an image
+    // Create the mapping - now we have enough unique images for all cards!
     const cardImages = new Map<number, string>();
     const imageIndexes = { dark: 0, light: 0, neutral: 0, assassin: 0 };
 
-    // Assign images to each card based on its type
+    // Assign unique images to each card based on its type
     roomData.gameState.cards.forEach(card => {
       const type = card.type;
-      const pool = shuffledPools[type];
+      const pool = imagePools[type];
       const index = imageIndexes[type];
       
-      // This should never happen now, but just in case
-      if (!pool || pool.length === 0) {
-        console.error(`No images available for card type: ${type}`);
-        return;
+      // This should never happen now that we have enough images
+      if (!pool || index >= pool.length) {
+        console.error(`Not enough images for card type: ${type}, index: ${index}`);
+        // Fallback: use modulo to reuse images if needed
+        const safeIndex = index % pool.length;
+        cardImages.set(card.id, pool[safeIndex]);
+      } else {
+        cardImages.set(card.id, pool[index]);
       }
       
-      cardImages.set(card.id, pool[index]);
       imageIndexes[type]++;
     });
 
