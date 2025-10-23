@@ -81,7 +81,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   
   // Handle mouse movement for 3D tilt effect
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current || card.revealed) return;
+    if (!cardRef.current) return;
     
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -98,9 +98,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   };
   
   const handleMouseEnter = () => {
-    if (!card.revealed) {
-      setIsHovered(true);
-    }
+    setIsHovered(true);
   };
   
   const handleMouseLeave = () => {
@@ -135,6 +133,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         colors.bg,
         colors.shadow,
         !card.revealed && "cursor-pointer",
+        card.revealed && "cursor-pointer hover-shimmer",
         "ring-2 ring-black/20",
         card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
         isAssassinCard && gameEnded && "animate-assassin-reveal",
