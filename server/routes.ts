@@ -781,12 +781,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            // FIX: Properly extract targetId from payload
-            const targetIdFromPayload = payload && payload.targetId ? String(payload.targetId) : undefined;
-            console.log("[FIX] Original payload:", JSON.stringify(payload));
-            console.log("[FIX] Extracted targetId:", targetIdFromPayload);
-            
-            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, targetIdFromPayload);
+            // Extract targetId from payload
+            const insultData = storage.sendInsult(ws.roomCode, ws.playerId, payload?.targetId);
             if (!insultData) {
               sendToClient(ws, { type: "error", payload: { message: "Laf sokma devre dışı veya cooldown'da" } });
               return;
