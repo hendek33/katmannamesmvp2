@@ -113,16 +113,11 @@ export default function Lobby() {
 
   const handleStartGame = () => {
     // Check if team names are still default
-    if (gameState?.darkTeamName === "Katman Koyu" && gameState?.lightTeamName === "Katman Açık") {
+    if (gameState?.darkTeamName === "Mavi Takım" || gameState?.lightTeamName === "Kırmızı Takım") {
       setShowTeamNameWarning(true);
     } else {
       send("start_game", {});
     }
-  };
-  
-  const handleConfirmStartWithDefaultNames = () => {
-    setShowTeamNameWarning(false);
-    send("start_game", {});
   };
 
   const handleAddBot = (team: "dark" | "light", role: "spymaster" | "guesser") => {
@@ -732,16 +727,20 @@ export default function Lobby() {
       <AlertDialog open={showTeamNameWarning} onOpenChange={setShowTeamNameWarning}>
         <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Takım İsimlerini Değiştirmek İster Misiniz?</AlertDialogTitle>
+            <AlertDialogTitle className="text-red-500">⚠️ Takım İsimleri Değiştirilmeli!</AlertDialogTitle>
             <AlertDialogDescription>
-              Takım isimleri hala varsayılan değerlerde: "Katman Koyu" ve "Katman Açık".<br />
-              Özel takım isimleri belirlemek ister misiniz?
+              Oyunu başlatmak için her iki takımın da ismini değiştirmelisiniz.<br /><br />
+              <span className="font-semibold">Mevcut isimler:</span><br />
+              • {gameState?.darkTeamName === "Mavi Takım" && <span className="text-red-400">Mavi Takım (varsayılan - değiştirilmeli)</span>}
+              {gameState?.darkTeamName !== "Mavi Takım" && <span className="text-green-400">{gameState?.darkTeamName} ✓</span>}<br />
+              • {gameState?.lightTeamName === "Kırmızı Takım" && <span className="text-red-400">Kırmızı Takım (varsayılan - değiştirilmeli)</span>}
+              {gameState?.lightTeamName !== "Kırmızı Takım" && <span className="text-green-400">{gameState?.lightTeamName} ✓</span>}<br /><br />
+              Lütfen takım isimlerini değiştirin ve tekrar deneyin.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>İsimleri Değiştir</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmStartWithDefaultNames}>
-              Varsayılan İsimlerle Devam Et
+            <AlertDialogAction onClick={() => setShowTeamNameWarning(false)}>
+              Tamam
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
