@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { videoPreloadManager } from "@/services/VideoPreloadManager";
 
 interface AssassinVideoProps {
   winnerTeam: "dark" | "light";
@@ -15,17 +16,37 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
   const [showWinnerText, setShowWinnerText] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [fadeOutWinner, setFadeOutWinner] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const videoSrc = "/siyah kelime seçme.mp4";
 
   useEffect(() => {
-    // Simple play logic
-    if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.error('Assassin video play error:', err);
-        // If video fails, still show winner
-        handleVideoEnd();
-      });
-    }
+    // Video yüklenene kadar bekle
+    const checkAndPlay = async () => {
+      // Video cache'de mi kontrol et
+      if (!videoPreloadManager.isVideoLoaded(videoSrc)) {
+        console.log(`Assassin video henüz yüklenmemiş, bekleniyor: ${videoSrc}`);
+        await videoPreloadManager.ensureAllVideosLoaded();
+      }
+      
+      setVideoReady(true);
+      
+      // Video hazırsa oynat
+      if (videoRef.current) {
+        // Küçük bir gecikme ekle (DOM render tamamlansın)
+        requestAnimationFrame(() => {
+          if (videoRef.current) {
+            videoRef.current.play().catch(err => {
+              console.error('Assassin video play error:', err);
+              // If video fails, still show winner
+              handleVideoEnd();
+            });
+          }
+        });
+      }
+    };
+    
+    checkAndPlay();
     
     return () => {
       if (videoRef.current) {
@@ -102,15 +123,21 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
                 boxShadow: '0 0 100px rgba(147,51,234,0.8), inset 0 0 50px rgba(147,51,234,0.4)'
               }}
             >
-              <video
-                ref={videoRef}
-                src="/siyah kelime seçme.mp4"
-                autoPlay
-                muted
-                playsInline
-                onEnded={handleVideoEnd}
-                className="w-full h-full object-cover"
-              />
+              {/* Video yüklenene kadar loading */}
+              {!videoReady ? (
+                <div className="w-full h-full flex items-center justify-center bg-black/50">
+                  <div className="text-white animate-pulse">Yükleniyor...</div>
+                </div>
+              ) : (
+                <video
+                  ref={videoRef}
+                  src={videoSrc}
+                  muted
+                  playsInline
+                  onEnded={handleVideoEnd}
+                  className="w-full h-full object-cover"
+                />
+              )}
               
               {/* Dark gradient overlay */}
               <div 
