@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { playbackController } from "@/services/PlaybackController";
 
 interface TurnVideoProps {
   team: "dark" | "light";
@@ -11,60 +10,38 @@ interface TurnVideoProps {
 export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
   const [show, setShow] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
-  
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const videoSrc = team === "dark" 
+    ? "/mavi takım video tur.mp4"
+    : "/kırmızı takım video tur.mp4";
+
   useEffect(() => {
-    let mounted = true;
+    let timeoutId: NodeJS.Timeout;
     
-    const setupVideo = async () => {
-      try {
-        // PlaybackController'ı başlat
-        await playbackController.initialize();
-        
-        if (!mounted) return;
-        
-        const videoName = team === "dark" ? "turn-dark" : "turn-light";
-        
-        // Video hazır mı kontrol et
-        if (playbackController.isVideoReady(videoName)) {
-          setIsVideoReady(true);
-          
-          // Video'yu container'a ekle ve oynat
-          if (mounted && videoContainerRef.current) {
-            await playbackController.attachAndPlay(videoName, videoContainerRef.current);
-          }
-        }
-      } catch (error) {
-        console.error('Video setup error:', error);
-      }
-      
-      // 4 saniye sonra kapat
-      timeoutRef.current = setTimeout(() => {
-        if (!mounted) return;
-        setIsClosing(true);
-        setTimeout(() => {
-          if (!mounted) return;
-          setShow(false);
-          onComplete?.();
-        }, 600);
-      }, 4000);
-    };
+    // Simple play logic
+    if (videoRef.current) {
+      videoRef.current.play().catch(err => {
+        console.error('Video play error:', err);
+      });
+    }
     
-    setupVideo();
-    
+    // Auto hide after 4 seconds
+    timeoutId = setTimeout(() => {
+      setIsClosing(true);
+      setTimeout(() => {
+        setShow(false);
+        onComplete?.();
+      }, 600);
+    }, 4000);
+
     return () => {
-      mounted = false;
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      // Video'yu temizle
-      if (videoContainerRef.current) {
-        videoContainerRef.current.innerHTML = '';
+      clearTimeout(timeoutId);
+      if (videoRef.current) {
+        videoRef.current.pause();
       }
     };
-  }, [team, onComplete]);
+  }, [onComplete]);
 
   if (!show) return null;
 
@@ -108,34 +85,14 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
                 : '0 0 60px rgba(239,68,68,0.6), inset 0 0 30px rgba(239,68,68,0.3)'
             }}
           >
-            {/* Video container veya fallback */}
-            <div ref={videoContainerRef} className="w-full h-full">
-              {!isVideoReady && (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-                  {/* Animated fallback - pulsing circle */}
-                  <div className="relative">
-                    <div 
-                      className={cn(
-                        "w-32 h-32 rounded-full animate-pulse",
-                        team === "dark" ? "bg-blue-600/50" : "bg-red-600/50"
-                      )}
-                    />
-                    <div 
-                      className={cn(
-                        "absolute inset-4 rounded-full animate-pulse animation-delay-200",
-                        team === "dark" ? "bg-blue-500/70" : "bg-red-500/70"
-                      )}
-                    />
-                    <div 
-                      className={cn(
-                        "absolute inset-8 rounded-full animate-pulse animation-delay-400",
-                        team === "dark" ? "bg-blue-400" : "bg-red-400"
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              autoPlay
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
             
             {/* Gradient overlay for better blending */}
             <div 
@@ -246,14 +203,6 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
           75% {
             transform: translateY(-10px) translateX(20px);
           }
-        }
-        
-        .animation-delay-200 {
-          animation-delay: 200ms;
-        }
-        
-        .animation-delay-400 {
-          animation-delay: 400ms;
         }
       `}</style>
     </div>

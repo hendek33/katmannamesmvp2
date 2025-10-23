@@ -34,16 +34,6 @@ export default function Game() {
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
   const assassinShownRef = useRef<boolean>(false);
-  
-  // Debug logging
-  console.log('Game page state:', {
-    isConnected,
-    gameStatePhase: gameState?.phase,
-    playerId,
-    roomCode,
-    showTurnVideo,
-    showAssassinVideo
-  });
 
   useEffect(() => {
     if (error) {

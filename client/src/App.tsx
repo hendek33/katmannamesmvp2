@@ -5,7 +5,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
-import { playbackController } from "@/services/PlaybackController";
+import { videoCache } from "@/services/VideoCache";
+import { VideoPreloader } from "@/components/VideoPreloader";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
@@ -28,18 +29,12 @@ function Router() {
 
 function App() {
   useEffect(() => {
-    // Uygulama başladığında videoları yükle
-    console.log('App mounting, initializing videos...');
-    playbackController.initialize()
-      .then(() => console.log('Videos initialized successfully'))
-      .catch(err => {
-        console.error('Video initialization failed:', err);
-      });
+    // Preload all videos when app starts
+    videoCache.preloadAllVideos();
     
-    // Cleanup
+    // Cleanup on unmount
     return () => {
-      console.log('App unmounting, disposing videos...');
-      playbackController.dispose();
+      videoCache.dispose();
     };
   }, []);
   
@@ -47,6 +42,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
         <TooltipProvider>
+          <VideoPreloader />
           <Toaster />
           <Router />
         </TooltipProvider>
