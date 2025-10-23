@@ -1,6 +1,6 @@
 /**
  * PlaybackController - Video yönetimi için merkezi singleton servis
- * Videoları blob URL olarak prefetch eder ve persistent video elementleri tutar
+ * Videoları blob URL olarak prefetch eder ve decoded frame'leri korur
  */
 class PlaybackController {
   private static instance: PlaybackController;
@@ -61,19 +61,34 @@ class PlaybackController {
         video.style.display = 'none';
         video.style.position = 'fixed';
         video.style.left = '-9999px';
+        video.style.pointerEvents = 'none';
         
-        // Video'yu decode et
+        // DOM'a ekle (decode için gerekli)
+        document.body.appendChild(video);
+        
+        // Video'yu decode et ve hazır tut
         await new Promise((resolve, reject) => {
-          video.addEventListener('loadeddata', resolve, { once: true });
-          video.addEventListener('error', reject, { once: true });
+          const handleCanPlay = () => {
+            video.removeEventListener('canplaythrough', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            resolve(undefined);
+          };
+          
+          const handleError = () => {
+            video.removeEventListener('canplaythrough', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            reject(new Error(`Video load failed: ${name}`));
+          };
+          
+          video.addEventListener('canplaythrough', handleCanPlay);
+          video.addEventListener('error', handleError);
+          
+          // Video'yu yükle ve decode et
           video.load();
         });
         
-        // DOM'a ekle (persistent tutmak için)
-        document.body.appendChild(video);
         this.videoElements.set(name, video);
-        
-        console.log(`✅ Video yüklendi: ${name}`);
+        console.log(`✅ Video yüklendi ve decode edildi: ${name}`);
       } catch (error) {
         console.error(`❌ Video yüklenemedi: ${name}`, error);
       }
@@ -84,13 +99,6 @@ class PlaybackController {
   }
   
   /**
-   * Video oynatmak için element döndürür
-   */
-  getVideoElement(name: string): HTMLVideoElement | null {
-    return this.videoElements.get(name) || null;
-  }
-  
-  /**
    * Video'nun yüklenip yüklenmediğini kontrol eder
    */
   isVideoReady(name: string): boolean {
@@ -98,31 +106,48 @@ class PlaybackController {
   }
   
   /**
-   * Belirli bir video'yu klonlar ve oynatır
+   * Persistent video elementini döndürür (decode edilmiş frame'lerle)
+   * Component bu elementi direkt kullanabilir
    */
-  async playVideo(name: string): Promise<HTMLVideoElement> {
-    await this.initialize();
-    
+  getDecodedVideoElement(name: string): HTMLVideoElement | null {
     const original = this.videoElements.get(name);
-    if (!original) {
+    if (!original) return null;
+    
+    // Orijinal elementi klonla (decoded frame'ler korunur)
+    const cloned = original.cloneNode(true) as HTMLVideoElement;
+    cloned.style.display = '';
+    cloned.style.position = '';
+    cloned.style.left = '';
+    cloned.style.pointerEvents = '';
+    
+    // Önemli: klonlanmış element aynı blob URL'yi kullanır
+    // ve tarayıcı decode edilmiş frame'leri yeniden kullanır
+    return cloned;
+  }
+  
+  /**
+   * Video'yu container'a ekler ve oynatır
+   */
+  async attachAndPlay(name: string, container: HTMLElement): Promise<void> {
+    const video = this.getDecodedVideoElement(name);
+    if (!video) {
       throw new Error(`Video not found: ${name}`);
     }
     
-    // Orijinal video'nun src'sini kullanarak yeni element oluştur
-    const video = document.createElement('video');
-    video.src = original.src;
-    video.muted = true;
-    video.playsInline = true;
-    video.autoplay = true;
+    // Container'ı temizle
+    container.innerHTML = '';
     
-    // Oynatmaya çalış
+    // Video'yu ekle
+    video.className = 'w-full h-full object-cover';
+    container.appendChild(video);
+    
+    // DOM'a eklendikten sonra oynat
     try {
       await video.play();
     } catch (err) {
       console.error(`Playback error for ${name}:`, err);
+      throw err;
     }
-    
-    return video;
   }
   
   /**

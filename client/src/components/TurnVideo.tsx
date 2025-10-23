@@ -31,15 +31,10 @@ export function TurnVideo({ team, teamName, onComplete }: TurnVideoProps) {
         if (playbackController.isVideoReady(videoName)) {
           setIsVideoReady(true);
           
-          // Video'yu oynat
-          const video = await playbackController.playVideo(videoName);
-          
-          if (!mounted || !videoContainerRef.current) return;
-          
-          // Video'yu container'a ekle
-          video.className = "w-full h-full object-cover";
-          videoContainerRef.current.innerHTML = '';
-          videoContainerRef.current.appendChild(video);
+          // Video'yu container'a ekle ve oynat
+          if (mounted && videoContainerRef.current) {
+            await playbackController.attachAndPlay(videoName, videoContainerRef.current);
+          }
         }
       } catch (error) {
         console.error('Video setup error:', error);

@@ -34,16 +34,15 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, onComplete }: Assass
         if (playbackController.isVideoReady("assassin")) {
           setIsVideoReady(true);
           
-          // Video'yu oynat
-          const video = await playbackController.playVideo("assassin");
-          
-          if (!mounted || !videoContainerRef.current) return;
-          
-          // Video'yu container'a ekle
-          video.className = "w-full h-full object-cover";
-          video.onended = handleVideoEnd;
-          videoContainerRef.current.innerHTML = '';
-          videoContainerRef.current.appendChild(video);
+          // Video'yu container'a ekle ve oynat
+          if (mounted && videoContainerRef.current) {
+            await playbackController.attachAndPlay("assassin", videoContainerRef.current);
+            // onended event'i container'daki video'ya ekle
+            const video = videoContainerRef.current.querySelector('video');
+            if (video) {
+              video.onended = handleVideoEnd;
+            }
+          }
         } else {
           // Video yoksa direkt end'e geç
           handleVideoEnd();
