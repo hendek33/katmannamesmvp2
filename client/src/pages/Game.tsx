@@ -11,6 +11,7 @@ import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
+import { BubbleManagerProvider } from "@/contexts/BubbleManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -417,7 +418,8 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <BubbleManagerProvider>
+      <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
@@ -456,6 +458,7 @@ export default function Game() {
           senderUsername={taunt.username}
           senderTeam={taunt.team}
           videoSrc={taunt.videoSrc}
+          timestamp={taunt.expiresAt - 3000} // Use expiresAt - duration as timestamp
         />
       ))}
       
@@ -1970,5 +1973,6 @@ export default function Game() {
         </div>
       </div>
     </div>
+    </BubbleManagerProvider>
   );
 }

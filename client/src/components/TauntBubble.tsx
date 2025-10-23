@@ -1,20 +1,38 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useBubbleManager } from '@/contexts/BubbleManager';
 
 interface TauntBubbleProps {
   senderUsername: string;
   senderTeam: "dark" | "light" | null;
   videoSrc: string;
+  timestamp: number;
 }
 
-export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbleProps) {
+export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }: TauntBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [verticalOffset, setVerticalOffset] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const bubbleId = useRef(`taunt-${timestamp}-${senderUsername}`).current;
+  const { registerBubble, unregisterBubble, getVerticalOffset } = useBubbleManager();
 
   const handleVideoReady = () => {
     setIsVideoLoaded(true);
+    
+    // Register bubble after video is loaded
+    if (senderTeam && senderTeam !== null) {
+      const offset = registerBubble({
+        id: bubbleId,
+        team: senderTeam,
+        timestamp,
+        duration: 3000,
+        type: 'taunt'
+      });
+      setVerticalOffset(offset);
+    }
+    
     // Show bubble only after video is loaded
     setTimeout(() => {
       setIsVisible(true);
@@ -31,13 +49,22 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
       videoRef.current.load();
     }
     
+    // Update position when offset changes
+    const updateInterval = setInterval(() => {
+      const newOffset = getVerticalOffset(bubbleId);
+      setVerticalOffset(newOffset);
+    }, 50);
+    
     // Start fade out after 2.5 seconds
     const fadeOutTimer = setTimeout(() => {
       setIsLeaving(true);
     }, 2500);
 
-    return () => clearTimeout(fadeOutTimer);
-  }, []);
+    return () => {
+      clearTimeout(fadeOutTimer);
+      clearInterval(updateInterval);
+    };
+  }, [bubbleId]);
 
   // Determine position based on team
   const isLeftSide = senderTeam === 'dark';
@@ -64,11 +91,11 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-700 ease-out",
         isLeftSide ? "left-[8%] lg:left-[12%] xl:left-[15%]" : "right-[8%] lg:right-[12%] xl:right-[15%]",
-        "top-[9vh] lg:top-[11vh] xl:top-[13vh]",
         isVisible && !isLeaving ? "opacity-100" : "opacity-0",
         isLeaving && "animate-fade-out"
       )}
       style={{
+        top: `calc(9vh + ${verticalOffset}px)`,
         transform: `${isVisible && !isLeaving ? 'translateY(0)' : 'translateY(-20px)'}`,
       }}
     >

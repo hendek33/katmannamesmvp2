@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { useBubbleManager } from '@/contexts/BubbleManager';
 
 interface InsultBubbleProps {
   senderUsername: string;
@@ -10,11 +11,30 @@ interface InsultBubbleProps {
   timestamp: number;
 }
 
-export function InsultBubble({ senderUsername, senderTeam, targetUsername, targetTeam, message }: InsultBubbleProps) {
+export function InsultBubble({ senderUsername, senderTeam, targetUsername, targetTeam, message, timestamp }: InsultBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [verticalOffset, setVerticalOffset] = useState(0);
+  const bubbleId = useRef(`insult-${timestamp}-${senderUsername}`).current;
+  const { registerBubble, unregisterBubble, getVerticalOffset } = useBubbleManager();
 
   useEffect(() => {
+    // Register bubble and get initial offset
+    const offset = registerBubble({
+      id: bubbleId,
+      team: senderTeam,
+      timestamp,
+      duration: 3000,
+      type: 'insult'
+    });
+    setVerticalOffset(offset);
+
+    // Update position when offset changes
+    const updateInterval = setInterval(() => {
+      const newOffset = getVerticalOffset(bubbleId);
+      setVerticalOffset(newOffset);
+    }, 50);
+
     // Fade in
     setTimeout(() => setIsVisible(true), 10);
     
@@ -23,8 +43,11 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
       setIsLeaving(true);
     }, 2500);
 
-    return () => clearTimeout(fadeOutTimer);
-  }, []);
+    return () => {
+      clearTimeout(fadeOutTimer);
+      clearInterval(updateInterval);
+    };
+  }, [bubbleId, senderTeam, timestamp]);
 
   // Determine position based on team
   const isLeftSide = senderTeam === 'dark';
@@ -34,11 +57,11 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-700 ease-out",
         isLeftSide ? "left-[8%] lg:left-[12%] xl:left-[15%]" : "right-[8%] lg:right-[12%] xl:right-[15%]",
-        "top-[9vh] lg:top-[11vh] xl:top-[13vh]",
         isVisible && !isLeaving ? "opacity-100" : "opacity-0",
         isLeaving && "animate-fade-out"
       )}
       style={{
+        top: `calc(9vh + ${verticalOffset}px)`,
         transform: `${isVisible && !isLeaving ? 'translateY(0)' : 'translateY(-20px)'}`,
       }}
     >
