@@ -251,15 +251,22 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         <div 
           className="absolute inset-0 card-3d-container"
           style={{
-            zIndex: isLifted ? 999 : 15
+            zIndex: isLifted ? 999 : 15,
+            pointerEvents: 'none'
           }}
         >
           <div 
             className={cn(
-              "absolute cursor-pointer animate-card-drop rounded-lg",
+              "absolute cursor-pointer animate-card-drop rounded-lg transition-all duration-200",
               isLifted ? "card-lifted" : "card-not-lifted"
             )}
-            onClick={() => setIsLifted(!isLifted)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLifted(!isLifted);
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
             style={{
               top: card.type === 'assassin' ? '0px' : '-4px',
@@ -270,7 +277,15 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
               backgroundSize: card.type === 'assassin' ? 'contain' : 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              boxShadow: isLifted ? '0 30px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.4)' : '0 4px 8px rgba(0,0,0,0.3)',
+              boxShadow: isLifted 
+                ? '0 30px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.4)' 
+                : isHovered
+                  ? '0 15px 30px rgba(0,0,0,0.5), 0 0 25px rgba(0,0,0,0.3)'
+                  : '0 4px 8px rgba(0,0,0,0.3)',
+              transform: isHovered 
+                ? `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05) translateZ(20px)`
+                : 'none',
+              transformStyle: 'preserve-3d',
               pointerEvents: 'auto'
             }}
           />
