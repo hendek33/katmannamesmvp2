@@ -76,12 +76,16 @@ export class MemStorage implements IStorage {
   private playerToRoom: Map<string, string>;
   private lastInsultTime: Map<string, number>; // roomCode -> timestamp
   private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
+  private insultCooldowns: Map<string, number>; // For V2 system
+  private tauntCooldowns: Map<string, number>; // For taunt system
 
   constructor() {
     this.rooms = new Map();
     this.playerToRoom = new Map();
     this.lastInsultTime = new Map();
     this.playerInsultCooldown = new Map();
+    this.insultCooldowns = new Map(); // Initialize V2 cooldowns
+    this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
   }
