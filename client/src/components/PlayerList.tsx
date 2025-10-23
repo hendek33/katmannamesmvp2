@@ -269,20 +269,22 @@ export function PlayerList({
           <div className="absolute inset-0 bg-amber-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
           <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border-2 border-dashed border-amber-600/50 p-4 space-y-2 shadow-2xl">
           <h3 className="font-bold text-sm text-amber-400">Takım Seçilmemiş ({noTeam.length})</h3>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-5 gap-1.5">
             {noTeam.map(player => (
               <div 
                 key={player.id}
                 data-testid={`player-${player.id}`}
-                className="flex flex-col items-center justify-center p-2 rounded bg-amber-900/20 border border-amber-700/30 hover:bg-amber-900/30 transition-all min-h-[60px]"
+                className="flex items-center justify-center p-1.5 rounded bg-amber-900/20 border border-amber-700/30 hover:bg-amber-900/30 transition-all min-h-[32px]"
               >
-                {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-400 mb-1" />}
-                <span className="text-xs font-medium text-slate-200 text-center break-all">{player.username}</span>
-                {player.id === currentPlayerId && (
-                  <span className="text-[10px] text-amber-300 mt-1">
-                    (Sen)
-                  </span>
-                )}
+                <div className="flex items-center gap-1">
+                  {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400 flex-shrink-0" />}
+                  <span className="text-[11px] font-medium text-slate-200 text-center truncate">{player.username}</span>
+                  {player.id === currentPlayerId && (
+                    <span className="text-[10px] text-amber-300 flex-shrink-0">
+                      (Sen)
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
