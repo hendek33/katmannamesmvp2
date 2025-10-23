@@ -1,51 +1,55 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { PlayerList } from "@/components/PlayerList";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Copy, Check, Plus, LogIn, Loader2, Bot, Sparkles, Users, Play, ArrowLeft, Eye, EyeOff, Timer, Lock, AlertCircle, X, ChevronUp, ChevronDown } from "lucide-react";
-import type { Team } from "@shared/schema";
+import { PlayerList } from "@/components/PlayerList";
+import { type Team } from "@shared/schema";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { 
+  AlertDialog, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogHeader, 
+  AlertDialogTitle,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel
+} from "@/components/ui/alert-dialog";
 
 export default function Lobby() {
   const [, setLocation] = useLocation();
-  const { toast } = useToast();
-  const { isConnected, gameState, playerId, roomCode, error, send } = useWebSocketContext();
-  const [mode, setMode] = useState<"select" | "create" | "join">("select");
-  const [joinCode, setJoinCode] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [username, setUsername] = useState("");
+  const { isConnected, send, gameState, error } = useWebSocketContext();
   const [showRoomCode, setShowRoomCode] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [timedMode, setTimedMode] = useState(false);
-  const [spymasterTime, setSpymasterTime] = useState(120); // 2 minutes default
-  const [guesserTime, setGuesserTime] = useState(180); // 3 minutes default
+  const [spymasterTime, setSpymasterTime] = useState(120);
+  const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
   const [showChaosDetails, setShowChaosDetails] = useState(false);
+  const { toast } = useToast();
+  
+  const playerId = localStorage.getItem("katmannames_player_id");
+  const roomCode = gameState?.roomCode || localStorage.getItem("katmannames_room_code") || "";
 
   useEffect(() => {
-    const savedUsername = localStorage.getItem("katmannames_username");
-    if (!savedUsername) {
+    const username = localStorage.getItem("katmannames_username");
+    if (!username || !roomCode) {
       setLocation("/");
-    } else {
-      setUsername(savedUsername);
+      return;
     }
-  }, [setLocation]);
+  }, [roomCode, setLocation]);
+
+  useEffect(() => {
+    if (gameState?.phase === "playing") {
+      setLocation("/game");
+    }
+  }, [gameState?.phase, setLocation]);
 
   useEffect(() => {
     if (error) {
@@ -58,13 +62,20 @@ export default function Lobby() {
   }, [error, toast]);
 
   useEffect(() => {
-    if (gameState?.phase === "playing") {
-      setLocation("/game");
+    const savedRoomCode = localStorage.getItem("katmannames_room_code");
+    const savedPlayerId = localStorage.getItem("katmannames_player_id");
+    const savedUsername = localStorage.getItem("katmannames_username");
+    
+    if (savedRoomCode && savedUsername && !gameState) {
+      send("join_room", {
+        roomCode: savedRoomCode,
+        username: savedUsername,
+        playerId: savedPlayerId || undefined,
+      });
     }
-  }, [gameState, setLocation]);
+  }, [send, gameState]);
 
   useEffect(() => {
-    // Sync timer and chaos mode settings from gameState
     if (gameState) {
       setTimedMode(gameState.timedMode);
       setSpymasterTime(gameState.spymasterTime);
@@ -72,18 +83,6 @@ export default function Lobby() {
       setChaosMode(gameState.chaosMode || false);
     }
   }, [gameState]);
-
-  const handleCreateRoom = () => {
-    if (username) {
-      send("create_room", { username });
-    }
-  };
-
-  const handleJoinRoom = () => {
-    if (username && joinCode.trim().length >= 4) {
-      send("join_room", { roomCode: joinCode.toUpperCase(), username });
-    }
-  };
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -148,163 +147,22 @@ export default function Lobby() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        {/* Light Effects */}
-        <div className="light-effect light-1" />
-        <div className="light-effect light-2" />
-        <div className="light-effect light-3" />
-        <div className="light-effect light-4" />
-        <div className="light-effect light-5" />
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center opacity-30" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
         
-        {[...Array(70)].map((_, i) => (
-          <div key={i} className={`particle particle-${i + 1}`} />
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1} opacity-50`} />
         ))}
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30 animate-pulse-slow">
-          <div className="relative">
-            <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
-            <div className="absolute inset-0 blur-xl bg-primary/20 animate-pulse" />
-          </div>
-          <div className="space-y-2">
-            <p className="text-lg font-semibold">Bağlanıyor</p>
-            <p className="text-sm text-muted-foreground">Sunucuya bağlanılıyor...</p>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!roomCode && mode === "select") {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        {/* Light Effects */}
-        <div className="light-effect light-1" />
-        <div className="light-effect light-2" />
-        <div className="light-effect light-3" />
-        <div className="light-effect light-4" />
-        <div className="light-effect light-5" />
         
-        {[...Array(70)].map((_, i) => (
-          <div key={i} className={`particle particle-${i + 1}`} />
-        ))}
-        <div className="w-full max-w-lg space-y-8 animate-in fade-in duration-500">
-          <div className="space-y-4">
-            <Card 
-              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/20 relative overflow-hidden" 
-              onClick={handleCreateRoom}
-              data-testid="button-create-room"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex items-center gap-6">
-                <div className="p-4 rounded-xl bg-gradient-to-br from-blue-600 to-blue-400 shadow-lg group-hover:scale-110 transition-transform">
-                  <Plus className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-2xl">Oda Oluştur</h3>
-                    <Sparkles className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <p className="text-muted-foreground mt-1">Yeni bir oyun başlat ve arkadaşlarını bekle</p>
-                </div>
-              </div>
-            </Card>
-
-            <Card 
-              className="group p-8 space-y-4 hover-elevate cursor-pointer transition-all border-2 bg-slate-900/85 backdrop-blur-md border-orange-900/30 hover:border-red-600/50 hover:shadow-2xl hover:shadow-red-600/20 relative overflow-hidden" 
-              onClick={() => setMode("join")}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex items-center gap-6">
-                <div className="p-4 rounded-xl bg-gradient-to-br from-red-700 to-red-500 shadow-lg group-hover:scale-110 transition-transform">
-                  <LogIn className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-2xl">Odaya Katıl</h3>
-                    <Users className="w-5 h-5 text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <p className="text-muted-foreground mt-1">Oda kodu ile arkadaşının oyununa gir</p>
-                </div>
-              </div>
-            </Card>
+        <div className="relative backdrop-blur-xl bg-slate-900/50 p-8 rounded-2xl border border-slate-800/50">
+          <div className="flex items-center justify-center space-x-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
-
-          <Button
-            variant="ghost"
-            onClick={() => setLocation("/")}
-            className="w-full group"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Geri Dön
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!roomCode && mode === "join") {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        {/* Light Effects */}
-        <div className="light-effect light-1" />
-        <div className="light-effect light-2" />
-        <div className="light-effect light-3" />
-        <div className="light-effect light-4" />
-        <div className="light-effect light-5" />
-        
-        {[...Array(70)].map((_, i) => (
-          <div key={i} className={`particle particle-${i + 1}`} />
-        ))}
-        <div className="w-full max-w-md space-y-8 animate-in fade-in duration-500">
-          <Card className="p-8 space-y-6 shadow-2xl border-2 bg-slate-900/90 backdrop-blur-md border-orange-900/30 hover:shadow-red-600/20 transition-shadow">
-            <div className="space-y-3 text-center">
-              <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-red-700 to-red-500 flex items-center justify-center shadow-lg">
-                <LogIn className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold">Odaya Katıl</h2>
-              <p className="text-sm text-muted-foreground">
-                Arkadaşının sana verdiği oda kodunu gir
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="roomCode" className="text-sm font-semibold">Oda Kodu</Label>
-                <Input
-                  id="roomCode"
-                  data-testid="input-room-code"
-                  placeholder="ABCD12"
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                  onKeyDown={(e) => e.key === "Enter" && handleJoinRoom()}
-                  maxLength={6}
-                  className="text-center text-2xl font-mono tracking-widest h-14 border-2 focus:border-red-600 transition-colors"
-                  autoFocus
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setMode("select")}
-                className="flex-1"
-                data-testid="button-back"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Geri
-              </Button>
-              <Button
-                onClick={handleJoinRoom}
-                disabled={joinCode.length < 4}
-                className="flex-1 bg-gradient-to-r from-red-700 to-red-500 hover:from-red-800 hover:to-red-600"
-                data-testid="button-join-room"
-              >
-                Katıl
-                <LogIn className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </Card>
+          <p className="mt-4 text-lg font-medium text-slate-300">Bağlanıyor...</p>
         </div>
       </div>
     );
@@ -312,21 +170,23 @@ export default function Lobby() {
 
   if (!gameState) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900 relative overflow-hidden" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-        {/* Light Effects */}
-        <div className="light-effect light-1" />
-        <div className="light-effect light-2" />
-        <div className="light-effect light-3" />
-        <div className="light-effect light-4" />
-        <div className="light-effect light-5" />
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center opacity-30" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
         
-        {[...Array(70)].map((_, i) => (
-          <div key={i} className={`particle particle-${i + 1}`} />
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className={`particle particle-${i + 1} opacity-50`} />
         ))}
-        <Card className="p-12 space-y-6 text-center border-2 shadow-2xl bg-slate-900/90 backdrop-blur-md border-orange-900/30">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary" />
-          <p className="text-lg font-semibold text-muted-foreground">Yükleniyor...</p>
-        </Card>
+        
+        <div className="relative backdrop-blur-xl bg-slate-900/50 p-8 rounded-2xl border border-slate-800/50">
+          <div className="flex items-center justify-center space-x-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
+            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse" />
+            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+          </div>
+          <p className="mt-4 text-lg font-medium text-slate-300">Yükleniyor...</p>
+        </div>
       </div>
     );
   }
@@ -345,398 +205,425 @@ export default function Lobby() {
   const canStartGame = currentPlayer?.isRoomOwner && 
     darkHasSpymaster &&
     lightHasSpymaster &&
-    darkTeam.length > 0 &&
-    lightTeam.length > 0;
+    darkTeam.length >= 2 &&
+    lightTeam.length >= 2 &&
+    noTeam.length === 0;
 
   const playerCount = gameState.players.length;
 
   return (
-    <div className="h-screen bg-slate-900 animate-in fade-in duration-500 relative overflow-hidden flex flex-col" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
-      {/* Light Effects - Reduced for performance */}
-      <div className="light-effect light-1" />
-      <div className="light-effect light-2" />
+    <div className="h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 relative overflow-hidden flex flex-col">
+      {/* Animated Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center opacity-30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/50" />
+      </div>
       
-      {/* Fewer particles for better performance */}
-      {[...Array(15)].map((_, i) => (
-        <div key={i} className={`particle particle-${i + 1}`} />
+      {/* Ambient Light Effects */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      
+      {/* Minimal Particles */}
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1} opacity-50`} />
       ))}
       
-      {/* Header Bar */}
-      <div className="relative z-10 w-full">
-        <div className="bg-slate-800 backdrop-blur-lg border-b border-slate-700">
-          <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center justify-between">
+      {/* Modern Header Bar */}
+      <header className="relative z-20 backdrop-blur-xl bg-slate-950/40 border-b border-slate-800/50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            {/* Left Section - Status */}
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <div className="px-3 py-1 bg-green-600/20 border border-green-600/50 rounded-full">
-                  <span className="text-xs font-medium text-green-400">Lobide</span>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-green-500 blur-md opacity-50" />
+                  <div className="relative px-3 py-1.5 bg-green-500/20 border border-green-500/50 rounded-full">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-sm font-medium text-green-400">Lobide</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-slate-400">
-                  <Users className="inline w-4 h-4 mr-1" />
-                  {playerCount} Oyuncu
+                <div className="text-sm text-slate-300 font-medium">
+                  <Users className="inline w-4 h-4 mr-1.5 text-slate-500" />
+                  <span className="text-white">{playerCount}</span> Oyuncu
                 </div>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700">
-                  <span className="text-xs text-slate-400">Oda Kodu:</span>
-                  <span className="text-lg font-mono font-bold text-white tracking-wider" data-testid="room-code">
+            </div>
+            
+            {/* Center Section - Room Code */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:block">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity" />
+                <div className="relative flex items-center gap-3 px-6 py-2.5 bg-slate-900/80 backdrop-blur-xl rounded-xl border border-slate-700/50">
+                  <span className="text-sm text-slate-400">Oda:</span>
+                  <span className="text-xl font-bold font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400" data-testid="room-code">
                     {showRoomCode ? roomCode : "••••••"}
                   </span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShowRoomCode(!showRoomCode)}
-                    className="h-6 w-6 p-0"
-                  >
-                    {showRoomCode ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleCopyRoomCode}
-                    className="h-6 w-6 p-0"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-                  </Button>
+                  <div className="flex items-center gap-1 ml-2 border-l border-slate-700 pl-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowRoomCode(!showRoomCode)}
+                      className="h-7 w-7 p-0 hover:bg-slate-800"
+                    >
+                      {showRoomCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleCopyRoomCode}
+                      className="h-7 w-7 p-0 hover:bg-slate-800"
+                    >
+                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => {
-                    send("leave_room", {});
-                    localStorage.removeItem("katmannames_room_code");
-                    localStorage.removeItem("katmannames_player_id");
-                    setLocation("/rooms");
-                  }}
-                  className="h-9"
-                  data-testid="button-leave-room"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-1.5" />
-                  Odadan Çık
-                </Button>
               </div>
             </div>
+            
+            {/* Mobile Room Code */}
+            <div className="md:hidden flex items-center gap-2">
+              <span className="text-sm font-mono font-bold text-white" data-testid="room-code-mobile">
+                {showRoomCode ? roomCode : "••••"}
+              </span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowRoomCode(!showRoomCode)}
+                className="h-6 w-6 p-0"
+              >
+                {showRoomCode ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+              </Button>
+            </div>
+            
+            {/* Right Section - Leave */}
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                send("leave_room", {});
+                localStorage.removeItem("katmannames_room_code");
+                localStorage.removeItem("katmannames_player_id");
+                setLocation("/rooms");
+              }}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
+              data-testid="button-leave-room"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Ayrıl</span>
+            </Button>
           </div>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="relative z-10 flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto h-full p-3 flex flex-col">
-          {/* Team Selection Area */}
-          <div className="flex-1 flex flex-col lg:flex-row gap-3 min-h-0">
-            {/* Left Side - Team Cards */}
-            <div className="flex-1 lg:w-3/5 overflow-hidden">
-              <PlayerList
-                players={gameState.players}
-                currentPlayerId={playerId}
-                onTeamSelect={handleTeamSelect}
-                onRoleToggle={handleRoleToggle}
-                isLobby={true}
-                darkTeamName={gameState.darkTeamName}
-                lightTeamName={gameState.lightTeamName}
-                onTeamNameChange={handleTeamNameChange}
-                onRemoveBot={handleRemoveBot}
-              />
-            </div>
-
-            {/* Right Sidebar */}
-            <div className="lg:w-2/5 flex flex-col gap-4">
-              {/* Start Game Card */}
-              <Card className="p-4 border-2 bg-slate-800 border-green-600/50 mt-0">
-                {/* Game Start Requirements Visual Indicators */}
-                {!canStartGame && currentPlayer?.isRoomOwner && (
-                  <div className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg space-y-2">
-                    <div className="text-sm font-bold text-amber-600 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      Başlatma Gereksinimleri
+      </header>
+      
+      {/* Main Content Grid */}
+      <div className="flex-1 overflow-hidden relative z-10">
+        <div className="h-full container mx-auto px-4 py-6">
+          <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Panel - Team Operations (8 cols on lg) */}
+            <div className="lg:col-span-8 flex flex-col gap-4 overflow-hidden">
+              {/* Mission Briefing */}
+              {currentPlayer && (
+                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 blur-md opacity-50" />
+                        <div className="relative w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-slate-400">Hoş geldin</p>
+                        <p className="text-lg font-bold text-white">{currentPlayer.username}</p>
+                      </div>
                     </div>
-                    <div className="text-xs space-y-1">
-                      {!darkHasSpymaster && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.darkTeamName} takımına İstihbarat Şefi gerekli</span>
+                    {currentPlayer.team && (
+                      <div className="flex items-center gap-2">
+                        <div className={`px-3 py-1.5 rounded-lg ${
+                          currentPlayer.team === "dark" 
+                            ? "bg-blue-500/20 border border-blue-500/50 text-blue-400"
+                            : "bg-red-500/20 border border-red-500/50 text-red-400"
+                        }`}>
+                          <span className="text-sm font-medium">
+                            {currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                          </span>
                         </div>
-                      )}
-                      {!lightHasSpymaster && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.lightTeamName} takımına İstihbarat Şefi gerekli</span>
-                        </div>
-                      )}
-                      {darkTeam.length < 2 && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.darkTeamName} takımında en az 2 oyuncu olmalı</span>
-                        </div>
-                      )}
-                      {lightTeam.length < 2 && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{gameState.lightTeamName} takımında en az 2 oyuncu olmalı</span>
-                        </div>
-                      )}
-                      {noTeam.length > 0 && (
-                        <div className="flex items-center gap-1 text-amber-500">
-                          <X className="w-3 h-3" />
-                          <span>{noTeam.length} oyuncu takım seçmemiş</span>
-                        </div>
-                      )}
-                    </div>
+                        {currentPlayer.role === "spymaster" && (
+                          <div className="px-3 py-1.5 bg-amber-500/20 border border-amber-500/50 rounded-lg">
+                            <Shield className="w-4 h-4 text-amber-400" />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
-                
-                {/* Game Ready Status */}
-                {canStartGame && currentPlayer?.isRoomOwner && (
-                  <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                    <div className="text-sm font-bold text-green-600 flex items-center gap-1">
-                      <Check className="w-4 h-4" />
-                      Oyun başlatmaya hazır!
-                    </div>
-                  </div>
-                )}
+                </div>
+              )}
               
-                <Button
-                  onClick={handleStartGame}
-                  disabled={!canStartGame}
-                  className={`w-full h-12 text-base font-bold transition-all mb-3 ${
-                    canStartGame 
-                      ? "bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-700 hover:to-emerald-600 shadow-lg hover:shadow-xl group"
-                      : "opacity-50"
-                  }`}
-                  size="lg"
-                  variant={canStartGame ? "default" : "secondary"}
-                  data-testid="button-start-game"
-                >
-                  {canStartGame ? (
-                    <>
-                      <Play className="w-4 h-4 mr-2 group-hover:scale-110 transition-transform animate-pulse" />
-                      Oyunu Başlat
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4 mr-2" />
-                      Gereksinimler Karşılanmadı
-                    </>
-                  )}
-                </Button>
-
-              {/* Compact How to Play */}
-              <div className="border-t pt-2 space-y-1">
-                <h3 className="text-xs font-bold flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-purple-500" />
-                  Hızlı Başlangıç
-                </h3>
-                <ul className="text-[10px] space-y-0.5 text-muted-foreground">
-                  <li>• Takım ve rol seç</li>
-                  <li>• Her takımda 1 İstihbarat Şefi olmalı</li>
-                  <li>• Hazırsan başlat!</li>
-                </ul>
-              </div>
-            </Card>
-
-            {/* Bot Controls - Compact */}
-            {currentPlayer?.isRoomOwner && (
-              <Card className="p-3 sm:p-4 space-y-2 border-2 bg-slate-800 border-amber-600/50">
-                <div className="flex items-center gap-2 mb-2">
-                  <Bot className="w-4 h-4 text-amber-600" />
-                  <h3 className="text-sm font-bold">Test Botları</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-[10px] font-semibold flex items-center gap-1 mb-1">
-                      <div className="w-2 h-2 rounded-full bg-blue-600" />
-                      {gameState.darkTeamName}
-                    </Label>
-                    <div className="flex gap-1">
-                      <Button
-                        onClick={() => handleAddBot("dark", "spymaster")}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-[10px] px-1 h-7"
-                        data-testid="button-add-bot-dark-spymaster"
-                      >
-                        +Şef
-                      </Button>
-                      <Button
-                        onClick={() => handleAddBot("dark", "guesser")}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-[10px] px-1 h-7"
-                        data-testid="button-add-bot-dark-guesser"
-                      >
-                        +Ajan
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-[10px] font-semibold flex items-center gap-1 mb-1">
-                      <div className="w-2 h-2 rounded-full bg-red-600" />
-                      {gameState.lightTeamName}
-                    </Label>
-                    <div className="flex gap-1">
-                      <Button
-                        onClick={() => handleAddBot("light", "spymaster")}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-[10px] px-1 h-7"
-                        data-testid="button-add-bot-light-spymaster"
-                      >
-                        +Şef
-                      </Button>
-                      <Button
-                        onClick={() => handleAddBot("light", "guesser")}
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-[10px] px-1 h-7"
-                        data-testid="button-add-bot-light-guesser"
-                      >
-                        +Ajan
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            )}
-
-            </div>
-          </div>
-          
-          {/* Bottom Settings Section - Only for Room Owner */}
-          {/* Game Settings - Visible to all, editable only by owner */}
-          <div className="mt-4 grid md:grid-cols-2 gap-3">
-            {/* Chaos Mode - Compact */}
-            <Card className={`p-3 border-2 bg-slate-800 border-gray-600/50 relative opacity-75`}>
-              <Badge className="absolute -top-2 -right-2 bg-gray-600 text-white text-[10px] px-1.5 py-0.5">
-                🧪 DENEYSEL
-              </Badge>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-gray-500" />
-                  <h3 className="text-base font-bold text-gray-500">
-                    KAOS MODU
-                  </h3>
-                  <button
-                    onClick={() => setShowChaosDetails(!showChaosDetails)}
-                    className="text-xs text-muted-foreground hover:text-white transition-colors"
-                  >
-                    (Bu nedir?)
-                  </button>
-                </div>
-                <Switch
-                  checked={false}
-                  disabled={true}
-                  onCheckedChange={(checked) => {
-                    // Chaos mode is temporarily disabled
-                  }}
-                  data-testid="switch-chaos-mode"
+              {/* Team Dashboard */}
+              <div className="flex-1 overflow-hidden">
+                <PlayerList
+                  players={gameState.players}
+                  currentPlayerId={playerId || undefined}
+                  onTeamSelect={handleTeamSelect}
+                  onRoleToggle={handleRoleToggle}
+                  isLobby={true}
+                  darkTeamName={gameState.darkTeamName}
+                  lightTeamName={gameState.lightTeamName}
+                  onTeamNameChange={handleTeamNameChange}
+                  onRemoveBot={handleRemoveBot}
                 />
               </div>
-              
-              <p className="text-[10px] text-gray-400 mt-2">
-                🚧 Geliştirme aşamasında - Yakında aktif olacak!
-              </p>
-            </Card>
+            </div>
             
-            {/* Timer Settings - Compact */}
-            <Card className={`p-3 border-2 bg-slate-800 border-purple-600/50 ${!currentPlayer?.isRoomOwner ? 'opacity-75' : ''}`}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Timer className="w-5 h-5 text-purple-500" />
-                  <h3 className="text-base font-bold">Zamanlayıcı</h3>
-                </div>
-                <Switch
-                  checked={timedMode}
-                  disabled={!currentPlayer?.isRoomOwner}
-                  onCheckedChange={(checked) => {
-                    if (currentPlayer?.isRoomOwner) {
-                      setTimedMode(checked);
-                      handleTimerSettingsUpdate(checked, spymasterTime, guesserTime);
-                    }
-                  }}
-                  data-testid="switch-timed-mode"
-                />
-              </div>
-                
-                {timedMode && (
+            {/* Right Panel - Control Console (4 cols on lg) */}
+            <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto">
+              {/* Game Start Panel */}
+              <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-6">
+                <div className="space-y-4">
+                  {/* Status Indicator */}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-white">Oyun Durumu</h3>
+                    {canStartGame ? (
+                      <div className="flex items-center gap-2 text-green-400">
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span className="text-sm font-medium">Hazır</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-amber-400">
+                        <AlertCircle className="w-5 h-5" />
+                        <span className="text-sm font-medium">Bekliyor</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Requirements Checklist */}
                   <div className="space-y-2">
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center">
-                        <Label className="text-xs">Şef</Label>
-                        <span className="text-xs font-mono text-purple-400">
-                          {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}
-                        </span>
-                      </div>
-                      <Slider
-                        value={[spymasterTime]}
-                        disabled={!currentPlayer?.isRoomOwner}
-                        onValueChange={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            setSpymasterTime(value);
-                          }
-                        }}
-                        onValueCommit={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            handleTimerSettingsUpdate(timedMode, value, guesserTime);
-                          }
-                        }}
-                        min={30}
-                        max={300}
-                        step={30}
-                        className="w-full h-1"
-                        data-testid="slider-spymaster-time"
-                      />
+                    <div className={`flex items-center gap-2 text-sm ${darkHasSpymaster ? 'text-green-400' : 'text-slate-500'}`}>
+                      {darkHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                      <span>{gameState.darkTeamName} İstihbarat Şefi</span>
                     </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center">
-                        <Label className="text-xs">Ajan</Label>
-                        <span className="text-xs font-mono text-purple-400">
-                          {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}
-                        </span>
+                    <div className={`flex items-center gap-2 text-sm ${lightHasSpymaster ? 'text-green-400' : 'text-slate-500'}`}>
+                      {lightHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                      <span>{gameState.lightTeamName} İstihbarat Şefi</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-sm ${darkTeam.length >= 2 ? 'text-green-400' : 'text-slate-500'}`}>
+                      {darkTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                      <span>{gameState.darkTeamName}: {darkTeam.length}/2+ Oyuncu</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-sm ${lightTeam.length >= 2 ? 'text-green-400' : 'text-slate-500'}`}>
+                      {lightTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                      <span>{gameState.lightTeamName}: {lightTeam.length}/2+ Oyuncu</span>
+                    </div>
+                    <div className={`flex items-center gap-2 text-sm ${noTeam.length === 0 ? 'text-green-400' : 'text-slate-500'}`}>
+                      {noTeam.length === 0 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                      <span>Tüm oyuncular takım seçti</span>
+                    </div>
+                  </div>
+                  
+                  {/* Start Button */}
+                  {currentPlayer?.isRoomOwner && (
+                    <Button
+                      onClick={handleStartGame}
+                      disabled={!canStartGame}
+                      className={`w-full py-6 text-lg font-bold transition-all ${
+                        canStartGame 
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-lg shadow-green-500/25'
+                          : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      }`}
+                      data-testid="button-start-game"
+                    >
+                      <Play className="w-5 h-5 mr-2" />
+                      Oyunu Başlat
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {/* Bot Controls */}
+              {currentPlayer?.isRoomOwner && (
+                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-slate-800/50 p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Bot className="w-5 h-5 text-purple-400" />
+                    <h3 className="text-lg font-bold text-white">Bot Yönetimi</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button
+                      onClick={() => handleAddBot("dark", "spymaster")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs"
+                      disabled={darkHasSpymaster}
+                      data-testid="button-add-bot-dark-spymaster"
+                    >
+                      {gameState.darkTeamName} Şef
+                    </Button>
+                    <Button
+                      onClick={() => handleAddBot("dark", "guesser")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs"
+                      data-testid="button-add-bot-dark-guesser"
+                    >
+                      {gameState.darkTeamName} Ajan
+                    </Button>
+                    <Button
+                      onClick={() => handleAddBot("light", "spymaster")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs"
+                      disabled={lightHasSpymaster}
+                      data-testid="button-add-bot-light-spymaster"
+                    >
+                      {gameState.lightTeamName} Şef
+                    </Button>
+                    <Button
+                      onClick={() => handleAddBot("light", "guesser")}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs"
+                      data-testid="button-add-bot-light-guesser"
+                    >
+                      {gameState.lightTeamName} Ajan
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Game Settings */}
+              <div className="space-y-4">
+                {/* Timer Settings */}
+                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-purple-800/30 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Timer className="w-5 h-5 text-purple-400" />
+                      <h3 className="text-base font-bold text-white">Zamanlayıcı</h3>
+                    </div>
+                    <Switch
+                      checked={timedMode}
+                      disabled={!currentPlayer?.isRoomOwner}
+                      onCheckedChange={(checked) => {
+                        if (currentPlayer?.isRoomOwner) {
+                          setTimedMode(checked);
+                          handleTimerSettingsUpdate(checked, spymasterTime, guesserTime);
+                        }
+                      }}
+                      data-testid="switch-timed-mode"
+                    />
+                  </div>
+                  
+                  {timedMode && (
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <Label className="text-xs text-slate-400">Şef Süresi</Label>
+                          <span className="text-xs font-mono text-purple-400">
+                            {Math.floor(spymasterTime / 60)}:{(spymasterTime % 60).toString().padStart(2, '0')}
+                          </span>
+                        </div>
+                        <Slider
+                          value={[spymasterTime]}
+                          disabled={!currentPlayer?.isRoomOwner}
+                          onValueChange={([value]) => {
+                            if (currentPlayer?.isRoomOwner) {
+                              setSpymasterTime(value);
+                            }
+                          }}
+                          onValueCommit={([value]) => {
+                            if (currentPlayer?.isRoomOwner) {
+                              handleTimerSettingsUpdate(timedMode, value, guesserTime);
+                            }
+                          }}
+                          min={30}
+                          max={300}
+                          step={30}
+                          className="w-full"
+                          data-testid="slider-spymaster-time"
+                        />
                       </div>
-                      <Slider
-                        value={[guesserTime]}
-                        disabled={!currentPlayer?.isRoomOwner}
-                        onValueChange={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            setGuesserTime(value);
-                          }
-                        }}
-                        onValueCommit={([value]) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            handleTimerSettingsUpdate(timedMode, spymasterTime, value);
-                          }
-                        }}
-                        min={30}
-                        max={300}
-                        step={30}
-                        className="w-full h-1"
-                        data-testid="slider-guesser-time"
+                      <div>
+                        <div className="flex justify-between items-center mb-1">
+                          <Label className="text-xs text-slate-400">Ajan Süresi</Label>
+                          <span className="text-xs font-mono text-purple-400">
+                            {Math.floor(guesserTime / 60)}:{(guesserTime % 60).toString().padStart(2, '0')}
+                          </span>
+                        </div>
+                        <Slider
+                          value={[guesserTime]}
+                          disabled={!currentPlayer?.isRoomOwner}
+                          onValueChange={([value]) => {
+                            if (currentPlayer?.isRoomOwner) {
+                              setGuesserTime(value);
+                            }
+                          }}
+                          onValueCommit={([value]) => {
+                            if (currentPlayer?.isRoomOwner) {
+                              handleTimerSettingsUpdate(timedMode, spymasterTime, value);
+                            }
+                          }}
+                          min={30}
+                          max={300}
+                          step={30}
+                          className="w-full"
+                          data-testid="slider-guesser-time"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Chaos Mode */}
+                <div className="backdrop-blur-xl bg-slate-900/40 rounded-xl border border-gray-800/30 p-4 opacity-60">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-gray-500" />
+                      <h3 className="text-base font-bold text-gray-400">KAOS MODU</h3>
+                      <button
+                        onClick={() => setShowChaosDetails(!showChaosDetails)}
+                        className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                      >
+                        (?)
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-gray-700 text-white text-xs rounded-full">
+                        🚧
+                      </div>
+                      <Switch
+                        checked={false}
+                        disabled={true}
+                        data-testid="switch-chaos-mode"
                       />
                     </div>
                   </div>
-                )}
-              </Card>
-          </div>
-          
-          {/* Developer Note */}
-          <Card className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30">
-            <div className="text-xs text-amber-400 space-y-1">
-              <div className="font-semibold">💬 Geliştiriciden not:</div>
-              <div className="italic">
-                Çağrı abi Mavi takım olmanız gerekiyor. Bütün tasarımları yaptıktan sonra 
-                sizin kırmızı takım olduğunuz aklıma geldi, kusuruma bakmayın tasarım konseptine bu uyuyor 😔
+                  <p className="text-xs text-gray-500">
+                    Geliştirme aşamasında - Yakında!
+                  </p>
+                </div>
+              </div>
+              
+              {/* Developer Note */}
+              <div className="backdrop-blur-xl bg-amber-500/10 rounded-xl border border-amber-500/30 p-4">
+                <div className="text-xs text-amber-400 space-y-1">
+                  <div className="font-semibold flex items-center gap-2">
+                    <Zap className="w-4 h-4" />
+                    Geliştiriciden not:
+                  </div>
+                  <div className="italic pl-6">
+                    Çağrı abi Mavi takım olmanız gerekiyor. Bütün tasarımları yaptıktan sonra 
+                    sizin kırmızı takım olduğunuz aklıma geldi, kusuruma bakmayın tasarım konseptine bu uyuyor 😔
+                  </div>
+                </div>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
       </div>
       
       {/* Team Name Warning Dialog */}
       <AlertDialog open={showTeamNameWarning} onOpenChange={setShowTeamNameWarning}>
-        <AlertDialogContent className="max-w-md">
+        <AlertDialogContent className="max-w-md backdrop-blur-xl bg-slate-900/95 border-slate-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-500">⚠️ Takım İsimleri Değiştirilmeli!</AlertDialogTitle>
             <AlertDialogDescription>
@@ -759,7 +646,7 @@ export default function Lobby() {
       
       {/* Chaos Mode Details Dialog */}
       <AlertDialog open={showChaosDetails} onOpenChange={setShowChaosDetails}>
-        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
               🎯 KAOS MODU NEDİR?
@@ -802,23 +689,24 @@ export default function Lobby() {
                 <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                   <h4 className="font-semibold text-amber-400 mb-2">⚡ Önemli Kurallar</h4>
                   <ul className="text-xs space-y-1">
-                    <li>• Her takımda 1 Kahin ve 1 Çift Ajan bulunur</li>
-                    <li>• Gizli roller oyun başladığında rastgele atanır</li>
-                    <li>• Rolünüz sadece size gösterilir, başkaları göremez</li>
-                    <li>• Kahin'in bildiği kartlar sadece ona mor renkte gösterilir</li>
-                    <li>• <span className="text-yellow-400">Kahin Tahmini:</span> Karşı takımın Kahin'ini tahmin edebilirsiniz (1 hak) - Doğru tahmin = anında kazanç, Yanlış tahmin = anında kayıp!</li>
-                    <li>• <span className="text-red-400">Çift Ajan Tahmini:</span> Oyun bittiğinde kaybeden takım, kendi içindeki haini bulabilir (1 hak) - Doğru tahmin oyunu tersine çevirir!</li>
+                    <li>• Roller oyun başında rastgele atanır ve gizlidir</li>
+                    <li>• Kahin oylamaya katılamaz, sadece ipucu verebilir</li>
+                    <li>• Çift Ajan kart seçemez ama oylamaya katılır</li>
+                    <li>• Normal oyuncu hem ipucu verebilir hem kart seçebilir</li>
+                    <li>• Oyun sonunda roller açığa çıkar</li>
                   </ul>
                 </div>
                 
-                <p className="text-xs text-muted-foreground italic">
-                  💡 İpucu: Gizli rolünüzü saklamak oyunun en önemli parçası! Çok bariz davranırsanız takımınız sizi fark edebilir.
-                </p>
+                <div className="text-xs text-slate-400 italic">
+                  Not: Bu mod henüz geliştirme aşamasındadır ve yakında aktif olacaktır!
+                </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction>Anladım</AlertDialogAction>
+            <AlertDialogAction onClick={() => setShowChaosDetails(false)}>
+              Anladım
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
