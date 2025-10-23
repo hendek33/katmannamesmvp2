@@ -93,7 +93,7 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
         <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
           <video
             ref={videoRef}
-            src="/siyah kelime seçme.mp4"
+            src="/siyah kelime seçme yeni.mp4"
             autoPlay
             muted
             playsInline

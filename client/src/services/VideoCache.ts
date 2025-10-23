@@ -15,7 +15,7 @@ class VideoCache {
     const videoPaths = [
       '/mavi takım video tur.mp4',
       '/kırmızı takım video tur.mp4',
-      '/siyah kelime seçme.mp4',
+      '/siyah kelime seçme yeni.mp4',
       '/mavi takım normal kazanma.mp4',
       '/kırmızı takım normal kazanma.mp4'
     ];
