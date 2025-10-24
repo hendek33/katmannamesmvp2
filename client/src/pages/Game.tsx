@@ -1756,7 +1756,7 @@ export default function Game() {
                 <Clock className="w-3 h-3 lg:w-3.5 lg:h-3.5 xl:w-4 xl:h-4 text-slate-400" />
                 <h4 className="text-xs lg:text-sm xl:text-base font-bold text-slate-300 uppercase tracking-wide">Günlük</h4>
               </div>
-              <div ref={logContainerRef} className="flex-1 overflow-y-auto min-h-0 space-y-0.5 scroll-smooth">
+              <div ref={logContainerRef} className="flex-1 overflow-y-auto min-h-0 space-y-0.5 scroll-smooth custom-scrollbar">
                 {/* Show game events in chronological order */}
                 {gameState.revealHistory.length === 0 && !gameState.currentClue ? (
                   <div className="text-[9px] lg:text-[10px] xl:text-xs text-gray-500 italic p-2">
