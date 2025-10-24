@@ -734,7 +734,7 @@ export default function Game() {
                   </Button>
                 </div>
               ) : gameState.currentClue ? (
-                <div className="relative z-[46] flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30 animate-clue-appear">
+                <div className="relative z-[46] flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30 animate-clue-slide-up">
                   <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
                   <span className="text-xs font-medium text-amber-300">İpucu:</span>
                   <span className="text-xs font-black text-amber-100">{gameState.currentClue.word}</span>
