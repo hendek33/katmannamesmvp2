@@ -354,7 +354,28 @@ export default function Game() {
   }, [isConnected, gameState, send]);
 
   useEffect(() => {
-    if (!gameState && isConnected) {
+    // Check if we should redirect to rooms
+    if (!isConnected) return; // Don't redirect if not connected yet
+    
+    // If gameState exists, we're good, don't redirect
+    if (gameState) return;
+    
+    // Check if we have saved room info in localStorage
+    const savedRoomCode = localStorage.getItem("katmannames_room_code");
+    const savedPlayerId = localStorage.getItem("katmannames_player_id");
+    
+    // If we have saved info, wait a bit for reconnection
+    if (savedRoomCode && savedPlayerId) {
+      const timeoutId = setTimeout(() => {
+        // After waiting, if still no gameState, redirect to rooms
+        if (!gameState) {
+          setLocation("/rooms");
+        }
+      }, 3000); // Wait 3 seconds for reconnection
+      
+      return () => clearTimeout(timeoutId);
+    } else {
+      // No saved info, immediately redirect to rooms
       setLocation("/rooms");
     }
   }, [gameState, isConnected, setLocation]);
