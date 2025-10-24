@@ -19,17 +19,15 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }:
   const bubbleIdRef = useRef(`taunt-${timestamp || Date.now()}-${Math.random()}`);
 
   const handleVideoReady = () => {
-    if (!isVideoLoaded) {
-      setIsVideoLoaded(true);
-      // Show bubble only after video is loaded
-      setTimeout(() => {
-        setIsVisible(true);
-        if (videoRef.current) {
-          videoRef.current.play()
-            .catch(err => console.error('Taunt video play error:', err));
-        }
-      }, 100);
-    }
+    setIsVideoLoaded(true);
+    // Show bubble only after video is loaded
+    setTimeout(() => {
+      setIsVisible(true);
+      if (videoRef.current) {
+        videoRef.current.play()
+          .catch(err => console.error('Taunt video play error:', err));
+      }
+    }, 100);
   };
 
   useEffect(() => {
@@ -39,27 +37,9 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }:
       setPosition(initialPosition);
     }
     
-    // Fallback mechanism to show bubble even if video doesn't load properly
-    const loadTimeout = setTimeout(() => {
-      if (!isVideoLoaded) {
-        console.log('Video load timeout, showing bubble anyway');
-        setIsVideoLoaded(true);
-        setIsVisible(true);
-        if (videoRef.current && videoRef.current.readyState >= 2) {
-          videoRef.current.play()
-            .catch(err => console.error('Taunt video play error:', err));
-        }
-      }
-    }, 500);
-    
     // Preload the video
     if (videoRef.current) {
-      // Check if video is already loaded
-      if (videoRef.current.readyState >= 3) {
-        handleVideoReady();
-      } else {
-        videoRef.current.load();
-      }
+      videoRef.current.load();
     }
     
     // Start fade out after 2.5 seconds
@@ -74,7 +54,6 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }:
     }, 2500);
 
     return () => {
-      clearTimeout(loadTimeout);
       clearTimeout(fadeOutTimer);
       if (senderTeam && senderTeam !== null) {
         bubbleManager.unregisterBubble(bubbleIdRef.current);
@@ -104,16 +83,15 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }:
   const spacing = 14; // Spacing between bubbles in vh (larger for taunt bubbles as they're bigger)
   const topPosition = baseTop + (position * spacing);
 
-  // Show a loading state with the video
+  // Don't show until video is loaded
   if (!isVideoLoaded) {
     return (
-      <div style={{ position: 'fixed', left: '-9999px', top: '-9999px', visibility: 'hidden' }}>
+      <div className="hidden">
         <video
           ref={videoRef}
           src={videoSrc}
           onCanPlay={handleVideoReady}
           onLoadedData={handleVideoReady}
-          onLoadedMetadata={handleVideoReady}
           muted
           playsInline
           preload="auto"
