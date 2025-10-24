@@ -1570,7 +1570,7 @@ export default function Game() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm sm:text-base font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg animate-bounce-slow">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
                         <span className="text-sm sm:text-base font-black text-white">{gameState.currentClue.count}</span>
                       </div>
                     </div>
