@@ -591,24 +591,6 @@ export default function Game() {
                 <>
                   <Button
                     onClick={() => {
-                      send("toggle_taunt", { enabled: !tauntEnabled });
-                    }}
-                    size="sm"
-                    variant="outline"
-                    className={cn(
-                      "h-6 px-3 text-xs font-medium transition-all",
-                      tauntEnabled 
-                        ? "border-amber-500 bg-amber-500/10 text-amber-400 hover:border-amber-400 hover:bg-amber-500/20" 
-                        : "border hover:border-amber-500 hover:bg-amber-500/10"
-                    )}
-                    title="Hareket çekme özelliğini aç/kapat"
-                  >
-                    <Zap className={cn("w-3 h-3 mr-1.5", tauntEnabled && "animate-pulse")} />
-                    <span>{tauntEnabled ? "Hareket Aktif" : "Hareket Pasif"}</span>
-                  </Button>
-                  <div className="w-px h-5 bg-amber-900/40" />
-                  <Button
-                    onClick={() => {
                       send("toggle_insult", { enabled: !insultEnabled });
                     }}
                     size="sm"
