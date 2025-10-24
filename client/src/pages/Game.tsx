@@ -284,6 +284,18 @@ export default function Game() {
     }
   }, [tauntCooldown]);
 
+  // Clean up expired taunts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTaunts(prev => prev.filter(taunt => {
+        const now = Date.now();
+        return taunt.expiresAt > now;
+      }));
+    }, 100); // Check every 100ms for smoother removal
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Countdown for insult cooldown
   useEffect(() => {
     if (insultCooldown > 0) {
@@ -313,7 +325,7 @@ export default function Game() {
     const handleMessage = (event: MessageEvent) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.type === 'taunt_fired' || message.type === 'taunt_triggered') {
+        if (message.type === 'taunt_fired') {
           setTaunts(prev => [...prev, message.payload]);
         } else if (message.type === 'insult_sent') {
           setInsults(prev => [...prev, message.payload]);

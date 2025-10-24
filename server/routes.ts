@@ -470,43 +470,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
-          case "trigger_taunt": {
-            if (!ws.roomCode || !ws.playerId) {
-              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
-              return;
-            }
-
-            const tauntData = storage.triggerTaunt(ws.roomCode, ws.playerId);
-            if (!tauntData) {
-              sendToClient(ws, { type: "error", payload: { message: "Taunt atılamadı. 20 saniye beklemelisin!" } });
-              return;
-            }
-
-            broadcastToRoom(ws.roomCode, {
-              type: "taunt_fired",
-              payload: tauntData,
-            });
-            break;
-          }
-
-          case "send_insult": {
-            if (!ws.roomCode || !ws.playerId) {
-              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
-              return;
-            }
-
-            const insultData = storage.sendInsult(ws.roomCode, ws.playerId);
-            if (!insultData) {
-              sendToClient(ws, { type: "error", payload: { message: "Laf sokma yapılamadı! Bekleme süresinde olabilirsin." } });
-              return;
-            }
-
-            broadcastToRoom(ws.roomCode, {
-              type: "insult_sent",
-              payload: insultData,
-            });
-            break;
-          }
 
           case "start_game": {
             if (!ws.roomCode || !ws.playerId) {
@@ -769,7 +732,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
 
             broadcastToRoom(ws.roomCode, {
-              type: "taunt_triggered",
+              type: "taunt_fired",
               payload: tauntData,
             });
             break;
