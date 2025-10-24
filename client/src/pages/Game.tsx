@@ -66,14 +66,6 @@ export default function Game() {
   const previousClueRef = useRef<string | null>(null);
   const assassinShownRef = useRef<boolean>(false);
 
-  useEffect(() => {
-    // Check if this is first visit to game
-    const isFirstGameVisit = !sessionStorage.getItem("katmannames_game_visited");
-    if (isFirstGameVisit && gameState?.phase === "playing") {
-      sessionStorage.setItem("katmannames_game_visited", "true");
-      window.location.reload();
-    }
-  }, [gameState?.phase]);
 
   useEffect(() => {
     if (error) {
