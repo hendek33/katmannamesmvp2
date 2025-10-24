@@ -83,8 +83,16 @@ export function PlayerList({
               <Input
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
-                onBlur={handleSaveName}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSaveName();
+                  } else if (e.key === "Escape") {
+                    e.preventDefault();
+                    setIsEditing(false);
+                    setEditedName(team === "dark" ? darkTeamName : lightTeamName);
+                  }
+                }}
                 maxLength={20}
                 className="h-6 text-xs font-semibold max-w-[120px]"
                 placeholder="Takım ismi belirle"
@@ -95,8 +103,21 @@ export function PlayerList({
                 variant="ghost"
                 className="h-6 w-6 p-0"
                 onClick={handleSaveName}
+                data-testid={`button-save-team-name-${team}`}
               >
                 <Check className="w-3 h-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-6 w-6 p-0"
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditedName(team === "dark" ? darkTeamName : lightTeamName);
+                }}
+                data-testid={`button-cancel-team-name-${team}`}
+              >
+                <X className="w-3 h-3" />
               </Button>
             </div>
           ) : (
