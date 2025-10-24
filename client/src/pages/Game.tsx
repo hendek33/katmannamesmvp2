@@ -37,6 +37,8 @@ export default function Game() {
   const [insults, setInsults] = useState<any[]>([]);
   const [tauntEnabled, setTauntEnabled] = useState(true);
   const [insultEnabled, setInsultEnabled] = useState(true);
+  const [globalTauntCooldown, setGlobalTauntCooldown] = useState<number>(0);
+  const [globalInsultCooldown, setGlobalInsultCooldown] = useState<number>(0);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
   
   // Close dropdowns when clicking outside
@@ -233,16 +235,14 @@ export default function Game() {
   }, []);
 
   const handleTriggerTaunt = () => {
-    if (tauntCooldown > 0 || !playerId || !tauntEnabled) return;
+    if (globalTauntCooldown > 0 || !playerId || !tauntEnabled) return;
     
     send("trigger_taunt", {});
-    
-    // Set 5 second cooldown
-    setTauntCooldown(5);
+    // Global cooldown will be set when server broadcasts the event
   };
 
   const handleInsultClick = () => {
-    if (insultCooldown > 0 || !playerId || !insultEnabled) return;
+    if (globalInsultCooldown > 0 || !playerId || !insultEnabled) return;
     setShowInsultV2Dialog(!showInsultV2Dialog);
   };
   
@@ -250,30 +250,28 @@ export default function Game() {
     console.log("[CLIENT] Sending insult to target:", targetPlayerId);
     setShowInsultV2Dialog(false);
     send("send_insult_v2", { targetId: targetPlayerId });
-    
-    // Set 5 second cooldown
-    setInsultCooldown(5);
+    // Global cooldown will be set when server broadcasts the event
   };
 
-  // Countdown for taunt cooldown
+  // Countdown for global taunt cooldown
   useEffect(() => {
-    if (tauntCooldown > 0) {
+    if (globalTauntCooldown > 0) {
       const timer = setTimeout(() => {
-        setTauntCooldown(prev => Math.max(0, prev - 1));
+        setGlobalTauntCooldown(prev => Math.max(0, prev - 1));
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [tauntCooldown]);
+  }, [globalTauntCooldown]);
 
-  // Countdown for insult cooldown
+  // Countdown for global insult cooldown
   useEffect(() => {
-    if (insultCooldown > 0) {
+    if (globalInsultCooldown > 0) {
       const timer = setTimeout(() => {
-        setInsultCooldown(prev => Math.max(0, prev - 1));
+        setGlobalInsultCooldown(prev => Math.max(0, prev - 1));
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [insultCooldown]);
+  }, [globalInsultCooldown]);
 
   // Listen for taunt and insult events via WebSocket
   useEffect(() => {
@@ -284,10 +282,14 @@ export default function Game() {
     const handleMessage = (event: MessageEvent) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.type === 'taunt_fired') {
+        if (message.type === 'taunt_fired' || message.type === 'taunt_triggered') {
           setTaunts(prev => [...prev, message.payload]);
+          // Set global cooldown for 5 seconds
+          setGlobalTauntCooldown(5);
         } else if (message.type === 'insult_sent') {
           setInsults(prev => [...prev, message.payload]);
+          // Set global cooldown for 5 seconds
+          setGlobalInsultCooldown(5);
           // Remove insult after 3 seconds
           setTimeout(() => {
             setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
@@ -307,6 +309,8 @@ export default function Game() {
         } else if (message.type === 'room_features') {
           setTauntEnabled(message.payload.tauntEnabled);
           setInsultEnabled(message.payload.insultEnabled);
+          setGlobalTauntCooldown(message.payload.globalTauntCooldown || 0);
+          setGlobalInsultCooldown(message.payload.globalInsultCooldown || 0);
         }
       } catch (err) {
         console.error('Error handling message:', err);
@@ -1334,14 +1338,14 @@ export default function Game() {
                     }`} />
                     <button
                       onClick={handleTriggerTaunt}
-                      disabled={tauntCooldown > 0 || !tauntEnabled}
+                      disabled={globalTauntCooldown > 0 || !tauntEnabled}
                       className={`
                         relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                         backdrop-blur-md border shadow-lg
                         ${currentPlayer.team === "dark" 
                           ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
                           : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                        ${tauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                        ${globalTauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
                       `}
                       data-testid="button-trigger-taunt"
                     >
@@ -1350,10 +1354,10 @@ export default function Game() {
                           <EyeOff className="w-4 h-4" />
                           Devre Dışı
                         </span>
-                      ) : tauntCooldown > 0 ? (
+                      ) : globalTauntCooldown > 0 ? (
                         <span className="flex items-center justify-center gap-1.5">
                           <Timer className="w-4 h-4" />
-                          {tauntCooldown}s
+                          {globalTauntCooldown}s
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-1.5">
@@ -1373,14 +1377,14 @@ export default function Game() {
                     }`} />
                     <button
                       onClick={handleInsultClick}
-                      disabled={insultCooldown > 0 || !insultEnabled}
+                      disabled={globalInsultCooldown > 0 || !insultEnabled}
                       className={`
                         relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                         backdrop-blur-md border shadow-lg
                         ${currentPlayer.team === "dark" 
                           ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
                           : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
-                        ${insultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                        ${globalInsultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
                       `}
                       data-testid="button-send-insult"
                     >
@@ -1389,10 +1393,10 @@ export default function Game() {
                           <EyeOff className="w-4 h-4" />
                           Devre Dışı
                         </span>
-                      ) : insultCooldown > 0 ? (
+                      ) : globalInsultCooldown > 0 ? (
                         <span className="flex items-center justify-center gap-1.5">
                           <Timer className="w-4 h-4" />
-                          {insultCooldown}s
+                          {globalInsultCooldown}s
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-1.5">
@@ -1403,7 +1407,7 @@ export default function Game() {
                     </button>
                     
                     {/* Player Selection List */}
-                    {showInsultV2Dialog && insultEnabled && insultCooldown === 0 && (
+                    {showInsultV2Dialog && insultEnabled && globalInsultCooldown === 0 && (
                       <div className="absolute top-full mt-2 left-0 right-0 z-50">
                         <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
                           {gameState.players

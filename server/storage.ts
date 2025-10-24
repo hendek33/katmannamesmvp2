@@ -11,6 +11,8 @@ interface RoomData {
   cardImages?: Map<number, string>; // cardId -> image path for revealed cards
   tauntEnabled?: boolean;
   insultEnabled?: boolean;
+  globalTauntCooldown?: number; // Global taunt cooldown timestamp
+  globalInsultCooldown?: number; // Global insult cooldown timestamp
 }
 
 export interface IStorage {
@@ -39,7 +41,7 @@ export interface IStorage {
   sendInsult(roomCode: string, playerId: string, targetId?: string): any;
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
-  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean } | null;
+  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean; globalTauntCooldown?: number; globalInsultCooldown?: number } | null;
 }
 
 // Insult templates
@@ -910,14 +912,14 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player || !player.team) return null;
     
-    // Check cooldown (5 seconds)
+    // Check GLOBAL cooldown (5 seconds)
     const now = Date.now();
-    if (player.lastTauntAt && (now - player.lastTauntAt) < 5000) {
-      return null; // Still on cooldown
+    if (roomData.globalTauntCooldown && (now - roomData.globalTauntCooldown) < 5000) {
+      return null; // Still on global cooldown
     }
     
-    // Update last taunt time
-    player.lastTauntAt = now;
+    // Update global taunt cooldown
+    roomData.globalTauntCooldown = now;
     
     // Generate random position on board (normalized 0-1)
     const position = {
@@ -1135,11 +1137,10 @@ export class MemStorage implements IStorage {
     // Check if insult is enabled
     if (!roomData.insultEnabled) return null;
 
-    // Check cooldown
+    // Check GLOBAL cooldown (5 seconds)
     const now = Date.now();
-    const lastInsult = this.insultCooldowns.get(senderId);
-    if (lastInsult && now - lastInsult < 5000) {
-      return null;
+    if (roomData.globalInsultCooldown && (now - roomData.globalInsultCooldown) < 5000) {
+      return null; // Still on global cooldown
     }
 
     // Get sender and target
@@ -1167,8 +1168,8 @@ export class MemStorage implements IStorage {
 
     if (!target) return null;
 
-    // Set cooldown
-    this.insultCooldowns.set(senderId, now);
+    // Set global cooldown
+    roomData.globalInsultCooldown = now;
 
     // Create insult - use V1 insult messages
     const insultTemplate = insultMessages[Math.floor(Math.random() * insultMessages.length)];
@@ -1205,13 +1206,23 @@ export class MemStorage implements IStorage {
     return { insultEnabled: enabled };
   }
   
-  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean } | null {
+  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean; globalTauntCooldown?: number; globalInsultCooldown?: number } | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
     
+    const now = Date.now();
+    const tauntRemaining = roomData.globalTauntCooldown && (roomData.globalTauntCooldown + 5000 - now) > 0 
+      ? Math.ceil((roomData.globalTauntCooldown + 5000 - now) / 1000) 
+      : 0;
+    const insultRemaining = roomData.globalInsultCooldown && (roomData.globalInsultCooldown + 5000 - now) > 0
+      ? Math.ceil((roomData.globalInsultCooldown + 5000 - now) / 1000)
+      : 0;
+    
     return {
       tauntEnabled: roomData.tauntEnabled !== false, // Default to true
-      insultEnabled: roomData.insultEnabled !== false // Default to true
+      insultEnabled: roomData.insultEnabled !== false, // Default to true
+      globalTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
+      globalInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
     };
   }
 }
