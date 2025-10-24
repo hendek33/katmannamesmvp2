@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import PlayerList from "@/components/PlayerList";
+import { PlayerList } from "@/components/PlayerList";
 import { type Team } from "@shared/schema";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -334,21 +334,62 @@ export default function Lobby() {
           <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Panel - Team Operations (7 cols on lg) */}
             <div className="col-span-12 lg:col-span-7 flex flex-col gap-4 overflow-hidden">
-              {/* Developer Notes Card */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 to-amber-500/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
-                  <div className="text-xs text-amber-400/80 space-y-0.5">
-                    <div className="font-medium flex items-center gap-1">
-                      <Zap className="w-3 h-3" />
-                      Geliştiriciden not:
+              {/* Mission Briefing - Enhanced Glassmorphism */}
+              {currentPlayer && (
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
+                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+                    <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-blue-600 blur-md opacity-50" />
+                        <div className="relative w-10 h-10 rounded-lg bg-gradient-to-r from-red-700 to-blue-700 flex items-center justify-center shadow-lg">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-start gap-4">
+                          <div>
+                            <p className="text-sm text-slate-400">Hoş geldin</p>
+                            <p className="text-lg font-bold text-slate-100">{currentPlayer.username}</p>
+                          </div>
+                          {/* Developer Note */}
+                          <div className="ml-auto">
+                            <div className="text-xs text-amber-400/80 space-y-0.5">
+                              <div className="font-medium flex items-center gap-1">
+                                <Zap className="w-3 h-3" />
+                                Geliştiriciden not:
+                              </div>
+                              <div className="italic text-amber-400/60">
+                                Çağrı abi tasarımları yaparken biraz geç fark ettim, senin mavi takım olman gerekecek maalesef :=)
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="italic text-amber-400/60">
-                      Çağrı abi normalde siz kırmızı takım oluyormuşsunuz ama tasarımları yaparken biraz geç fark ettim, mavi takım olmanız gerekecek maalesef :=) Yeni özellikler ve iyileştirmeler yakında!
-                    </div>
+                    {currentPlayer.team && (
+                      <div className="flex items-center gap-2">
+                        <div className={`px-3 py-1.5 rounded-lg font-medium ${
+                          currentPlayer.team === "dark" 
+                            ? "bg-blue-900/50 border border-blue-700/50 text-blue-300"
+                            : "bg-red-900/50 border border-red-700/50 text-red-300"
+                        }`}>
+                          <span className="text-sm">
+                            {currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                          </span>
+                        </div>
+                        {currentPlayer.role === "spymaster" && (
+                          <div className="px-3 py-1.5 bg-amber-900/50 border border-amber-700/50 rounded-lg">
+                            <Shield className="w-4 h-4 text-amber-400" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   </div>
                 </div>
-              </div>
+              )}
               
               {/* Team Dashboard */}
               <div className="flex-1 overflow-hidden">
@@ -522,44 +563,27 @@ export default function Lobby() {
                 <div className="backdrop-blur-lg bg-black/60 rounded-xl border border-amber-900/40 p-4 opacity-90">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      {/* Custom Chaos Icon */}
-                      <svg 
-                        className="w-5 h-5 text-amber-500" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path 
-                          d="M12 2L13.5 7L19 7.5L15 11L16.5 17L12 14L7.5 17L9 11L5 7.5L10.5 7L12 2Z" 
-                          stroke="currentColor" 
-                          strokeWidth="2" 
-                          strokeLinejoin="round"
-                          fill="currentColor"
-                          opacity="0.3"
-                        />
-                        <circle cx="12" cy="12" r="3" fill="currentColor"/>
-                        <path 
-                          d="M12 5V8M12 16V19M7 7L9 9M15 15L17 17M5 12H8M16 12H19M7 17L9 15M15 9L17 7" 
-                          stroke="currentColor" 
-                          strokeWidth="1.5" 
-                          strokeLinecap="round"
-                        />
-                      </svg>
+                      <Sparkles className="w-5 h-5 text-amber-600/50" />
                       <h3 className="text-base font-bold text-amber-700/60">KAOS MODU</h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
-                        className="w-6 h-6 rounded-full bg-amber-500/30 border border-amber-400/50 text-amber-300 font-bold text-sm hover:bg-amber-500/40 hover:border-amber-400/70 hover:text-amber-200 hover:scale-110 transition-all flex items-center justify-center"
+                        className="text-xs text-amber-700/50 hover:text-amber-600/50 transition-colors"
                       >
-                        ?
+                        (?)
                       </button>
                     </div>
-                    <Switch
-                      checked={false}
-                      disabled={true}
-                      data-testid="switch-chaos-mode"
-                    />
+                    <div className="relative">
+                      <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-slate-800 text-amber-400/60 text-xs rounded-full">
+                        🚧
+                      </div>
+                      <Switch
+                        checked={false}
+                        disabled={true}
+                        data-testid="switch-chaos-mode"
+                      />
+                    </div>
                   </div>
-                  <p className="text-xs text-amber-600 font-medium">
+                  <p className="text-xs text-amber-800/50">
                     Geliştirme aşamasında - Yakında!
                   </p>
                 </div>

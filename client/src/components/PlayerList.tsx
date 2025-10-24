@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, Crown, Eye, Target, Edit2, Check, X } from "lucide-react";
-import { useState, useEffect, memo } from "react";
+import { useState } from "react";
 
 interface PlayerListProps {
   players: Player[];
@@ -18,41 +18,35 @@ interface PlayerListProps {
   onRemoveBot?: (botId: string) => void;
 }
 
-// TeamSection component moved outside and memoized to prevent remounting
-const TeamSection = memo(({ 
-  team, 
-  title, 
-  players: teamPlayers, 
-  gradient,
-  currentPlayer,
-  onTeamSelect,
+export function PlayerList({ 
+  players, 
+  currentPlayerId, 
+  onTeamSelect, 
   onRoleToggle,
-  isLobby,
-  darkTeamName,
-  lightTeamName,
+  isLobby = false,
+  darkTeamName = "Mavi Takım",
+  lightTeamName = "Kırmızı Takım",
   onTeamNameChange,
   onRemoveBot
-}: { 
-  team: Team; 
-  title: string; 
-  players: Player[];
-  gradient: string;
-  currentPlayer?: Player;
-  onTeamSelect?: (team: Team) => void;
-  onRoleToggle?: () => void;
-  isLobby?: boolean;
-  darkTeamName?: string;
-  lightTeamName?: string;
-  onTeamNameChange?: (team: Team, name: string) => void;
-  onRemoveBot?: (botId: string) => void;
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState(title);
+}: PlayerListProps) {
+  const darkTeam = players.filter(p => p.team === "dark");
+  const lightTeam = players.filter(p => p.team === "light");
+  const noTeam = players.filter(p => p.team === null);
   
-  // Update editedName when title changes
-  useEffect(() => {
-    setEditedName(title);
-  }, [title]);
+  const currentPlayer = players.find(p => p.id === currentPlayerId);
+  
+  // Check if teams have required roles for game start
+  const darkHasSpymaster = darkTeam.some(p => p.role === "spymaster");
+  const lightHasSpymaster = lightTeam.some(p => p.role === "spymaster");
+
+  const TeamSection = ({ team, title, players: teamPlayers, gradient }: { 
+    team: Team; 
+    title: string; 
+    players: Player[];
+    gradient: string;
+  }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedName, setEditedName] = useState(title);
 
     const handleSaveName = () => {
       // Don't save if empty
@@ -89,16 +83,8 @@ const TeamSection = memo(({
               <Input
                 value={editedName}
                 onChange={(e) => setEditedName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleSaveName();
-                  } else if (e.key === "Escape") {
-                    e.preventDefault();
-                    setIsEditing(false);
-                    setEditedName(team === "dark" ? (darkTeamName || "Mavi Takım") : (lightTeamName || "Kırmızı Takım"));
-                  }
-                }}
+                onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+                onBlur={handleSaveName}
                 maxLength={20}
                 className="h-6 text-xs font-semibold max-w-[120px]"
                 placeholder="Takım ismi belirle"
@@ -109,21 +95,8 @@ const TeamSection = memo(({
                 variant="ghost"
                 className="h-6 w-6 p-0"
                 onClick={handleSaveName}
-                data-testid={`button-save-team-name-${team}`}
               >
                 <Check className="w-3 h-3" />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-6 w-6 p-0"
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditedName(team === "dark" ? (darkTeamName || "Mavi Takım") : (lightTeamName || "Kırmızı Takım"));
-                }}
-                data-testid={`button-cancel-team-name-${team}`}
-              >
-                <X className="w-3 h-3" />
               </Button>
             </div>
           ) : (
@@ -189,7 +162,7 @@ const TeamSection = memo(({
                 key={spymaster.id}
                 data-testid={`player-${spymaster.id}`}
                 className={`flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/40 to-amber-800/30 border border-amber-600/50 ${
-                  spymaster.id === currentPlayer?.id ? 'ring-2 ring-accent' : ''
+                  spymaster.id === currentPlayerId ? 'ring-2 ring-accent' : ''
                 }`}
               >
                 {spymaster.isRoomOwner && (
@@ -209,7 +182,7 @@ const TeamSection = memo(({
                   </button>
                 )}
                 {/* Show "Ajan Ol" button for current player who is spymaster */}
-                {isLobby && spymaster.id === currentPlayer?.id && onRoleToggle && (
+                {isLobby && spymaster.id === currentPlayerId && onRoleToggle && (
                   <button 
                     onClick={onRoleToggle}
                     className="text-[10px] text-blue-400 hover:text-blue-300 mt-1 font-semibold"
@@ -249,7 +222,7 @@ const TeamSection = memo(({
                 key={agent.id}
                 data-testid={`player-${agent.id}`}
                 className={`flex flex-col items-center p-2 rounded transition-all ${
-                  agent.id === currentPlayer?.id 
+                  agent.id === currentPlayerId 
                     ? 'bg-accent/20 border border-accent/30 shadow-sm' 
                     : 'bg-black/20 hover:bg-black/30'
                 }`}
@@ -280,25 +253,8 @@ const TeamSection = memo(({
       </div>
     </div>
     );
-  });
+  };
 
-export default function PlayerList({
-  players,
-  currentPlayerId,
-  onTeamSelect,
-  onRoleToggle,
-  isLobby = false,
-  darkTeamName = "Mavi Takım",
-  lightTeamName = "Kırmızı Takım",
-  onTeamNameChange,
-  onRemoveBot,
-}: PlayerListProps) {
-  const darkTeam = players.filter(p => p.team === "dark");
-  const lightTeam = players.filter(p => p.team === "light");
-  const noTeam = players.filter(p => !p.team);
-  
-  const currentPlayer = players.find(p => p.id === currentPlayerId);
-  
   return (
     <div className="h-full flex flex-col gap-2">
       <div className="flex items-center gap-2 text-slate-400 px-1">
@@ -313,22 +269,20 @@ export default function PlayerList({
           <div className="absolute inset-0 bg-amber-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
           <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border-2 border-dashed border-amber-600/50 p-4 space-y-2 shadow-2xl">
           <h3 className="font-bold text-sm text-amber-400">Takım Seçilmemiş ({noTeam.length})</h3>
-          <div className="grid grid-cols-5 gap-1.5">
+          <div className="space-y-1">
             {noTeam.map(player => (
               <div 
                 key={player.id}
                 data-testid={`player-${player.id}`}
-                className="flex items-center justify-center p-1.5 rounded bg-amber-900/20 border border-amber-700/30 hover:bg-amber-900/30 transition-all min-h-[32px]"
+                className="flex items-center gap-2 p-1 rounded bg-amber-900/20 border border-amber-700/30"
               >
-                <div className="flex items-center gap-1">
-                  {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400 flex-shrink-0" />}
-                  <span className="text-[11px] font-medium text-slate-200 text-center truncate">{player.username}</span>
-                  {player.id === currentPlayerId && (
-                    <span className="text-[10px] text-amber-300 flex-shrink-0">
-                      (Sen)
-                    </span>
-                  )}
-                </div>
+                {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-400" />}
+                <span className="text-sm font-medium text-slate-200">{player.username}</span>
+                {player.id === currentPlayerId && (
+                  <Badge variant="outline" className="text-xs px-2 h-5 ml-auto border-amber-600/50 text-amber-300">
+                    Sen
+                  </Badge>
+                )}
               </div>
             ))}
           </div>
@@ -346,14 +300,6 @@ export default function PlayerList({
           title={darkTeamName}
           players={darkTeam}
           gradient="bg-gradient-to-r from-blue-600 to-blue-400"
-          currentPlayer={currentPlayer}
-          onTeamSelect={onTeamSelect}
-          onRoleToggle={onRoleToggle}
-          isLobby={isLobby}
-          darkTeamName={darkTeamName}
-          lightTeamName={lightTeamName}
-          onTeamNameChange={onTeamNameChange}
-          onRemoveBot={onRemoveBot}
         />
         
         <TeamSection 
@@ -361,14 +307,6 @@ export default function PlayerList({
           title={lightTeamName}
           players={lightTeam}
           gradient="bg-gradient-to-r from-red-600 to-red-400"
-          currentPlayer={currentPlayer}
-          onTeamSelect={onTeamSelect}
-          onRoleToggle={onRoleToggle}
-          isLobby={isLobby}
-          darkTeamName={darkTeamName}
-          lightTeamName={lightTeamName}
-          onTeamNameChange={onTeamNameChange}
-          onRemoveBot={onRemoveBot}
         />
       </div>
     </div>

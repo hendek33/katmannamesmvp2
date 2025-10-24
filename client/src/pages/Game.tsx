@@ -4,14 +4,13 @@ import { Logo } from "@/components/Logo";
 import { GameCard } from "@/components/GameCard";
 import { GameStatus } from "@/components/GameStatus";
 import { ClueDisplay } from "@/components/ClueDisplay";
-import PlayerList from "@/components/PlayerList";
+import { PlayerList } from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
-import { BubbleManagerProvider } from "@/contexts/BubbleManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -284,18 +283,6 @@ export default function Game() {
     }
   }, [tauntCooldown]);
 
-  // Clean up expired taunts
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTaunts(prev => prev.filter(taunt => {
-        const now = Date.now();
-        return taunt.expiresAt > now;
-      }));
-    }, 100); // Check every 100ms for smoother removal
-
-    return () => clearInterval(interval);
-  }, []);
-
   // Countdown for insult cooldown
   useEffect(() => {
     if (insultCooldown > 0) {
@@ -326,10 +313,8 @@ export default function Game() {
       try {
         const message = JSON.parse(event.data);
         if (message.type === 'taunt_fired') {
-          console.log('Taunt received:', message.payload);
           setTaunts(prev => [...prev, message.payload]);
-        } else if (message.type === 'insult_sent' || message.type === 'insult_v2_sent') {
-          console.log('Insult received:', message.payload);
+        } else if (message.type === 'insult_sent') {
           setInsults(prev => [...prev, message.payload]);
           // Remove insult after 3 seconds
           setTimeout(() => {
@@ -368,28 +353,7 @@ export default function Game() {
   }, [isConnected, gameState, send]);
 
   useEffect(() => {
-    // Check if we should redirect to rooms
-    if (!isConnected) return; // Don't redirect if not connected yet
-    
-    // If gameState exists, we're good, don't redirect
-    if (gameState) return;
-    
-    // Check if we have saved room info in localStorage
-    const savedRoomCode = localStorage.getItem("katmannames_room_code");
-    const savedPlayerId = localStorage.getItem("katmannames_player_id");
-    
-    // If we have saved info, wait a bit for reconnection
-    if (savedRoomCode && savedPlayerId) {
-      const timeoutId = setTimeout(() => {
-        // After waiting, if still no gameState, redirect to rooms
-        if (!gameState) {
-          setLocation("/rooms");
-        }
-      }, 3000); // Wait 3 seconds for reconnection
-      
-      return () => clearTimeout(timeoutId);
-    } else {
-      // No saved info, immediately redirect to rooms
+    if (!gameState && isConnected) {
       setLocation("/rooms");
     }
   }, [gameState, isConnected, setLocation]);
@@ -453,8 +417,7 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
-    <BubbleManagerProvider>
-      <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
@@ -493,7 +456,6 @@ export default function Game() {
           senderUsername={taunt.username}
           senderTeam={taunt.team}
           videoSrc={taunt.videoSrc}
-          timestamp={taunt.expiresAt - 3000} // Use expiresAt - duration as timestamp
         />
       ))}
       
@@ -1606,15 +1568,6 @@ export default function Game() {
               ))}
             </div>
 
-            {/* Clue Display - Show current clue above the grid */}
-            {gameState.currentClue && gameState.phase === "playing" && (
-              <div className="absolute bottom-[100px] left-1/2 transform -translate-x-1/2 animate-fadeIn z-50">
-                <div className="animate-pulse-slow">
-                  <ClueDisplay clue={gameState.currentClue} />
-                </div>
-              </div>
-            )}
-
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* End Turn Button for Guessers - Positioned to the left */}
@@ -2017,6 +1970,5 @@ export default function Game() {
         </div>
       </div>
     </div>
-    </BubbleManagerProvider>
   );
 }
