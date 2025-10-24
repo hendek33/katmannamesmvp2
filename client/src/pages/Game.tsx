@@ -326,8 +326,10 @@ export default function Game() {
       try {
         const message = JSON.parse(event.data);
         if (message.type === 'taunt_fired') {
+          console.log('Taunt received:', message.payload);
           setTaunts(prev => [...prev, message.payload]);
-        } else if (message.type === 'insult_sent') {
+        } else if (message.type === 'insult_sent' || message.type === 'insult_v2_sent') {
+          console.log('Insult received:', message.payload);
           setInsults(prev => [...prev, message.payload]);
           // Remove insult after 3 seconds
           setTimeout(() => {
@@ -1603,6 +1605,15 @@ export default function Game() {
                 </div>
               ))}
             </div>
+
+            {/* Clue Display - Show current clue above the grid */}
+            {gameState.currentClue && gameState.phase === "playing" && (
+              <div className="absolute bottom-[100px] left-1/2 transform -translate-x-1/2 animate-fadeIn z-50">
+                <div className="animate-pulse-slow">
+                  <ClueDisplay clue={gameState.currentClue} />
+                </div>
+              </div>
+            )}
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
