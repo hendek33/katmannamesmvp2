@@ -312,7 +312,7 @@ export default function Game() {
     const handleMessage = (event: MessageEvent) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.type === 'taunt_fired') {
+        if (message.type === 'taunt_triggered') {
           setTaunts(prev => [...prev, message.payload]);
         } else if (message.type === 'insult_sent') {
           setInsults(prev => [...prev, message.payload]);
