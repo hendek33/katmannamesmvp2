@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { useBubbleManager } from '@/contexts/BubbleManager';
 
 interface InsultBubbleProps {
   senderUsername: string;
@@ -10,35 +11,66 @@ interface InsultBubbleProps {
   timestamp: number;
 }
 
-export function InsultBubble({ senderUsername, senderTeam, targetUsername, targetTeam, message }: InsultBubbleProps) {
+export function InsultBubble({ senderUsername, senderTeam, targetUsername, targetTeam, message, timestamp }: InsultBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [position, setPosition] = useState(0);
+  const bubbleManager = useBubbleManager();
+  const bubbleIdRef = useRef(`insult-${timestamp}-${Math.random()}`);
 
   useEffect(() => {
+    // Register bubble and get initial position
+    const initialPosition = bubbleManager.registerBubble(bubbleIdRef.current, 'insult', senderTeam);
+    setPosition(initialPosition);
+    
     // Fade in
     setTimeout(() => setIsVisible(true), 10);
     
     // Start fade out after 2.5 seconds
     const fadeOutTimer = setTimeout(() => {
       setIsLeaving(true);
+      // Unregister after animation completes
+      setTimeout(() => {
+        bubbleManager.unregisterBubble(bubbleIdRef.current);
+      }, 700);
     }, 2500);
 
-    return () => clearTimeout(fadeOutTimer);
-  }, []);
+    return () => {
+      clearTimeout(fadeOutTimer);
+      bubbleManager.unregisterBubble(bubbleIdRef.current);
+    };
+  }, [senderTeam, bubbleManager, timestamp]);
+
+  // Update position when bubble manager changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newPosition = bubbleManager.getBubblePosition(bubbleIdRef.current);
+      if (newPosition !== position) {
+        setPosition(newPosition);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [position, bubbleManager]);
 
   // Determine position based on team
   const isLeftSide = senderTeam === 'dark';
+  
+  // Calculate vertical position based on stack index
+  const baseTop = 9; // Base top position in vh
+  const spacing = 12; // Spacing between bubbles in vh
+  const topPosition = baseTop + (position * spacing);
 
   return (
     <div 
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-700 ease-out",
         isLeftSide ? "left-[8%] lg:left-[12%] xl:left-[15%]" : "right-[8%] lg:right-[12%] xl:right-[15%]",
-        "top-[9vh] lg:top-[11vh] xl:top-[13vh]",
         isVisible && !isLeaving ? "opacity-100" : "opacity-0",
         isLeaving && "animate-fade-out"
       )}
       style={{
+        top: `${topPosition}vh`,
         transform: `${isVisible && !isLeaving ? 'translateY(0)' : 'translateY(-20px)'}`,
       }}
     >
