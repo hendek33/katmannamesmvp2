@@ -291,7 +291,7 @@ export default function Game() {
     const handleMessage = (event: MessageEvent) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.type === 'insult_sent') {
+        if (message.type === 'insult_sent' || message.type === 'insult_v2') {
           setInsults(prev => [...prev, message.payload]);
           // Remove insult after 3 seconds
           setTimeout(() => {
