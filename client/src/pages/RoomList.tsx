@@ -34,10 +34,16 @@ export default function RoomList() {
 
   useEffect(() => {
     if (gameState) {
-      // Reload the page when navigating to game after room creation/join
-      window.location.href = "/game";
+      // Only redirect if we're not already on the game page
+      if (!window.location.pathname.includes('/game')) {
+        // Reload the page when navigating to game after room creation/join
+        window.location.href = "/game";
+      } else {
+        // If already on game page, use normal navigation
+        setLocation("/game");
+      }
     }
-  }, [gameState]);
+  }, [gameState, setLocation]);
 
   const handleJoinRoom = (roomCode: string, hasPassword: boolean) => {
     if (hasPassword) {
