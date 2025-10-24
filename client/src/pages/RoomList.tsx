@@ -20,6 +20,13 @@ export default function RoomList() {
       return;
     }
     setUsername(storedUsername);
+    
+    // Check if this is first visit to rooms page
+    const isFirstRoomsVisit = !sessionStorage.getItem("katmannames_rooms_visited");
+    if (isFirstRoomsVisit) {
+      sessionStorage.setItem("katmannames_rooms_visited", "true");
+      window.location.reload();
+    }
   }, [setLocation]);
 
   useEffect(() => {
