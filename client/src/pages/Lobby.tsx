@@ -352,7 +352,7 @@ export default function Lobby() {
                             Geliştiriciden not:
                           </div>
                           <div className="italic text-amber-400/60">
-                            Çağrı abi tasarımları yaparken biraz geç fark ettim, senin mavi takım olman gerekecek maalesef :=)
+                            Gerizekalılar takımı, normalde sizin kırmızı takım olduğunuzu unutmuşum, tasarımları yaparken biraz geç fark ettim, bu yüzden mavi takım olmanız gerekecek maalesef :=) İyi oyunlar, made by ardansmn. 
                           </div>
                         </div>
                       </div>

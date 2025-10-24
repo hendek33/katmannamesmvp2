@@ -1542,39 +1542,37 @@ export default function Game() {
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
-              {/* End Turn Button for Guessers - Positioned to the left */}
-              {!canGiveClue && gameState.currentClue && currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && gameState.phase !== "ended" && (
-                <div className="absolute bottom-2 left-4 sm:left-8">
-                  <Button
-                    onClick={() => {
-                      send("end_turn", {});
-                      toast({
-                        title: "Tahmin Tamamlandı",
-                        description: "Sıra diğer takıma geçti",
-                      });
-                    }}
-                    className="h-10 sm:h-12 px-6 sm:px-8 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-black shadow-2xl text-sm sm:text-base rounded-xl border-2 border-orange-400/60 transform transition-all hover:scale-105"
-                  >
-                    <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    TAHMİNİ BİTİR
-                  </Button>
-                </div>
-              )}
-              
               {/* Clue Display Card - Shows after clue is given */}
               {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
-                <Card className="px-3 py-2 sm:px-4 sm:py-2.5 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up mb-2">
-                  <div className="flex items-center gap-3">
+                <Card className="px-2 py-1 sm:px-3 sm:py-1.5 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up mb-2">
+                  <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1">
-                      <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 animate-pulse" />
-                      <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
+                      <Lightbulb className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400 animate-pulse" />
+                      <span className="text-[9px] sm:text-[10px] font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm sm:text-base font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                        <span className="text-sm sm:text-base font-black text-white">{gameState.currentClue.count}</span>
+                      <span className="text-[10px] sm:text-xs font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                        <span className="text-[10px] sm:text-xs font-black text-white">{gameState.currentClue.count}</span>
                       </div>
                     </div>
+                    {/* End Turn Button for Guessers - Now inside the card */}
+                    {currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
+                      <Button
+                        onClick={() => {
+                          send("end_turn", {});
+                          toast({
+                            title: "Tahmin Tamamlandı",
+                            description: "Sıra diğer takıma geçti",
+                          });
+                        }}
+                        size="sm"
+                        className="h-6 sm:h-7 px-2 sm:px-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-[10px] sm:text-xs"
+                      >
+                        <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5" />
+                        Tahmini Bitir
+                      </Button>
+                    )}
                   </div>
                 </Card>
               )}
