@@ -29,6 +29,8 @@ export const BubbleManagerProvider = ({ children }: { children: ReactNode }) => 
 
   // Register a new bubble and return its position index
   const registerBubble = (id: string, type: 'insult' | 'taunt', team: 'dark' | 'light'): number => {
+    let initialIndex = 0;
+    
     setBubbles(prev => {
       const newBubbles = new Map(prev);
       
@@ -39,6 +41,7 @@ export const BubbleManagerProvider = ({ children }: { children: ReactNode }) => 
       
       // Assign the next available index
       const nextIndex = sameBubbles.length;
+      initialIndex = nextIndex;
       
       newBubbles.set(id, {
         id,
@@ -52,8 +55,7 @@ export const BubbleManagerProvider = ({ children }: { children: ReactNode }) => 
     });
     
     // Return the initial position
-    const bubble = bubbles.get(id);
-    return bubble?.index || 0;
+    return initialIndex;
   };
 
   // Unregister a bubble and update positions of remaining bubbles

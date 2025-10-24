@@ -19,25 +19,31 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
   const bubbleIdRef = useRef(`insult-${timestamp}-${Math.random()}`);
 
   useEffect(() => {
+    const bubbleId = bubbleIdRef.current;
+    let cleanupTimer: NodeJS.Timeout;
+    
     // Register bubble and get initial position
-    const initialPosition = bubbleManager.registerBubble(bubbleIdRef.current, 'insult', senderTeam);
+    const initialPosition = bubbleManager.registerBubble(bubbleId, 'insult', senderTeam);
     setPosition(initialPosition);
     
     // Fade in
-    setTimeout(() => setIsVisible(true), 10);
+    const fadeInTimer = setTimeout(() => setIsVisible(true), 10);
     
-    // Start fade out after 2.5 seconds
+    // Start fade out after 3 seconds (increased from 2.5)
     const fadeOutTimer = setTimeout(() => {
       setIsLeaving(true);
       // Unregister after animation completes
-      setTimeout(() => {
-        bubbleManager.unregisterBubble(bubbleIdRef.current);
+      cleanupTimer = setTimeout(() => {
+        bubbleManager.unregisterBubble(bubbleId);
       }, 700);
-    }, 2500);
+    }, 3000);
 
     return () => {
+      clearTimeout(fadeInTimer);
       clearTimeout(fadeOutTimer);
-      bubbleManager.unregisterBubble(bubbleIdRef.current);
+      if (cleanupTimer) clearTimeout(cleanupTimer);
+      // Always ensure bubble is unregistered on unmount
+      bubbleManager.unregisterBubble(bubbleId);
     };
   }, [senderTeam, bubbleManager, timestamp]);
 
