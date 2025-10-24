@@ -299,18 +299,24 @@ function CreateRoomModal({ username, onClose, send }: ModalProps) {
               <div className="flex gap-3 mt-6">
                 <button 
                   onClick={onClose}
-                  className="flex-1 px-4 py-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium hover:bg-white/20 hover:border-white/30 transition-all duration-300"
+                  className="group relative flex-1 px-4 py-3 rounded-lg overflow-hidden transition-all duration-300"
                   data-testid="button-cancel-create"
                 >
-                  İptal
+                  <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
+                  <div className="absolute inset-0 border border-white/20 group-hover:border-white/30 rounded-lg" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-white/5 group-hover:from-white/10 group-hover:to-white/5" />
+                  <span className="relative text-white font-medium">İptal</span>
                 </button>
                 <button 
                   onClick={handleCreate}
-                  className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold hover:from-blue-500 hover:to-blue-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative flex-1 px-4 py-3 rounded-lg overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={hasPassword && !password}
                   data-testid="button-confirm-create"
                 >
-                  Oluştur
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-800/80 to-blue-900/80 backdrop-blur-sm" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-blue-600/20 group-hover:from-blue-400/20" />
+                  <div className="absolute inset-0 border border-blue-400/30 group-hover:border-blue-400/50 rounded-lg" />
+                  <span className="relative text-white font-bold">Oluştur</span>
                 </button>
               </div>
             </div>
@@ -397,18 +403,24 @@ function JoinRoomModal({ username, onClose, send }: ModalProps) {
               <div className="flex gap-3 mt-6">
                 <button 
                   onClick={onClose}
-                  className="flex-1 px-4 py-3 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 text-white font-medium hover:bg-white/20 hover:border-white/30 transition-all duration-300"
+                  className="group relative flex-1 px-4 py-3 rounded-lg overflow-hidden transition-all duration-300"
                   data-testid="button-cancel-join"
                 >
-                  İptal
+                  <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
+                  <div className="absolute inset-0 border border-white/20 group-hover:border-white/30 rounded-lg" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-white/5 group-hover:from-white/10 group-hover:to-white/5" />
+                  <span className="relative text-white font-medium">İptal</span>
                 </button>
                 <button 
                   onClick={handleJoin}
-                  className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-white font-bold hover:from-red-500 hover:to-red-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="group relative flex-1 px-4 py-3 rounded-lg overflow-hidden transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!roomCode.trim() || (needsPassword && !password)}
                   data-testid="button-confirm-join"
                 >
-                  Katıl
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-800/80 to-red-900/80 backdrop-blur-sm" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-red-600/20 group-hover:from-red-400/20" />
+                  <div className="absolute inset-0 border border-red-400/30 group-hover:border-red-400/50 rounded-lg" />
+                  <span className="relative text-white font-bold">Katıl</span>
                 </button>
               </div>
             </div>
