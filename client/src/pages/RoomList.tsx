@@ -99,14 +99,14 @@ export default function RoomList() {
           <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl" />
           <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl flex flex-col max-h-[90vh]">
             <div className="p-6 flex flex-col h-full">
-              {/* Header with Logo-like Design */}
+              {/* Header with Animated Logo */}
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-3 mb-2">
-                  <div className="w-2 h-12 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full" />
-                  <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-white to-red-400">
+                  <div className="w-2 h-12 bg-gradient-to-b from-blue-600 to-blue-400 rounded-full animate-pulse" />
+                  <h1 className="katman-logo text-5xl font-black">
                     KATMANNAMES
                   </h1>
-                  <div className="w-2 h-12 bg-gradient-to-b from-red-600 to-red-400 rounded-full" />
+                  <div className="w-2 h-12 bg-gradient-to-b from-red-600 to-red-400 rounded-full animate-pulse" />
                 </div>
                 <p className="text-sm text-slate-400">
                   Bir odaya katıl veya yeni oda oluştur
