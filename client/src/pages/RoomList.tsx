@@ -34,9 +34,10 @@ export default function RoomList() {
 
   useEffect(() => {
     if (gameState) {
-      setLocation("/game");
+      // Reload the page when navigating to game after room creation/join
+      window.location.href = "/game";
     }
-  }, [gameState, setLocation]);
+  }, [gameState]);
 
   const handleJoinRoom = (roomCode: string, hasPassword: boolean) => {
     if (hasPassword) {
