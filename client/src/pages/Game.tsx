@@ -9,7 +9,6 @@ import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
-import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,11 +30,8 @@ export default function Game() {
   const [showNumberSelector, setShowNumberSelector] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
-  const [taunts, setTaunts] = useState<any[]>([]);
-  const [tauntCooldown, setTauntCooldown] = useState<number>(0);
   const [insultCooldown, setInsultCooldown] = useState<number>(0);
   const [insults, setInsults] = useState<any[]>([]);
-  const [tauntEnabled, setTauntEnabled] = useState(true);
   const [insultEnabled, setInsultEnabled] = useState(true);
   const [showInsultTargetDialog, setShowInsultTargetDialog] = useState(false);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
@@ -233,14 +229,6 @@ export default function Game() {
     setShowNormalWinVideo(false);
   }, []);
 
-  const handleTriggerTaunt = () => {
-    if (tauntCooldown > 0 || !playerId || !tauntEnabled) return;
-    
-    send("trigger_taunt", {});
-    
-    // Set 5 second cooldown
-    setTauntCooldown(5);
-  };
 
   const handleInsultClick = () => {
     if (insultCooldown > 0 || !playerId || !insultEnabled) return;
@@ -273,15 +261,6 @@ export default function Game() {
     setInsultV2Cooldown(5);
   };
 
-  // Countdown for taunt cooldown
-  useEffect(() => {
-    if (tauntCooldown > 0) {
-      const timer = setTimeout(() => {
-        setTauntCooldown(prev => Math.max(0, prev - 1));
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [tauntCooldown]);
 
   // Countdown for insult cooldown
   useEffect(() => {
@@ -312,20 +291,12 @@ export default function Game() {
     const handleMessage = (event: MessageEvent) => {
       try {
         const message = JSON.parse(event.data);
-        if (message.type === 'taunt_fired') {
-          setTaunts(prev => [...prev, message.payload]);
-        } else if (message.type === 'insult_sent') {
+        if (message.type === 'insult_sent') {
           setInsults(prev => [...prev, message.payload]);
           // Remove insult after 3 seconds
           setTimeout(() => {
             setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
           }, 3000);
-        } else if (message.type === 'taunt_toggled') {
-          setTauntEnabled(message.payload.tauntEnabled);
-          toast({
-            title: "Hareket Çekme",
-            description: message.payload.tauntEnabled ? "Aktif" : "Devre dışı",
-          });
         } else if (message.type === 'insult_toggled') {
           setInsultEnabled(message.payload.insultEnabled);
           toast({
@@ -333,7 +304,6 @@ export default function Game() {
             description: message.payload.insultEnabled ? "Aktif" : "Devre dışı",
           });
         } else if (message.type === 'room_features') {
-          setTauntEnabled(message.payload.tauntEnabled);
           setInsultEnabled(message.payload.insultEnabled);
         }
       } catch (err) {
@@ -448,17 +418,6 @@ export default function Game() {
           onComplete={handleAssassinVideoComplete}
         />
       )}
-      
-      {/* Taunt Bubbles - Show as speech bubbles */}
-      {taunts.map((taunt, index) => (
-        <TauntBubble
-          key={`${taunt.playerId}-${taunt.expiresAt}-${index}`}
-          senderUsername={taunt.username}
-          senderTeam={taunt.team}
-          videoSrc={taunt.videoSrc}
-          timestamp={taunt.expiresAt}
-        />
-      ))}
       
       {/* Insult Bubbles */}
       {insults.map((insult, index) => (
@@ -1354,46 +1313,6 @@ export default function Game() {
               <div className="mt-4 space-y-2">
                 {/* Action Buttons Container */}
                 <div className="flex gap-2">
-                  {/* Taunt Button */}
-                  <div className="relative flex-1">
-                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      currentPlayer.team === "dark" 
-                        ? "bg-blue-600/40" 
-                        : "bg-red-600/40"
-                    }`} />
-                    <button
-                      onClick={handleTriggerTaunt}
-                      disabled={tauntCooldown > 0 || !tauntEnabled}
-                      className={`
-                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
-                        backdrop-blur-md border shadow-lg
-                        ${currentPlayer.team === "dark" 
-                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
-                          : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                        ${tauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
-                      `}
-                      data-testid="button-trigger-taunt"
-                    >
-                      {!tauntEnabled ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <EyeOff className="w-4 h-4" />
-                          Devre Dışı
-                        </span>
-                      ) : tauntCooldown > 0 ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Timer className="w-4 h-4" />
-                          {tauntCooldown}s
-                        </span>
-                      ) : (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Zap className="w-4 h-4" />
-                          Hareket Çek
-                        </span>
-                      )}
-                    </button>
-                  </div>
-
-                  
                   {/* Insult Button */}
                   <div className="relative">
                     <button
