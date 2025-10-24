@@ -350,9 +350,7 @@ export default function Game() {
     );
   }
 
-  if (gameState.phase === "lobby") {
-    return <Lobby />;
-  }
+  // Game page now handles both lobby and playing phases
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   if (!currentPlayer) {
@@ -1492,24 +1490,26 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
-                 overflow-visible
-                 w-[calc(min(90vw,55vh*1.5))] 
-                 min-[360px]:w-[calc(min(85vw,58vh*1.5))]
-                 min-[400px]:w-[calc(min(85vw,60vh*1.5))]
-                 min-[500px]:w-[calc(min(80vw,62vh*1.5))]
-                 min-[600px]:w-[calc(min(80vw,64vh*1.5))]
-                 min-[700px]:w-[calc(min(75vw,66vh*1.5))]
-                 min-[800px]:w-[calc(min(75vw,68vh*1.5))]
-                 min-[900px]:w-[calc(min(70vw,70vh*1.5))]
-                 min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
-                 min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
-                 min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
-                 min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
-                 max-w-[1000px]
-                 mb-14" 
-                 data-testid="game-grid">
-              {gameState.cards.map((card, index) => (
+            {/* Only show game grid when playing, show lobby UI when in lobby phase */}
+            {gameState.phase === "playing" || gameState.phase === "ended" ? (
+              <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
+                   overflow-visible
+                   w-[calc(min(90vw,55vh*1.5))] 
+                   min-[360px]:w-[calc(min(85vw,58vh*1.5))]
+                   min-[400px]:w-[calc(min(85vw,60vh*1.5))]
+                   min-[500px]:w-[calc(min(80vw,62vh*1.5))]
+                   min-[600px]:w-[calc(min(80vw,64vh*1.5))]
+                   min-[700px]:w-[calc(min(75vw,66vh*1.5))]
+                   min-[800px]:w-[calc(min(75vw,68vh*1.5))]
+                   min-[900px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
+                   min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
+                   min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
+                   max-w-[1000px]
+                   mb-14" 
+                   data-testid="game-grid">
+                {gameState.cards?.map((card, index) => (
                 <div 
                   key={`wrapper-${index}`}
                   className="animate-card-drop overflow-visible"
@@ -1538,6 +1538,29 @@ export default function Game() {
                 </div>
               ))}
             </div>
+            ) : (
+              // Lobby UI
+              <div className="flex flex-col items-center justify-center gap-8 p-8">
+                <Card className="p-8 bg-slate-900/90 backdrop-blur-lg border-2 border-orange-900/30">
+                  <h2 className="text-3xl font-bold text-white mb-4">Oyun Lobisi</h2>
+                  <p className="text-slate-300 mb-6">Oyuncular hazırlanıyor...</p>
+                  <div className="space-y-4">
+                    <div className="text-slate-400">
+                      <p>Oyuncu Sayısı: {gameState.players.length}</p>
+                      <p>Oda Kodu: {gameState.roomCode}</p>
+                    </div>
+                    {currentPlayer?.isRoomOwner && (
+                      <Button
+                        onClick={() => send("start_game", {})}
+                        className="w-full bg-gradient-to-r from-red-700 to-blue-700 hover:from-red-600 hover:to-blue-600 text-white"
+                      >
+                        Oyunu Başlat
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            )}
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
