@@ -1239,97 +1239,60 @@
 }
 
 /* Animated Logo Styles for KATMANNAMES */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@900&family=Russo+One&family=Black+Ops+One&family=Bungee&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Orbitron:wght@900&display=swap');
 
 @keyframes logoAnimation {
   0%, 100% {
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
-    background: linear-gradient(90deg, #123c6b 0%, #ffffff 50%, #711d1c 100%);
+    background: linear-gradient(90deg, #123c6b, #ffffff, #711d1c);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(18, 60, 107, 0.8));
-    transform: perspective(800px) rotateY(0deg) scale(1);
-    letter-spacing: 2px;
-  }
-  
-  16% {
-    font-family: 'Bebas Neue', cursive;
-    font-weight: 400;
-    background: linear-gradient(270deg, #ff0000, #ff7700, #ffdd00, #00ff00, #0099ff, #6633ff);
-    background-size: 600% 600%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 30px rgba(255, 0, 0, 0.8));
-    transform: perspective(800px) rotateY(360deg) scale(1.1);
-    letter-spacing: 4px;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    transform: scale(1);
+    letter-spacing: 1px;
   }
   
   33% {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.8));
-    transform: perspective(800px) rotateX(360deg) scale(0.95);
-    letter-spacing: 6px;
-  }
-  
-  50% {
     font-family: 'Russo One', sans-serif;
     font-weight: 400;
-    background: linear-gradient(180deg, #ffd700, #ff6347, #ffd700);
+    background: linear-gradient(90deg, #711d1c, #ffffff, #123c6b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.9));
-    transform: perspective(800px) rotateZ(360deg) scale(1.05);
-    letter-spacing: 3px;
+    text-shadow: 0 0 25px rgba(113, 29, 28, 0.4);
+    transform: scale(1.02);
+    letter-spacing: 2px;
   }
   
   66% {
-    font-family: 'Black Ops One', cursive;
-    font-weight: 400;
-    background: linear-gradient(90deg, #ff00ff, #00ff00, #ff00ff);
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    background: linear-gradient(90deg, #ffffff, #123c6b, #711d1c);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 35px rgba(255, 0, 255, 0.8));
-    transform: perspective(800px) rotateY(-360deg) scale(0.98);
-    letter-spacing: 5px;
-  }
-  
-  83% {
-    font-family: 'Bungee', cursive;
-    font-weight: 400;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #fda085 75%, #667eea 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 30px rgba(102, 126, 234, 0.9));
-    transform: perspective(800px) rotateX(-360deg) scale(1.02);
-    letter-spacing: 1px;
+    text-shadow: 0 0 25px rgba(18, 60, 107, 0.4);
+    transform: scale(0.98);
+    letter-spacing: 3px;
   }
 }
 
 .katman-logo {
-  animation: logoAnimation 6s linear infinite;
+  animation: logoAnimation 3s ease-in-out infinite;
   display: inline-block;
-  background: linear-gradient(90deg, #123c6b 0%, #ffffff 50%, #711d1c 100%);
+  background: linear-gradient(90deg, #123c6b, #ffffff, #711d1c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   cursor: pointer;
   user-select: none;
 }
 
 .katman-logo:hover {
   animation-play-state: paused;
-  transform: scale(1.15) translateY(-5px) !important;
-  filter: drop-shadow(0 10px 40px rgba(255, 255, 255, 0.5));
+  transform: scale(1.05) !important;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
 }
