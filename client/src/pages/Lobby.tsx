@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { PlayerList } from "@/components/PlayerList";
@@ -21,7 +21,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel
 } from "@/components/ui/alert-dialog";
-import { videoCache } from "@/services/VideoCache";
 
 export default function Lobby() {
   const [, setLocation] = useLocation();
@@ -33,7 +32,6 @@ export default function Lobby() {
   const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
   const [showChaosDetails, setShowChaosDetails] = useState(false);
-  const [preparingVideos, setPreparingVideos] = useState(false);
   const { toast } = useToast();
   
   const playerId = localStorage.getItem("katmannames_player_id");
@@ -112,30 +110,12 @@ export default function Lobby() {
 
   const [showTeamNameWarning, setShowTeamNameWarning] = useState(false);
 
-  const handleStartGame = async () => {
+  const handleStartGame = () => {
     // Check if team names are still default
     if (gameState?.darkTeamName === "Mavi Takım" || gameState?.lightTeamName === "Kırmızı Takım") {
       setShowTeamNameWarning(true);
     } else {
-      // Ensure videos are preloaded before starting game
-      setPreparingVideos(true);
-      
-      try {
-        // Wait for all videos to be ready
-        await videoCache.waitForVideosReady();
-        
-        // Start the game
-        send("start_game", {});
-      } catch (error) {
-        console.error('Failed to prepare videos:', error);
-        toast({
-          title: "Hazırlık Hatası",
-          description: "Animasyonlar yüklenemedi. Lütfen tekrar deneyin.",
-          variant: "destructive"
-        });
-      } finally {
-        setPreparingVideos(false);
-      }
+      send("start_game", {});
     }
   };
 
@@ -448,25 +428,16 @@ export default function Lobby() {
                   {currentPlayer?.isRoomOwner && (
                     <Button
                       onClick={handleStartGame}
-                      disabled={!canStartGame || preparingVideos}
+                      disabled={!canStartGame}
                       className={`w-full py-6 text-lg font-bold transition-all ${
-                        canStartGame && !preparingVideos
+                        canStartGame 
                           ? 'bg-gradient-to-r from-red-700 to-blue-700 hover:from-red-600 hover:to-blue-600 text-white shadow-2xl'
                           : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                       }`}
                       data-testid="button-start-game"
                     >
-                      {preparingVideos ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Animasyonlar hazırlanıyor...
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-5 h-5 mr-2" />
-                          Oyunu Başlat
-                        </>
-                      )}
+                      <Play className="w-5 h-5 mr-2" />
+                      Oyunu Başlat
                     </Button>
                   )}
                 </div>

@@ -28,22 +28,17 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
     video.currentTime = 0;
     setVideoReady(false);
     
-    const tryPlay = () => {
-      // Check if video is ready to play smoothly
-      if (video.readyState >= 4) { // HAVE_ENOUGH_DATA
-        video.play()
-          .then(() => {
-            setVideoReady(true);
-          })
-          .catch(err => {
-            console.error('Video play error:', err);
-            // If play fails, still show the overlay
-            setVideoReady(true);
-          });
-      } else {
-        // Wait a bit and try again
-        setTimeout(tryPlay, 100);
-      }
+    const handleLoadedData = () => {
+      // Video data is loaded and ready to play
+      video.play()
+        .then(() => {
+          setVideoReady(true);
+        })
+        .catch(err => {
+          console.error('Video play error:', err);
+          // If play fails, still show the overlay
+          setVideoReady(true);
+        });
     };
     
     const handleVideoEnd = () => {
@@ -54,11 +49,12 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
       }, 500);
     };
     
-    // Add event listener for video end
+    // Add event listeners
+    video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('ended', handleVideoEnd);
     
-    // Start playback attempt
-    tryPlay();
+    // Load the video
+    video.load();
     
     // Emergency timeout (5 seconds) in case video never loads
     emergencyTimeoutRef.current = setTimeout(() => {
@@ -70,6 +66,7 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
       if (emergencyTimeoutRef.current) {
         clearTimeout(emergencyTimeoutRef.current);
       }
+      video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('ended', handleVideoEnd);
       video.pause();
     };

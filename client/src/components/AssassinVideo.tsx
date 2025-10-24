@@ -20,25 +20,13 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    // Simple play logic
     if (videoRef.current) {
-      const video = videoRef.current;
-      video.currentTime = 0;
-      
-      // Try to play when ready
-      const tryPlay = () => {
-        if (video.readyState >= 4) { // HAVE_ENOUGH_DATA
-          video.play().catch(err => {
-            console.error('Assassin video play error:', err);
-            // If video fails, still show winner
-            handleVideoEnd();
-          });
-        } else {
-          // Wait a bit and try again
-          setTimeout(tryPlay, 100);
-        }
-      };
-      
-      tryPlay();
+      videoRef.current.play().catch(err => {
+        console.error('Assassin video play error:', err);
+        // If video fails, still show winner
+        handleVideoEnd();
+      });
     }
     
     return () => {
