@@ -1,22 +1,17 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { useBubbleManager } from "@/contexts/BubbleManager";
 
 interface TauntBubbleProps {
   senderUsername: string;
   senderTeam: "dark" | "light" | null;
   videoSrc: string;
-  timestamp?: number;
 }
 
-export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }: TauntBubbleProps) {
+export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [position, setPosition] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const bubbleManager = useBubbleManager();
-  const bubbleIdRef = useRef(`taunt-${timestamp || Date.now()}-${Math.random()}`);
 
   const handleVideoReady = () => {
     setIsVideoLoaded(true);
@@ -31,12 +26,6 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }:
   };
 
   useEffect(() => {
-    if (senderTeam && senderTeam !== null) {
-      // Register bubble and get initial position
-      const initialPosition = bubbleManager.registerBubble(bubbleIdRef.current, 'taunt', senderTeam);
-      setPosition(initialPosition);
-    }
-    
     // Preload the video
     if (videoRef.current) {
       videoRef.current.load();
@@ -45,43 +34,13 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }:
     // Start fade out after 2.5 seconds
     const fadeOutTimer = setTimeout(() => {
       setIsLeaving(true);
-      // Unregister after animation completes
-      setTimeout(() => {
-        if (senderTeam && senderTeam !== null) {
-          bubbleManager.unregisterBubble(bubbleIdRef.current);
-        }
-      }, 700);
     }, 2500);
 
-    return () => {
-      clearTimeout(fadeOutTimer);
-      if (senderTeam && senderTeam !== null) {
-        bubbleManager.unregisterBubble(bubbleIdRef.current);
-      }
-    };
-  }, [senderTeam, bubbleManager, timestamp]);
-
-  // Update position when bubble manager changes
-  useEffect(() => {
-    if (senderTeam && senderTeam !== null) {
-      const interval = setInterval(() => {
-        const newPosition = bubbleManager.getBubblePosition(bubbleIdRef.current);
-        if (newPosition !== position) {
-          setPosition(newPosition);
-        }
-      }, 100);
-
-      return () => clearInterval(interval);
-    }
-  }, [position, bubbleManager, senderTeam]);
+    return () => clearTimeout(fadeOutTimer);
+  }, []);
 
   // Determine position based on team
   const isLeftSide = senderTeam === 'dark';
-  
-  // Calculate vertical position based on stack index
-  const baseTop = 9; // Base top position in vh
-  const spacing = 14; // Spacing between bubbles in vh (larger for taunt bubbles as they're bigger)
-  const topPosition = baseTop + (position * spacing);
 
   // Don't show until video is loaded
   if (!isVideoLoaded) {
@@ -105,11 +64,11 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc, timestamp }:
       className={cn(
         "fixed z-[100] pointer-events-none transition-all duration-700 ease-out",
         isLeftSide ? "left-[8%] lg:left-[12%] xl:left-[15%]" : "right-[8%] lg:right-[12%] xl:right-[15%]",
+        "top-[9vh] lg:top-[11vh] xl:top-[13vh]",
         isVisible && !isLeaving ? "opacity-100" : "opacity-0",
         isLeaving && "animate-fade-out"
       )}
       style={{
-        top: `${topPosition}vh`,
         transform: `${isVisible && !isLeaving ? 'translateY(0)' : 'translateY(-20px)'}`,
       }}
     >

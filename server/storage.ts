@@ -1170,35 +1170,9 @@ export class MemStorage implements IStorage {
     // Set cooldown
     this.insultCooldowns.set(senderId, now);
 
-    // Create insult
-    const insults = [
-      `${target.username} seni pis kokarca!`,
-      `${target.username} sütünü iç de uyu!`,
-      `${target.username} git yat zıbar!`,
-      `${target.username} sen SALAKSIN!`,
-      `${target.username} beynin mi yok senin?`,
-      `${target.username} git köşende ağla!`,
-      `${target.username} götüne vururum ha!`,
-      `${target.username} patates kafalı!`,
-      `${target.username} s*ktir git!`,
-      `${target.username} uyku vaktin geldi senin!`,
-      `${target.username} git kumda oyna!`,
-      `${target.username} seni gidi ahmak!`,
-      `${target.username} karga beyinli!`,
-      `${target.username} yazık kafana!`,
-      `${target.username} peş para etmezsin!`,
-      `${target.username} akılsız insan!`,
-      `${target.username} ezan okundu hadi evine!`,
-      `${target.username} haline gülsem mi ağlasam mı?!`,
-      `${target.username} seni soğan kafalı!`,
-      `${target.username} A.M.K!`,
-      `${target.username} sen ne tür bir soytarısın?`,
-      `${target.username} peçete ister misin?`,
-      `${target.username} şinasi bile senden zeki...`,
-      `${target.username} vay gerizekalı vay!`,
-      `${target.username} şapşal mısın nesin?`
-      
-    ];
+    // Create insult - use V1 insult messages
+    const insultTemplate = insultMessages[Math.floor(Math.random() * insultMessages.length)];
+    const message = insultTemplate.replace("{target}", target.username);
 
     const insultData = {
       senderId: sender.id,
@@ -1207,7 +1181,7 @@ export class MemStorage implements IStorage {
       targetId: target.id,
       targetUsername: target.username,
       targetTeam: target.team,
-      message: insults[Math.floor(Math.random() * insults.length)],
+      message: message,
       timestamp: now
     };
 

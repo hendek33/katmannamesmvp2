@@ -9,6 +9,7 @@ import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
+import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,12 +31,13 @@ export default function Game() {
   const [showNumberSelector, setShowNumberSelector] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
+  const [taunts, setTaunts] = useState<any[]>([]);
+  const [tauntCooldown, setTauntCooldown] = useState<number>(0);
   const [insultCooldown, setInsultCooldown] = useState<number>(0);
   const [insults, setInsults] = useState<any[]>([]);
+  const [tauntEnabled, setTauntEnabled] = useState(true);
   const [insultEnabled, setInsultEnabled] = useState(true);
-  const [showInsultTargetDialog, setShowInsultTargetDialog] = useState(false);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
-  const [insultV2Cooldown, setInsultV2Cooldown] = useState(0);
   
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -45,15 +47,15 @@ export default function Game() {
         setShowNumberSelector(false);
       }
       if (!target.closest('.insult-button-container')) {
-        setShowInsultTargetDialog(false);
+        setShowInsultV2Dialog(false);
       }
     };
     
-    if (showNumberSelector || showInsultTargetDialog || showInsultV2Dialog) {
+    if (showNumberSelector || showInsultV2Dialog) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [showNumberSelector, showInsultTargetDialog, showInsultV2Dialog]);
+  }, [showNumberSelector, showInsultV2Dialog]);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
   const [isGameStart, setIsGameStart] = useState(false);
@@ -229,38 +231,38 @@ export default function Game() {
     setShowNormalWinVideo(false);
   }, []);
 
+  const handleTriggerTaunt = () => {
+    if (tauntCooldown > 0 || !playerId || !tauntEnabled) return;
+    
+    send("trigger_taunt", {});
+    
+    // Set 5 second cooldown
+    setTauntCooldown(5);
+  };
 
   const handleInsultClick = () => {
     if (insultCooldown > 0 || !playerId || !insultEnabled) return;
-    setShowInsultTargetDialog(!showInsultTargetDialog);
-  };
-
-  const handleSendInsultToPlayer = (targetPlayerId: string) => {
-    console.log("[CLIENT] Sending insult to target:", targetPlayerId);
-    setShowInsultTargetDialog(false);
-    const payload = { targetId: targetPlayerId };
-    console.log("[CLIENT] Payload:", payload);
-    send("send_insult", payload);
-    
-    // Set 5 second cooldown
-    setInsultCooldown(5);
-  };
-  
-  // V2 System handlers
-  const handleInsultV2Click = () => {
-    if (insultV2Cooldown > 0 || !playerId || !insultEnabled) return;
     setShowInsultV2Dialog(!showInsultV2Dialog);
   };
   
-  const handleSendInsultV2ToPlayer = (targetPlayerId: string) => {
-    console.log("[V2 CLIENT] Sending insult to target:", targetPlayerId);
+  const handleSendInsultToPlayer = (targetPlayerId: string) => {
+    console.log("[CLIENT] Sending insult to target:", targetPlayerId);
     setShowInsultV2Dialog(false);
     send("send_insult_v2", { targetId: targetPlayerId });
     
     // Set 5 second cooldown
-    setInsultV2Cooldown(5);
+    setInsultCooldown(5);
   };
 
+  // Countdown for taunt cooldown
+  useEffect(() => {
+    if (tauntCooldown > 0) {
+      const timer = setTimeout(() => {
+        setTauntCooldown(prev => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [tauntCooldown]);
 
   // Countdown for insult cooldown
   useEffect(() => {
@@ -271,85 +273,47 @@ export default function Game() {
       return () => clearTimeout(timer);
     }
   }, [insultCooldown]);
-  
-  // Countdown for insult V2 cooldown
-  useEffect(() => {
-    if (insultV2Cooldown > 0) {
-      const timer = setTimeout(() => {
-        setInsultV2Cooldown(prev => Math.max(0, prev - 1));
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [insultV2Cooldown]);
 
   // Listen for taunt and insult events via WebSocket
   useEffect(() => {
     // Access WebSocket directly to listen for events
-    const checkWS = () => {
-      const wsRef = (window as any).wsRef;
-      if (!wsRef || !wsRef.current) {
-        console.log('WebSocket not available yet, retrying...');
-        return null;
+    const ws = (window as any).wsRef?.current;
+    if (!ws) return;
+    
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'taunt_fired') {
+          setTaunts(prev => [...prev, message.payload]);
+        } else if (message.type === 'insult_sent') {
+          setInsults(prev => [...prev, message.payload]);
+          // Remove insult after 3 seconds
+          setTimeout(() => {
+            setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
+          }, 3000);
+        } else if (message.type === 'taunt_toggled') {
+          setTauntEnabled(message.payload.tauntEnabled);
+          toast({
+            title: "Hareket Çekme",
+            description: message.payload.tauntEnabled ? "Aktif" : "Devre dışı",
+          });
+        } else if (message.type === 'insult_toggled') {
+          setInsultEnabled(message.payload.insultEnabled);
+          toast({
+            title: "Laf Sokma",
+            description: message.payload.insultEnabled ? "Aktif" : "Devre dışı",
+          });
+        } else if (message.type === 'room_features') {
+          setTauntEnabled(message.payload.tauntEnabled);
+          setInsultEnabled(message.payload.insultEnabled);
+        }
+      } catch (err) {
+        console.error('Error handling message:', err);
       }
-      return wsRef.current;
     };
     
-    let ws = checkWS();
-    if (!ws) {
-      const retryInterval = setInterval(() => {
-        ws = checkWS();
-        if (ws) {
-          clearInterval(retryInterval);
-          setupListener(ws);
-        }
-      }, 100);
-      
-      return () => clearInterval(retryInterval);
-    }
-    
-    const setupListener = (websocket: WebSocket) => {
-      const handleMessage = (event: MessageEvent) => {
-        try {
-          const message = JSON.parse(event.data);
-          console.log('WebSocket message received:', message.type);
-          
-          if (message.type === 'insult_sent' || message.type === 'insult_v2') {
-            console.log('Insult received:', message.type, message.payload);
-            setInsults(prev => {
-              const newInsults = [...prev, message.payload];
-              console.log('Insults state updated:', newInsults);
-              return newInsults;
-            });
-            // Remove insult after 3 seconds
-            setTimeout(() => {
-              setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
-            }, 3000);
-          } else if (message.type === 'insult_toggled') {
-            setInsultEnabled(message.payload.insultEnabled);
-            toast({
-              title: "Laf Sokma",
-              description: message.payload.insultEnabled ? "Aktif" : "Devre dışı",
-            });
-          } else if (message.type === 'room_features') {
-            setInsultEnabled(message.payload.insultEnabled);
-          }
-        } catch (err) {
-          console.error('Error handling message:', err);
-        }
-      };
-      
-      websocket.addEventListener('message', handleMessage);
-      console.log('WebSocket listener attached');
-      
-      return () => {
-        websocket.removeEventListener('message', handleMessage);
-        console.log('WebSocket listener removed');
-      };
-    };
-    
-    if (ws) {
-      return setupListener(ws);
-    }
+    ws.addEventListener('message', handleMessage);
+    return () => ws.removeEventListener('message', handleMessage);
   }, [toast]);
   
   // Get room features on mount
@@ -455,6 +419,16 @@ export default function Game() {
           onComplete={handleAssassinVideoComplete}
         />
       )}
+      
+      {/* Taunt Bubbles - Show as speech bubbles */}
+      {taunts.map((taunt, index) => (
+        <TauntBubble
+          key={`${taunt.playerId}-${taunt.expiresAt}-${index}`}
+          senderUsername={taunt.username}
+          senderTeam={taunt.team}
+          videoSrc={taunt.videoSrc}
+        />
+      ))}
       
       {/* Insult Bubbles */}
       {insults.map((insult, index) => (
@@ -626,6 +600,24 @@ export default function Game() {
               {/* Moderator Controls for Taunt/Insult */}
               {currentPlayer?.isRoomOwner && gameState.phase === "playing" && (
                 <>
+                  <Button
+                    onClick={() => {
+                      send("toggle_taunt", { enabled: !tauntEnabled });
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className={cn(
+                      "h-6 px-3 text-xs font-medium transition-all",
+                      tauntEnabled 
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400 hover:border-amber-400 hover:bg-amber-500/20" 
+                        : "border hover:border-amber-500 hover:bg-amber-500/10"
+                    )}
+                    title="Hareket çekme özelliğini aç/kapat"
+                  >
+                    <Zap className={cn("w-3 h-3 mr-1.5", tauntEnabled && "animate-pulse")} />
+                    <span>{tauntEnabled ? "Hareket Aktif" : "Hareket Pasif"}</span>
+                  </Button>
+                  <div className="w-px h-5 bg-amber-900/40" />
                   <Button
                     onClick={() => {
                       send("toggle_insult", { enabled: !insultEnabled });
@@ -1332,34 +1324,74 @@ export default function Game() {
               <div className="mt-4 space-y-2">
                 {/* Action Buttons Container */}
                 <div className="flex gap-2">
-                  {/* Insult Button */}
-                  <div className="relative">
+                  {/* Taunt Button */}
+                  <div className="relative flex-1">
+                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
+                      currentPlayer.team === "dark" 
+                        ? "bg-blue-600/40" 
+                        : "bg-red-600/40"
+                    }`} />
                     <button
-                      onClick={handleInsultV2Click}
-                      disabled={insultV2Cooldown > 0 || !insultEnabled}
-                      className={cn(
-                        "w-full px-3 py-3 rounded-lg text-sm font-bold transition-all",
-                        "flex items-center justify-center text-center",
-                        "shadow-2xl border-2",
-                        !insultEnabled
-                          ? "bg-gray-800/70 text-gray-500 border-gray-700/30 cursor-not-allowed"
-                          : insultV2Cooldown > 0
-                          ? "bg-amber-900/50 text-amber-300 border-amber-700/30 cursor-not-allowed"
-                          : "bg-gradient-to-r from-amber-600/80 to-amber-700/80 text-amber-100 border-amber-500/30",
-                        "hover:shadow-amber-500/20 hover:scale-105",
-                        "disabled:hover:scale-100"
+                      onClick={handleTriggerTaunt}
+                      disabled={tauntCooldown > 0 || !tauntEnabled}
+                      className={`
+                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                        backdrop-blur-md border shadow-lg
+                        ${currentPlayer.team === "dark" 
+                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
+                          : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
+                        ${tauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                      `}
+                      data-testid="button-trigger-taunt"
+                    >
+                      {!tauntEnabled ? (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <EyeOff className="w-4 h-4" />
+                          Devre Dışı
+                        </span>
+                      ) : tauntCooldown > 0 ? (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Timer className="w-4 h-4" />
+                          {tauntCooldown}s
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Zap className="w-4 h-4" />
+                          Hareket Çek
+                        </span>
                       )}
-                      data-testid="button-send-insult-v2"
+                    </button>
+                  </div>
+
+                  {/* Insult Button */}
+                  <div className="relative flex-1 insult-button-container">
+                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
+                      currentPlayer.team === "dark" 
+                        ? "bg-purple-600/40" 
+                        : "bg-orange-600/40"
+                    }`} />
+                    <button
+                      onClick={handleInsultClick}
+                      disabled={insultCooldown > 0 || !insultEnabled}
+                      className={`
+                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                        backdrop-blur-md border shadow-lg
+                        ${currentPlayer.team === "dark" 
+                          ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
+                          : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
+                        ${insultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                      `}
+                      data-testid="button-send-insult"
                     >
                       {!insultEnabled ? (
                         <span className="flex items-center justify-center gap-1.5">
                           <EyeOff className="w-4 h-4" />
                           Devre Dışı
                         </span>
-                      ) : insultV2Cooldown > 0 ? (
+                      ) : insultCooldown > 0 ? (
                         <span className="flex items-center justify-center gap-1.5">
                           <Timer className="w-4 h-4" />
-                          {insultV2Cooldown}s
+                          {insultCooldown}s
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-1.5">
@@ -1370,7 +1402,7 @@ export default function Game() {
                     </button>
                     
                     {/* Player Selection List */}
-                    {showInsultV2Dialog && insultEnabled && insultV2Cooldown === 0 && (
+                    {showInsultV2Dialog && insultEnabled && insultCooldown === 0 && (
                       <div className="absolute top-full mt-2 left-0 right-0 z-50">
                         <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
                           {gameState.players
@@ -1378,7 +1410,7 @@ export default function Game() {
                             .map(player => (
                               <button
                                 key={player.id}
-                                onClick={() => handleSendInsultV2ToPlayer(player.id)}
+                                onClick={() => handleSendInsultToPlayer(player.id)}
                                 className={cn(
                                   "w-full px-3 py-2 rounded text-xs font-medium transition-all text-left",
                                   "hover:scale-105",
