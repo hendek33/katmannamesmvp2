@@ -4,7 +4,7 @@ import { Logo } from "@/components/Logo";
 import { GameCard } from "@/components/GameCard";
 import { GameStatus } from "@/components/GameStatus";
 import { ClueDisplay } from "@/components/ClueDisplay";
-import { PlayerList } from "@/components/PlayerList";
+import PlayerList from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
