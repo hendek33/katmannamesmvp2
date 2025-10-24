@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
+import { BubbleManagerProvider } from "@/contexts/BubbleManager";
 import { videoCache } from "@/services/VideoCache";
 import { VideoPreloader } from "@/components/VideoPreloader";
 import Welcome from "@/pages/Welcome";
@@ -41,11 +42,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
-        <TooltipProvider>
-          <VideoPreloader />
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <BubbleManagerProvider>
+          <TooltipProvider>
+            <VideoPreloader />
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </BubbleManagerProvider>
       </WebSocketProvider>
     </QueryClientProvider>
   );
