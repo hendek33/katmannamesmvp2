@@ -773,6 +773,20 @@
   animation: pulseOnce 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Bounce animation that plays 3 times then stops */
+@keyframes bounceThrice {
+  0%, 20%, 40%, 60%, 80%, 100% {
+    transform: translateY(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-bounce-thrice {
+  animation: bounceThrice 1.5s ease-in-out;
+}
+
 /**
  * Using the elevate system.
  * Automatic contrast adjustment.

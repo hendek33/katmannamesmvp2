@@ -108,7 +108,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "ring-2 ring-black/20",
         card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
         isAssassinCard && gameEnded && "animate-assassin-reveal",
-        isLastCard && gameEnded && !isAssassinCard && "animate-bounce border-green-500 ring-4 ring-green-400/50",
+        isLastCard && gameEnded && !isAssassinCard && "animate-bounce-thrice border-green-500 ring-4 ring-green-400/50",
         "shadow-inner"
       )}
       style={{
