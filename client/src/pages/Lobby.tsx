@@ -378,7 +378,7 @@ export default function Lobby() {
             </div>
             
             {/* Right Panel - Control Console (5 cols on lg) */}
-            <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 overflow-y-auto">
+            <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
               {/* Game Start Panel - Enhanced Glassmorphism */}
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
@@ -533,27 +533,27 @@ export default function Lobby() {
                 <div className="backdrop-blur-lg bg-black/60 rounded-xl border border-amber-900/40 p-4 opacity-90">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-amber-600/50" />
+                      {/* Custom Chaos Mode Icon */}
+                      <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                          d="M12 2L9 7H4l4 5-2 7 6-5 6 5-2-7 4-5h-5l-3-5z"/>
+                        <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.6"/>
+                      </svg>
                       <h3 className="text-base font-bold text-amber-700/60">KAOS MODU</h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
-                        className="text-xs text-amber-700/50 hover:text-amber-600/50 transition-colors"
+                        className="px-2 py-0.5 text-sm text-amber-400 hover:text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-700/50 rounded transition-all"
                       >
-                        (?)
+                        ?
                       </button>
                     </div>
-                    <div className="relative">
-                      <div className="absolute -top-2 -right-2 px-2 py-0.5 bg-slate-800 text-amber-400/60 text-xs rounded-full">
-                        🚧
-                      </div>
-                      <Switch
-                        checked={false}
-                        disabled={true}
-                        data-testid="switch-chaos-mode"
-                      />
-                    </div>
+                    <Switch
+                      checked={false}
+                      disabled={true}
+                      data-testid="switch-chaos-mode"
+                    />
                   </div>
-                  <p className="text-xs text-amber-800/50">
+                  <p className="text-xs text-amber-700/70 font-medium">
                     Geliştirme aşamasında - Yakında!
                   </p>
                 </div>
