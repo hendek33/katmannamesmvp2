@@ -373,9 +373,24 @@ export default function Game() {
     );
   }
 
-  const isSpymaster = currentPlayer.role === "spymaster";
-  const isCurrentTurn = currentPlayer.team === gameState.currentTeam;
-  const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended";
+  const isSpymaster = currentPlayer?.role === "spymaster";
+  const isCurrentTurn = currentPlayer?.team === gameState.currentTeam;
+  const canGiveClue = currentPlayer && currentPlayer.role && currentPlayer.team && isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended";
+  
+  // Debug logging
+  useEffect(() => {
+    console.log("canGiveClue Debug:", {
+      currentPlayer: currentPlayer,
+      currentPlayerRole: currentPlayer?.role,
+      currentPlayerTeam: currentPlayer?.team,
+      isSpymaster,
+      isCurrentTurn,
+      currentTeam: gameState.currentTeam,
+      currentClue: gameState.currentClue,
+      phase: gameState.phase,
+      canGiveClue
+    });
+  }, [currentPlayer, isSpymaster, isCurrentTurn, gameState.currentClue, gameState.phase, canGiveClue, gameState.currentTeam]);
   
   // In Chaos Mode, Double Agents can only vote, not reveal cards
   const canRevealCardBase = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null && gameState.phase !== "ended";
