@@ -96,7 +96,7 @@ const TeamSection = memo(({
                   } else if (e.key === "Escape") {
                     e.preventDefault();
                     setIsEditing(false);
-                    setEditedName(team === "dark" ? darkTeamName : lightTeamName);
+                    setEditedName(team === "dark" ? (darkTeamName || "Mavi Takım") : (lightTeamName || "Kırmızı Takım"));
                   }
                 }}
                 maxLength={20}
@@ -119,7 +119,7 @@ const TeamSection = memo(({
                 className="h-6 w-6 p-0"
                 onClick={() => {
                   setIsEditing(false);
-                  setEditedName(team === "dark" ? darkTeamName : lightTeamName);
+                  setEditedName(team === "dark" ? (darkTeamName || "Mavi Takım") : (lightTeamName || "Kırmızı Takım"));
                 }}
                 data-testid={`button-cancel-team-name-${team}`}
               >
@@ -189,7 +189,7 @@ const TeamSection = memo(({
                 key={spymaster.id}
                 data-testid={`player-${spymaster.id}`}
                 className={`flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/40 to-amber-800/30 border border-amber-600/50 ${
-                  spymaster.id === currentPlayerId ? 'ring-2 ring-accent' : ''
+                  spymaster.id === currentPlayer?.id ? 'ring-2 ring-accent' : ''
                 }`}
               >
                 {spymaster.isRoomOwner && (
@@ -209,7 +209,7 @@ const TeamSection = memo(({
                   </button>
                 )}
                 {/* Show "Ajan Ol" button for current player who is spymaster */}
-                {isLobby && spymaster.id === currentPlayerId && onRoleToggle && (
+                {isLobby && spymaster.id === currentPlayer?.id && onRoleToggle && (
                   <button 
                     onClick={onRoleToggle}
                     className="text-[10px] text-blue-400 hover:text-blue-300 mt-1 font-semibold"
@@ -249,7 +249,7 @@ const TeamSection = memo(({
                 key={agent.id}
                 data-testid={`player-${agent.id}`}
                 className={`flex flex-col items-center p-2 rounded transition-all ${
-                  agent.id === currentPlayerId 
+                  agent.id === currentPlayer?.id 
                     ? 'bg-accent/20 border border-accent/30 shadow-sm' 
                     : 'bg-black/20 hover:bg-black/30'
                 }`}
@@ -280,8 +280,25 @@ const TeamSection = memo(({
       </div>
     </div>
     );
-  };
+  });
 
+export default function PlayerList({
+  players,
+  currentPlayerId,
+  onTeamSelect,
+  onRoleToggle,
+  isLobby = false,
+  darkTeamName = "Mavi Takım",
+  lightTeamName = "Kırmızı Takım",
+  onTeamNameChange,
+  onRemoveBot,
+}: PlayerListProps) {
+  const darkTeam = players.filter(p => p.team === "dark");
+  const lightTeam = players.filter(p => p.team === "light");
+  const noTeam = players.filter(p => !p.team);
+  
+  const currentPlayer = players.find(p => p.id === currentPlayerId);
+  
   return (
     <div className="h-full flex flex-col gap-2">
       <div className="flex items-center gap-2 text-slate-400 px-1">
@@ -329,6 +346,14 @@ const TeamSection = memo(({
           title={darkTeamName}
           players={darkTeam}
           gradient="bg-gradient-to-r from-blue-600 to-blue-400"
+          currentPlayer={currentPlayer}
+          onTeamSelect={onTeamSelect}
+          onRoleToggle={onRoleToggle}
+          isLobby={isLobby}
+          darkTeamName={darkTeamName}
+          lightTeamName={lightTeamName}
+          onTeamNameChange={onTeamNameChange}
+          onRemoveBot={onRemoveBot}
         />
         
         <TeamSection 
@@ -336,6 +361,14 @@ const TeamSection = memo(({
           title={lightTeamName}
           players={lightTeam}
           gradient="bg-gradient-to-r from-red-600 to-red-400"
+          currentPlayer={currentPlayer}
+          onTeamSelect={onTeamSelect}
+          onRoleToggle={onRoleToggle}
+          isLobby={isLobby}
+          darkTeamName={darkTeamName}
+          lightTeamName={lightTeamName}
+          onTeamNameChange={onTeamNameChange}
+          onRemoveBot={onRemoveBot}
         />
       </div>
     </div>
