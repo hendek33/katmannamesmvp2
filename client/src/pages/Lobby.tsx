@@ -43,6 +43,13 @@ export default function Lobby() {
       setLocation("/");
       return;
     }
+    
+    // Check if this is first visit to lobby
+    const isFirstLobbyVisit = !sessionStorage.getItem("katmannames_lobby_visited");
+    if (isFirstLobbyVisit) {
+      sessionStorage.setItem("katmannames_lobby_visited", "true");
+      window.location.reload();
+    }
   }, [roomCode, setLocation]);
 
   useEffect(() => {
