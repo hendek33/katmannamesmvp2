@@ -1245,50 +1245,93 @@
   0%, 100% {
     font-family: 'Poppins', sans-serif;
     font-weight: 900;
-    background: linear-gradient(90deg, #123c6b, #ffffff, #711d1c);
+    background: linear-gradient(90deg, #123c6b 0%, #ffffff 50%, #711d1c 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
     transform: scale(1);
     letter-spacing: 1px;
+    opacity: 1;
+  }
+  
+  25% {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    background: linear-gradient(90deg, #711d1c 0%, #ffffff 50%, #123c6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 22px rgba(255, 255, 255, 0.35);
+    transform: scale(1.01);
+    letter-spacing: 1.5px;
+    opacity: 1;
   }
   
   33% {
     font-family: 'Russo One', sans-serif;
     font-weight: 400;
-    background: linear-gradient(90deg, #711d1c, #ffffff, #123c6b);
+    background: linear-gradient(90deg, #711d1c 0%, #ffffff 50%, #123c6b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: 0 0 25px rgba(113, 29, 28, 0.4);
     transform: scale(1.02);
     letter-spacing: 2px;
+    opacity: 1;
+  }
+  
+  58% {
+    font-family: 'Russo One', sans-serif;
+    font-weight: 400;
+    background: linear-gradient(90deg, #ffffff 0%, #123c6b 50%, #711d1c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 24px rgba(18, 60, 107, 0.35);
+    transform: scale(1);
+    letter-spacing: 2.5px;
+    opacity: 1;
   }
   
   66% {
     font-family: 'Orbitron', monospace;
     font-weight: 900;
-    background: linear-gradient(90deg, #ffffff, #123c6b, #711d1c);
+    background: linear-gradient(90deg, #ffffff 0%, #123c6b 50%, #711d1c 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-shadow: 0 0 25px rgba(18, 60, 107, 0.4);
     transform: scale(0.98);
     letter-spacing: 3px;
+    opacity: 1;
+  }
+  
+  91% {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    background: linear-gradient(90deg, #123c6b 0%, #ffffff 50%, #711d1c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 22px rgba(255, 255, 255, 0.35);
+    transform: scale(0.99);
+    letter-spacing: 1.5px;
+    opacity: 1;
   }
 }
 
 .katman-logo {
-  animation: logoAnimation 3s ease-in-out infinite;
+  animation: logoAnimation 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   display: inline-block;
-  background: linear-gradient(90deg, #123c6b, #ffffff, #711d1c);
+  background: linear-gradient(90deg, #123c6b 0%, #ffffff 50%, #711d1c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   user-select: none;
+  position: relative;
 }
 
 .katman-logo:hover {
