@@ -456,6 +456,7 @@ export default function Game() {
           senderUsername={taunt.username}
           senderTeam={taunt.team}
           videoSrc={taunt.videoSrc}
+          timestamp={taunt.expiresAt}
         />
       ))}
       
