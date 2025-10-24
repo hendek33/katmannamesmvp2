@@ -19,13 +19,25 @@ export function NormalWinVideo({ winnerTeam, winnerTeamName, onComplete }: Norma
     : "/kırmızı takım normal kazanma.mp4";
 
   useEffect(() => {
-    // Simple play logic
     if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.error('Win video play error:', err);
-        // If video fails, still show winner
-        handleVideoEnd();
-      });
+      const video = videoRef.current;
+      video.currentTime = 0;
+      
+      // Try to play when ready
+      const tryPlay = () => {
+        if (video.readyState >= 4) { // HAVE_ENOUGH_DATA
+          video.play().catch(err => {
+            console.error('Win video play error:', err);
+            // If video fails, still show winner
+            handleVideoEnd();
+          });
+        } else {
+          // Wait a bit and try again
+          setTimeout(tryPlay, 100);
+        }
+      };
+      
+      tryPlay();
     }
     
     return () => {
