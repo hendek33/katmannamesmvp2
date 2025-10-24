@@ -285,34 +285,71 @@ export default function Game() {
   // Listen for taunt and insult events via WebSocket
   useEffect(() => {
     // Access WebSocket directly to listen for events
-    const ws = (window as any).wsRef?.current;
-    if (!ws) return;
-    
-    const handleMessage = (event: MessageEvent) => {
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type === 'insult_sent' || message.type === 'insult_v2') {
-          setInsults(prev => [...prev, message.payload]);
-          // Remove insult after 3 seconds
-          setTimeout(() => {
-            setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
-          }, 3000);
-        } else if (message.type === 'insult_toggled') {
-          setInsultEnabled(message.payload.insultEnabled);
-          toast({
-            title: "Laf Sokma",
-            description: message.payload.insultEnabled ? "Aktif" : "Devre dışı",
-          });
-        } else if (message.type === 'room_features') {
-          setInsultEnabled(message.payload.insultEnabled);
-        }
-      } catch (err) {
-        console.error('Error handling message:', err);
+    const checkWS = () => {
+      const wsRef = (window as any).wsRef;
+      if (!wsRef || !wsRef.current) {
+        console.log('WebSocket not available yet, retrying...');
+        return null;
       }
+      return wsRef.current;
     };
     
-    ws.addEventListener('message', handleMessage);
-    return () => ws.removeEventListener('message', handleMessage);
+    let ws = checkWS();
+    if (!ws) {
+      const retryInterval = setInterval(() => {
+        ws = checkWS();
+        if (ws) {
+          clearInterval(retryInterval);
+          setupListener(ws);
+        }
+      }, 100);
+      
+      return () => clearInterval(retryInterval);
+    }
+    
+    const setupListener = (websocket: WebSocket) => {
+      const handleMessage = (event: MessageEvent) => {
+        try {
+          const message = JSON.parse(event.data);
+          console.log('WebSocket message received:', message.type);
+          
+          if (message.type === 'insult_sent' || message.type === 'insult_v2') {
+            console.log('Insult received:', message.type, message.payload);
+            setInsults(prev => {
+              const newInsults = [...prev, message.payload];
+              console.log('Insults state updated:', newInsults);
+              return newInsults;
+            });
+            // Remove insult after 3 seconds
+            setTimeout(() => {
+              setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
+            }, 3000);
+          } else if (message.type === 'insult_toggled') {
+            setInsultEnabled(message.payload.insultEnabled);
+            toast({
+              title: "Laf Sokma",
+              description: message.payload.insultEnabled ? "Aktif" : "Devre dışı",
+            });
+          } else if (message.type === 'room_features') {
+            setInsultEnabled(message.payload.insultEnabled);
+          }
+        } catch (err) {
+          console.error('Error handling message:', err);
+        }
+      };
+      
+      websocket.addEventListener('message', handleMessage);
+      console.log('WebSocket listener attached');
+      
+      return () => {
+        websocket.removeEventListener('message', handleMessage);
+        console.log('WebSocket listener removed');
+      };
+    };
+    
+    if (ws) {
+      return setupListener(ws);
+    }
   }, [toast]);
   
   // Get room features on mount
