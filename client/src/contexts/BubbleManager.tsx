@@ -32,9 +32,9 @@ export const BubbleManagerProvider = ({ children }: { children: ReactNode }) => 
     setBubbles(prev => {
       const newBubbles = new Map(prev);
       
-      // Find all bubbles of the same type and team
+      // Find all bubbles of the same team (regardless of type)
       const sameBubbles = Array.from(newBubbles.values())
-        .filter(b => b.type === type && b.team === team)
+        .filter(b => b.team === team)
         .sort((a, b) => a.index - b.index);
       
       // Assign the next available index
@@ -65,9 +65,9 @@ export const BubbleManagerProvider = ({ children }: { children: ReactNode }) => 
       if (removedBubble) {
         newBubbles.delete(id);
         
-        // Update indices for remaining bubbles of the same type and team
+        // Update indices for remaining bubbles of the same team (regardless of type)
         Array.from(newBubbles.values())
-          .filter(b => b.type === removedBubble.type && b.team === removedBubble.team)
+          .filter(b => b.team === removedBubble.team)
           .sort((a, b) => a.createdAt - b.createdAt)
           .forEach((bubble, index) => {
             bubble.index = index;
