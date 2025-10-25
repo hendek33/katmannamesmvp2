@@ -1597,7 +1597,7 @@ export default function Game() {
                       onChange={(e) => setClueWord(e.target.value.toUpperCase())}
                       onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                       maxLength={20}
-                      className="w-40 sm:w-56 text-center font-bold text-sm sm:text-base uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-10 sm:h-12 text-slate-100 placeholder:text-slate-500"
+                      className="w-40 sm:w-56 text-center font-bold text-lg sm:text-xl uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-10 sm:h-12 text-slate-100 placeholder:text-slate-500"
                     />
                     <div className="relative number-selector-container">
                       <div className="flex items-center gap-1">
