@@ -134,19 +134,19 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       
       {/* Parlama efekti overlay */}
       <div 
-        className="absolute inset-0 pointer-events-none mix-blend-screen opacity-35 rounded-lg"
+        className="absolute inset-0 pointer-events-none rounded-lg"
         style={{
           background: `
             repeating-linear-gradient(135deg,
-              rgba(255,255,255,0.15) 0px,
-              rgba(255,255,255,0.06) 25px,
+              rgba(255,255,255,0.35) 0px,
+              rgba(255,255,255,0.20) 25px,
               transparent 65px,
-              rgba(255,255,255,0.10) 100px,
+              rgba(255,255,255,0.25) 100px,
               transparent 145px),
             repeating-linear-gradient(135deg,
-              rgba(255,255,255,0.08) 0px,
+              rgba(255,255,255,0.18) 0px,
               transparent 35px,
-              rgba(255,255,255,0.04) 75px,
+              rgba(255,255,255,0.15) 75px,
               transparent 125px)
           `,
           maskImage: `radial-gradient(circle at center,
@@ -161,6 +161,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             rgba(0,0,0,0.70) 70%,
             rgba(0,0,0,1) 95%,
             rgba(0,0,0,0.80) 100%)`,
+          mixBlendMode: 'overlay',
+          opacity: 0.7,
           zIndex: 11
         }}
       />
