@@ -429,14 +429,14 @@ export default function Lobby() {
                     <Button
                       onClick={handleStartGame}
                       disabled={!canStartGame}
-                      className={`w-full py-6 text-lg font-bold transition-all ${
+                      className={`w-full py-5 text-base font-semibold transition-all backdrop-blur-xl border ${
                         canStartGame 
-                          ? 'bg-gradient-to-r from-red-700 to-blue-700 hover:from-red-600 hover:to-blue-600 text-white shadow-2xl'
-                          : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                          ? 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border-emerald-600/40 hover:border-emerald-500/60 shadow-lg'
+                          : 'bg-slate-800/30 text-slate-600 border-slate-700/30 cursor-not-allowed'
                       }`}
                       data-testid="button-start-game"
                     >
-                      <Play className="w-5 h-5 mr-2" />
+                      <Play className="w-4 h-4 mr-2" />
                       Oyunu Başlat
                     </Button>
                   )}
