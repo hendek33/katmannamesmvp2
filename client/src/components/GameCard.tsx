@@ -281,10 +281,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
               <span
                 key={voter}
                 className={cn(
-                  "px-1 py-0.5 text-[8px] sm:text-[9px] rounded animate-pop-in",
-                  hasVoted && voter === voters[voters.length - 1] ? 
-                    "bg-yellow-500/90 text-white font-bold" : 
-                    "bg-black/60 text-white"
+                  "px-1.5 py-0.5 text-xs rounded animate-pop-in bg-red-950/80 text-red-200",
+                  hasVoted && voter === voters[voters.length - 1] ? "font-bold" : ""
                 )}
                 style={{
                   animationDelay: `${idx * 0.05}s`
