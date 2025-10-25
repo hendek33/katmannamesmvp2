@@ -300,6 +300,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           "relative rounded px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
           "flex items-center justify-center",
           "border-t border-black/20",
+          "backdrop-blur-none bg-opacity-100",
           colors.panel
         )}>
           <span className={cn(
