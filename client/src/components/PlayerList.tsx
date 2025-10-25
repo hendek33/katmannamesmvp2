@@ -133,17 +133,32 @@ export function PlayerList({
             {teamPlayers.length} oyuncu
           </Badge>
         </div>
-        {isLobby && currentPlayer?.team !== team && onTeamSelect && (
-          <Button 
-            size="sm" 
-            variant={team === "dark" ? "default" : "destructive"}
-            onClick={() => onTeamSelect(team)}
-            className="h-7 px-2 text-xs"
-            data-testid={`button-join-${team}`}
-          >
-            Katıl
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Show "Ajan Ol" button for spymasters in this team */}
+          {isLobby && currentPlayer?.team === team && currentPlayer?.role === "spymaster" && onRoleToggle && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onRoleToggle}
+              className="h-7 px-3 text-xs border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:text-blue-300 hover:border-blue-400/60"
+              data-testid="button-become-agent"
+            >
+              <Target className="w-3 h-3 mr-1" />
+              Ajan Ol
+            </Button>
+          )}
+          {isLobby && currentPlayer?.team !== team && onTeamSelect && (
+            <Button 
+              size="sm" 
+              variant={team === "dark" ? "default" : "destructive"}
+              onClick={() => onTeamSelect(team)}
+              className="h-7 px-2 text-xs"
+              data-testid={`button-join-${team}`}
+            >
+              Katıl
+            </Button>
+          )}
+        </div>
       </div>
       
       {/* Warning if team needs spymaster */}
@@ -179,16 +194,6 @@ export function PlayerList({
                     data-testid={`button-remove-bot-${spymaster.id}`}
                   >
                     kaldır
-                  </button>
-                )}
-                {/* Show "Ajan Ol" button for current player who is spymaster */}
-                {isLobby && spymaster.id === currentPlayerId && onRoleToggle && (
-                  <button 
-                    onClick={onRoleToggle}
-                    className="text-[10px] text-blue-400 hover:text-blue-300 mt-1 font-semibold"
-                    data-testid="button-become-agent"
-                  >
-                    Ajan Ol
                   </button>
                 )}
               </div>
