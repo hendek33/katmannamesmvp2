@@ -123,7 +123,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     >
       {/* Soft gradient overlay */}
       <div 
-        className="absolute inset-0 rounded-lg pointer-events-none"
+        className="absolute -inset-[2px] rounded-lg pointer-events-none"
         style={{
           background: `linear-gradient(to bottom left, 
             rgba(255,255,255,0.15) 0%, 
