@@ -286,13 +286,11 @@ export function PlayerList({
               <div 
                 key={player.id}
                 data-testid={`player-${player.id}`}
-                className="flex flex-col items-center p-1 rounded bg-amber-900/20 border border-amber-700/30"
+                className="flex items-center justify-center gap-0.5 p-1 rounded bg-amber-900/20 border border-amber-700/30"
               >
-                <div className="flex items-center gap-0.5">
-                  {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400" />}
-                  {player.id === currentPlayerId && <span className="text-[10px] text-amber-300">(Sen)</span>}
-                </div>
-                <span className="text-xs font-medium text-slate-200 text-center truncate w-full">{player.username}</span>
+                {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400" />}
+                <span className="text-xs font-medium text-slate-200 text-center truncate">{player.username}</span>
+                {player.id === currentPlayerId && <span className="text-[10px] text-amber-300 ml-0.5">(Sen)</span>}
               </div>
             ))}
           </div>
