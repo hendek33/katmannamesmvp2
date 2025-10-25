@@ -120,35 +120,16 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         zIndex: isLifted ? 1000 : card.revealed ? 20 : 1
       }}
     >
-      {/* Glass reflection overlay */}
+      {/* Soft gradient overlay */}
       <div 
-        className="absolute -inset-[1px] rounded-lg pointer-events-none overflow-hidden"
+        className="absolute inset-0 rounded-lg pointer-events-none"
         style={{
+          background: `linear-gradient(to bottom left, 
+            rgba(255,255,255,0.15) 0%, 
+            transparent 70%)`,
           zIndex: 11
         }}
-      >
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(180deg, 
-              rgba(255,255,255,0.25) 0%, 
-              rgba(255,255,255,0.15) 30%,
-              transparent 50%,
-              transparent 100%)`
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(45deg, 
-              transparent 0%,
-              transparent 40%,
-              rgba(255,255,255,0.1) 50%,
-              transparent 60%,
-              transparent 100%)`
-          }}
-        />
-      </div>
+      />
       
       {/* Prophet indicator - enhanced visual effects */}
       {isKnownCard && !card.revealed && (
