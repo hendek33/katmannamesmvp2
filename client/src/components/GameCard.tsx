@@ -302,7 +302,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           "border-t border-black/20",
           "backdrop-blur-none bg-opacity-100",
           colors.panel
-        )}>
+        )} style={{ position: 'relative', zIndex: 12 }}>
           <span className={cn(
             "font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md",
             colors.textColor
