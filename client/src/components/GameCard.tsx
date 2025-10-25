@@ -281,7 +281,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
               <span
                 key={voter}
                 className={cn(
-                  "px-0.5 py-0 sm:px-1 sm:py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[9px] xl:text-[10px] rounded animate-pop-in bg-red-950/80 text-red-200",
+                  "px-0.5 py-0 sm:px-0.5 sm:py-0 md:px-1 md:py-0.5 text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px] xl:text-[9px] rounded animate-pop-in bg-red-950/80 text-red-200",
                   hasVoted && voter === voters[voters.length - 1] ? "font-bold" : ""
                 )}
                 style={{
@@ -307,14 +307,14 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         
         {/* Word panel - always show */}
         <div className={cn(
-          "relative rounded-md px-0.5 py-0.5 sm:px-1 sm:py-0.5 md:px-1.5 md:py-0.5 lg:px-2 lg:py-0.5 xl:px-2.5 xl:py-1",
+          "relative rounded-md px-0.5 py-0 sm:px-0.5 sm:py-0.5 md:px-1 md:py-0.5 lg:px-1.5 lg:py-0.5 xl:px-2 xl:py-0.5 2xl:px-2.5 2xl:py-1",
           "flex items-center justify-center",
           "border-t border-black/20",
           "backdrop-blur-none bg-opacity-100",
           colors.panel
         )} style={{ position: 'relative', zIndex: 12 }}>
           <span className={cn(
-            "font-bold text-[7px] sm:text-[8px] md:text-[9px] lg:text-[10px] xl:text-xs 2xl:text-sm uppercase tracking-wide text-center leading-tight drop-shadow-md",
+            "font-bold text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px] xl:text-[9px] 2xl:text-[10px] uppercase tracking-wide text-center leading-tight drop-shadow-md",
             colors.textColor
           )}>
             {card.word}
