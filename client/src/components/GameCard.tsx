@@ -94,7 +94,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     <div
       ref={cardRef}
       className={cn(
-        "relative rounded-lg border-[6px] p-0.5 sm:p-1 lg:p-1.5 w-full",
+        "relative rounded-lg border-[8px] p-0.5 sm:p-1 lg:p-1.5 w-full",
         "aspect-[3/2]",
         "flex flex-col",
         !card.revealed && "overflow-hidden",
