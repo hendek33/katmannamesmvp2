@@ -1545,10 +1545,10 @@ export default function Game() {
             </div>
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
+            <div className="absolute bottom-0 left-0 right-0 h-20 flex items-center justify-center p-0" style={{ zIndex: 50 }}>
               {/* Clue Display Card - Shows after clue is given */}
               {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
-                <Card className="px-4 py-2.5 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up mb-2">
+                <Card className="px-4 py-2.5 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-1.5">
                       <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
