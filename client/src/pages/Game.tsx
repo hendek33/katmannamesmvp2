@@ -1597,28 +1597,28 @@ export default function Game() {
                       onChange={(e) => setClueWord(e.target.value.toUpperCase())}
                       onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                       maxLength={20}
-                      className="w-32 sm:w-40 text-center font-bold text-xs sm:text-sm uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-8 sm:h-10 text-slate-100 placeholder:text-slate-500"
+                      className="w-40 sm:w-56 text-center font-bold text-sm sm:text-base uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-10 sm:h-12 text-slate-100 placeholder:text-slate-500"
                     />
                     <div className="relative number-selector-container">
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                          className="h-8 sm:h-10 w-8 sm:w-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-sm rounded border border-slate-700"
+                          className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-base rounded border border-slate-700"
                         >
                           -
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowNumberSelector(!showNumberSelector)}
-                          className="h-8 sm:h-10 w-10 sm:w-12 flex items-center justify-center bg-slate-900/70 hover:bg-slate-800/80 border border-amber-500/60 rounded text-base font-black text-amber-400 cursor-pointer transition-all"
+                          className="h-10 sm:h-12 w-12 sm:w-16 flex items-center justify-center bg-slate-900/70 hover:bg-slate-800/80 border border-amber-500/60 rounded text-lg font-black text-amber-400 cursor-pointer transition-all"
                         >
                           {clueCount}
                         </button>
                         <button
                           type="button"
                           onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                          className="h-8 sm:h-10 w-8 sm:w-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-sm rounded border border-slate-700"
+                          className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-base rounded border border-slate-700"
                         >
                           +
                         </button>
@@ -1685,10 +1685,10 @@ export default function Game() {
                       onClick={handleGiveClue}
                       disabled={!clueWord.trim() || parseInt(clueCount) < 0}
                       data-testid="button-give-clue"
-                      size="sm"
-                      className="h-8 sm:h-10 px-3 sm:px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-sm"
+                      size="default"
+                      className="h-10 sm:h-12 px-4 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-sm sm:text-base"
                     >
-                      <Send className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      <Send className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Gönder
                     </Button>
                   </div>
