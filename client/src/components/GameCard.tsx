@@ -54,8 +54,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           };
         case "assassin":
           return {
-            bg: "bg-gradient-to-br from-gray-800 to-gray-900",
-            border: "border-gray-600",
+            bg: "bg-gradient-to-br from-gray-900 to-black",
+            border: "border-gray-700",
             panel: "bg-black",
             textColor: "text-white",
             shadow: "shadow-2xl shadow-black/70",
@@ -112,7 +112,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "shadow-inner"
       )}
       style={{
-        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
+        boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.6)',
         overflow: card.revealed ? 'visible' : 'hidden',
         transformStyle: 'preserve-3d',
         transition: 'all 0.2s ease-out',
@@ -297,7 +297,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         
         {/* Word panel - always show */}
         <div className={cn(
-          "relative rounded px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
+          "relative rounded-md px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
           "flex items-center justify-center",
           "border-t border-black/20",
           "backdrop-blur-none bg-opacity-100",
