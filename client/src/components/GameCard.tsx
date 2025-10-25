@@ -132,9 +132,9 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         }}
       />
       
-      {/* Parlama efekti overlay */}
+      {/* Parlama efekti overlay - tam kartı kaplar */}
       <div 
-        className="absolute inset-0 pointer-events-none rounded-lg"
+        className="absolute -inset-[1px] pointer-events-none"
         style={{
           background: `
             repeating-linear-gradient(135deg,
@@ -163,6 +163,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             rgba(0,0,0,0.80) 100%)`,
           mixBlendMode: 'overlay',
           opacity: 0.7,
+          borderRadius: '8px',
           zIndex: 11
         }}
       />
