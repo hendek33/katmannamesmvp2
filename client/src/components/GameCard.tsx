@@ -137,17 +137,23 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         className="absolute -inset-[1px] pointer-events-none"
         style={{
           background: `
-            repeating-linear-gradient(135deg,
+            repeating-linear-gradient(120deg,
               rgba(255,255,255,0.5) 0px,
-              rgba(255,255,255,0.3) 25px,
-              transparent 65px,
-              rgba(255,255,255,0.4) 100px,
-              transparent 145px),
-            repeating-linear-gradient(135deg,
+              rgba(255,255,255,0.3) 20px,
+              transparent 22px,
+              transparent 60px,
+              rgba(255,255,255,0.4) 62px,
+              rgba(255,255,255,0.35) 85px,
+              transparent 87px,
+              transparent 140px),
+            repeating-linear-gradient(120deg,
               rgba(255,255,255,0.25) 0px,
-              transparent 35px,
-              rgba(255,255,255,0.2) 75px,
-              transparent 125px)
+              transparent 15px,
+              transparent 45px,
+              rgba(255,255,255,0.2) 47px,
+              rgba(255,255,255,0.15) 70px,
+              transparent 72px,
+              transparent 110px)
           `,
           maskImage: `radial-gradient(circle at center,
             rgba(0,0,0,0) 0%,
