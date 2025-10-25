@@ -1544,8 +1544,8 @@ export default function Game() {
               ))}
             </div>
 
-            {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 flex items-center justify-center p-0" style={{ zIndex: 50 }}>
+            {/* Clue Input/Display - Centered in Bottom Space */}
+            <div className="absolute bottom-7 left-1/2 transform -translate-x-1/2" style={{ zIndex: 50 }}>
               {/* Clue Display Card - Shows after clue is given */}
               {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
                 <Card className="px-4 py-2.5 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
