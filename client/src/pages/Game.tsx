@@ -17,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -1287,6 +1287,7 @@ export default function Game() {
                       {darkPlayers.filter(p => p.role === "spymaster").map(player => (
                         <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
+                          {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
                             {player.username}
                           </span>
@@ -1298,7 +1299,8 @@ export default function Game() {
                   {darkPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {darkPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs">
+                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs flex items-center gap-1">
+                          {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-blue-100" : "text-blue-200"}>
                             {player.username}
                           </span>
@@ -1731,6 +1733,7 @@ export default function Game() {
                       {lightPlayers.filter(p => p.role === "spymaster").map(player => (
                         <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
+                          {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
                             {player.username}
                           </span>
@@ -1742,7 +1745,8 @@ export default function Game() {
                   {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {lightPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs">
+                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs flex items-center gap-1">
+                          {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
                             {player.username}
                           </span>
