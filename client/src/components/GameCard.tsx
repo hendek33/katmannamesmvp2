@@ -122,7 +122,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     >
       {/* Glass reflection overlay */}
       <div 
-        className="absolute inset-[10px] rounded pointer-events-none"
+        className="absolute inset-0 rounded-lg pointer-events-none"
         style={{
           background: `linear-gradient(135deg, 
             rgba(255,255,255,0.3) 0%, 
