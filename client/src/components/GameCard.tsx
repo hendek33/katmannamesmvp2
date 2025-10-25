@@ -138,15 +138,15 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         style={{
           background: `
             repeating-linear-gradient(135deg,
-              rgba(255,255,255,0.35) 0px,
-              rgba(255,255,255,0.20) 25px,
+              rgba(255,255,255,0.5) 0px,
+              rgba(255,255,255,0.3) 25px,
               transparent 65px,
-              rgba(255,255,255,0.25) 100px,
+              rgba(255,255,255,0.4) 100px,
               transparent 145px),
             repeating-linear-gradient(135deg,
-              rgba(255,255,255,0.18) 0px,
+              rgba(255,255,255,0.25) 0px,
               transparent 35px,
-              rgba(255,255,255,0.15) 75px,
+              rgba(255,255,255,0.2) 75px,
               transparent 125px)
           `,
           maskImage: `radial-gradient(circle at center,
@@ -162,7 +162,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             rgba(0,0,0,1) 95%,
             rgba(0,0,0,0.80) 100%)`,
           mixBlendMode: 'overlay',
-          opacity: 0.7,
+          opacity: 0.9,
           borderRadius: '8px',
           zIndex: 11
         }}
