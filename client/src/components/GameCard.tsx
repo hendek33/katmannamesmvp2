@@ -276,12 +276,12 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       {/* Voters display */}
       {voters.length > 0 && !card.revealed && (
         <div className="absolute top-1 right-1 z-10 max-w-[60%]">
-          <div className="flex flex-wrap-reverse flex-row-reverse gap-0.5 justify-start">
+          <div className="flex flex-wrap gap-0.5 justify-end">
             {voters.map((voter, idx) => (
               <span
                 key={voter}
                 className={cn(
-                  "px-1 py-0.5 text-[8px] sm:text-[9px] md:text-[10px] rounded animate-pop-in bg-red-950/80 text-red-200",
+                  "px-1.5 py-0.5 text-[10px] sm:text-[11px] rounded animate-pop-in bg-red-950/80 text-red-200",
                   hasVoted && voter === voters[voters.length - 1] ? "font-bold" : ""
                 )}
                 style={{
@@ -307,14 +307,14 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         
         {/* Word panel - always show */}
         <div className={cn(
-          "relative rounded-md px-0.5 py-0.5 sm:px-1 sm:py-0.5 md:px-1.5 md:py-0.5 lg:px-2 lg:py-0.5 xl:px-2.5 xl:py-1",
+          "relative rounded-md px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 lg:px-2.5 lg:py-1 xl:px-3 xl:py-1 2xl:px-3 2xl:py-1",
           "flex items-center justify-center",
           "border-t border-black/20",
           "backdrop-blur-none bg-opacity-100",
           colors.panel
         )} style={{ position: 'relative', zIndex: 12 }}>
           <span className={cn(
-            "font-bold text-[7px] sm:text-[8px] md:text-[10px] lg:text-xs xl:text-sm uppercase tracking-wide text-center leading-tight drop-shadow-md",
+            "font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base uppercase tracking-wide text-center leading-tight drop-shadow-md",
             colors.textColor
           )}>
             {card.word}
