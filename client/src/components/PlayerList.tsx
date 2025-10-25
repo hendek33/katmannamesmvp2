@@ -181,7 +181,7 @@ export function PlayerList({
                 }`}
               >
                 <Eye className="w-4 h-4 text-amber-500 mb-0.5" />
-                <div className="flex items-center gap-1 justify-center">
+                <div className="flex items-center gap-1 justify-center w-full">
                   {spymaster.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
@@ -242,7 +242,7 @@ export function PlayerList({
                 }`}
               >
                 <Target className="w-3.5 h-3.5 text-muted-foreground mb-0.5" />
-                <div className="flex items-center gap-1 justify-center">
+                <div className="flex items-center gap-1 justify-center w-full">
                   {agent.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
