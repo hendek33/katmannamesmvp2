@@ -275,7 +275,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       
       {/* Voters display */}
       {voters.length > 0 && !card.revealed && (
-        <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 z-10 max-w-[85%]">
+        <div className="absolute top-8 right-0.5 sm:top-10 sm:right-1 z-10 max-w-[85%]">
           <div className="flex flex-wrap gap-0.5 justify-end">
             {voters.map((voter, idx) => (
               <span
