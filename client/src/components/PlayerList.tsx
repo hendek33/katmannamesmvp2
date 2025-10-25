@@ -184,7 +184,7 @@ export function PlayerList({
                   <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
                 )}
                 <Eye className="w-4 h-4 text-amber-500 mb-0.5" />
-                <span className="text-xs font-bold text-center truncate w-full text-amber-200">
+                <span className="text-sm font-bold text-center truncate w-full text-amber-200">
                   {spymaster.username}
                 </span>
                 {isLobby && spymaster.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
@@ -205,16 +205,23 @@ export function PlayerList({
                 key="empty-spymaster"
                 className="flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/20 to-amber-800/10 border-2 border-dashed border-amber-600/30 hover:border-amber-500/50 transition-all cursor-pointer"
                 onClick={() => {
-                  if (isLobby && currentPlayer?.team === team && currentPlayer?.role !== "spymaster" && onRoleToggle) {
-                    onRoleToggle();
+                  if (isLobby && onRoleToggle) {
+                    // If player is not in this team, first join the team
+                    if (currentPlayer?.team !== team && onTeamSelect) {
+                      onTeamSelect(team);
+                    }
+                    // Then become spymaster
+                    if (currentPlayer?.role !== "spymaster") {
+                      setTimeout(() => onRoleToggle(), 100);
+                    }
                   }
                 }}
               >
                 <Eye className="w-4 h-4 text-amber-600/50 mb-0.5" />
                 <span className="text-[10px] text-amber-600/70 text-center">
-                  {isLobby && currentPlayer?.team === team && currentPlayer?.role !== "spymaster" 
-                    ? "İstihbarat\nŞefi Ol" 
-                    : "İstihbarat\nŞefi Yok"}
+                  İstihbarat
+                  <br />
+                  Şefi Ol
                 </span>
               </div>
             );
@@ -236,7 +243,7 @@ export function PlayerList({
                   <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
                 )}
                 <Target className="w-3.5 h-3.5 text-muted-foreground mb-0.5" />
-                <span className="text-xs font-medium text-center truncate w-full">
+                <span className="text-sm font-medium text-center truncate w-full">
                   {agent.username}
                 </span>
                 {isLobby && agent.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
@@ -285,15 +292,10 @@ export function PlayerList({
                   {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400" />}
                   {player.id === currentPlayerId && <span className="text-[10px] text-amber-300">(Sen)</span>}
                 </div>
-                <span className="text-[11px] font-medium text-slate-200 text-center truncate w-full">{player.username}</span>
+                <span className="text-xs font-medium text-slate-200 text-center truncate w-full">{player.username}</span>
               </div>
             ))}
           </div>
-          {noTeam.some(p => p.id === currentPlayerId) && onTeamSelect && (
-            <div className="text-xs text-amber-400 font-medium">
-              ⬇ Aşağıdaki takımlardan birini seç
-            </div>
-          )}
           </div>
         </div>
       )}
