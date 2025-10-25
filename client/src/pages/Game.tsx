@@ -1572,10 +1572,10 @@ export default function Game() {
                             description: "Sıra diğer takıma geçti",
                           });
                         }}
-                        size="sm"
-                        className="h-8 sm:h-10 px-3 sm:px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-sm"
+                        size="default"
+                        className="h-10 sm:h-12 px-4 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-sm sm:text-base"
                       >
-                        <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                         Tahmini Bitir
                       </Button>
                     )}
