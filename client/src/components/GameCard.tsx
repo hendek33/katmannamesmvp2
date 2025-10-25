@@ -132,42 +132,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         }}
       />
       
-      {/* Parlama efekti overlay - tam kartı kaplar */}
-      <div 
-        className="absolute -inset-[1px] pointer-events-none"
-        style={{
-          background: `
-            repeating-linear-gradient(135deg,
-              rgba(255,255,255,0.5) 0px,
-              rgba(255,255,255,0.3) 25px,
-              transparent 65px,
-              rgba(255,255,255,0.4) 100px,
-              transparent 145px),
-            repeating-linear-gradient(135deg,
-              rgba(255,255,255,0.25) 0px,
-              transparent 35px,
-              rgba(255,255,255,0.2) 75px,
-              transparent 125px)
-          `,
-          maskImage: `radial-gradient(circle at center,
-            rgba(0,0,0,0) 0%,
-            rgba(0,0,0,0.10) 40%,
-            rgba(0,0,0,0.70) 70%,
-            rgba(0,0,0,1) 95%,
-            rgba(0,0,0,0.80) 100%)`,
-          WebkitMaskImage: `radial-gradient(circle at center,
-            rgba(0,0,0,0) 0%,
-            rgba(0,0,0,0.10) 40%,
-            rgba(0,0,0,0.70) 70%,
-            rgba(0,0,0,1) 95%,
-            rgba(0,0,0,0.80) 100%)`,
-          mixBlendMode: 'overlay',
-          opacity: 0.9,
-          borderRadius: '8px',
-          zIndex: 11
-        }}
-      />
-      
       {/* Prophet indicator - enhanced visual effects */}
       {isKnownCard && !card.revealed && (
         <>
