@@ -1742,7 +1742,7 @@ export default function Game() {
                   {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {lightPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs">
+                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-xs lg:text-sm xl:text-base">
                           <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
                             {player.username}
                           </span>
@@ -1763,7 +1763,7 @@ export default function Game() {
               <div ref={logContainerRef} className="flex-1 overflow-y-auto min-h-0 space-y-0.5 scroll-smooth custom-scrollbar">
                 {/* Show game events in chronological order */}
                 {gameState.revealHistory.length === 0 && !gameState.currentClue ? (
-                  <div className="text-[9px] lg:text-[10px] xl:text-xs text-gray-500 italic p-2">
+                  <div className="text-xs lg:text-sm xl:text-base text-gray-500 italic p-2">
                     Henüz hamle yapılmadı...
                   </div>
                 ) : (
@@ -1778,7 +1778,7 @@ export default function Game() {
                         if (entry.type === "end_turn") {
                           // End turn log
                           groupedEntries.push(
-                            <div key={`end-turn-${idx}`} className="p-1 rounded text-[10px] bg-gray-800/30 border border-gray-600/50 mb-1 italic">
+                            <div key={`end-turn-${idx}`} className="p-1 rounded text-xs bg-gray-800/30 border border-gray-600/50 mb-1 italic">
                               <div className="flex items-center gap-1">
                                 <Clock className="w-2.5 h-2.5 text-gray-400" />
                                 <span className="text-gray-300">
@@ -1798,7 +1798,7 @@ export default function Game() {
                         if (entry.type === "team_change") {
                           // Team change log
                           groupedEntries.push(
-                            <div key={`team-change-${idx}`} className="p-1 rounded text-[10px] bg-purple-800/20 border border-purple-600/30 mb-1 italic">
+                            <div key={`team-change-${idx}`} className="p-1 rounded text-xs bg-purple-800/20 border border-purple-600/30 mb-1 italic">
                               <div className="flex items-center gap-1">
                                 <Users className="w-2.5 h-2.5 text-purple-400" />
                                 <span className="text-purple-300">
@@ -1816,7 +1816,7 @@ export default function Game() {
                         if (entry.type === "role_change") {
                           // Role change log
                           groupedEntries.push(
-                            <div key={`role-change-${idx}`} className="p-1 rounded text-[10px] bg-green-800/20 border border-green-600/30 mb-1 italic">
+                            <div key={`role-change-${idx}`} className="p-1 rounded text-xs bg-green-800/20 border border-green-600/30 mb-1 italic">
                               <div className="flex items-center gap-1">
                                 <Eye className="w-2.5 h-2.5 text-green-400" />
                                 <span className="text-green-300">
@@ -1856,7 +1856,7 @@ export default function Game() {
                           
                           // Add clue header
                           groupedEntries.push(
-                            <div key={`clue-${idx}`} className={`p-1.5 rounded text-[11px] border flex items-center gap-1.5 mb-1 ${
+                            <div key={`clue-${idx}`} className={`p-1.5 rounded text-sm border flex items-center gap-1.5 mb-1 ${
                               entry.team === "dark" ? 
                                 "bg-blue-800/40 border-blue-600/50" : 
                                 "bg-red-800/40 border-red-600/50"
@@ -1875,7 +1875,7 @@ export default function Game() {
                         // Only add guess entry if it has a word (not special entry types)
                         if (entry.word) {
                           groupedEntries.push(
-                            <div key={`entry-${idx}`} className={`p-1.5 rounded text-[11px] border mb-1 ml-2 ${
+                            <div key={`entry-${idx}`} className={`p-1.5 rounded text-sm border mb-1 ml-2 ${
                               entry.team === "dark" ? 
                                 "bg-blue-900/30 border-blue-600/50" : 
                                 "bg-red-900/30 border-red-600/50"
@@ -1920,7 +1920,7 @@ export default function Game() {
                           );
                         }
                         groupedEntries.push(
-                          <div key="clue-current" className={`p-1.5 rounded text-[11px] border flex items-center gap-1.5 mb-1 ${
+                          <div key="clue-current" className={`p-1.5 rounded text-sm border flex items-center gap-1.5 mb-1 ${
                             gameState.currentTeam === "dark" ? 
                               "bg-blue-800/40 border-blue-600/50" : 
                               "bg-red-800/40 border-red-600/50"
@@ -1943,7 +1943,7 @@ export default function Game() {
               </div>
               
               {/* Quick stats at bottom */}
-              <div className="mt-1 pt-1 border-t border-slate-700/50 flex justify-around text-[9px]">
+              <div className="mt-1 pt-1 border-t border-slate-700/50 flex justify-around text-xs">
                 <div className="flex items-center gap-1">
                   <span className="text-gray-500">Açılan:</span>
                   <span className="font-bold text-gray-300">{gameState.revealHistory.filter((e: any) => e.word).length}/25</span>
