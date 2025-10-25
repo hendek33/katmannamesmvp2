@@ -109,7 +109,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
         isAssassinCard && gameEnded && "animate-assassin-reveal",
         isLastCard && gameEnded && !isAssassinCard && "border-green-500 ring-4 ring-green-400/50",
-        "shadow-inner"
+        "shadow-inner",
+        canVote && "hover:shadow-2xl hover:ring-4 hover:ring-white/20"
       )}
       style={{
         boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
@@ -301,8 +302,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         disabled={!canVote}
         data-testid={`card-${card.id}`}
         className={cn(
-          "flex-1 w-full flex flex-col",
-          canVote && "hover:brightness-110 transition-all duration-200"
+          "flex-1 w-full flex flex-col"
         )}
       >
         <div className="flex-1" />
