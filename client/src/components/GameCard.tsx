@@ -122,22 +122,33 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     >
       {/* Glass reflection overlay */}
       <div 
-        className="absolute -inset-[2px] rounded-lg pointer-events-none"
+        className="absolute -inset-[1px] rounded-lg pointer-events-none overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, 
-            rgba(255,255,255,0.35) 0%, 
-            rgba(255,255,255,0.2) 10%,
-            transparent 25%,
-            transparent 35%,
-            rgba(255,255,255,0.1) 45%,
-            transparent 55%,
-            transparent 70%,
-            rgba(255,255,255,0.05) 80%,
-            rgba(255,255,255,0.2) 90%,
-            rgba(255,255,255,0.25) 100%)`,
           zIndex: 11
         }}
-      />
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, 
+              rgba(255,255,255,0.25) 0%, 
+              rgba(255,255,255,0.15) 30%,
+              transparent 50%,
+              transparent 100%)`
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(45deg, 
+              transparent 0%,
+              transparent 40%,
+              rgba(255,255,255,0.1) 50%,
+              transparent 60%,
+              transparent 100%)`
+          }}
+        />
+      </div>
       
       {/* Prophet indicator - enhanced visual effects */}
       {isKnownCard && !card.revealed && (
