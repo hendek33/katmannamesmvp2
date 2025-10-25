@@ -281,7 +281,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
               <span
                 key={voter}
                 className={cn(
-                  "px-1.5 py-0.5 text-xs rounded animate-pop-in bg-red-950/80 text-red-200",
+                  "px-1.5 py-0.5 text-[10px] sm:text-[11px] rounded animate-pop-in bg-red-950/80 text-red-200",
                   hasVoted && voter === voters[voters.length - 1] ? "font-bold" : ""
                 )}
                 style={{
