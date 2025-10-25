@@ -34,7 +34,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             border: "border-blue-400",
             panel: "bg-blue-900",
             textColor: "text-white",
-            shadow: "shadow-xl shadow-blue-900/50",
+            shadow: "",
           };
         case "light":
           return {
@@ -42,7 +42,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             border: "border-red-400",
             panel: "bg-red-900",
             textColor: "text-white",
-            shadow: "shadow-xl shadow-red-900/50",
+            shadow: "",
           };
         case "neutral":
           return {
@@ -50,7 +50,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             border: "border-[#b8a483]",
             panel: "bg-[#9b8872]",
             textColor: "text-white",
-            shadow: "shadow-lg shadow-[#a89474]/30",
+            shadow: "",
           };
         case "assassin":
           return {
@@ -58,7 +58,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             border: "border-gray-700",
             panel: "bg-black",
             textColor: "text-white",
-            shadow: "shadow-2xl shadow-black/70",
+            shadow: "",
           };
       }
     }
@@ -68,7 +68,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       border: "border-[#b8a483]",
       panel: "bg-[#9b8872]",
       textColor: "text-white",
-      shadow: "shadow-lg shadow-[#a89474]/40",
+      shadow: "",
     };
   };
 
@@ -113,7 +113,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         canVote && "hover:brightness-125 hover:contrast-110"
       )}
       style={{
-        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
+        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3), 0 8px 12px rgba(0,0,0,0.6), 0 4px 6px rgba(0,0,0,0.4)',
         borderRadius: '8px',
         overflow: card.revealed ? 'visible' : 'hidden',
         transformStyle: 'preserve-3d',
