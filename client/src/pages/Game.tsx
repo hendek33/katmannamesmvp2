@@ -1742,7 +1742,7 @@ export default function Game() {
                   {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {lightPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-xs lg:text-sm xl:text-base">
+                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs">
                           <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
                             {player.username}
                           </span>
