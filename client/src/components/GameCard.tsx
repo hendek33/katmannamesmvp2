@@ -32,24 +32,24 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           return {
             bg: "bg-gradient-to-br from-blue-700 to-blue-800",
             border: "border-blue-400",
-            panel: "bg-white",
-            textColor: "text-black",
+            panel: "bg-blue-900",
+            textColor: "text-white",
             shadow: "shadow-xl shadow-blue-900/50",
           };
         case "light":
           return {
             bg: "bg-gradient-to-br from-red-700 to-red-800",
             border: "border-red-400",
-            panel: "bg-white",
-            textColor: "text-black",
+            panel: "bg-red-900",
+            textColor: "text-white",
             shadow: "shadow-xl shadow-red-900/50",
           };
         case "neutral":
           return {
             bg: "bg-gradient-to-br from-[#d4c0a0] to-[#c9b592]",
             border: "border-[#b8a483]",
-            panel: "bg-white",
-            textColor: "text-black",
+            panel: "bg-[#9b8872]",
+            textColor: "text-white",
             shadow: "shadow-lg shadow-[#a89474]/30",
           };
         case "assassin":
@@ -66,8 +66,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     return {
       bg: "bg-gradient-to-br from-[#d4c0a0] to-[#c9b592]",
       border: "border-[#b8a483]",
-      panel: "bg-white",
-      textColor: "text-black",
+      panel: "bg-[#9b8872]",
+      textColor: "text-white",
       shadow: "shadow-lg shadow-[#a89474]/40",
     };
   };
