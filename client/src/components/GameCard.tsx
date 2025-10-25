@@ -301,8 +301,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         disabled={!canVote}
         data-testid={`card-${card.id}`}
         className={cn(
-          "flex-1 w-full flex flex-col",
-          canVote && "hover:scale-[1.02] active:scale-[1.01]"
+          "flex-1 w-full flex flex-col"
         )}
       >
         <div className="flex-1" />
