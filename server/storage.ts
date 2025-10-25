@@ -47,31 +47,31 @@ export interface IStorage {
 
 // Insult templates
 const insultMessages = [
-  "{target} seni pis kokarca!",
+  "{target} acayip hayvanlara benziyirsen!",
   "{target} sütünü iç de uyu!",
-  "{target} git yat zıbar!",
+  "{target} fuck you!",
   "{target} sen SALAKSIN!",
-  "{target} beynin mi yok senin?",
+  "{target} beynini söğüş yapıp yemiş...",
   "{target} git köşende ağla!",
-  "{target} götüne vururum ha!",
+  "{target} sırtına vururum ha!",
   "{target} patates kafalı!",
-  "{target} s*ktir git!",
-  "{target} uyku vaktin geldi senin!",
+  "{target} hadi köyüne!",
+  "{target} uyku vaktin gelmedi mi senin?",
   "{target} git kumda oyna!",
-  "{target} seni gidi ahmak!",
+  "{target} seni gidi aptal!",
   "{target} karga beyinli!",
   "{target} yazık kafana!",
   "{target} peş para etmezsin!",
-  "{target} akılsız insan!",
+  "{target} akılsız mahlukat!",
   "{target} ezan okundu hadi evine!",
   "{target} haline gülsem mi ağlasam mı?!",
   "{target} seni soğan kafalı!",
   "{target} A.M.K!",
-  "{target} sen ne tür bir soytarısın?",
-  "{target} peçete ister misin?",
-  "{target} şinasi bile senden zeki...",
+  "{target} sen tam bir soytarısın!",
+  "{target} ağlayacaksan peçete getireyim?",
+  "{target} şinasi bile senden akıllı...",
   "{target} vay gerizekalı vay!",
-  "{target} şapşal mısın nesin?"
+  "{target} haha ezik XD"
 ];
 
 export class MemStorage implements IStorage {
