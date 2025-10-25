@@ -110,7 +110,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         isAssassinCard && gameEnded && "animate-assassin-reveal",
         isLastCard && gameEnded && !isAssassinCard && "border-green-500 ring-4 ring-green-400/50",
         "shadow-inner",
-        canVote && "hover:shadow-2xl hover:ring-4 hover:ring-white/20"
+        canVote && "hover:brightness-125 hover:contrast-110"
       )}
       style={{
         boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
