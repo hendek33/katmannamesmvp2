@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap } from "lucide-react";
+import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Lock, LockOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { PlayerList } from "@/components/PlayerList";
@@ -32,6 +32,7 @@ export default function Lobby() {
   const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
   const [showChaosDetails, setShowChaosDetails] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const { toast } = useToast();
   
   const playerId = localStorage.getItem("katmannames_player_id");
@@ -529,6 +530,42 @@ export default function Lobby() {
                   </div>
                 </div>
                 
+                {/* Password Settings - Enhanced Glassmorphism */}
+                {currentPlayer?.isRoomOwner && (
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-emerald-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
+                    <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          {gameState.hasPassword ? (
+                            <Lock className="w-5 h-5 text-emerald-400" />
+                          ) : (
+                            <LockOpen className="w-5 h-5 text-slate-400" />
+                          )}
+                          <h3 className="text-base font-bold text-slate-100">Oda Şifresi</h3>
+                        </div>
+                        <Button
+                          onClick={() => setShowPasswordModal(true)}
+                          size="sm"
+                          variant="outline"
+                          className={`text-xs ${
+                            gameState.hasPassword 
+                              ? 'border-emerald-600/50 text-emerald-400 hover:bg-emerald-900/20' 
+                              : 'border-slate-600/50 text-slate-400 hover:bg-slate-800/20'
+                          }`}
+                        >
+                          {gameState.hasPassword ? 'Şifreyi Değiştir' : 'Şifre Koy'}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        {gameState.hasPassword 
+                          ? 'Bu oda şifre korumalı. Sadece şifreyi bilen kişiler katılabilir.'
+                          : 'Bu oda herkese açık. İsterseniz şifre koyabilirsiniz.'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Chaos Mode - Codenames Style */}
                 <div className="backdrop-blur-lg bg-black/60 rounded-xl border border-amber-900/40 p-4 opacity-90">
                   <div className="flex items-center justify-between mb-2">
@@ -705,6 +742,151 @@ export default function Lobby() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Password Modal */}
+      {showPasswordModal && currentPlayer?.isRoomOwner && (
+        <PasswordModal 
+          hasPassword={gameState.hasPassword}
+          onClose={() => setShowPasswordModal(false)}
+          send={send}
+          roomCode={roomCode}
+        />
+      )}
+    </div>
+  );
+}
+
+function PasswordModal({ hasPassword, onClose, send, roomCode }: { 
+  hasPassword: boolean;
+  onClose: () => void;
+  send: (type: string, payload: any) => void;
+  roomCode: string;
+}) {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = () => {
+    if (password.length < 1) {
+      toast({
+        title: "Hata",
+        description: "Lütfen bir şifre girin",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      toast({
+        title: "Hata", 
+        description: "Şifreler eşleşmiyor",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    send("update_password", {
+      roomCode,
+      password: password || null
+    });
+    
+    toast({
+      title: hasPassword ? "Şifre Güncellendi" : "Şifre Eklendi",
+      description: password ? "Oda artık şifre korumalı" : "Şifre kaldırıldı",
+    });
+    
+    onClose();
+  };
+
+  const handleRemovePassword = () => {
+    send("update_password", {
+      roomCode,
+      password: null
+    });
+    
+    toast({
+      title: "Şifre Kaldırıldı",
+      description: "Oda artık herkese açık",
+    });
+    
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      <Card className="w-full max-w-md bg-slate-900/95 border-emerald-900/30">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            {hasPassword ? 'Oda Şifresini Değiştir' : 'Oda Şifresi Belirle'}
+          </h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Yeni Şifre
+              </label>
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Şifre girin"
+                  className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Şifre Tekrar
+              </label>
+              <input 
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Şifreyi tekrar girin"
+                className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            {hasPassword && (
+              <div className="pt-2 border-t border-slate-700">
+                <button
+                  onClick={handleRemovePassword}
+                  className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                >
+                  Şifreyi Kaldır
+                </button>
+              </div>
+            )}
+
+            <div className="flex gap-3 mt-6">
+              <Button 
+                onClick={onClose}
+                variant="outline"
+                className="flex-1"
+              >
+                İptal
+              </Button>
+              <Button 
+                onClick={handleSubmit}
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                disabled={!password || password !== confirmPassword}
+              >
+                {hasPassword ? 'Güncelle' : 'Şifre Koy'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

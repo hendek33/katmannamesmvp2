@@ -26,6 +26,7 @@ export interface IStorage {
   updateTeamName(roomCode: string, team: Team, name: string): GameState | null;
   updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
+  updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   startGame(roomCode: string): GameState | null;
@@ -458,6 +459,23 @@ export class MemStorage implements IStorage {
     if (room.phase !== "lobby") return null;
 
     room.chaosMode = chaosMode;
+
+    return room;
+  }
+
+  updatePassword(roomCode: string, password: string | null): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Update the password and hasPassword flag
+    if (password) {
+      roomData.password = password;
+      room.hasPassword = true;
+    } else {
+      roomData.password = undefined;
+      room.hasPassword = false;
+    }
 
     return room;
   }

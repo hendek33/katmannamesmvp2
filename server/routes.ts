@@ -420,6 +420,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "update_password": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi şifre değiştirebilir" } });
+              return;
+            }
+
+            const gameState = storage.updatePassword(ws.roomCode, payload.password);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Şifre güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
           case "guess_prophet": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
