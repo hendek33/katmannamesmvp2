@@ -30,7 +30,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       switch (card.type) {
         case "dark":
           return {
-            bg: "bg-gradient-to-br from-blue-500 to-blue-600",
+            bg: "bg-gradient-to-br from-blue-700 to-blue-800",
             border: "border-blue-400",
             panel: "bg-white",
             textColor: "text-black",
@@ -38,7 +38,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           };
         case "light":
           return {
-            bg: "bg-gradient-to-br from-red-500 to-red-600",
+            bg: "bg-gradient-to-br from-red-700 to-red-800",
             border: "border-red-400",
             panel: "bg-white",
             textColor: "text-black",
@@ -46,16 +46,16 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           };
         case "neutral":
           return {
-            bg: "bg-gradient-to-br from-[#f0dbb9] to-[#e5d0a8]",
-            border: "border-[#d9c4a2]",
+            bg: "bg-gradient-to-br from-[#d4c0a0] to-[#c9b592]",
+            border: "border-[#b8a483]",
             panel: "bg-white",
             textColor: "text-black",
-            shadow: "shadow-lg shadow-[#c9b492]/30",
+            shadow: "shadow-lg shadow-[#a89474]/30",
           };
         case "assassin":
           return {
-            bg: "bg-gradient-to-br from-gray-600 to-gray-700",
-            border: "border-gray-500",
+            bg: "bg-gradient-to-br from-gray-800 to-gray-900",
+            border: "border-gray-600",
             panel: "bg-black",
             textColor: "text-white",
             shadow: "shadow-2xl shadow-black/70",
@@ -64,11 +64,11 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
     }
     
     return {
-      bg: "bg-gradient-to-br from-[#f0dbb9] to-[#e5d0a8]",
-      border: "border-[#d9c4a2]",
+      bg: "bg-gradient-to-br from-[#d4c0a0] to-[#c9b592]",
+      border: "border-[#b8a483]",
       panel: "bg-white",
       textColor: "text-black",
-      shadow: "shadow-lg shadow-[#c9b492]/40",
+      shadow: "shadow-lg shadow-[#a89474]/40",
     };
   };
 
