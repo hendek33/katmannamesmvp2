@@ -112,7 +112,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "shadow-inner"
       )}
       style={{
-        boxShadow: 'inset 0 4px 12px rgba(0,0,0,0.6)',
+        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)',
+        borderRadius: '8px',
         overflow: card.revealed ? 'visible' : 'hidden',
         transformStyle: 'preserve-3d',
         transition: 'all 0.2s ease-out',
