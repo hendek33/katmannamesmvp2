@@ -180,13 +180,15 @@ export function PlayerList({
                   spymaster.id === currentPlayerId ? 'ring-2 ring-accent' : ''
                 }`}
               >
-                {spymaster.isRoomOwner && (
-                  <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
-                )}
                 <Eye className="w-4 h-4 text-amber-500 mb-0.5" />
-                <span className="text-sm font-bold text-center truncate w-full text-amber-200">
-                  {spymaster.username}
-                </span>
+                <div className="flex items-center gap-1 justify-center">
+                  {spymaster.isRoomOwner && (
+                    <Crown className="w-3 h-3 text-yellow-500" />
+                  )}
+                  <span className="text-sm font-bold text-center truncate text-amber-200">
+                    {spymaster.username}
+                  </span>
+                </div>
                 {isLobby && spymaster.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
                   <button 
                     onClick={() => onRemoveBot(spymaster.id)}
@@ -239,13 +241,15 @@ export function PlayerList({
                     : 'bg-black/20 hover:bg-black/30'
                 }`}
               >
-                {agent.isRoomOwner && (
-                  <Crown className="w-3.5 h-3.5 text-yellow-500 mb-0.5" />
-                )}
                 <Target className="w-3.5 h-3.5 text-muted-foreground mb-0.5" />
-                <span className="text-sm font-medium text-center truncate w-full">
-                  {agent.username}
-                </span>
+                <div className="flex items-center gap-1 justify-center">
+                  {agent.isRoomOwner && (
+                    <Crown className="w-3 h-3 text-yellow-500" />
+                  )}
+                  <span className="text-sm font-medium text-center truncate">
+                    {agent.username}
+                  </span>
+                </div>
                 {isLobby && agent.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
                   <button 
                     onClick={() => onRemoveBot(agent.id)}
