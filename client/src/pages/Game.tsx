@@ -1787,7 +1787,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Clock className="w-2.5 h-2.5 text-gray-400" />
                                 <span className="text-gray-300">
-                                  {entry.playerUsername} turu sonlandırdı
+                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} turu sonlandırdı
                                 </span>
                               </div>
                             </div>
@@ -1807,7 +1807,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Users className="w-2.5 h-2.5 text-purple-400" />
                                 <span className="text-purple-300">
-                                  {entry.playerUsername} takım değiştirdi: 
+                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} takım değiştirdi: 
                                   <span className={entry.fromTeam === "dark" ? "text-blue-400" : "text-red-400"}> {entry.fromTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
                                   <span className="text-gray-400"> → </span>
                                   <span className={entry.toTeam === "dark" ? "text-blue-400" : "text-red-400"}>{entry.toTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
@@ -1825,7 +1825,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Eye className="w-2.5 h-2.5 text-green-400" />
                                 <span className="text-green-300">
-                                  {entry.playerUsername} rol değiştirdi: 
+                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} rol değiştirdi: 
                                   <span className="text-gray-300"> {entry.fromRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
                                   <span className="text-gray-400"> → </span>
                                   <span className="text-gray-100">{entry.toRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
@@ -1842,8 +1842,9 @@ export default function Game() {
                         const isAssassin = entry.type === "assassin";
                         
                         // Get player name from entry if available, fallback to team name
-                        const playerName = entry.playerUsername || 
+                        const fullPlayerName = entry.playerUsername || 
                           (entry.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName);
+                        const playerName = fullPlayerName && fullPlayerName.length > 6 ? `${fullPlayerName.slice(0, 6)}...` : fullPlayerName;
                         
                         // Check if this is a new clue/turn
                         const clueKey = entry.clue ? `${entry.clue.word}-${entry.clue.count}` : 'no-clue';
