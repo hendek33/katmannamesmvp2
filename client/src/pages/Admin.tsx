@@ -229,19 +229,40 @@ export default function Admin() {
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label className="text-slate-200">
-                Normal Kart Görsel Boyutu: {config.cardImages.normalCardOffset}px
+                Normal Kart Görsel Boyutu
               </Label>
-              <Slider
-                value={[config.cardImages.normalCardOffset]}
-                onValueChange={([value]) => setConfig({
-                  ...config,
-                  cardImages: { ...config.cardImages, normalCardOffset: value }
-                })}
-                min={-10}
-                max={0}
-                step={1}
-                className="w-full"
-              />
+              <div className="flex gap-3 items-center">
+                <Slider
+                  value={[config.cardImages.normalCardOffset]}
+                  onValueChange={([value]) => setConfig({
+                    ...config,
+                    cardImages: { ...config.cardImages, normalCardOffset: value }
+                  })}
+                  min={-10}
+                  max={0}
+                  step={1}
+                  className="flex-1"
+                />
+                <div className="flex items-center gap-1">
+                  <Input
+                    type="number"
+                    value={config.cardImages.normalCardOffset}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value) && value >= -10 && value <= 0) {
+                        setConfig({
+                          ...config,
+                          cardImages: { ...config.cardImages, normalCardOffset: value }
+                        });
+                      }
+                    }}
+                    className="w-20 bg-slate-900/50 border-slate-700 text-slate-100 text-center"
+                    min={-10}
+                    max={0}
+                  />
+                  <span className="text-slate-400 text-sm">px</span>
+                </div>
+              </div>
               <p className="text-xs text-slate-400">
                 Kart açıldığında görselin kenarlardan ne kadar taşacağını belirler (-10: çok büyük, 0: tam sığdır)
               </p>
@@ -249,19 +270,40 @@ export default function Admin() {
 
             <div className="space-y-2">
               <Label className="text-slate-200">
-                Suikastçı Kartı Görsel Boyutu: {config.cardImages.assassinCardOffset}px
+                Suikastçı Kartı Görsel Boyutu
               </Label>
-              <Slider
-                value={[config.cardImages.assassinCardOffset]}
-                onValueChange={([value]) => setConfig({
-                  ...config,
-                  cardImages: { ...config.cardImages, assassinCardOffset: value }
-                })}
-                min={-10}
-                max={0}
-                step={1}
-                className="w-full"
-              />
+              <div className="flex gap-3 items-center">
+                <Slider
+                  value={[config.cardImages.assassinCardOffset]}
+                  onValueChange={([value]) => setConfig({
+                    ...config,
+                    cardImages: { ...config.cardImages, assassinCardOffset: value }
+                  })}
+                  min={-10}
+                  max={0}
+                  step={1}
+                  className="flex-1"
+                />
+                <div className="flex items-center gap-1">
+                  <Input
+                    type="number"
+                    value={config.cardImages.assassinCardOffset}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value) && value >= -10 && value <= 0) {
+                        setConfig({
+                          ...config,
+                          cardImages: { ...config.cardImages, assassinCardOffset: value }
+                        });
+                      }
+                    }}
+                    className="w-20 bg-slate-900/50 border-slate-700 text-slate-100 text-center"
+                    min={-10}
+                    max={0}
+                  />
+                  <span className="text-slate-400 text-sm">px</span>
+                </div>
+              </div>
               <p className="text-xs text-slate-400">
                 Suikastçı kartı açıldığında görselin boyutu (genelde 0 olmalı)
               </p>
@@ -280,19 +322,40 @@ export default function Admin() {
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label className="text-slate-200">
-                İpucu Kutusu Yazı Boyutu: {config.fonts.clueInputSize}px
+                İpucu Kutusu Yazı Boyutu
               </Label>
-              <Slider
-                value={[config.fonts.clueInputSize]}
-                onValueChange={([value]) => setConfig({
-                  ...config,
-                  fonts: { ...config.fonts, clueInputSize: value }
-                })}
-                min={14}
-                max={36}
-                step={1}
-                className="w-full"
-              />
+              <div className="flex gap-3 items-center">
+                <Slider
+                  value={[config.fonts.clueInputSize]}
+                  onValueChange={([value]) => setConfig({
+                    ...config,
+                    fonts: { ...config.fonts, clueInputSize: value }
+                  })}
+                  min={14}
+                  max={36}
+                  step={1}
+                  className="flex-1"
+                />
+                <div className="flex items-center gap-1">
+                  <Input
+                    type="number"
+                    value={config.fonts.clueInputSize}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!isNaN(value) && value >= 14 && value <= 36) {
+                        setConfig({
+                          ...config,
+                          fonts: { ...config.fonts, clueInputSize: value }
+                        });
+                      }
+                    }}
+                    className="w-20 bg-slate-900/50 border-slate-700 text-slate-100 text-center"
+                    min={14}
+                    max={36}
+                  />
+                  <span className="text-slate-400 text-sm">px</span>
+                </div>
+              </div>
               <p className="text-xs text-slate-400">
                 İstihbarat şefinin ipucu yazarken göreceği yazı boyutu
               </p>
