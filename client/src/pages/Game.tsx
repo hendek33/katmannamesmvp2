@@ -1598,7 +1598,7 @@ export default function Game() {
                       onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                       maxLength={20}
                       className="w-44 sm:w-56 text-center font-bold uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-12 sm:h-14 text-slate-100 placeholder:text-slate-500"
-                      style={{fontSize: "18px"}}
+                      style={{fontSize: "21px"}}
                     />
                     <div className="relative number-selector-container">
                       <div className="flex items-center gap-1">
