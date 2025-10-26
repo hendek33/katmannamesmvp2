@@ -1,6 +1,6 @@
 import type { GameState, Player, Card, CardType, Team, Clue, RoomListItem } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { getRandomWords, turkishWords } from "./words";
+import { getRandomWords } from "./words";
 
 interface RoomData {
   gameState: GameState;
@@ -43,15 +43,6 @@ export interface IStorage {
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean; globalTauntCooldown?: number; globalInsultCooldown?: number } | null;
-  
-  // Admin functions
-  getAllRooms(): { roomCode: string; gameState: GameState; playerCount: number; created: Date; }[];
-  closeRoom(roomCode: string): boolean;
-  kickPlayer(roomCode: string, playerId: string): boolean;
-  getGameWords(): string[];
-  addGameWord(word: string): boolean;
-  removeGameWord(word: string): boolean;
-  verifyAdminPassword(password: string): boolean;
 }
 
 // Insult templates
@@ -90,7 +81,6 @@ export class MemStorage implements IStorage {
   private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
   private insultCooldowns: Map<string, number>; // For V2 system
   private tauntCooldowns: Map<string, number>; // For taunt system
-  private gameWords: string[]; // In-memory word list that can be modified
 
   constructor() {
     this.rooms = new Map();
@@ -99,9 +89,6 @@ export class MemStorage implements IStorage {
     this.playerInsultCooldown = new Map();
     this.insultCooldowns = new Map(); // Initialize V2 cooldowns
     this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
-    
-    // Initialize with default word list (now imported at the top)
-    this.gameWords = [...turkishWords];
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
   }
@@ -184,15 +171,8 @@ export class MemStorage implements IStorage {
     roomData.cardImages = cardImages;
   }
 
-  private getRandomGameWords(count: number): string[] {
-    // Use the modifiable in-memory word list
-    const shuffled = [...this.gameWords].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, count);
-  }
-
   private createGameCards(): Card[] {
-    // Use the in-memory word list instead of the static import
-    const words = this.getRandomGameWords(25);
+    const words = getRandomWords(25);
     const cards: Card[] = [];
     
     const darkFirst = Math.random() > 0.5;
@@ -1262,87 +1242,6 @@ export class MemStorage implements IStorage {
       globalTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
       globalInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
     };
-  }
-
-  // Admin functions
-  getAllRooms(): { roomCode: string; gameState: GameState; playerCount: number; created: Date; }[] {
-    const roomList: { roomCode: string; gameState: GameState; playerCount: number; created: Date; }[] = [];
-    
-    this.rooms.forEach((roomData, roomCode) => {
-      roomList.push({
-        roomCode,
-        gameState: roomData.gameState,
-        playerCount: roomData.gameState.players.filter(p => !p.isBot).length,
-        created: new Date() // We would need to track creation date for this to be accurate
-      });
-    });
-    
-    return roomList;
-  }
-  
-  closeRoom(roomCode: string): boolean {
-    const room = this.rooms.get(roomCode);
-    if (!room) return false;
-    
-    // Remove all players from room mapping
-    room.gameState.players.forEach(player => {
-      this.playerToRoom.delete(player.id);
-    });
-    
-    // Remove the room
-    this.rooms.delete(roomCode);
-    return true;
-  }
-  
-  kickPlayer(roomCode: string, playerId: string): boolean {
-    const roomData = this.rooms.get(roomCode);
-    if (!roomData) return false;
-    
-    const playerIndex = roomData.gameState.players.findIndex(p => p.id === playerId);
-    if (playerIndex === -1) return false;
-    
-    // Remove player
-    roomData.gameState.players.splice(playerIndex, 1);
-    this.playerToRoom.delete(playerId);
-    return true;
-  }
-  
-  getGameWords(): string[] {
-    return [...this.gameWords]; // Return a copy of the word list
-  }
-  
-  addGameWord(word: string): boolean {
-    // Check if word already exists (case-insensitive)
-    const exists = this.gameWords.some(w => w.toLowerCase() === word.toLowerCase());
-    if (exists) {
-      return false;
-    }
-    
-    // Add the word to the in-memory list
-    this.gameWords.push(word);
-    return true;
-  }
-  
-  removeGameWord(word: string): boolean {
-    // Find the index of the word (case-insensitive)
-    const index = this.gameWords.findIndex(w => w.toLowerCase() === word.toLowerCase());
-    
-    if (index === -1) {
-      return false;
-    }
-    
-    // Remove the word from the in-memory list
-    this.gameWords.splice(index, 1);
-    return true;
-  }
-  
-  verifyAdminPassword(password: string): boolean {
-    // Use environment variable if available, otherwise fall back to default
-    // In production, this should use proper password hashing
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "katman2024admin";
-    
-    // Basic rate limiting could be added here to prevent brute force attacks
-    return password === ADMIN_PASSWORD;
   }
 }
 
