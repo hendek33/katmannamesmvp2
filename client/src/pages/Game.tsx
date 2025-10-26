@@ -1550,16 +1550,16 @@ export default function Game() {
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 50 }}>
               {/* Clue Display Card - Shows after clue is given */}
               {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
-                <Card className="px-4 py-2.5 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
-                  <div className="flex items-center gap-3">
+                <Card className="px-5 py-3 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
+                  <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
                       <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
                       <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-sm sm:text-base font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                        <span className="text-sm sm:text-base font-black text-white">{gameState.currentClue.count}</span>
+                      <span className="text-lg sm:text-xl font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                        <span className="text-base sm:text-lg font-black text-white">{gameState.currentClue.count}</span>
                       </div>
                     </div>
                     {/* End Turn Button for Guessers - Now inside the card */}
@@ -1598,7 +1598,7 @@ export default function Game() {
                       onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                       maxLength={20}
                       className="w-44 sm:w-56 text-center font-bold uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-12 sm:h-14 text-slate-100 placeholder:text-slate-500"
-                      style={{fontSize: "24px"}}
+                      style={{fontSize: "18px"}}
                     />
                     <div className="relative number-selector-container">
                       <div className="flex items-center gap-1">
