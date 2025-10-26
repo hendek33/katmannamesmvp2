@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils";
 import { CheckSquare } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import logoImg from "@assets/logoo.png";
-import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 interface GameCardProps {
   card: Card;
@@ -25,7 +24,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-  const { gameConfig } = useWebSocketContext();
 
   const getCardColors = () => {
     if (card.revealed || isSpymaster) {
@@ -244,10 +242,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             }}
             title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
             style={{
-              top: card.type === 'assassin' ? `${gameConfig.cardImages.assassinCardOffset}px` : `${gameConfig.cardImages.normalCardOffset}px`,
-              left: card.type === 'assassin' ? `${gameConfig.cardImages.assassinCardOffset}px` : `${gameConfig.cardImages.normalCardOffset}px`,
-              right: card.type === 'assassin' ? `${gameConfig.cardImages.assassinCardOffset}px` : `${gameConfig.cardImages.normalCardOffset}px`, 
-              bottom: card.type === 'assassin' ? `${gameConfig.cardImages.assassinCardOffset}px` : `${gameConfig.cardImages.normalCardOffset}px`,
+              top: card.type === 'assassin' ? '0px' : '-6px',
+              left: card.type === 'assassin' ? '0px' : '-6px',
+              right: card.type === 'assassin' ? '0px' : '-6px', 
+              bottom: card.type === 'assassin' ? '0px' : '-6px',
               backgroundImage: `url('${revealedImage}')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',

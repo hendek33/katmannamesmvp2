@@ -1,7 +1,6 @@
 import type { GameState, Player, Card, CardType, Team, Clue, RoomListItem } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { getRandomWords } from "./words";
-import { loadConfig, updateAdminConfig } from "./config-persistence";
 
 interface RoomData {
   gameState: GameState;
@@ -14,17 +13,6 @@ interface RoomData {
   insultEnabled?: boolean;
   globalTauntCooldown?: number; // Global taunt cooldown timestamp
   globalInsultCooldown?: number; // Global insult cooldown timestamp
-}
-
-export interface GameConfig {
-  cardImages: {
-    normalCardOffset: number;
-    assassinCardOffset: number;
-  };
-  fonts: {
-    clueInputSize: number;
-  };
-  // Future config options can be added here
 }
 
 export interface IStorage {
@@ -55,8 +43,6 @@ export interface IStorage {
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean; globalTauntCooldown?: number; globalInsultCooldown?: number } | null;
-  getGameConfig(): GameConfig;
-  updateGameConfig(config: GameConfig): void;
 }
 
 // Insult templates
@@ -95,7 +81,6 @@ export class MemStorage implements IStorage {
   private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
   private insultCooldowns: Map<string, number>; // For V2 system
   private tauntCooldowns: Map<string, number>; // For taunt system
-  private gameConfig: GameConfig;
 
   constructor() {
     this.rooms = new Map();
@@ -104,18 +89,6 @@ export class MemStorage implements IStorage {
     this.playerInsultCooldown = new Map();
     this.insultCooldowns = new Map(); // Initialize V2 cooldowns
     this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
-    
-    // Load config from persistent storage
-    const persistedConfig = loadConfig();
-    this.gameConfig = {
-      cardImages: {
-        normalCardOffset: persistedConfig.adminPanel.cardImageOffsetNormal,
-        assassinCardOffset: persistedConfig.adminPanel.cardImageOffsetAssassin
-      },
-      fonts: {
-        clueInputSize: persistedConfig.adminPanel.clueInputFontSize
-      }
-    };
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
   }
@@ -1269,20 +1242,6 @@ export class MemStorage implements IStorage {
       globalTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
       globalInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
     };
-  }
-
-  getGameConfig(): GameConfig {
-    return { ...this.gameConfig };
-  }
-
-  updateGameConfig(config: GameConfig): void {
-    this.gameConfig = { ...config };
-    // Save to persistent storage
-    updateAdminConfig({
-      cardImageOffsetNormal: config.cardImages.normalCardOffset,
-      cardImageOffsetAssassin: config.cardImages.assassinCardOffset,
-      clueInputFontSize: config.fonts.clueInputSize
-    });
   }
 }
 

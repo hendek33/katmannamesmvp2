@@ -25,7 +25,7 @@ import Lobby from "./Lobby";
 export default function Game() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { isConnected, gameState, playerId, roomCode, error, send, cardVotes, cardImages, gameConfig } = useWebSocketContext();
+  const { isConnected, gameState, playerId, roomCode, error, send, cardVotes, cardImages } = useWebSocketContext();
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
   const [showNumberSelector, setShowNumberSelector] = useState(false);
@@ -1598,7 +1598,7 @@ export default function Game() {
                       onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                       maxLength={20}
                       className="w-44 sm:w-56 text-center font-bold uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-12 sm:h-14 text-slate-100 placeholder:text-slate-500"
-                      style={{fontSize: `${gameConfig.fonts.clueInputSize}px`}}
+                      style={{fontSize: "21px"}}
                     />
                     <div className="relative number-selector-container">
                       <div className="flex items-center gap-1">
