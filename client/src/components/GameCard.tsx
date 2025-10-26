@@ -242,10 +242,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             }}
             title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
             style={{
-              top: card.type === 'assassin' ? '0px' : '-9px',
-              left: card.type === 'assassin' ? '0px' : '-9px',
-              right: card.type === 'assassin' ? '0px' : '-9px', 
-              bottom: card.type === 'assassin' ? '0px' : '-9px',
+              top: card.type === 'assassin' ? '0px' : '-5px',
+              left: card.type === 'assassin' ? '0px' : '-5px',
+              right: card.type === 'assassin' ? '0px' : '-5px', 
+              bottom: card.type === 'assassin' ? '0px' : '-5px',
               backgroundImage: `url('${revealedImage}')`,
               backgroundSize: card.type === 'assassin' ? 'contain' : 'cover',
               backgroundPosition: 'center',
