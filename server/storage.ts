@@ -1,6 +1,7 @@
 import type { GameState, Player, Card, CardType, Team, Clue, RoomListItem } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { getRandomWords } from "./words";
+import { loadConfig, updateAdminConfig } from "./config-persistence";
 
 interface RoomData {
   gameState: GameState;
@@ -94,6 +95,7 @@ export class MemStorage implements IStorage {
   private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
   private insultCooldowns: Map<string, number>; // For V2 system
   private tauntCooldowns: Map<string, number>; // For taunt system
+  private gameConfig: GameConfig;
 
   constructor() {
     this.rooms = new Map();
@@ -102,6 +104,18 @@ export class MemStorage implements IStorage {
     this.playerInsultCooldown = new Map();
     this.insultCooldowns = new Map(); // Initialize V2 cooldowns
     this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
+    
+    // Load config from persistent storage
+    const persistedConfig = loadConfig();
+    this.gameConfig = {
+      cardImages: {
+        normalCardOffset: persistedConfig.adminPanel.cardImageOffsetNormal,
+        assassinCardOffset: persistedConfig.adminPanel.cardImageOffsetAssassin
+      },
+      fonts: {
+        clueInputSize: persistedConfig.adminPanel.clueInputFontSize
+      }
+    };
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
   }
@@ -1257,22 +1271,18 @@ export class MemStorage implements IStorage {
     };
   }
 
-  private gameConfig: GameConfig = {
-    cardImages: {
-      normalCardOffset: -6,
-      assassinCardOffset: 0
-    },
-    fonts: {
-      clueInputSize: 21
-    }
-  };
-
   getGameConfig(): GameConfig {
     return { ...this.gameConfig };
   }
 
   updateGameConfig(config: GameConfig): void {
     this.gameConfig = { ...config };
+    // Save to persistent storage
+    updateAdminConfig({
+      cardImageOffsetNormal: config.cardImages.normalCardOffset,
+      cardImageOffsetAssassin: config.cardImages.assassinCardOffset,
+      clueInputFontSize: config.fonts.clueInputSize
+    });
   }
 }
 
