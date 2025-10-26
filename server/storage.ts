@@ -15,6 +15,17 @@ interface RoomData {
   globalInsultCooldown?: number; // Global insult cooldown timestamp
 }
 
+export interface GameConfig {
+  cardImages: {
+    normalCardOffset: number;
+    assassinCardOffset: number;
+  };
+  fonts: {
+    clueInputSize: number;
+  };
+  // Future config options can be added here
+}
+
 export interface IStorage {
   createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState };
   getRoom(roomCode: string): GameState | undefined;
@@ -43,6 +54,8 @@ export interface IStorage {
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean; globalTauntCooldown?: number; globalInsultCooldown?: number } | null;
+  getGameConfig(): GameConfig;
+  updateGameConfig(config: GameConfig): void;
 }
 
 // Insult templates
@@ -1242,6 +1255,24 @@ export class MemStorage implements IStorage {
       globalTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
       globalInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
     };
+  }
+
+  private gameConfig: GameConfig = {
+    cardImages: {
+      normalCardOffset: -6,
+      assassinCardOffset: 0
+    },
+    fonts: {
+      clueInputSize: 21
+    }
+  };
+
+  getGameConfig(): GameConfig {
+    return { ...this.gameConfig };
+  }
+
+  updateGameConfig(config: GameConfig): void {
+    this.gameConfig = { ...config };
   }
 }
 

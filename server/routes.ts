@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { z } from "zod";
 import { storage } from "./storage";
 import type { GameState } from "@shared/schema";
+import * as crypto from "crypto";
 import {
   createRoomSchema,
   joinRoomSchema,
@@ -127,7 +128,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             sendToClient(ws, {
               type: "room_created",
-              payload: { roomCode, playerId, gameState: getFilteredGameState(gameState, playerId) },
+              payload: { 
+                roomCode, 
+                playerId, 
+                gameState: getFilteredGameState(gameState, playerId),
+                config: storage.getGameConfig()
+              },
             });
             break;
           }
@@ -177,7 +183,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               payload: { 
                 playerId, 
                 gameState: getFilteredGameState(gameState, playerId),
-                cardImages: cardImages || {}
+                cardImages: cardImages || {},
+                config: storage.getGameConfig()
               },
             });
             
@@ -1000,6 +1007,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   wss.on("close", () => {
     clearInterval(interval);
+  });
+
+  // Admin authentication state
+  const adminSessions = new Map<string, number>(); // token -> expiry timestamp
+  
+  // Generate secure token
+  const generateToken = () => {
+    const randomBytes = crypto.randomBytes(32);
+    return randomBytes.toString('hex');
+  };
+  
+  // Verify admin token
+  const verifyAdminToken = (token: string): boolean => {
+    const expiry = adminSessions.get(token);
+    if (!expiry) return false;
+    if (Date.now() > expiry) {
+      adminSessions.delete(token);
+      return false;
+    }
+    return true;
+  };
+  
+  // Admin routes
+  app.post("/api/admin/login", (req, res) => {
+    const { password } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    
+    if (!adminPassword || password !== adminPassword) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+    
+    // Generate session token
+    const token = generateToken();
+    const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+    adminSessions.set(token, expiryTime);
+    
+    return res.json({ success: true, token });
+  });
+
+  app.get("/api/admin/config", (req, res) => {
+    // Require authentication
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+    
+    if (!token || !verifyAdminToken(token)) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    const config = storage.getGameConfig();
+    res.json(config);
+  });
+
+  app.post("/api/admin/config", (req, res) => {
+    const { config } = req.body;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+    
+    if (!token || !verifyAdminToken(token)) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    
+    storage.updateGameConfig(config);
+    
+    // Broadcast config update to all connected clients
+    wss.clients.forEach((client: WSClient) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({
+          type: "config_update",
+          payload: config
+        }));
+      }
+    });
+    
+    res.json({ success: true, config });
   });
 
   return httpServer;

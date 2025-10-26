@@ -16,6 +16,15 @@ export function useWebSocket() {
   const [roomsList, setRoomsList] = useState<RoomListItem[]>([]);
   const [cardVotes, setCardVotes] = useState<Record<number, string[]>>({});
   const [cardImages, setCardImages] = useState<Record<number, string>>({});
+  const [gameConfig, setGameConfig] = useState({
+    cardImages: {
+      normalCardOffset: -6,
+      assassinCardOffset: 0
+    },
+    fonts: {
+      clueInputSize: 21
+    }
+  });
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -85,6 +94,9 @@ export function useWebSocket() {
                 setPlayerId(message.payload.playerId);
                 setRoomCode(message.payload.roomCode);
                 setGameState(message.payload.gameState);
+                if (message.payload.config) {
+                  setGameConfig(message.payload.config);
+                }
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.roomCode);
                 break;
@@ -95,6 +107,9 @@ export function useWebSocket() {
                 setRoomCode(message.payload.gameState.roomCode);
                 if (message.payload.cardImages) {
                   setCardImages(message.payload.cardImages);
+                }
+                if (message.payload.config) {
+                  setGameConfig(message.payload.config);
                 }
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.gameState.roomCode);
@@ -145,6 +160,11 @@ export function useWebSocket() {
                 
               case "pong":
                 // Server acknowledged our ping, connection is alive
+                break;
+                
+              case "config_update":
+                // Update game configuration from admin panel
+                setGameConfig(message.payload);
                 break;
             }
           } catch (err) {
@@ -225,6 +245,7 @@ export function useWebSocket() {
     roomsList,
     cardVotes,
     cardImages,
+    gameConfig,
     send,
   };
 }

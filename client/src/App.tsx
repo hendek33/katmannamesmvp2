@@ -12,6 +12,7 @@ import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
 import Game from "@/pages/Game";
 import GameEnd from "@/pages/GameEnd";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/lobby" component={Lobby} />
       <Route path="/game" component={Game} />
       <Route path="/end" component={GameEnd} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );

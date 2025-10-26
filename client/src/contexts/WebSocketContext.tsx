@@ -2,6 +2,16 @@ import { createContext, useContext, ReactNode } from "react";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import type { GameState, RoomListItem } from "@shared/schema";
 
+interface GameConfig {
+  cardImages: {
+    normalCardOffset: number;
+    assassinCardOffset: number;
+  };
+  fonts: {
+    clueInputSize: number;
+  };
+}
+
 interface WebSocketContextType {
   isConnected: boolean;
   gameState: GameState | null;
@@ -11,6 +21,7 @@ interface WebSocketContextType {
   roomsList: RoomListItem[];
   cardVotes: Record<number, string[]>;
   cardImages: Record<number, string>;
+  gameConfig: GameConfig;
   send: (type: string, payload: any) => void;
 }
 
