@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 import { storage } from "./storage";
 import type { GameState } from "@shared/schema";
 import {
@@ -31,6 +32,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
   const roomClients = new Map<string, Set<WSClient>>();
+  
+  // Store valid admin tokens with expiry times (in-memory for this demo)
+  const adminTokens = new Map<string, { expires: number }>();
 
   function broadcastToRoom(roomCode: string, message: any, excludeClient?: WSClient) {
     const clients = roomClients.get(roomCode);
@@ -1000,6 +1004,218 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   wss.on("close", () => {
     clearInterval(interval);
+  });
+
+  // Clean up expired tokens periodically
+  setInterval(() => {
+    const now = Date.now();
+    for (const [token, data] of adminTokens.entries()) {
+      if (data.expires < now) {
+        adminTokens.delete(token);
+      }
+    }
+  }, 60000); // Check every minute
+
+  // Admin API routes
+  app.post("/api/admin/login", (req, res) => {
+    try {
+      const { password } = req.body;
+      
+      if (!password) {
+        return res.status(400).json({ error: "Şifre gerekli" });
+      }
+      
+      const isValid = storage.verifyAdminPassword(password);
+      
+      if (isValid) {
+        // Generate a secure random token
+        const token = "admin-" + randomUUID();
+        
+        // Store token with 1 hour expiry
+        const expires = Date.now() + 3600000; // 1 hour
+        adminTokens.set(token, { expires });
+        
+        res.json({ 
+          success: true, 
+          token,
+          expiresIn: 3600 // seconds
+        });
+      } else {
+        res.status(401).json({ error: "Geçersiz şifre" });
+      }
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
+  });
+  
+  // Middleware to check admin auth - now actually verifies the token
+  const checkAdminAuth = (req: any, res: any, next: any) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: "Yetkilendirme gerekli" });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    const tokenData = adminTokens.get(token);
+    
+    if (!tokenData) {
+      return res.status(401).json({ error: "Geçersiz token" });
+    }
+    
+    if (tokenData.expires < Date.now()) {
+      adminTokens.delete(token);
+      return res.status(401).json({ error: "Token süresi dolmuş" });
+    }
+    
+    // Token is valid - extend expiry
+    tokenData.expires = Date.now() + 3600000; // Extend by 1 hour
+    next();
+  };
+  
+  app.get("/api/admin/rooms", checkAdminAuth, (req, res) => {
+    try {
+      const rooms = storage.getAllRooms();
+      res.json(rooms);
+    } catch (error) {
+      console.error("Get rooms error:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
+  });
+  
+  app.post("/api/admin/rooms/:roomCode/close", checkAdminAuth, (req, res) => {
+    try {
+      const { roomCode } = req.params;
+      
+      // First check if room exists and get its clients
+      const clients = roomClients.get(roomCode);
+      
+      const success = storage.closeRoom(roomCode);
+      
+      if (success) {
+        // Notify all clients in the room that it's being closed
+        if (clients) {
+          broadcastToRoom(roomCode, {
+            type: "room_closed",
+            payload: { message: "Oda yönetici tarafından kapatıldı" }
+          });
+          
+          // Disconnect all clients from this room
+          clients.forEach(client => {
+            client.roomCode = undefined;
+            client.playerId = undefined;
+            client.close();
+          });
+          
+          // Clean up the room from roomClients
+          roomClients.delete(roomCode);
+        }
+        
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Oda bulunamadı" });
+      }
+    } catch (error) {
+      console.error("Close room error:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
+  });
+  
+  app.post("/api/admin/rooms/:roomCode/kick/:playerId", checkAdminAuth, (req, res) => {
+    try {
+      const { roomCode, playerId } = req.params;
+      
+      // Find the client to kick
+      const clients = roomClients.get(roomCode);
+      let kickedClient: WSClient | undefined;
+      
+      if (clients) {
+        kickedClient = Array.from(clients).find(c => c.playerId === playerId);
+      }
+      
+      const success = storage.kickPlayer(roomCode, playerId);
+      
+      if (success) {
+        // Notify the kicked player
+        if (kickedClient) {
+          sendToClient(kickedClient, {
+            type: "player_kicked",
+            payload: { message: "Yönetici tarafından odadan atıldınız" }
+          });
+          
+          // Remove the client from the room
+          kickedClient.roomCode = undefined;
+          kickedClient.playerId = undefined;
+          kickedClient.close();
+          
+          if (clients) {
+            clients.delete(kickedClient);
+          }
+        }
+        
+        // Notify remaining players in the room
+        const room = storage.getRoom(roomCode);
+        if (room) {
+          broadcastToRoom(roomCode, {
+            type: "player_left",
+            payload: { gameState: room }
+          });
+        }
+        
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Oyuncu veya oda bulunamadı" });
+      }
+    } catch (error) {
+      console.error("Kick player error:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
+  });
+  
+  app.get("/api/admin/words", checkAdminAuth, (req, res) => {
+    try {
+      const words = storage.getGameWords();
+      res.json(words);
+    } catch (error) {
+      console.error("Get words error:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
+  });
+  
+  app.post("/api/admin/words", checkAdminAuth, (req, res) => {
+    try {
+      const { word } = req.body;
+      if (!word) {
+        return res.status(400).json({ error: "Kelime gerekli" });
+      }
+      
+      const success = storage.addGameWord(word);
+      if (success) {
+        res.json({ success: true });
+      } else {
+        res.status(400).json({ error: "Kelime eklenemedi" });
+      }
+    } catch (error) {
+      console.error("Add word error:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
+  });
+  
+  app.delete("/api/admin/words/:word", checkAdminAuth, (req, res) => {
+    try {
+      const { word } = req.params;
+      const success = storage.removeGameWord(word);
+      
+      if (success) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "Kelime bulunamadı" });
+      }
+    } catch (error) {
+      console.error("Remove word error:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
   });
 
   return httpServer;

@@ -49,6 +49,8 @@ export const turkishWords = [
   "Kütüphane", "Müze", "Sinema", "Tiyatro", "Opera"
 ];
 
+// This function is now deprecated - use storage.getRandomGameWords() instead
+// Kept for backward compatibility
 export function getRandomWords(count: number): string[] {
   const shuffled = [...turkishWords].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
