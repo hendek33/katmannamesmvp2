@@ -273,6 +273,44 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         </button>
       )}
       
+      {/* Game ended color reveal overlay */}
+      {gameEnded && !card.revealed && (
+        <div 
+          className="absolute inset-0 rounded-lg pointer-events-none"
+          style={{
+            background: card.type === 'dark' 
+              ? 'rgba(59, 130, 246, 0.5)' // Blue overlay for dark team
+              : card.type === 'light'
+              ? 'rgba(239, 68, 68, 0.5)' // Red overlay for light team  
+              : card.type === 'neutral'
+              ? 'rgba(156, 163, 175, 0.5)' // Gray overlay for neutral
+              : 'rgba(0, 0, 0, 0.8)', // Black overlay for assassin
+            border: '2px solid ' + (
+              card.type === 'dark' ? '#3b82f6' :
+              card.type === 'light' ? '#ef4444' :
+              card.type === 'neutral' ? '#9ca3af' :
+              '#000000'
+            ),
+            zIndex: 25
+          }}
+        >
+          <div className="absolute top-1 left-1 bg-white/90 rounded px-1 py-0.5">
+            <span className={cn(
+              "text-[8px] font-bold uppercase",
+              card.type === 'dark' ? "text-blue-600" :
+              card.type === 'light' ? "text-red-600" :
+              card.type === 'neutral' ? "text-gray-600" :
+              "text-black"
+            )}>
+              {card.type === 'dark' ? "MAVİ" :
+               card.type === 'light' ? "KIRMIZI" :
+               card.type === 'neutral' ? "NÖTR" :
+               "SUİKASTÇI"}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Voters display */}
       {voters.length > 0 && !card.revealed && (
         <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 z-[5] max-w-[85%]">
