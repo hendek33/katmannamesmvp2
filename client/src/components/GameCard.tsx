@@ -26,7 +26,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const cardRef = useRef<HTMLDivElement>(null);
 
   const getCardColors = () => {
-    if (card.revealed || isSpymaster) {
+    // Show colors for: revealed cards, spymasters, or unrevealed cards when game ends
+    if (card.revealed || isSpymaster || (gameEnded && !card.revealed)) {
       switch (card.type) {
         case "dark":
           return {
@@ -78,9 +79,9 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   
   
   
-  // Preload image when card is revealed or game ends
+  // Preload image when card is revealed
   useEffect(() => {
-    if ((card.revealed || gameEnded) && revealedImage) {
+    if (card.revealed && revealedImage) {
       const img = new Image();
       img.onload = () => setImageLoaded(true);
       img.src = revealedImage;
@@ -88,7 +89,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       setImageLoaded(false);
       setIsLifted(false); // Reset lift state when card is unrevealed
     }
-  }, [card.revealed, gameEnded, revealedImage]);
+  }, [card.revealed, revealedImage]);
 
   return (
     <div
@@ -271,44 +272,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         >
           <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
         </button>
-      )}
-      
-      {/* Game ended color reveal overlay - only for unrevealed cards */}
-      {gameEnded && !card.revealed && (
-        <div 
-          className="absolute inset-0 rounded-lg pointer-events-none"
-          style={{
-            background: card.type === 'dark' 
-              ? 'rgba(59, 130, 246, 0.5)' // Blue overlay for dark team
-              : card.type === 'light'
-              ? 'rgba(239, 68, 68, 0.5)' // Red overlay for light team  
-              : card.type === 'neutral'
-              ? 'rgba(156, 163, 175, 0.5)' // Gray overlay for neutral
-              : 'rgba(0, 0, 0, 0.8)', // Black overlay for assassin
-            border: '2px solid ' + (
-              card.type === 'dark' ? '#3b82f6' :
-              card.type === 'light' ? '#ef4444' :
-              card.type === 'neutral' ? '#9ca3af' :
-              '#000000'
-            ),
-            zIndex: 25
-          }}
-        >
-          <div className="absolute top-1 left-1 bg-white/90 rounded px-1 py-0.5">
-            <span className={cn(
-              "text-[8px] font-bold uppercase",
-              card.type === 'dark' ? "text-blue-600" :
-              card.type === 'light' ? "text-red-600" :
-              card.type === 'neutral' ? "text-gray-600" :
-              "text-black"
-            )}>
-              {card.type === 'dark' ? "MAVİ" :
-               card.type === 'light' ? "KIRMIZI" :
-               card.type === 'neutral' ? "NÖTR" :
-               "SUİKASTÇI"}
-            </span>
-          </div>
-        </div>
       )}
 
       {/* Voters display */}
