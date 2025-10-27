@@ -78,9 +78,9 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   
   
   
-  // Preload image when card is revealed
+  // Preload image when card is revealed or game ends
   useEffect(() => {
-    if (card.revealed && revealedImage) {
+    if ((card.revealed || gameEnded) && revealedImage) {
       const img = new Image();
       img.onload = () => setImageLoaded(true);
       img.src = revealedImage;
@@ -88,7 +88,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       setImageLoaded(false);
       setIsLifted(false); // Reset lift state when card is unrevealed
     }
-  }, [card.revealed, revealedImage]);
+  }, [card.revealed, gameEnded, revealedImage]);
 
   return (
     <div
