@@ -78,17 +78,17 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   
   
   
-  // Preload image when card is revealed or game ends
+  // Preload image when card is revealed
   useEffect(() => {
-    if ((card.revealed || gameEnded) && revealedImage) {
+    if (card.revealed && revealedImage) {
       const img = new Image();
       img.onload = () => setImageLoaded(true);
       img.src = revealedImage;
-    } else if (!gameEnded) {
+    } else {
       setImageLoaded(false);
       setIsLifted(false); // Reset lift state when card is unrevealed
     }
-  }, [card.revealed, gameEnded, revealedImage]);
+  }, [card.revealed, revealedImage]);
 
   return (
     <div
@@ -97,8 +97,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         "relative rounded-lg border-[8px] p-0.5 sm:p-1 lg:p-1.5 w-full",
         "aspect-[3/2]",
         "flex flex-col",
-        !card.revealed && !gameEnded && "overflow-hidden",
-        (card.revealed || gameEnded) && "overflow-visible",
+        !card.revealed && "overflow-hidden",
+        card.revealed && "overflow-visible",
         "transition-all transform-gpu duration-200",
         colors.border,
         colors.bg,
@@ -199,7 +199,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           backgroundRepeat: 'no-repeat',
           opacity: 0.15,
           filter: 'grayscale(100%)',
-          zIndex: (card.revealed || gameEnded) ? 1 : 10
+          zIndex: card.revealed ? 1 : 10
         }}
       />
       
@@ -223,7 +223,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       )}
       
       {/* Revealed card overlay with 3D container - drops in after image loads */}
-      {(card.revealed || gameEnded) && imageLoaded && revealedImage && (
+      {card.revealed && imageLoaded && revealedImage && (
         <div 
           className="absolute inset-0 card-3d-container"
           style={{
@@ -273,6 +273,43 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         </button>
       )}
       
+      {/* Game ended color reveal overlay - only for unrevealed cards */}
+      {gameEnded && !card.revealed && (
+        <div 
+          className="absolute inset-0 rounded-lg pointer-events-none"
+          style={{
+            background: card.type === 'dark' 
+              ? 'rgba(59, 130, 246, 0.5)' // Blue overlay for dark team
+              : card.type === 'light'
+              ? 'rgba(239, 68, 68, 0.5)' // Red overlay for light team  
+              : card.type === 'neutral'
+              ? 'rgba(156, 163, 175, 0.5)' // Gray overlay for neutral
+              : 'rgba(0, 0, 0, 0.8)', // Black overlay for assassin
+            border: '2px solid ' + (
+              card.type === 'dark' ? '#3b82f6' :
+              card.type === 'light' ? '#ef4444' :
+              card.type === 'neutral' ? '#9ca3af' :
+              '#000000'
+            ),
+            zIndex: 25
+          }}
+        >
+          <div className="absolute top-1 left-1 bg-white/90 rounded px-1 py-0.5">
+            <span className={cn(
+              "text-[8px] font-bold uppercase",
+              card.type === 'dark' ? "text-blue-600" :
+              card.type === 'light' ? "text-red-600" :
+              card.type === 'neutral' ? "text-gray-600" :
+              "text-black"
+            )}>
+              {card.type === 'dark' ? "MAVİ" :
+               card.type === 'light' ? "KIRMIZI" :
+               card.type === 'neutral' ? "NÖTR" :
+               "SUİKASTÇI"}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Voters display */}
       {voters.length > 0 && !card.revealed && (
