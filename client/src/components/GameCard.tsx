@@ -248,7 +248,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         >
           <div 
             className={cn(
-              "absolute cursor-pointer animate-card-drop rounded-lg",
+              "absolute cursor-pointer rounded-lg",
               isLifted ? "card-lifted" : "card-not-lifted"
             )}
             onClick={(e) => {
