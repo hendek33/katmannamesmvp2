@@ -16,7 +16,7 @@ interface RoomData {
 }
 
 export interface IStorage {
-  createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState };
+  createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState } | null;
   getRoom(roomCode: string): GameState | undefined;
   joinRoom(roomCode: string, username: string, password?: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null;
   listRooms(): RoomListItem[];
@@ -81,6 +81,8 @@ export class MemStorage implements IStorage {
   private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
   private insultCooldowns: Map<string, number>; // For V2 system
   private tauntCooldowns: Map<string, number>; // For taunt system
+  private activeUsernames: Map<string, string>; // username -> playerId, tracks active usernames globally
+  private playerIdToUsername: Map<string, string>; // playerId -> username for cleanup
 
   constructor() {
     this.rooms = new Map();
@@ -89,6 +91,8 @@ export class MemStorage implements IStorage {
     this.playerInsultCooldown = new Map();
     this.insultCooldowns = new Map(); // Initialize V2 cooldowns
     this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
+    this.activeUsernames = new Map(); // Track active usernames globally
+    this.playerIdToUsername = new Map(); // Track playerId to username mapping
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
   }
@@ -200,9 +204,18 @@ export class MemStorage implements IStorage {
     return cards;
   }
 
-  createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState } {
+  createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState } | null {
+    // Check if username is already taken globally
+    if (this.activeUsernames.has(ownerUsername.toLowerCase())) {
+      return null; // Username already in use
+    }
+
     const roomCode = this.generateRoomCode();
     const playerId = randomUUID();
+    
+    // Register username globally
+    this.activeUsernames.set(ownerUsername.toLowerCase(), playerId);
+    this.playerIdToUsername.set(playerId, ownerUsername.toLowerCase());
     
     const player: Player = {
       id: playerId,
@@ -265,16 +278,25 @@ export class MemStorage implements IStorage {
     if (reconnectPlayerId) {
       const existingPlayer = room.players.find(p => p.id === reconnectPlayerId && p.username === username);
       if (existingPlayer) {
-        this.playerToRoom.set(existingPlayer.id, roomCode);
-        return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
+        // Check if this username belongs to this playerId
+        if (this.playerIdToUsername.get(existingPlayer.id) === username.toLowerCase()) {
+          this.playerToRoom.set(existingPlayer.id, roomCode);
+          return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
+        }
       }
     }
 
-    // Check if reconnecting by username
-    if (room.players.some(p => p.username === username)) {
-      const existingPlayer = room.players.find(p => p.username === username)!;
-      this.playerToRoom.set(existingPlayer.id, roomCode);
-      return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
+    // Check if reconnecting by username - only allow if it's the same player
+    const existingPlayerId = this.activeUsernames.get(username.toLowerCase());
+    if (existingPlayerId) {
+      // Check if this player is in this room
+      const existingPlayer = room.players.find(p => p.id === existingPlayerId);
+      if (existingPlayer) {
+        this.playerToRoom.set(existingPlayer.id, roomCode);
+        return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
+      }
+      // Username is taken by someone else globally - reject
+      return null;
     }
 
     // For new players, check password
@@ -283,6 +305,11 @@ export class MemStorage implements IStorage {
     }
 
     const playerId = randomUUID();
+    
+    // Register username globally
+    this.activeUsernames.set(username.toLowerCase(), playerId);
+    this.playerIdToUsername.set(playerId, username.toLowerCase());
+    
     const player: Player = {
       id: playerId,
       username,
