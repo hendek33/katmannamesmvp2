@@ -112,23 +112,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            const { roomCode, playerId, gameState } = storage.createRoom(
-              validation.data.username,
-              validation.data.password
-            );
-            
-            ws.playerId = playerId;
-            ws.roomCode = roomCode;
+            try {
+              const { roomCode, playerId, gameState } = storage.createRoom(
+                validation.data.username,
+                validation.data.password
+              );
+              
+              ws.playerId = playerId;
+              ws.roomCode = roomCode;
 
-            if (!roomClients.has(roomCode)) {
-              roomClients.set(roomCode, new Set());
+              if (!roomClients.has(roomCode)) {
+                roomClients.set(roomCode, new Set());
+              }
+              roomClients.get(roomCode)!.add(ws);
+
+              sendToClient(ws, {
+                type: "room_created",
+                payload: { roomCode, playerId, gameState: getFilteredGameState(gameState, playerId) },
+              });
+            } catch (error: any) {
+              sendToClient(ws, { type: "error", payload: { message: error.message } });
             }
-            roomClients.get(roomCode)!.add(ws);
-
-            sendToClient(ws, {
-              type: "room_created",
-              payload: { roomCode, playerId, gameState: getFilteredGameState(gameState, playerId) },
-            });
             break;
           }
 
@@ -136,6 +140,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const validation = joinRoomSchema.safeParse(payload);
             if (!validation.success) {
               sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+
+            // Check if username is available before attempting to join
+            if (!validation.data.playerId && !storage.checkUsernameAvailable(validation.data.username)) {
+              sendToClient(ws, { type: "error", payload: { message: "Bu kullanıcı adı zaten kullanımda!" } });
               return;
             }
 
@@ -937,6 +947,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             sendToClient(ws, {
               type: "room_features",
               payload: features,
+            });
+            break;
+          }
+
+          case "check_username": {
+            const username = payload.username;
+            if (!username || typeof username !== "string") {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz kullanıcı adı" } });
+              return;
+            }
+
+            const isAvailable = storage.checkUsernameAvailable(username);
+            sendToClient(ws, {
+              type: "username_availability",
+              payload: { username, available: isAvailable },
             });
             break;
           }

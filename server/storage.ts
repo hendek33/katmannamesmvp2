@@ -16,6 +16,7 @@ interface RoomData {
 }
 
 export interface IStorage {
+  checkUsernameAvailable(username: string): boolean;
   createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState };
   getRoom(roomCode: string): GameState | undefined;
   joinRoom(roomCode: string, username: string, password?: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null;
@@ -81,6 +82,7 @@ export class MemStorage implements IStorage {
   private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
   private insultCooldowns: Map<string, number>; // For V2 system
   private tauntCooldowns: Map<string, number>; // For taunt system
+  private globalUsernames: Set<string>; // Track all usernames globally
 
   constructor() {
     this.rooms = new Map();
@@ -89,6 +91,7 @@ export class MemStorage implements IStorage {
     this.playerInsultCooldown = new Map();
     this.insultCooldowns = new Map(); // Initialize V2 cooldowns
     this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
+    this.globalUsernames = new Set(); // Initialize global username tracking
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
   }
@@ -100,6 +103,10 @@ export class MemStorage implements IStorage {
       code += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return this.rooms.has(code) ? this.generateRoomCode() : code;
+  }
+
+  checkUsernameAvailable(username: string): boolean {
+    return !this.globalUsernames.has(username.toLowerCase());
   }
 
   private assignCardImages(roomData: RoomData): void {
@@ -201,8 +208,16 @@ export class MemStorage implements IStorage {
   }
 
   createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState } {
+    // Check if username is available
+    if (!this.checkUsernameAvailable(ownerUsername)) {
+      throw new Error("Bu kullanıcı adı zaten kullanımda!");
+    }
+    
     const roomCode = this.generateRoomCode();
     const playerId = randomUUID();
+    
+    // Add username to global set
+    this.globalUsernames.add(ownerUsername.toLowerCase());
     
     const player: Player = {
       id: playerId,
@@ -270,17 +285,25 @@ export class MemStorage implements IStorage {
       }
     }
 
-    // Check if reconnecting by username
+    // Check if reconnecting by username in same room
     if (room.players.some(p => p.username === username)) {
       const existingPlayer = room.players.find(p => p.username === username)!;
       this.playerToRoom.set(existingPlayer.id, roomCode);
       return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
     }
 
-    // For new players, check password
+    // For new players, check if username is available globally
+    if (!this.checkUsernameAvailable(username)) {
+      return null; // Username already taken globally
+    }
+
+    // Check password
     if (roomData.password && roomData.password !== password) {
       return null;
     }
+
+    // Add username to global set
+    this.globalUsernames.add(username.toLowerCase());
 
     const playerId = randomUUID();
     const player: Player = {
@@ -1045,6 +1068,15 @@ export class MemStorage implements IStorage {
     if (!roomData) return;
     const room = roomData.gameState;
 
+    // Find the player to get their username
+    const player = room.players.find(p => p.id === playerId);
+    if (player) {
+      // Remove username from global tracking (bots don't have global usernames)
+      if (!player.isBot) {
+        this.globalUsernames.delete(player.username.toLowerCase());
+      }
+    }
+
     room.players = room.players.filter(p => p.id !== playerId);
     this.playerToRoom.delete(playerId);
 
@@ -1058,6 +1090,12 @@ export class MemStorage implements IStorage {
   cleanupEmptyRooms(): void {
     Array.from(this.rooms.entries()).forEach(([roomCode, roomData]) => {
       if (roomData.gameState.players.length === 0) {
+        // Also remove all player usernames from global tracking when room is deleted
+        roomData.gameState.players.forEach(player => {
+          if (!player.isBot) {
+            this.globalUsernames.delete(player.username.toLowerCase());
+          }
+        });
         this.rooms.delete(roomCode);
       }
     });
