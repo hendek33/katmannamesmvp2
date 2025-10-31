@@ -23,6 +23,7 @@ interface GameCardProps {
 export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false, isKnownCard = false }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
+  const [isRevealing, setIsRevealing] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const getCardColors = () => {
@@ -82,12 +83,20 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   // Preload image when card is revealed
   useEffect(() => {
     if (card.revealed && revealedImage) {
+      // Trigger reveal animation
+      setIsRevealing(true);
+      
       const img = new Image();
-      img.onload = () => setImageLoaded(true);
+      img.onload = () => {
+        setImageLoaded(true);
+        // Remove revealing state after animation completes
+        setTimeout(() => setIsRevealing(false), 600);
+      };
       img.src = revealedImage;
     } else {
       setImageLoaded(false);
       setIsLifted(false); // Reset lift state when card is unrevealed
+      setIsRevealing(false);
     }
   }, [card.revealed, revealedImage]);
 
@@ -107,7 +116,12 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         !card.revealed && "cursor-pointer",
         card.revealed && "cursor-pointer",
         "ring-2 ring-black/20",
-        card.revealed && !isAssassinCard && !isLastCard && "animate-pulse-once",
+        // Animation classes
+        isRevealing && "animate-card-flip animate-reveal-glow",
+        card.revealed && !isRevealing && !isAssassinCard && !isLastCard && "animate-pulse-once",
+        card.revealed && card.type === "dark" && !isRevealing && "animate-card-success",
+        card.revealed && card.type === "light" && !isRevealing && "animate-card-success",
+        card.revealed && card.type === "neutral" && !isRevealing && "animate-card-shake",
         isAssassinCard && gameEnded && "animate-assassin-reveal",
         isLastCard && gameEnded && !isAssassinCard && "border-green-500 ring-4 ring-green-400/50",
         "shadow-inner",
