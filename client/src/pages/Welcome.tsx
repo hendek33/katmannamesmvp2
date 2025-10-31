@@ -128,8 +128,7 @@ export default function Welcome() {
 
   const handleContinue = () => {
     if (username.trim().length >= 2 && !usernameError && !isCheckingUsername) {
-      // Reserve the username
-      send("reserve_username", { username: username.trim() });
+      // No need to reserve username here - it will be handled when creating/joining room
       localStorage.setItem("katmannames_username", username.trim());
       navigate("/rooms");
     }

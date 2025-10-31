@@ -208,15 +208,25 @@ export class MemStorage implements IStorage {
   }
 
   createRoom(ownerUsername: string, password?: string): { roomCode: string; playerId: string; gameState: GameState } | null {
-    // Check if username is already taken globally
-    if (this.activeUsernames.has(ownerUsername.toLowerCase())) {
-      return null; // Username already in use
-    }
-
     const roomCode = this.generateRoomCode();
     const playerId = randomUUID();
     
-    // Register username globally
+    // Check if username is reserved or taken by another player
+    const existingPlayerId = this.activeUsernames.get(ownerUsername.toLowerCase());
+    if (existingPlayerId) {
+      // If it's a temporary reservation (from reserve_username), replace it
+      const existingRoom = this.playerToRoom.get(existingPlayerId);
+      if (!existingRoom) {
+        // This is just a reservation, we can replace it
+        this.activeUsernames.delete(ownerUsername.toLowerCase());
+        this.playerIdToUsername.delete(existingPlayerId);
+      } else {
+        // Username is actually in use by another player in a room
+        return null;
+      }
+    }
+    
+    // Register username globally with the actual playerId
     this.activeUsernames.set(ownerUsername.toLowerCase(), playerId);
     this.playerIdToUsername.set(playerId, ownerUsername.toLowerCase());
     
@@ -298,8 +308,17 @@ export class MemStorage implements IStorage {
         this.playerToRoom.set(existingPlayer.id, roomCode);
         return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
       }
-      // Username is taken by someone else globally - reject
-      return null;
+      
+      // Check if it's just a reservation (not in any room)
+      const existingRoom = this.playerToRoom.get(existingPlayerId);
+      if (!existingRoom) {
+        // This is just a reservation, we can replace it
+        this.activeUsernames.delete(username.toLowerCase());
+        this.playerIdToUsername.delete(existingPlayerId);
+      } else {
+        // Username is taken by someone in another room - reject
+        return null;
+      }
     }
 
     // For new players, check password
