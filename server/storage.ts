@@ -302,13 +302,18 @@ export class MemStorage implements IStorage {
     const roomList: RoomListItem[] = [];
     
     this.rooms.forEach((roomData) => {
+      // Find the room owner's name
+      const owner = roomData.gameState.players.find(p => p.isRoomOwner);
+      const ownerName = owner ? owner.username : "Unknown";
+      
       roomList.push({
         roomCode: roomData.gameState.roomCode,
         playerCount: roomData.gameState.players.length,
         hasPassword: roomData.gameState.hasPassword,
         phase: roomData.gameState.phase,
         createdAt: roomData.gameState.createdAt,
-      });
+        ownerName: ownerName,
+      } as any); // Cast to any to add ownerName without modifying shared schema
     });
 
     // Sort by creation time, newest first

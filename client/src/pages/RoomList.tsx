@@ -129,7 +129,7 @@ export default function RoomList() {
                   <p className="text-xs mt-2">İlk odayı sen oluştur!</p>
                 </div>
               ) : (
-                roomsList.map((room: RoomListItem) => (
+                roomsList.map((room: RoomListItem & { ownerName?: string }) => (
                   <Card 
                     key={room.roomCode}
                     className="bg-slate-800/80 border-slate-700 hover:bg-slate-800 transition-all cursor-pointer group"
@@ -137,9 +137,14 @@ export default function RoomList() {
                   >
                     <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-bold text-white">
+                            {room.ownerName ? `${room.ownerName}'in Odası` : "Oda"}
+                          </span>
+                        </div>
                         <div className="flex items-center gap-2 text-slate-300">
                           <Users className="w-4 h-4 text-orange-400" />
-                          <span className="text-lg font-semibold text-white">{room.playerCount} Oyuncu</span>
+                          <span className="text-sm font-semibold text-white">{room.playerCount} Oyuncu</span>
                         </div>
                         {room.hasPassword && (
                           <div className="flex items-center gap-1 text-yellow-400">

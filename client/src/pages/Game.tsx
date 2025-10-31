@@ -113,9 +113,9 @@ export default function Game() {
         const img = new Image();
         img.onload = () => {
           loadedCount++;
-          // Log progress for debugging (optional)
+          // Log progress for debugging
           if (loadedCount === totalImages) {
-            console.log('Tüm kart görselleri yüklendi');
+            console.log(`Tüm kart görselleri yüklendi (${totalImages} adet)`);
             setImagesPreloaded(true);
           }
           resolve();
