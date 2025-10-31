@@ -20,6 +20,9 @@ export interface IStorage {
   getRoom(roomCode: string): GameState | undefined;
   joinRoom(roomCode: string, username: string, password?: string, reconnectPlayerId?: string): { playerId: string; gameState: GameState; isReconnect: boolean } | null;
   listRooms(): RoomListItem[];
+  isUsernameAvailable(username: string): boolean;
+  reserveUsername(username: string): string | null;
+  releaseUsername(username: string): void;
   addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null;
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null;
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
@@ -345,6 +348,28 @@ export class MemStorage implements IStorage {
 
     // Sort by creation time, newest first
     return roomList.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  isUsernameAvailable(username: string): boolean {
+    return !this.activeUsernames.has(username.toLowerCase());
+  }
+
+  reserveUsername(username: string): string | null {
+    if (!this.isUsernameAvailable(username)) {
+      return null;
+    }
+    const tempId = randomUUID();
+    this.activeUsernames.set(username.toLowerCase(), tempId);
+    this.playerIdToUsername.set(tempId, username.toLowerCase());
+    return tempId;
+  }
+
+  releaseUsername(username: string): void {
+    const playerId = this.activeUsernames.get(username.toLowerCase());
+    if (playerId) {
+      this.activeUsernames.delete(username.toLowerCase());
+      this.playerIdToUsername.delete(playerId);
+    }
   }
 
   addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null {

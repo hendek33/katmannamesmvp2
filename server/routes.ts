@@ -96,6 +96,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
           
+          case "check_username": {
+            const username = payload.username;
+            if (!username || typeof username !== "string") {
+              sendToClient(ws, {
+                type: "username_availability",
+                payload: { available: false, username },
+              });
+              return;
+            }
+            
+            const available = storage.isUsernameAvailable(username);
+            sendToClient(ws, {
+              type: "username_availability",
+              payload: { available, username },
+            });
+            break;
+          }
+          
+          case "reserve_username": {
+            const username = payload.username;
+            if (!username || typeof username !== "string") {
+              sendToClient(ws, {
+                type: "username_reserved",
+                payload: { success: false, username },
+              });
+              return;
+            }
+            
+            const tempId = storage.reserveUsername(username);
+            sendToClient(ws, {
+              type: "username_reserved",
+              payload: { 
+                success: !!tempId, 
+                username,
+                tempId 
+              },
+            });
+            break;
+          }
+          
+          case "release_username": {
+            const username = payload.username;
+            if (username && typeof username === "string") {
+              storage.releaseUsername(username);
+            }
+            break;
+          }
+          
           case "list_rooms": {
             const roomList = storage.listRooms();
             sendToClient(ws, {
