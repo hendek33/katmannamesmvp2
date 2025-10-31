@@ -85,6 +85,7 @@ export function useWebSocket() {
                 setPlayerId(message.payload.playerId);
                 setRoomCode(message.payload.roomCode);
                 setGameState(message.payload.gameState);
+                setError(""); // Clear any previous errors
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.roomCode);
                 break;
@@ -93,6 +94,7 @@ export function useWebSocket() {
                 setPlayerId(message.payload.playerId);
                 setGameState(message.payload.gameState);
                 setRoomCode(message.payload.gameState.roomCode);
+                setError(""); // Clear any previous errors
                 if (message.payload.cardImages) {
                   setCardImages(message.payload.cardImages);
                 }
