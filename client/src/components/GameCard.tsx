@@ -116,12 +116,12 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         !card.revealed && "cursor-pointer",
         card.revealed && "cursor-pointer",
         "ring-2 ring-black/20",
-        // Animation classes
-        isRevealing && "animate-card-flip animate-reveal-glow",
+        // Animation classes - takım bazlı efektler direkt kart açıldığında
+        isRevealing && card.type === "dark" && "animate-card-flip animate-reveal-glow animate-card-success",
+        isRevealing && card.type === "light" && "animate-card-flip animate-reveal-glow animate-card-success",
+        isRevealing && card.type === "neutral" && "animate-card-flip animate-reveal-glow animate-card-shake",
+        isRevealing && card.type === "assassin" && "animate-card-flip animate-reveal-glow",
         card.revealed && !isRevealing && !isAssassinCard && !isLastCard && "animate-pulse-once",
-        card.revealed && card.type === "dark" && !isRevealing && "animate-card-success",
-        card.revealed && card.type === "light" && !isRevealing && "animate-card-success",
-        card.revealed && card.type === "neutral" && !isRevealing && "animate-card-shake",
         isAssassinCard && gameEnded && "animate-assassin-reveal",
         isLastCard && gameEnded && !isAssassinCard && "border-green-500 ring-4 ring-green-400/50",
         "shadow-inner",
