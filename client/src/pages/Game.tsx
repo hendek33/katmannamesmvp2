@@ -40,6 +40,7 @@ export default function Game() {
   const [globalTauntCooldown, setGlobalTauntCooldown] = useState<number>(0);
   const [globalInsultCooldown, setGlobalInsultCooldown] = useState<number>(0);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
+  const [imagesPreloaded, setImagesPreloaded] = useState(false);
   
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -68,6 +69,72 @@ export default function Game() {
   const previousClueRef = useRef<string | null>(null);
   const assassinShownRef = useRef<boolean>(false);
 
+
+  // Preload all card images when the game page loads
+  useEffect(() => {
+    const allCardImages = [
+      // Dark/Blue team cards
+      '/acilmiskartgorsel/ali mavi.png',
+      '/acilmiskartgorsel/blush mavi.png',
+      '/acilmiskartgorsel/hasan mavi.png',
+      '/acilmiskartgorsel/kasım mavi.png',
+      '/acilmiskartgorsel/mami mavi.png',
+      '/acilmiskartgorsel/noeldayı mavi.png',
+      '/acilmiskartgorsel/nuriben mavi.png',
+      '/acilmiskartgorsel/çağrı mavi.png',
+      '/acilmiskartgorsel/şinasi mavi.png',
+      // Light/Red team cards
+      '/acilmiskartgorsel/alik kırmızı.png',
+      '/acilmiskartgorsel/begüm kırmızı.png',
+      '/acilmiskartgorsel/dobby kırmızı.png',
+      '/acilmiskartgorsel/karaman kırmızı.png',
+      '/acilmiskartgorsel/neswin kırmızı.png',
+      '/acilmiskartgorsel/noeldayı kırmızı.png',
+      '/acilmiskartgorsel/perver kırmızı.png',
+      '/acilmiskartgorsel/triel kırmızı.png',
+      '/acilmiskartgorsel/şinasi kırmızı.png',
+      // Neutral cards
+      '/acilmiskartgorsel/blush beyaz.png',
+      '/acilmiskartgorsel/hasan beyaz.png',
+      '/acilmiskartgorsel/mami beyaz.png',
+      '/acilmiskartgorsel/perver beyaz.png',
+      '/acilmiskartgorsel/çağrı normal beyaz.png',
+      '/acilmiskartgorsel/çağrı sigara beyaz.png',
+      '/acilmiskartgorsel/şinasi su beyaz.png',
+      // Assassin card
+      '/ajan siyah.png'
+    ];
+
+    let loadedCount = 0;
+    const totalImages = allCardImages.length;
+
+    const preloadImage = (src: string) => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          loadedCount++;
+          // Log progress for debugging (optional)
+          if (loadedCount === totalImages) {
+            console.log('Tüm kart görselleri yüklendi');
+            setImagesPreloaded(true);
+          }
+          resolve();
+        };
+        img.onerror = () => {
+          console.warn(`Görsel yüklenemedi: ${src}`);
+          loadedCount++;
+          if (loadedCount === totalImages) {
+            setImagesPreloaded(true);
+          }
+          resolve(); // Continue even if an image fails
+        };
+        img.src = src;
+      });
+    };
+
+    // Start preloading all images
+    Promise.all(allCardImages.map(preloadImage));
+  }, []); // Run once on component mount
 
   useEffect(() => {
     if (error) {
