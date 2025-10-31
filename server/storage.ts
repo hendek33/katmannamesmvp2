@@ -1075,6 +1075,13 @@ export class MemStorage implements IStorage {
     room.players = room.players.filter(p => p.id !== playerId);
     this.playerToRoom.delete(playerId);
 
+    // Clear username from global tracking
+    const username = this.playerIdToUsername.get(playerId);
+    if (username) {
+      this.activeUsernames.delete(username);
+      this.playerIdToUsername.delete(playerId);
+    }
+
     if (room.players.length === 0) {
       this.rooms.delete(roomCode);
     } else if (room.players.every(p => !p.isRoomOwner)) {

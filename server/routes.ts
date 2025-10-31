@@ -112,10 +112,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            const { roomCode, playerId, gameState } = storage.createRoom(
+            const result = storage.createRoom(
               validation.data.username,
               validation.data.password
             );
+            
+            if (!result) {
+              sendToClient(ws, { 
+                type: "error", 
+                payload: { 
+                  message: "Bu kullanıcı adı zaten kullanımda! Lütfen farklı bir kullanıcı adı seçin.",
+                  code: "USERNAME_TAKEN" 
+                } 
+              });
+              return;
+            }
+            
+            const { roomCode, playerId, gameState } = result;
             
             ws.playerId = playerId;
             ws.roomCode = roomCode;
@@ -146,7 +159,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
               validation.data.playerId
             );
             if (!result) {
-              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı veya şifre yanlış" } });
+              // Try to determine the specific error
+              const room = storage.getRoom(validation.data.roomCode);
+              if (!room) {
+                sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              } else {
+                // Username is likely taken
+                sendToClient(ws, { 
+                  type: "error", 
+                  payload: { 
+                    message: "Bu kullanıcı adı zaten kullanımda! Lütfen farklı bir kullanıcı adı seçin.",
+                    code: "USERNAME_TAKEN" 
+                  } 
+                });
+              }
               return;
             }
 
