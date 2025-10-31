@@ -146,13 +146,6 @@ export function useWebSocket() {
               case "pong":
                 // Server acknowledged our ping, connection is alive
                 break;
-
-              case "username_availability":
-                // Dispatch custom event for username availability
-                window.dispatchEvent(new CustomEvent("username_availability", {
-                  detail: message.payload
-                }));
-                break;
             }
           } catch (err) {
             console.error("Error parsing WebSocket message:", err);

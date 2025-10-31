@@ -1,22 +1,18 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot, Loader2, AlertCircle } from "lucide-react";
+import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot, Loader2 } from "lucide-react";
 import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
-import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 export default function Welcome() {
   const [, navigate] = useLocation();
   const [showUsernameInput, setShowUsernameInput] = useState(false);
   const [username, setUsername] = useState("");
   const [cardsLoaded, setCardsLoaded] = useState(false);
-  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
-  const [usernameError, setUsernameError] = useState("");
-  const { send, isConnected } = useWebSocketContext();
   
   // Clear any old/invalid localStorage keys on mount
   useEffect(() => {
@@ -82,40 +78,8 @@ export default function Welcome() {
     loadImages();
   }, [cardImageNames]);
 
-  // Check username availability when user types
-  useEffect(() => {
-    if (username.trim().length < 2) {
-      setUsernameError("");
-      return;
-    }
-
-    const checkTimer = setTimeout(() => {
-      if (isConnected) {
-        setIsCheckingUsername(true);
-        send("check_username", { username: username.trim() });
-      }
-    }, 500);
-
-    return () => clearTimeout(checkTimer);
-  }, [username, send, isConnected]);
-
-  // Listen for username availability response
-  useEffect(() => {
-    const handleUsernameAvailability = (event: any) => {
-      setIsCheckingUsername(false);
-      if (!event.detail.available && event.detail.username === username.trim()) {
-        setUsernameError("Bu kullanıcı adı zaten kullanımda!");
-      } else if (event.detail.available && event.detail.username === username.trim()) {
-        setUsernameError("");
-      }
-    };
-
-    window.addEventListener("username_availability", handleUsernameAvailability);
-    return () => window.removeEventListener("username_availability", handleUsernameAvailability);
-  }, [username]);
-
   const handleContinue = () => {
-    if (username.trim().length >= 2 && !usernameError) {
+    if (username.trim().length >= 2) {
       localStorage.setItem("katmannames_username", username.trim());
       navigate("/rooms");
     }
@@ -251,40 +215,24 @@ export default function Welcome() {
               <Label htmlFor="username" className="text-lg font-bold">
                 Kullanıcı Adınız
               </Label>
-              <div className="relative">
-                <Input
-                  id="username"
-                  data-testid="input-username"
-                  placeholder="Adınızı girin"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !usernameError && !isCheckingUsername) handleContinue();
-                    if (e.key === "Escape") setShowUsernameInput(false);
-                  }}
-                  className={cn(
-                    "text-base pr-10",
-                    usernameError && "border-red-500 focus-visible:ring-red-500"
-                  )}
-                  maxLength={20}
-                  autoFocus
-                  autoComplete="off"
-                />
-                {isCheckingUsername && (
-                  <Loader2 className="w-4 h-4 absolute right-3 top-3 animate-spin text-muted-foreground" />
-                )}
-              </div>
-              {usernameError && (
-                <div className="flex items-center gap-2 text-red-500 text-sm animate-in fade-in slide-in-from-top-1 duration-200">
-                  <AlertCircle className="w-4 h-4" />
-                  <span>{usernameError}</span>
-                </div>
-              )}
-              {!usernameError && (
-                <p className="text-xs text-muted-foreground">
-                  En az 2 karakter giriniz
-                </p>
-              )}
+              <Input
+                id="username"
+                data-testid="input-username"
+                placeholder="Adınızı girin"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleContinue();
+                  if (e.key === "Escape") setShowUsernameInput(false);
+                }}
+                className="text-base"
+                maxLength={20}
+                autoFocus
+                autoComplete="off"
+              />
+              <p className="text-xs text-muted-foreground">
+                En az 2 karakter giriniz
+              </p>
             </div>
 
             <div className="flex gap-3">
@@ -298,24 +246,15 @@ export default function Welcome() {
               </Button>
               <Button
                 onClick={handleContinue}
-                disabled={username.trim().length < 2 || !!usernameError || isCheckingUsername}
+                disabled={username.trim().length < 2}
                 className="flex-1"
                 style={{
                   background: 'linear-gradient(to bottom right, rgba(124, 45, 18, 0.95), rgba(15, 23, 42, 0.95), rgba(23, 37, 84, 0.95))'
                 }}
                 data-testid="button-continue"
               >
-                {isCheckingUsername ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Kontrol Ediliyor...
-                  </>
-                ) : (
-                  <>
-                    Devam Et
-                    <ChevronRight className="w-4 h-4 ml-2" />
-                  </>
-                )}
+                Devam Et
+                <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
           </Card>
