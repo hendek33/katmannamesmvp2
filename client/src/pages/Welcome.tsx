@@ -7,12 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users, Trophy, Eye, Timer, Bot, Loader2 } from "lucide-react";
 import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 export default function Welcome() {
   const [, navigate] = useLocation();
   const [showUsernameInput, setShowUsernameInput] = useState(false);
   const [username, setUsername] = useState("");
   const [cardsLoaded, setCardsLoaded] = useState(false);
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const { send, isConnected } = useWebSocketContext();
   
   // Clear any old/invalid localStorage keys on mount
   useEffect(() => {
@@ -78,8 +82,54 @@ export default function Welcome() {
     loadImages();
   }, [cardImageNames]);
 
+  // Check username availability
+  useEffect(() => {
+    if (!username.trim() || username.trim().length < 2) {
+      setUsernameError("");
+      setIsCheckingUsername(false);
+      return;
+    }
+
+    setIsCheckingUsername(true);
+    const checkTimer = setTimeout(() => {
+      if (isConnected) {
+        send("check_username", { username: username.trim() });
+      }
+    }, 300); // Debounce for 300ms
+
+    return () => clearTimeout(checkTimer);
+  }, [username, isConnected, send]);
+
+  // Listen for username availability response
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === "username_availability") {
+          setIsCheckingUsername(false);
+          if (!message.payload.available && message.payload.username === username.trim()) {
+            setUsernameError("Bu kullanıcı adı zaten kullanımda!");
+          } else {
+            setUsernameError("");
+          }
+        }
+      } catch (err) {
+        // Ignore parse errors
+      }
+    };
+
+    // Get WebSocket from window ref (set in useWebSocket hook)
+    const ws = (window as any).wsRef?.current;
+    if (ws) {
+      ws.addEventListener("message", handleMessage);
+      return () => ws.removeEventListener("message", handleMessage);
+    }
+  }, [username]);
+
   const handleContinue = () => {
-    if (username.trim().length >= 2) {
+    if (username.trim().length >= 2 && !usernameError && !isCheckingUsername) {
+      // Reserve the username
+      send("reserve_username", { username: username.trim() });
       localStorage.setItem("katmannames_username", username.trim());
       navigate("/rooms");
     }
@@ -222,17 +272,35 @@ export default function Welcome() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleContinue();
+                  if (e.key === "Enter" && !usernameError && !isCheckingUsername) handleContinue();
                   if (e.key === "Escape") setShowUsernameInput(false);
                 }}
-                className="text-base"
+                className={cn("text-base", usernameError && "border-red-500")}
                 maxLength={20}
                 autoFocus
                 autoComplete="off"
               />
-              <p className="text-xs text-muted-foreground">
-                En az 2 karakter giriniz
-              </p>
+              {isCheckingUsername && (
+                <p className="text-xs text-yellow-500 flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Kullanıcı adı kontrol ediliyor...
+                </p>
+              )}
+              {usernameError && !isCheckingUsername && (
+                <p className="text-xs text-red-500">
+                  {usernameError}
+                </p>
+              )}
+              {!usernameError && !isCheckingUsername && username.trim().length >= 2 && (
+                <p className="text-xs text-green-500">
+                  ✓ Kullanıcı adı müsait
+                </p>
+              )}
+              {!usernameError && !isCheckingUsername && username.trim().length < 2 && (
+                <p className="text-xs text-muted-foreground">
+                  En az 2 karakter giriniz
+                </p>
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -246,15 +314,24 @@ export default function Welcome() {
               </Button>
               <Button
                 onClick={handleContinue}
-                disabled={username.trim().length < 2}
+                disabled={username.trim().length < 2 || !!usernameError || isCheckingUsername}
                 className="flex-1"
                 style={{
                   background: 'linear-gradient(to bottom right, rgba(124, 45, 18, 0.95), rgba(15, 23, 42, 0.95), rgba(23, 37, 84, 0.95))'
                 }}
                 data-testid="button-continue"
               >
-                Devam Et
-                <ChevronRight className="w-4 h-4 ml-2" />
+                {isCheckingUsername ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Kontrol ediliyor...
+                  </>
+                ) : (
+                  <>
+                    Devam Et
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </Button>
             </div>
           </Card>
