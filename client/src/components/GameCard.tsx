@@ -116,9 +116,9 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         !card.revealed && "cursor-pointer",
         card.revealed && "cursor-pointer",
         "ring-2 ring-black/20",
-        // Animation classes - takım bazlı efektler direkt kart açıldığında
-        isRevealing && card.type === "dark" && "animate-card-flip animate-reveal-glow animate-card-success",
-        isRevealing && card.type === "light" && "animate-card-flip animate-reveal-glow animate-card-success",
+        // Animation classes - takım bazlı efektler direkt kart açıldığında (bounce kaldırıldı)
+        isRevealing && card.type === "dark" && "animate-card-flip animate-reveal-glow",
+        isRevealing && card.type === "light" && "animate-card-flip animate-reveal-glow",
         isRevealing && card.type === "neutral" && "animate-card-flip animate-reveal-glow animate-card-shake",
         isRevealing && card.type === "assassin" && "animate-card-flip animate-reveal-glow",
         card.revealed && !isRevealing && !isAssassinCard && !isLastCard && "animate-pulse-once",
@@ -248,7 +248,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         >
           <div 
             className={cn(
-              "absolute cursor-pointer rounded-lg",
+              "absolute cursor-pointer animate-card-drop rounded-lg",
               isLifted ? "card-lifted" : "card-not-lifted"
             )}
             onClick={(e) => {
