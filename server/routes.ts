@@ -614,6 +614,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            console.log(`\n========== OYUN BAŞLATILIYOR ==========`);
+            console.log(`Oda Kodu: ${ws.roomCode}`);
+            console.log(`Başlatan: ${ws.playerId}`);
+            console.log(`Tarih/Saat: ${new Date().toLocaleString('tr-TR')}`);
+
             const gameState = storage.startGame(ws.roomCode);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Oyun başlatılamadı. Her takımda bir İpucu Veren olmalı." } });

@@ -686,7 +686,7 @@ export default function Lobby() {
             <AlertDialogDescription asChild>
               <div className="space-y-4 pt-4">
                 <p className="text-sm">
-                  Kaos Modu, klasik Codenames oyununa gizli roller ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
+                  Kaos Modu, klasik Katmannames oyununa gizli roller ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
                   Her oyuncuya gizlice atanan bu roller, oyunun dinamiğini tamamen değiştirir!
                 </p>
                 
@@ -699,8 +699,8 @@ export default function Lobby() {
                     <p className="text-xs">
                       Her takımda 1 tane bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
                       Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır!</span>
-                      <span className="text-red-400 font-bold"> DİKKAT: Yanlış tahmin anında kaybedersiniz!</span>
+                      <span className="text-amber-400 font-bold"> Oyun boyunca karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır, oyun bittikten sonra tahmin yapılamaz!</span>
+                      <span className="text-red-400 font-bold"> DİKKAT: Yanlış tahmin anında kaybettirir!</span>
                     </p>
                   </div>
                   

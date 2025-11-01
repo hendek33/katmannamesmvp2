@@ -642,6 +642,32 @@ export class MemStorage implements IStorage {
       room.currentTurnStartTime = Date.now();
     }
 
+    // Log game details to console
+    console.log(`\n========== OYUN DETAYLARI ==========`);
+    console.log(`Oda Kodu: ${room.roomCode}`);
+    console.log(`Oyun Modları:`);
+    console.log(`  - Zamanlı Mod: ${room.timedMode ? 'AÇIK' : 'KAPALI'}`);
+    console.log(`  - Kaos Modu: ${room.chaosMode ? 'AÇIK' : 'KAPALI'}`);
+    console.log(`\n----- TAKIMLAR -----`);
+    console.log(`${room.darkTeamName} (${room.darkCardsRemaining} kart):`);
+    darkTeam.forEach(p => {
+      console.log(`  - ${p.username} (${p.role === 'spymaster' ? 'İstihbarat Şefi' : 'Ajan'})`);
+    });
+    console.log(`\n${room.lightTeamName} (${room.lightCardsRemaining} kart):`);
+    lightTeam.forEach(p => {
+      console.log(`  - ${p.username} (${p.role === 'spymaster' ? 'İstihbarat Şefi' : 'Ajan'})`);
+    });
+    
+    console.log(`\n----- KART DAĞILIMI -----`);
+    console.log(`  - ${room.darkTeamName}: ${room.darkCardsRemaining} kart`);
+    console.log(`  - ${room.lightTeamName}: ${room.lightCardsRemaining} kart`);
+    console.log(`  - Tarafsız: ${room.cards.filter(c => c.type === "neutral").length} kart`);
+    console.log(`  - Suikastçı: 1 kart`);
+    console.log(`  - Toplam: 25 kart`);
+    
+    console.log(`\nİlk başlayan takım: ${room.currentTeam === "dark" ? room.darkTeamName : room.lightTeamName}`);
+    console.log(`========================================\n`);
+
     return room;
   }
 
