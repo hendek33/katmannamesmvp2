@@ -1502,19 +1502,31 @@ export default function Game() {
                   </div>
                 </div>
                 
-                {/* Developer Note */}
-                <div className="mt-8 mb-4 p-4 bg-slate-900/80 backdrop-blur-sm rounded-lg border border-slate-700/40 shadow-lg">
-                  <p className="text-xs sm:text-sm text-slate-300 text-center leading-relaxed font-medium">
-                    Oyunu geliştirmemize katkı sağlamak isterseniz<br/>
-                    geri bildirimlerinizi<br/>
-                    <span className="text-slate-100 font-semibold">discord: ardamsn</span> veya<br/>
-                    <span className="text-slate-100 font-semibold">ardanasman@hotmail.com</span><br/>
-                    adresinden paylaşabilirsiniz.<br/>
-                    <span className="mt-2 block text-slate-200">Teşekkürler, Katman Ekibi ❤️</span>
-                  </p>
-                </div>
               </div>
             )}
+            
+            {/* Developer Note - At the bottom of the left panel */}
+            <div className="absolute bottom-4 left-4 right-4">
+              <div className="p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
+                <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
+                  Oyunu geliştirmemize katkı sağlamak isterseniz
+                  geri bildirimlerinizi
+                </p>
+                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold mt-1">
+                  discord: ardamsn
+                </p>
+                <p className="text-xs sm:text-sm text-slate-200 text-center">veya</p>
+                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold">
+                  ardanasman@hotmail.com
+                </p>
+                <p className="text-xs sm:text-sm text-slate-200 text-center mt-1">
+                  adresinden paylaşabilirsiniz.
+                </p>
+                <p className="text-sm text-slate-100 text-center font-semibold mt-3">
+                  Teşekkürler, Katman Ekibi ❤️
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Center - Grid */}
