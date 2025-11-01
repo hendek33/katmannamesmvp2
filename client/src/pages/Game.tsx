@@ -1504,7 +1504,7 @@ export default function Game() {
                 
                 
                 {/* Developer Note - With more spacing from buttons */}
-                <div className="mt-12 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
+                <div className="mt-20 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
                   <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
                     Oyunu geliştirmemize katkı sağlamak isterseniz
                     geri bildirimlerinizi
