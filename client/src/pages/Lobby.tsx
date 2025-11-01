@@ -711,26 +711,23 @@ export default function Lobby() {
                     </div>
                     <p className="text-xs">
                       <span className="text-purple-400 font-bold">Her takımda 1 tane bulunur.</span> Karşı takım için gizlice çalışan casus! 
-                      Görünüşte kendi takımında ama aslında karşı takım için çalışır. Takımını yanlış kartlara yönlendirmeye çalışır. 
-                      Kart seçemez, sadece oy verebilir. 
-                      <span className="text-red-400 font-bold">Oyun bittiğinde: Kaybeden takım, kendi içlerindeki haini (karşı takım için çalışan Çift Ajanı) bulursa oyunu tersine çevirir!</span>
+                      Görünüşte kendi takımında ama aslında karşı takım için çalışır. Takımını yanlış kartlara yönlendirmeye çalışır.  
+                      <span className="text-red-400 font-bold">Oyun bittiğinde: Kaybeden takım, kendi içlerindeki haini (karşı takım için çalışan Çift Ajanı) bulursa oyunu kazanır!</span>
                     </p>
                   </div>
                 </div>
                 
                 <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <h4 className="font-semibold text-amber-400 mb-2">⚡ Önemli Kurallar</h4>
+                  <h4 className="font-semibold text-amber-400 mb-2">⚡ Notlar</h4>
                   <ul className="text-xs space-y-1">
-                    <li>• Roller oyun başında rastgele atanır ve gizlidir</li>
-                    <li>• Kahin oylamaya katılamaz, sadece ipucu verebilir</li>
-                    <li>• Çift Ajan kart seçemez ama oylamaya katılır</li>
-                    <li>• Normal oyuncu hem ipucu verebilir hem kart seçebilir</li>
-                    <li>• Oyun sonunda roller açığa çıkar</li>
+                    <li>• Takımlardaki ajan sayıları eşit olması ve toplamda minimum 10 kişi olunması önerilir.</li>
+                    <li>• Roller oyun başında rastgele atanır ve gizlidir.</li>
+                    <li>• Oyun sonunda tahminler yapıldıktan sonra roller açığa çıkar.</li>
                   </ul>
                 </div>
                 
                 <div className="text-xs text-slate-400 italic">
-                  Not: Bu mod henüz geliştirme aşamasındadır ve yakında aktif olacaktır!
+                  Bu mod henüz geliştirme aşamasındadır ve yakında aktif olacaktır!
                 </div>
               </div>
             </AlertDialogDescription>
