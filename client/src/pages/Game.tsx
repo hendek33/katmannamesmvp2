@@ -1530,11 +1530,11 @@ export default function Game() {
                 </button>
                 
                 <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
-                  Oyunu geliştirmemize katkı sağlamak isterseniz
+                  Oyunu geliştirmeme katkı sağlamak isterseniz
                   geri bildirimlerinizi
                 </p>
                 <p className="text-xs sm:text-sm text-center font-semibold mt-1">
-                  <span className="text-blue-400">discord: ardamsn</span>
+                  <span className="text-blue-400">Discord: ardamsn</span>
                 </p>
                 <p className="text-xs sm:text-sm text-slate-200 text-center">veya</p>
                 <p className="text-xs sm:text-sm text-center font-semibold">
