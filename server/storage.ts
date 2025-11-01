@@ -52,7 +52,7 @@ export interface IStorage {
 const insultMessages = [
   "{target} acayip hayvanlara benziyirsen!",
   "{target} sütünü iç de uyu!",
-  "{target} fuck you!",
+  "{target} pislik topu!",
   "{target} sen SALAKSIN!",
   "{target} beynini söğüş yapıp yemiş...",
   "{target} git köşende ağla!",
