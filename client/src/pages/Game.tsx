@@ -63,6 +63,7 @@ export default function Game() {
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
   const [isGameStart, setIsGameStart] = useState(false);
+  const [isManualEndTurn, setIsManualEndTurn] = useState(false);
   const [showAssassinVideo, setShowAssassinVideo] = useState<{ show: boolean; x?: number; y?: number }>({ show: false });
   const [showNormalWinVideo, setShowNormalWinVideo] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
@@ -205,15 +206,23 @@ export default function Game() {
       if (prevTeam !== gameState.currentTeam) {
         setCurrentTurn(gameState.currentTeam);
         setIsGameStart(false);  // Not game start, it's a turn change
-        // Delay the turn video to allow card reveal animation to complete
-        setTimeout(() => {
+        
+        // If it's a manual end turn (button click), show immediately
+        // Otherwise, delay to allow card reveal animation to complete
+        if (isManualEndTurn) {
           setShowTurnVideo(true);
-        }, 800); // 800ms delay for card animation to complete
+          setIsManualEndTurn(false); // Reset the flag
+        } else {
+          // Delay the turn video to allow card reveal animation to complete
+          setTimeout(() => {
+            setShowTurnVideo(true);
+          }, 800); // 800ms delay for card animation to complete
+        }
       }
     }
     
     previousTurnRef.current = turnKey;
-  }, [gameState?.currentTeam, gameState?.revealHistory?.length, gameState?.phase]);
+  }, [gameState?.currentTeam, gameState?.revealHistory?.length, gameState?.phase, isManualEndTurn]);
 
   // Detect assassin card reveal and show video
   useEffect(() => {
@@ -1669,6 +1678,7 @@ export default function Game() {
                     {currentPlayer?.team === gameState.currentTeam && currentPlayer?.role === "guesser" && (
                       <Button
                         onClick={() => {
+                          setIsManualEndTurn(true); // Mark as manual end turn
                           send("end_turn", {});
                           toast({
                             title: "Tahmin Tamamlandı",
