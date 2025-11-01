@@ -17,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -41,6 +41,7 @@ export default function Game() {
   const [globalInsultCooldown, setGlobalInsultCooldown] = useState<number>(0);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
+  const [showDeveloperNote, setShowDeveloperNote] = useState(true);
   
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -1505,18 +1506,27 @@ export default function Game() {
             )}
             
             {/* Developer Note - Always visible, with large spacing from buttons */}
-            {currentPlayer && gameState.phase === "playing" && (
-              <div className="mt-24 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
+            {currentPlayer && gameState.phase === "playing" && showDeveloperNote && (
+              <div className="mt-24 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl relative">
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowDeveloperNote(false)}
+                  className="absolute top-2 right-2 p-1 rounded hover:bg-slate-700/50 transition-colors"
+                  aria-label="Kapat"
+                >
+                  <X className="w-4 h-4 text-slate-400 hover:text-slate-200" />
+                </button>
+                
                 <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
                   Oyunu geliştirmemize katkı sağlamak isterseniz
                   geri bildirimlerinizi
                 </p>
-                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold mt-1">
-                  discord: ardamsn
+                <p className="text-xs sm:text-sm text-center font-semibold mt-1">
+                  <span className="text-blue-400">discord: ardamsn</span>
                 </p>
                 <p className="text-xs sm:text-sm text-slate-200 text-center">veya</p>
-                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold">
-                  ardanasman@hotmail.com
+                <p className="text-xs sm:text-sm text-center font-semibold">
+                  <span className="text-red-400">ardanasman@hotmail.com</span>
                 </p>
                 <p className="text-xs sm:text-sm text-slate-200 text-center mt-1">
                   adresinden paylaşabilirsiniz.
