@@ -1501,28 +1501,29 @@ export default function Game() {
                     )}
                   </div>
                 </div>
-                
-                
-                {/* Developer Note - With more spacing from buttons */}
-                <div className="mt-20 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
-                  <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
-                    Oyunu geliştirmemize katkı sağlamak isterseniz
-                    geri bildirimlerinizi
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold mt-1">
-                    discord: ardamsn
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-200 text-center">veya</p>
-                  <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold">
-                    ardanasman@hotmail.com
-                  </p>
-                  <p className="text-xs sm:text-sm text-slate-200 text-center mt-1">
-                    adresinden paylaşabilirsiniz.
-                  </p>
-                  <p className="text-sm text-slate-100 text-center font-semibold mt-3">
-                    Teşekkürler, Katman Ekibi ❤️
-                  </p>
-                </div>
+              </div>
+            )}
+            
+            {/* Developer Note - Always visible, with large spacing from buttons */}
+            {currentPlayer && gameState.phase === "playing" && (
+              <div className="mt-24 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
+                <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
+                  Oyunu geliştirmemize katkı sağlamak isterseniz
+                  geri bildirimlerinizi
+                </p>
+                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold mt-1">
+                  discord: ardamsn
+                </p>
+                <p className="text-xs sm:text-sm text-slate-200 text-center">veya</p>
+                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold">
+                  ardanasman@hotmail.com
+                </p>
+                <p className="text-xs sm:text-sm text-slate-200 text-center mt-1">
+                  adresinden paylaşabilirsiniz.
+                </p>
+                <p className="text-sm text-slate-100 text-center font-semibold mt-3">
+                  Teşekkürler, Katman Ekibi ❤️
+                </p>
               </div>
             )}
           </div>
