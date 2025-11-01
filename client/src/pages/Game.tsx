@@ -1502,31 +1502,29 @@ export default function Game() {
                   </div>
                 </div>
                 
+                
+                {/* Developer Note - With more spacing from buttons */}
+                <div className="mt-12 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
+                  <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
+                    Oyunu geliştirmemize katkı sağlamak isterseniz
+                    geri bildirimlerinizi
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold mt-1">
+                    discord: ardamsn
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-200 text-center">veya</p>
+                  <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold">
+                    ardanasman@hotmail.com
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-200 text-center mt-1">
+                    adresinden paylaşabilirsiniz.
+                  </p>
+                  <p className="text-sm text-slate-100 text-center font-semibold mt-3">
+                    Teşekkürler, Katman Ekibi ❤️
+                  </p>
+                </div>
               </div>
             )}
-            
-            {/* Developer Note - At the bottom of the left panel */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl">
-                <p className="text-xs sm:text-sm text-slate-200 text-center leading-relaxed">
-                  Oyunu geliştirmemize katkı sağlamak isterseniz
-                  geri bildirimlerinizi
-                </p>
-                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold mt-1">
-                  discord: ardamsn
-                </p>
-                <p className="text-xs sm:text-sm text-slate-200 text-center">veya</p>
-                <p className="text-xs sm:text-sm text-slate-100 text-center font-semibold">
-                  ardanasman@hotmail.com
-                </p>
-                <p className="text-xs sm:text-sm text-slate-200 text-center mt-1">
-                  adresinden paylaşabilirsiniz.
-                </p>
-                <p className="text-sm text-slate-100 text-center font-semibold mt-3">
-                  Teşekkürler, Katman Ekibi ❤️
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Center - Grid */}
