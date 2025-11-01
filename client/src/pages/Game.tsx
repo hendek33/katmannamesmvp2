@@ -205,7 +205,10 @@ export default function Game() {
       if (prevTeam !== gameState.currentTeam) {
         setCurrentTurn(gameState.currentTeam);
         setIsGameStart(false);  // Not game start, it's a turn change
-        setShowTurnVideo(true);
+        // Delay the turn video to allow card reveal animation to complete
+        setTimeout(() => {
+          setShowTurnVideo(true);
+        }, 800); // 800ms delay for card animation to complete
       }
     }
     
