@@ -1501,6 +1501,16 @@ export default function Game() {
                     )}
                   </div>
                 </div>
+                
+                {/* Developer Note */}
+                <div className="mt-4 p-3 bg-slate-900/70 backdrop-blur-sm rounded-lg border border-slate-700/30">
+                  <p className="text-[10px] text-slate-400 text-center leading-relaxed">
+                    Oyunu geliştirmemize katkı sağlamak isterseniz geri bildirimlerinizi<br/>
+                    <span className="text-slate-300">discord: ardamsn</span> veya <span className="text-slate-300">ardanasman@hotmail.com</span><br/>
+                    adresinden paylaşabilirsiniz.<br/>
+                    <span className="mt-1 block">Teşekkürler, Katman Ekibi ❤️</span>
+                  </p>
+                </div>
               </div>
             )}
           </div>
