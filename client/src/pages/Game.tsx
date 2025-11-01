@@ -1544,7 +1544,7 @@ export default function Game() {
                   adresinden paylaşabilirsiniz.
                 </p>
                 <p className="text-sm text-slate-100 text-center font-semibold mt-3">
-                  Teşekkürler, Katman Ekibi ❤️
+                  İyi oyunlar Katman Ekibi ❤️
                 </p>
               </div>
             )}
