@@ -1567,14 +1567,11 @@ export default function Game() {
                       className={`
                         relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                         backdrop-blur-md border shadow-lg
-                        ${currentPlayer.team === "dark" 
-                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100" 
-                          : "bg-red-900/60 border-red-600/50 text-red-100"}
                         ${globalTauntCooldown > 0 || !tauntEnabled 
-                          ? "opacity-40 cursor-not-allowed grayscale" 
+                          ? "bg-gray-800/60 border-gray-600/50 text-gray-400 opacity-50 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
-                            ? "cursor-pointer hover:scale-105 hover:bg-blue-900/80 hover:border-blue-500/60"
-                            : "cursor-pointer hover:scale-105 hover:bg-red-900/80 hover:border-red-500/60"}
+                            ? "bg-blue-900/60 border-blue-600/50 text-blue-100 cursor-pointer hover:scale-105 hover:bg-blue-900/80 hover:border-blue-500/60"
+                            : "bg-red-900/60 border-red-600/50 text-red-100 cursor-pointer hover:scale-105 hover:bg-red-900/80 hover:border-red-500/60"}
                       `}
                       data-testid="button-trigger-taunt"
                     >
@@ -1584,9 +1581,9 @@ export default function Game() {
                           Devre Dışı
                         </span>
                       ) : globalTauntCooldown > 0 ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Timer className="w-4 h-4" />
-                          {globalTauntCooldown}s
+                        <span className="flex items-center justify-center gap-1.5 text-gray-300">
+                          <Timer className="w-4 h-4 text-gray-300" />
+                          <span className="font-mono text-base">{globalTauntCooldown}s</span>
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-1.5">
@@ -1612,14 +1609,11 @@ export default function Game() {
                       className={`
                         relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                         backdrop-blur-md border shadow-lg
-                        ${currentPlayer.team === "dark" 
-                          ? "bg-purple-900/60 border-purple-600/50 text-purple-100" 
-                          : "bg-orange-900/60 border-orange-600/50 text-orange-100"}
                         ${globalInsultCooldown > 0 || !insultEnabled 
-                          ? "opacity-40 cursor-not-allowed grayscale" 
+                          ? "bg-gray-800/60 border-gray-600/50 text-gray-400 opacity-50 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
-                            ? "cursor-pointer hover:scale-105 hover:bg-purple-900/80 hover:border-purple-500/60"
-                            : "cursor-pointer hover:scale-105 hover:bg-orange-900/80 hover:border-orange-500/60"}
+                            ? "bg-purple-900/60 border-purple-600/50 text-purple-100 cursor-pointer hover:scale-105 hover:bg-purple-900/80 hover:border-purple-500/60"
+                            : "bg-orange-900/60 border-orange-600/50 text-orange-100 cursor-pointer hover:scale-105 hover:bg-orange-900/80 hover:border-orange-500/60"}
                       `}
                       data-testid="button-send-insult"
                     >
@@ -1629,9 +1623,9 @@ export default function Game() {
                           Devre Dışı
                         </span>
                       ) : globalInsultCooldown > 0 ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Timer className="w-4 h-4" />
-                          {globalInsultCooldown}s
+                        <span className="flex items-center justify-center gap-1.5 text-gray-300">
+                          <Timer className="w-4 h-4 text-gray-300" />
+                          <span className="font-mono text-base">{globalInsultCooldown}s</span>
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-1.5">
