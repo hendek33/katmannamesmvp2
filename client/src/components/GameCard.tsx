@@ -332,7 +332,7 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           colors.panel
         )} style={{ position: 'relative', zIndex: 12 }}>
           <span className={cn(
-            "font-bold text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] xl:text-xs 2xl:text-sm uppercase tracking-wide text-center leading-tight drop-shadow-md",
+            "font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg uppercase tracking-wide text-center leading-tight drop-shadow-md",
             colors.textColor
           )}>
             {card.word}
