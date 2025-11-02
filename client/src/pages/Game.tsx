@@ -1495,16 +1495,16 @@ export default function Game() {
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                  <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
+                  <h3 className="text-[10px] lg:text-xs xl:text-sm font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
+                  <div className="text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-blue-100 group-hover:scale-110 transition-transform">
                     {gameState.darkCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[8px] lg:text-[10px] xl:text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[10px] lg:text-xs xl:text-sm text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Player List - Separated by Role */}
                 <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-1">
@@ -1512,7 +1512,7 @@ export default function Game() {
                   {darkPlayers.filter(p => p.role === "spymaster").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {darkPlayers.filter(p => p.role === "spymaster").map(player => (
-                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
+                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
@@ -1526,7 +1526,7 @@ export default function Game() {
                   {darkPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {darkPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs flex items-center gap-1">
+                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-blue-100" : "text-blue-200"}>
                             {player.username}
@@ -1726,8 +1726,8 @@ export default function Game() {
                   }}
                 >
                   <div className="text-center relative z-10">
-                    <div className="text-[10px] font-bold text-blue-100">{gameState.darkTeamName}</div>
-                    <div className="text-xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
+                    <div className="text-xs font-bold text-blue-100">{gameState.darkTeamName}</div>
+                    <div className="text-2xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
                     {gameState.currentTeam === "dark" && (
                       <div className="text-[9px] font-bold">
                         <span className="text-blue-300">Sıradaki takım: </span>
@@ -1745,8 +1745,8 @@ export default function Game() {
                   }}
                 >
                   <div className="text-center relative z-10">
-                    <div className="text-[10px] font-bold text-red-100">{gameState.lightTeamName}</div>
-                    <div className="text-xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
+                    <div className="text-xs font-bold text-red-100">{gameState.lightTeamName}</div>
+                    <div className="text-2xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
                     {gameState.currentTeam === "light" && (
                       <div className="text-[9px] font-bold">
                         <span className="text-red-300">Sıradaki takım: </span>
@@ -1975,16 +1975,16 @@ export default function Game() {
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-red-600 animate-pulse" />
-                  <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
+                  <h3 className="text-[10px] lg:text-xs xl:text-sm font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-red-100 group-hover:scale-110 transition-transform">
+                  <div className="text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-red-100 group-hover:scale-110 transition-transform">
                     {gameState.lightCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-red-600/20 group-hover:bg-red-600/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[8px] lg:text-[10px] xl:text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[10px] lg:text-xs xl:text-sm text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Player List - Separated by Role */}
                 <div className="mt-2 pt-2 border-t border-red-700/30 space-y-1">
@@ -1992,7 +1992,7 @@ export default function Game() {
                   {lightPlayers.filter(p => p.role === "spymaster").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {lightPlayers.filter(p => p.role === "spymaster").map(player => (
-                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
+                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
@@ -2006,7 +2006,7 @@ export default function Game() {
                   {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {lightPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs flex items-center gap-1">
+                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
                             {player.username}
