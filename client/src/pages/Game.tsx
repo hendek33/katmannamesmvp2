@@ -20,6 +20,7 @@ import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Edit2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { getPlayerName, getPlayerDisplayName } from "@/lib/playerUtils";
 import Lobby from "./Lobby";
 
 export default function Game() {
@@ -1516,7 +1517,7 @@ export default function Game() {
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
-                            {player.username}
+                            {getPlayerName(player)}
                           </span>
                         </div>
                       ))}
@@ -1529,7 +1530,7 @@ export default function Game() {
                         <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-blue-100" : "text-blue-200"}>
-                            {player.username}
+                            {getPlayerName(player)}
                           </span>
                         </div>
                       ))}
@@ -1996,7 +1997,7 @@ export default function Game() {
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
-                            {player.username}
+                            {getPlayerName(player)}
                           </span>
                         </div>
                       ))}
@@ -2009,7 +2010,7 @@ export default function Game() {
                         <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
-                            {player.username}
+                            {getPlayerName(player)}
                           </span>
                         </div>
                       ))}
@@ -2047,7 +2048,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Clock className="w-2.5 h-2.5 text-gray-400" />
                                 <span className="text-gray-300">
-                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} turu sonlandırdı
+                                  {getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)?.length > 6 ? `${getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName).slice(0, 6)}...` : getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)} turu sonlandırdı
                                 </span>
                               </div>
                             </div>
@@ -2067,7 +2068,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Users className="w-2.5 h-2.5 text-purple-400" />
                                 <span className="text-purple-300">
-                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} takım değiştirdi: 
+                                  {getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)?.length > 6 ? `${getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName).slice(0, 6)}...` : getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)} takım değiştirdi: 
                                   <span className={entry.fromTeam === "dark" ? "text-blue-400" : "text-red-400"}> {entry.fromTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
                                   <span className="text-gray-400"> → </span>
                                   <span className={entry.toTeam === "dark" ? "text-blue-400" : "text-red-400"}>{entry.toTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
@@ -2085,7 +2086,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Eye className="w-2.5 h-2.5 text-green-400" />
                                 <span className="text-green-300">
-                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} rol değiştirdi: 
+                                  {getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)?.length > 6 ? `${getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName).slice(0, 6)}...` : getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)} rol değiştirdi: 
                                   <span className="text-gray-300"> {entry.fromRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
                                   <span className="text-gray-400"> → </span>
                                   <span className="text-gray-100">{entry.toRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
