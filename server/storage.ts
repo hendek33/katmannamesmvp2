@@ -437,6 +437,43 @@ export class MemStorage implements IStorage {
     }
   }
 
+  changePlayerUsername(roomCode: string, playerId: string, newUsername: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || player.isBot) return null;
+
+    // Check if new username is available (excluding current player)
+    const newUsernameLower = newUsername.toLowerCase();
+    const currentOwner = this.activeUsernames.get(newUsernameLower);
+    if (currentOwner && currentOwner !== playerId) {
+      return null; // Username already taken by another player
+    }
+
+    // Release old username
+    const oldUsername = this.playerIdToUsername.get(playerId);
+    if (oldUsername) {
+      this.activeUsernames.delete(oldUsername);
+    }
+
+    // Reserve new username
+    this.activeUsernames.set(newUsernameLower, playerId);
+    this.playerIdToUsername.set(playerId, newUsernameLower);
+
+    // Update player in game state
+    player.username = newUsername;
+    
+    // Update disconnected player info if exists
+    const disconnectedInfo = this.disconnectedPlayers.get(playerId);
+    if (disconnectedInfo) {
+      disconnectedInfo.player.username = newUsername;
+    }
+
+    return room;
+  }
+
   addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;

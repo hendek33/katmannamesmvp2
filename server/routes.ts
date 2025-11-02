@@ -215,6 +215,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
           
+          case "change_username": {
+            const { newUsername } = payload;
+            if (!newUsername || typeof newUsername !== "string" || !ws.playerId || !ws.roomCode) {
+              sendToClient(ws, { 
+                type: "username_changed", 
+                payload: { 
+                  success: false, 
+                  message: "Geçersiz veri veya oturum" 
+                } 
+              });
+              return;
+            }
+            
+            // Validate username length
+            if (newUsername.length < 2 || newUsername.length > 20) {
+              sendToClient(ws, {
+                type: "username_changed",
+                payload: { 
+                  success: false,
+                  message: "İsim 2-20 karakter arasında olmalıdır"
+                }
+              });
+              return;
+            }
+            
+            const gameState = storage.changePlayerUsername(ws.roomCode, ws.playerId, newUsername);
+            if (!gameState) {
+              sendToClient(ws, {
+                type: "username_changed", 
+                payload: { 
+                  success: false,
+                  message: "Bu kullanıcı adı zaten kullanımda veya değiştirilemedi"
+                }
+              });
+              return;
+            }
+            
+            // Notify all clients in the room
+            const clients = roomClients.get(ws.roomCode);
+            if (clients) {
+              for (const client of Array.from(clients)) {
+                sendToClient(client, {
+                  type: "game_state_updated",
+                  payload: { gameState: getFilteredGameState(gameState, client.playerId || "") }
+                });
+              }
+            }
+            
+            sendToClient(ws, {
+              type: "username_changed",
+              payload: { 
+                success: true,
+                message: "Kullanıcı adınız başarıyla değiştirildi"
+              }
+            });
+            break;
+          }
+          
           case "list_rooms": {
             const roomList = storage.listRooms();
             sendToClient(ws, {

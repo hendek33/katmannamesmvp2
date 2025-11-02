@@ -18,7 +18,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command, Edit2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -57,6 +57,9 @@ export default function Game() {
   const [showZoomHelp, setShowZoomHelp] = useState(false);
   const [zoomButtonPosition, setZoomButtonPosition] = useState<{ top: number; left: number } | null>(null);
   const zoomButtonRef = useRef<HTMLButtonElement>(null);
+  const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [isChangingName, setIsChangingName] = useState(false);
   
   // Handle zoom help button click
   const handleZoomHelpClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -295,6 +298,29 @@ export default function Game() {
       });
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+  
+  const handleChangeName = () => {
+    if (!newUsername.trim() || isChangingName) return;
+    
+    if (newUsername.length < 2 || newUsername.length > 20) {
+      toast({
+        title: "Geçersiz isim",
+        description: "İsim 2-20 karakter arasında olmalıdır",
+        duration: 3000,
+      });
+      return;
+    }
+    
+    setIsChangingName(true);
+    send("change_username", { newUsername: newUsername.trim() });
+    
+    // Reset after sending
+    setTimeout(() => {
+      setIsChangingName(false);
+      setShowChangeNameDialog(false);
+      setNewUsername("");
+    }, 1000);
   };
 
   const handleGiveClue = () => {
@@ -769,6 +795,86 @@ export default function Game() {
                   </Button>
                 </>
               )}
+              {/* Change Username Dialog */}
+              <Dialog open={showChangeNameDialog} onOpenChange={setShowChangeNameDialog}>
+                <DialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 px-2 border hover:border-green-500 hover:bg-green-500/10"
+                    title="İsim Değiştir"
+                  >
+                    <Edit2 className="w-2.5 h-2.5 mr-0.5" />
+                    <span className="text-[10px]">İsim</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900/95 border-2 border-green-900/30 max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      İsim Değiştir
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-300">Mevcut İsim</Label>
+                      <div className="px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                        <span className="text-sm text-slate-200">{currentPlayer?.username || ""}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-300">Yeni İsim</Label>
+                      <Input
+                        type="text"
+                        placeholder="Yeni kullanıcı adınız"
+                        value={newUsername}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                        maxLength={20}
+                        disabled={isChangingName}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            handleChangeName();
+                          }
+                        }}
+                        className="bg-slate-800/50 border-slate-700 focus:border-green-500 text-white"
+                      />
+                      <p className="text-xs text-slate-500">2-20 karakter arasında olmalıdır</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleChangeName}
+                        disabled={isChangingName || !newUsername.trim() || newUsername.trim() === currentPlayer?.username}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        {isChangingName ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Değiştiriliyor...
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-4 h-4 mr-2" />
+                            Değiştir
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowChangeNameDialog(false);
+                          setNewUsername("");
+                        }}
+                        variant="outline"
+                        className="flex-1 border-slate-700 hover:border-slate-600"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        İptal
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <div className="w-px h-5 bg-amber-900/40" />
+              
               {/* Players Dialog */}
               <Dialog>
                 <DialogTrigger asChild>

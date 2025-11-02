@@ -160,6 +160,34 @@ export function useWebSocket() {
                 // Handle timer expiry notification
                 setServerTimer({ timeRemaining: 0, isExpired: true });
                 break;
+                
+              case "username_changed":
+                // Handle username change response
+                if (message.payload.success) {
+                  // Username changed successfully - update local storage
+                  const currentPlayer = message.payload.gameState?.players?.find((p: any) => p.id === playerId);
+                  if (currentPlayer) {
+                    localStorage.setItem("katmannames_username", currentPlayer.username);
+                  }
+                } else {
+                  setError(message.payload.message || "İsim değiştirilemedi");
+                }
+                break;
+                
+              case "game_state_updated":
+                // Handle game state updates (team changes, username changes, etc.)
+                if (message.payload.gameState) {
+                  setGameState(message.payload.gameState);
+                  // Update username in localStorage if it changed
+                  const currentPlayer = message.payload.gameState.players?.find((p: any) => p.id === playerId);
+                  if (currentPlayer) {
+                    const storedUsername = localStorage.getItem("katmannames_username");
+                    if (storedUsername !== currentPlayer.username) {
+                      localStorage.setItem("katmannames_username", currentPlayer.username);
+                    }
+                  }
+                }
+                break;
             }
           } catch (err) {
             console.error("Error parsing WebSocket message:", err);
