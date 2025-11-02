@@ -64,8 +64,8 @@ export default function Game() {
     const button = e.currentTarget;
     const rect = button.getBoundingClientRect();
     setZoomButtonPosition({
-      top: rect.bottom + window.scrollY + 12,
-      left: rect.left + rect.width / 2 + window.scrollX
+      top: rect.bottom + 5,
+      left: rect.left + rect.width / 2
     });
     setShowZoomHelp(!showZoomHelp);
   };
@@ -2155,11 +2155,11 @@ export default function Game() {
             transform: 'translateX(-50%)'
           }}
         >
-          <div className="bg-slate-900/98 backdrop-blur-xl border-2 border-amber-500/40 rounded-xl p-6 shadow-2xl min-w-[350px]">
+          <div className="bg-slate-900 backdrop-blur-xl border-2 border-amber-500/50 rounded-xl p-6 shadow-[0_0_40px_rgba(245,158,11,0.3)] min-w-[350px]">
             <div className="flex flex-col gap-4">
               <div className="text-base font-bold text-amber-400 text-center">Tahtayı Yakınlaştır / Uzaklaştır</div>
               <div className="flex items-center gap-4 justify-center">
-                <div className="flex items-center gap-3 bg-slate-800/60 rounded-lg px-5 py-3 animate-pulse-subtle">
+                <div className="flex items-center gap-3 bg-slate-800 rounded-lg px-5 py-3 border border-slate-700 animate-pulse-subtle">
                   <Command className="w-6 h-6 text-blue-400" />
                   <span className="text-sm text-slate-200 font-bold">Ctrl</span>
                   <span className="text-lg text-slate-400 font-bold">+</span>
@@ -2182,7 +2182,7 @@ export default function Game() {
                 Ctrl tuşunu basılı tutup fare tekerleğini çevirin
               </div>
             </div>
-            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-slate-900/98 border-t-2 border-l-2 border-amber-500/40 rotate-45"></div>
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-slate-900 border-t-2 border-l-2 border-amber-500/50 rotate-45"></div>
           </div>
         </div>,
         document.body
