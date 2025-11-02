@@ -14,6 +14,14 @@ interface WebSocketContextType {
   serverTimer: { timeRemaining: number; isExpired: boolean } | null;
   usernameChangeStatus: { success: boolean; message?: string } | null;
   clearUsernameChangeStatus: () => void;
+  taunts: any[];
+  insults: any[];
+  tauntEnabled: boolean;
+  insultEnabled: boolean;
+  globalTauntCooldown: number;
+  globalInsultCooldown: number;
+  setGlobalTauntCooldown: (value: number | ((prev: number) => number)) => void;
+  setGlobalInsultCooldown: (value: number | ((prev: number) => number)) => void;
   send: (type: string, payload: any) => void;
 }
 

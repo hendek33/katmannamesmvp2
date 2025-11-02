@@ -26,20 +26,33 @@ import Lobby from "./Lobby";
 export default function Game() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { isConnected, gameState, playerId, roomCode, error, send, cardVotes, cardImages, usernameChangeStatus, clearUsernameChangeStatus } = useWebSocketContext();
+  const { 
+    isConnected, 
+    gameState, 
+    playerId, 
+    roomCode, 
+    error, 
+    send, 
+    cardVotes, 
+    cardImages, 
+    usernameChangeStatus, 
+    clearUsernameChangeStatus,
+    taunts,
+    insults,
+    tauntEnabled,
+    insultEnabled,
+    globalTauntCooldown,
+    globalInsultCooldown,
+    setGlobalTauntCooldown,
+    setGlobalInsultCooldown
+  } = useWebSocketContext();
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
   const [showNumberSelector, setShowNumberSelector] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showRoomCode, setShowRoomCode] = useState(false);
-  const [taunts, setTaunts] = useState<any[]>([]);
   const [tauntCooldown, setTauntCooldown] = useState<number>(0);
   const [insultCooldown, setInsultCooldown] = useState<number>(0);
-  const [insults, setInsults] = useState<any[]>([]);
-  const [tauntEnabled, setTauntEnabled] = useState(true);
-  const [insultEnabled, setInsultEnabled] = useState(true);
-  const [globalTauntCooldown, setGlobalTauntCooldown] = useState<number>(0);
-  const [globalInsultCooldown, setGlobalInsultCooldown] = useState<number>(0);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const [showDeveloperNote, setShowDeveloperNote] = useState(true);
@@ -434,53 +447,6 @@ export default function Game() {
     }
   }, [globalInsultCooldown]);
 
-  // Listen for taunt and insult events via WebSocket
-  useEffect(() => {
-    // Access WebSocket directly to listen for events
-    const ws = (window as any).wsRef?.current;
-    if (!ws) return;
-    
-    const handleMessage = (event: MessageEvent) => {
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type === 'taunt_fired' || message.type === 'taunt_triggered') {
-          setTaunts(prev => [...prev, message.payload]);
-          // Set global cooldown for 5 seconds
-          setGlobalTauntCooldown(5);
-        } else if (message.type === 'insult_sent') {
-          setInsults(prev => [...prev, message.payload]);
-          // Set global cooldown for 5 seconds
-          setGlobalInsultCooldown(5);
-          // Remove insult after 3 seconds
-          setTimeout(() => {
-            setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
-          }, 3000);
-        } else if (message.type === 'taunt_toggled') {
-          setTauntEnabled(message.payload.tauntEnabled);
-          toast({
-            title: "Hareket Çekme",
-            description: message.payload.tauntEnabled ? "Aktif" : "Devre dışı",
-          });
-        } else if (message.type === 'insult_toggled') {
-          setInsultEnabled(message.payload.insultEnabled);
-          toast({
-            title: "Laf Sokma",
-            description: message.payload.insultEnabled ? "Aktif" : "Devre dışı",
-          });
-        } else if (message.type === 'room_features') {
-          setTauntEnabled(message.payload.tauntEnabled);
-          setInsultEnabled(message.payload.insultEnabled);
-          setGlobalTauntCooldown(message.payload.globalTauntCooldown || 0);
-          setGlobalInsultCooldown(message.payload.globalInsultCooldown || 0);
-        }
-      } catch (err) {
-        console.error('Error handling message:', err);
-      }
-    };
-    
-    ws.addEventListener('message', handleMessage);
-    return () => ws.removeEventListener('message', handleMessage);
-  }, [toast]);
   
   // Get room features on mount
   useEffect(() => {

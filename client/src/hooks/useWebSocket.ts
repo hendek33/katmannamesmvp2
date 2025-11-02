@@ -18,6 +18,12 @@ export function useWebSocket() {
   const [cardImages, setCardImages] = useState<Record<number, string>>({});
   const [serverTimer, setServerTimer] = useState<{ timeRemaining: number; isExpired: boolean } | null>(null);
   const [usernameChangeStatus, setUsernameChangeStatus] = useState<{ success: boolean; message?: string } | null>(null);
+  const [taunts, setTaunts] = useState<any[]>([]);
+  const [insults, setInsults] = useState<any[]>([]);
+  const [tauntEnabled, setTauntEnabled] = useState<boolean>(true);
+  const [insultEnabled, setInsultEnabled] = useState<boolean>(true);
+  const [globalTauntCooldown, setGlobalTauntCooldown] = useState<number>(0);
+  const [globalInsultCooldown, setGlobalInsultCooldown] = useState<number>(0);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -195,6 +201,50 @@ export function useWebSocket() {
                   }
                 }
                 break;
+                
+              case "taunt_fired":
+              case "taunt_triggered":
+                // Handle taunt events
+                setTaunts(prev => [...prev, message.payload]);
+                setGlobalTauntCooldown(5);
+                // Remove taunt after expiry
+                if (message.payload.expiresAt) {
+                  const timeout = message.payload.expiresAt - Date.now();
+                  if (timeout > 0) {
+                    setTimeout(() => {
+                      setTaunts(prev => prev.filter(t => 
+                        t.expiresAt !== message.payload.expiresAt || 
+                        t.playerId !== message.payload.playerId
+                      ));
+                    }, timeout);
+                  }
+                }
+                break;
+                
+              case "insult_sent":
+                // Handle insult events
+                setInsults(prev => [...prev, message.payload]);
+                setGlobalInsultCooldown(5);
+                // Remove insult after 3 seconds
+                setTimeout(() => {
+                  setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
+                }, 3000);
+                break;
+                
+              case "taunt_toggled":
+                setTauntEnabled(message.payload.tauntEnabled);
+                break;
+                
+              case "insult_toggled":
+                setInsultEnabled(message.payload.insultEnabled);
+                break;
+                
+              case "room_features":
+                setTauntEnabled(message.payload.tauntEnabled);
+                setInsultEnabled(message.payload.insultEnabled);
+                setGlobalTauntCooldown(message.payload.globalTauntCooldown || 0);
+                setGlobalInsultCooldown(message.payload.globalInsultCooldown || 0);
+                break;
             }
           } catch (err) {
             console.error("Error parsing WebSocket message:", err);
@@ -281,6 +331,14 @@ export function useWebSocket() {
     serverTimer,
     usernameChangeStatus,
     clearUsernameChangeStatus,
+    taunts,
+    insults,
+    tauntEnabled,
+    insultEnabled,
+    globalTauntCooldown,
+    globalInsultCooldown,
+    setGlobalTauntCooldown,
+    setGlobalInsultCooldown,
     send,
   };
 }
