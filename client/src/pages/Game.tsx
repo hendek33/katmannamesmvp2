@@ -17,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -70,6 +70,7 @@ export default function Game() {
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
   const assassinShownRef = useRef<boolean>(false);
+  const [zoomLevel, setZoomLevel] = useState(100);
 
 
   // Preload all card images when the game page loads
@@ -313,6 +314,19 @@ export default function Game() {
   const handleNormalWinVideoComplete = useCallback(() => {
     setShowNormalWinVideo(false);
   }, []);
+
+  // Zoom controls
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 10, 150));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 10, 50));
+  };
+
+  const handleZoomReset = () => {
+    setZoomLevel(100);
+  };
 
   const handleTriggerTaunt = () => {
     if (globalTauntCooldown > 0 || !playerId || !tauntEnabled) return;
@@ -604,7 +618,7 @@ export default function Game() {
         </div>
       )}
       
-      <div className="relative z-10 h-full flex flex-col p-2">
+      <div className="relative z-10 h-full flex flex-col p-2" style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center', height: `${100 / (zoomLevel / 100)}vh` }}>
         <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Mobile Header */}
         <div className="lg:hidden flex justify-between gap-2 flex-shrink-0 mb-2">
@@ -626,6 +640,26 @@ export default function Game() {
                   ) : (
                     <Eye className="w-2.5 h-2.5" />
                   )}
+                </Button>
+              </div>
+              {/* Mobile Zoom Controls */}
+              <div className="flex items-center gap-0.5">
+                <Button
+                  onClick={handleZoomOut}
+                  size="sm"
+                  variant="ghost"
+                  className="h-5 w-5 p-0"
+                >
+                  <ZoomOut className="w-2.5 h-2.5" />
+                </Button>
+                <span className="text-[10px] font-medium text-muted-foreground">{zoomLevel}%</span>
+                <Button
+                  onClick={handleZoomIn}
+                  size="sm"
+                  variant="ghost"
+                  className="h-5 w-5 p-0"
+                >
+                  <ZoomIn className="w-2.5 h-2.5" />
                 </Button>
               </div>
               <div className="flex items-center gap-1">
@@ -783,6 +817,39 @@ export default function Game() {
                   </div>
                 </DialogContent>
               </Dialog>
+              
+              {/* Zoom Controls */}
+              <div className="w-px h-5 bg-amber-900/40" />
+              <div className="flex items-center gap-1">
+                <Button
+                  onClick={handleZoomOut}
+                  size="sm"
+                  variant="outline"
+                  className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
+                  title="Uzaklaştır"
+                >
+                  <ZoomOut className="w-3 h-3" />
+                </Button>
+                <Button
+                  onClick={handleZoomReset}
+                  size="sm"
+                  variant="outline"
+                  className="h-6 px-3 text-xs font-medium border hover:border-amber-500 hover:bg-amber-500/10"
+                  title="Sıfırla"
+                >
+                  {zoomLevel}%
+                </Button>
+                <Button
+                  onClick={handleZoomIn}
+                  size="sm"
+                  variant="outline"
+                  className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
+                  title="Yakınlaştır"
+                >
+                  <ZoomIn className="w-3 h-3" />
+                </Button>
+              </div>
+              
               {/* Game End Controls */}
               {gameState.phase === "ended" ? (
                 <div className="flex items-center gap-2">
