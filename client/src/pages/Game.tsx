@@ -1595,8 +1595,8 @@ export default function Game() {
               />
             )}
             
-            {/* Action Buttons - Below Blue Team Panel */}
-            {currentPlayer && gameState.phase === "playing" && (
+            {/* Action Buttons - Below Blue Team Panel (Hidden for Spymasters) */}
+            {currentPlayer && gameState.phase === "playing" && currentPlayer.role !== "spymaster" && (
               <div className="mt-4 space-y-2">
                 {/* Action Buttons Container */}
                 <div className="flex gap-2">
