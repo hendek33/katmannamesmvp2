@@ -3,11 +3,12 @@ import { cn } from "@/lib/utils";
 
 interface TauntBubbleProps {
   senderUsername: string;
+  senderDisplayName?: string;
   senderTeam: "dark" | "light" | null;
   videoSrc: string;
 }
 
-export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbleProps) {
+export function TauntBubble({ senderUsername, senderDisplayName, senderTeam, videoSrc }: TauntBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -96,7 +97,7 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
             ? '0 2px 8px rgba(59,130,246,0.5), 0 0 15px rgba(59,130,246,0.3)'
             : '0 2px 8px rgba(239,68,68,0.5), 0 0 15px rgba(239,68,68,0.3)'
         }}>
-          {senderUsername}
+          {senderDisplayName || senderUsername}
         </div>
         
         {/* Circular video container */}

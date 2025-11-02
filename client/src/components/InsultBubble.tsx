@@ -3,14 +3,16 @@ import { cn } from '@/lib/utils';
 
 interface InsultBubbleProps {
   senderUsername: string;
+  senderDisplayName?: string;
   senderTeam: 'dark' | 'light';
   targetUsername?: string;
+  targetDisplayName?: string;
   targetTeam?: 'dark' | 'light';
   message: string;
   timestamp: number;
 }
 
-export function InsultBubble({ senderUsername, senderTeam, targetUsername, targetTeam, message }: InsultBubbleProps) {
+export function InsultBubble({ senderUsername, senderDisplayName, senderTeam, targetUsername, targetDisplayName, targetTeam, message }: InsultBubbleProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
 
@@ -57,7 +59,7 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
             ? "bg-blue-700/80 text-blue-100"
             : "bg-red-700/80 text-red-100"
         )}>
-          {senderUsername}
+          {senderDisplayName || senderUsername}
         </div>
         
         {/* Message with highlighted target */}
@@ -72,9 +74,9 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
                     : "text-red-400"
                 )}
               >
-                {targetUsername}
+                {targetDisplayName || targetUsername}
               </span>
-              {message.replace(targetUsername, '')}
+              {message.replace(targetDisplayName || targetUsername, '')}
             </>
           ) : (
             message
