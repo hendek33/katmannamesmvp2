@@ -153,50 +153,37 @@ export class MemStorage implements IStorage {
         '/acilmiskartgorsel/çağrı sigara beyaz.png',
         '/acilmiskartgorsel/şinasi su beyaz.png'  // 7 total neutral cards!
       ],
-      assassin: [
-        '/ajan siyah.png',
-        '/acilmiskartgorsel/arda siyah.png'  // Added variety for assassin card
-      ]
+      assassin: ['/ajan siyah.png']
     };
 
-    // Shuffle each pool using Fisher-Yates for better randomness
+    // Shuffle each pool
     for (const type in imagePools) {
-      imagePools[type as keyof typeof imagePools] = this.fisherYatesShuffle(imagePools[type as keyof typeof imagePools]);
+      imagePools[type as keyof typeof imagePools] = imagePools[type as keyof typeof imagePools]
+        .sort(() => Math.random() - 0.5);
     }
 
     // Create the mapping - now we have enough unique images for all cards!
     const cardImages = new Map<number, string>();
-    
-    // Group cards by type for better randomization
-    const cardsByType: Record<CardType, Card[]> = {
-      dark: [],
-      light: [],
-      neutral: [],
-      assassin: []
-    };
-    
+    const imageIndexes = { dark: 0, light: 0, neutral: 0, assassin: 0 };
+
+    // Assign unique images to each card based on its type
     roomData.gameState.cards.forEach(card => {
-      cardsByType[card.type].push(card);
+      const type = card.type;
+      const pool = imagePools[type];
+      const index = imageIndexes[type];
+      
+      // This should never happen now that we have enough images
+      if (!pool || index >= pool.length) {
+        console.error(`Not enough images for card type: ${type}, index: ${index}`);
+        // Fallback: use modulo to reuse images if needed
+        const safeIndex = index % pool.length;
+        cardImages.set(card.id, pool[safeIndex]);
+      } else {
+        cardImages.set(card.id, pool[index]);
+      }
+      
+      imageIndexes[type]++;
     });
-    
-    // Assign images with better randomization
-    for (const type in cardsByType) {
-      const cards = cardsByType[type as CardType];
-      const pool = imagePools[type as CardType];
-      
-      // Shuffle the cards of this type too for extra randomness
-      const shuffledCards = this.fisherYatesShuffle(cards);
-      
-      shuffledCards.forEach((card, index) => {
-        if (pool && index < pool.length) {
-          cardImages.set(card.id, pool[index]);
-        } else {
-          // Fallback: use modulo to reuse images if needed
-          const safeIndex = index % pool.length;
-          cardImages.set(card.id, pool[safeIndex]);
-        }
-      });
-    }
 
     roomData.cardImages = cardImages;
   }
