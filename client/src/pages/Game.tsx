@@ -973,15 +973,6 @@ export default function Game() {
                     <span className="text-xs">Oyunu Düzenle</span>
                   </Button>
                 </div>
-              ) : gameState.currentClue ? (
-                <div className="relative z-[46] flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-600/20 to-orange-600/20 rounded-lg border border-amber-500/30 animate-clue-slide-up">
-                  <Lightbulb className="w-3 h-3 text-amber-400 animate-pulse" />
-                  <span className="text-xs font-medium text-amber-300">İpucu:</span>
-                  <span className="text-xs font-black text-amber-100">{gameState.currentClue.word}</span>
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                    <span className="text-xs font-black text-white">{gameState.currentClue.count}</span>
-                  </div>
-                </div>
               ) : (
                 <div className="flex items-center gap-3 px-3 py-1 bg-slate-800/50 rounded-lg border border-slate-700/50">
                   <div className="flex items-center gap-2">
@@ -994,11 +985,6 @@ export default function Game() {
                         {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
                       </span>
                     </span>
-                  </div>
-                  <div className="w-px h-4 bg-slate-600" />
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs text-slate-400">Açılan:</span>
-                    <span className="text-xs font-bold text-slate-200">{gameState.revealHistory.filter((e: any) => e.word).length}/25</span>
                   </div>
                 </div>
               )}
@@ -2218,10 +2204,6 @@ export default function Game() {
               
               {/* Quick stats at bottom */}
               <div className="mt-1 pt-1 border-t border-slate-700/50 flex justify-around text-xs">
-                <div className="flex items-center gap-1">
-                  <span className="text-gray-500">Açılan:</span>
-                  <span className="font-bold text-gray-300">{gameState.revealHistory.filter((e: any) => e.word).length}/25</span>
-                </div>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-500">Koyu:</span>
                   <span className="font-bold text-blue-400">{gameState.darkCardsRemaining}</span>
