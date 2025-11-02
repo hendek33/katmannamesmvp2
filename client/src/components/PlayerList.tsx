@@ -112,7 +112,7 @@ export function PlayerList({
                   Takım ismi belirle
                 </button>
               ) : (
-                <h3 className="font-bold text-sm sm:text-base text-slate-100">{title}</h3>
+                <h3 className="font-bold text-base sm:text-lg text-slate-100">{title}</h3>
               )}
               {isLobby && onTeamNameChange && !(title === "Mavi Takım" || title === "Kırmızı Takım") && (
                 <Button
@@ -188,7 +188,7 @@ export function PlayerList({
                   {spymaster.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
-                  <span className="text-sm font-bold text-center truncate text-amber-200">
+                  <span className="text-base font-bold text-center truncate text-amber-200">
                     {(spymaster as any).displayName || spymaster.username}
                   </span>
                 </div>
@@ -252,7 +252,7 @@ export function PlayerList({
                   {agent.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
-                  <span className="text-sm font-medium text-center truncate">
+                  <span className="text-base font-medium text-center truncate">
                     {(agent as any).displayName || agent.username}
                   </span>
                 </div>
