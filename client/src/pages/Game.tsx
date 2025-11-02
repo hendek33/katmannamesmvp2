@@ -1517,8 +1517,8 @@ export default function Game() {
               </div>
             )}
             
-            {/* Developer Note - Always visible, with large spacing from buttons */}
-            {currentPlayer && gameState.phase === "playing" && showDeveloperNote && (
+            {/* Developer Note - Visible during playing and ended phases */}
+            {currentPlayer && (gameState.phase === "playing" || gameState.phase === "ended") && showDeveloperNote && (
               <div className="mt-6 p-4 bg-slate-900/90 backdrop-blur-sm rounded-lg border border-slate-600/50 shadow-xl relative">
                 {/* Close Button */}
                 <button
