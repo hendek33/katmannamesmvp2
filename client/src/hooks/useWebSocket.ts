@@ -17,6 +17,7 @@ export function useWebSocket() {
   const [cardVotes, setCardVotes] = useState<Record<number, string[]>>({});
   const [cardImages, setCardImages] = useState<Record<number, string>>({});
   const [serverTimer, setServerTimer] = useState<{ timeRemaining: number; isExpired: boolean } | null>(null);
+  const [usernameChangeStatus, setUsernameChangeStatus] = useState<{ success: boolean; message?: string } | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -169,7 +170,13 @@ export function useWebSocket() {
                   if (currentPlayer) {
                     localStorage.setItem("katmannames_username", currentPlayer.username);
                   }
+                  setUsernameChangeStatus({ success: true });
+                  setError("");
                 } else {
+                  setUsernameChangeStatus({ 
+                    success: false, 
+                    message: message.payload.message || "İsim değiştirilemedi" 
+                  });
                   setError(message.payload.message || "İsim değiştirilemedi");
                 }
                 break;
@@ -258,6 +265,10 @@ export function useWebSocket() {
     }
   }, []);
 
+  const clearUsernameChangeStatus = useCallback(() => {
+    setUsernameChangeStatus(null);
+  }, []);
+
   return {
     isConnected,
     gameState,
@@ -268,6 +279,8 @@ export function useWebSocket() {
     cardVotes,
     cardImages,
     serverTimer,
+    usernameChangeStatus,
+    clearUsernameChangeStatus,
     send,
   };
 }

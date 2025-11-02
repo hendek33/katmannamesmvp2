@@ -12,6 +12,8 @@ interface WebSocketContextType {
   cardVotes: Record<number, string[]>;
   cardImages: Record<number, string>;
   serverTimer: { timeRemaining: number; isExpired: boolean } | null;
+  usernameChangeStatus: { success: boolean; message?: string } | null;
+  clearUsernameChangeStatus: () => void;
   send: (type: string, payload: any) => void;
 }
 

@@ -26,7 +26,7 @@ import Lobby from "./Lobby";
 export default function Game() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { isConnected, gameState, playerId, roomCode, error, send, cardVotes, cardImages } = useWebSocketContext();
+  const { isConnected, gameState, playerId, roomCode, error, send, cardVotes, cardImages, usernameChangeStatus, clearUsernameChangeStatus } = useWebSocketContext();
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
   const [showNumberSelector, setShowNumberSelector] = useState(false);
@@ -60,6 +60,34 @@ export default function Game() {
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [isChangingName, setIsChangingName] = useState(false);
+  
+  // Handle username change response
+  useEffect(() => {
+    if (usernameChangeStatus) {
+      if (usernameChangeStatus.success) {
+        // Success - close dialog and reset
+        setShowChangeNameDialog(false);
+        setNewUsername("");
+        setIsChangingName(false);
+        toast({
+          title: "İsim değiştirildi",
+          description: "Yeni isminiz başarıyla kaydedildi",
+          duration: 3000,
+        });
+      } else {
+        // Error - show message and keep dialog open
+        setIsChangingName(false);
+        toast({
+          title: "Hata",
+          description: usernameChangeStatus.message || "İsim değiştirilemedi",
+          variant: "destructive",
+          duration: 4000,
+        });
+      }
+      // Clear the status after handling
+      clearUsernameChangeStatus();
+    }
+  }, [usernameChangeStatus, clearUsernameChangeStatus, toast]);
   
   // Handle zoom help button click
   const handleZoomHelpClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -314,13 +342,6 @@ export default function Game() {
     
     setIsChangingName(true);
     send("change_username", { newUsername: newUsername.trim() });
-    
-    // Reset after sending
-    setTimeout(() => {
-      setIsChangingName(false);
-      setShowChangeNameDialog(false);
-      setNewUsername("");
-    }, 1000);
   };
 
   const handleGiveClue = () => {
