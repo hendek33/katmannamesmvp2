@@ -17,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -42,24 +42,6 @@ export default function Game() {
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const [showDeveloperNote, setShowDeveloperNote] = useState(true);
-  
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('.number-selector-container')) {
-        setShowNumberSelector(false);
-      }
-      if (!target.closest('.insult-button-container')) {
-        setShowInsultV2Dialog(false);
-      }
-    };
-    
-    if (showNumberSelector || showInsultV2Dialog) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [showNumberSelector, showInsultV2Dialog]);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
   const [currentTurn, setCurrentTurn] = useState<"dark" | "light" | null>(null);
   const [isGameStart, setIsGameStart] = useState(false);
@@ -71,6 +53,28 @@ export default function Game() {
   const previousClueRef = useRef<string | null>(null);
   const assassinShownRef = useRef<boolean>(false);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [showZoomHelp, setShowZoomHelp] = useState(false);
+  
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.number-selector-container')) {
+        setShowNumberSelector(false);
+      }
+      if (!target.closest('.insult-button-container')) {
+        setShowInsultV2Dialog(false);
+      }
+      if (!target.closest('.zoom-help-container')) {
+        setShowZoomHelp(false);
+      }
+    };
+    
+    if (showNumberSelector || showInsultV2Dialog || showZoomHelp) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showNumberSelector, showInsultV2Dialog, showZoomHelp]);
 
 
   // Preload all card images when the game page loads
@@ -644,25 +648,37 @@ export default function Game() {
                   )}
                 </Button>
               </div>
-              {/* Mobile Zoom Controls */}
-              <div className="flex items-center gap-0.5">
+              {/* Mobile Zoom Info Button */}
+              <div className="relative zoom-help-container">
                 <Button
-                  onClick={handleZoomOut}
+                  onClick={() => setShowZoomHelp(!showZoomHelp)}
                   size="sm"
                   variant="ghost"
-                  className="h-5 w-5 p-0"
+                  className="h-6 w-6 p-0"
+                  title="Yakınlaştırma Bilgisi"
                 >
-                  <ZoomOut className="w-2.5 h-2.5" />
+                  <Info className="w-3 h-3" />
                 </Button>
-                <span className="text-[10px] font-medium text-muted-foreground">{zoomLevel}%</span>
-                <Button
-                  onClick={handleZoomIn}
-                  size="sm"
-                  variant="ghost"
-                  className="h-5 w-5 p-0"
-                >
-                  <ZoomIn className="w-2.5 h-2.5" />
-                </Button>
+                
+                {/* Zoom Help Bubble - Mobile */}
+                {showZoomHelp && (
+                  <div className="absolute top-8 right-0 z-50 animate-zoom-help-enter">
+                    <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-3 shadow-2xl min-w-[200px]">
+                      <div className="flex flex-col gap-2">
+                        <div className="text-xs font-semibold text-amber-400">Yakınlaştırma</div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 bg-slate-800/50 rounded px-2 py-1">
+                            <Command className="w-3 h-3 text-blue-400" />
+                            <span className="text-[10px] text-slate-300">+</span>
+                            <Mouse className="w-3 h-3 text-blue-400" />
+                          </div>
+                          <span className="text-[10px] text-slate-400">Kaydır</span>
+                        </div>
+                      </div>
+                      <div className="absolute -top-1 right-2 w-2 h-2 bg-slate-900/95 border-t-2 border-l-2 border-amber-500/30 transform rotate-45"></div>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-1">
                 <Users className="w-3 h-3 text-muted-foreground" />
@@ -820,36 +836,48 @@ export default function Game() {
                 </DialogContent>
               </Dialog>
               
-              {/* Zoom Controls */}
+              {/* Desktop Zoom Info Button */}
               <div className="w-px h-5 bg-amber-900/40" />
-              <div className="flex items-center gap-1">
+              <div className="relative zoom-help-container">
                 <Button
-                  onClick={handleZoomOut}
+                  onClick={() => setShowZoomHelp(!showZoomHelp)}
                   size="sm"
                   variant="outline"
-                  className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
-                  title="Uzaklaştır"
+                  className="h-7 px-3 border hover:border-amber-500 hover:bg-amber-500/10"
+                  title="Yakınlaştırma Bilgisi"
                 >
-                  <ZoomOut className="w-3 h-3" />
+                  <Info className="w-3 h-3 mr-1" />
+                  <span className="text-xs">Büyüt/Küçült</span>
                 </Button>
-                <Button
-                  onClick={handleZoomReset}
-                  size="sm"
-                  variant="outline"
-                  className="h-6 px-3 text-xs font-medium border hover:border-amber-500 hover:bg-amber-500/10"
-                  title="Sıfırla"
-                >
-                  {zoomLevel}%
-                </Button>
-                <Button
-                  onClick={handleZoomIn}
-                  size="sm"
-                  variant="outline"
-                  className="h-6 px-2 border hover:border-amber-500 hover:bg-amber-500/10"
-                  title="Yakınlaştır"
-                >
-                  <ZoomIn className="w-3 h-3" />
-                </Button>
+                
+                {/* Zoom Help Bubble - Desktop */}
+                {showZoomHelp && (
+                  <div className="absolute top-9 left-1/2 transform -translate-x-1/2 z-50 animate-zoom-help-enter">
+                    <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
+                      <div className="flex flex-col gap-3">
+                        <div className="text-sm font-semibold text-amber-400">Tahtayı Yakınlaştır/Uzaklaştır</div>
+                        <div className="flex items-center gap-3 justify-center">
+                          <div className="flex items-center gap-2 bg-slate-800/50 rounded px-3 py-2 animate-pulse-subtle">
+                            <Command className="w-4 h-4 text-blue-400" />
+                            <span className="text-xs text-slate-300 font-medium">Ctrl</span>
+                            <span className="text-slate-400">+</span>
+                            <div className="flex flex-col items-center">
+                              <Mouse className="w-4 h-4 text-blue-400" />
+                              <div className="flex flex-col items-center -mt-1">
+                                <div className="w-0.5 h-2 bg-gradient-to-b from-blue-400 to-transparent animate-scroll-up"></div>
+                                <div className="w-0.5 h-2 bg-gradient-to-t from-red-400 to-transparent animate-scroll-down"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-[10px] text-slate-500 text-center">
+                          Ctrl tuşunu basılı tutup fare tekerleğini çevirin
+                        </div>
+                      </div>
+                      <div className="absolute -top-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-slate-900/95 border-t-2 border-l-2 border-amber-500/30 rotate-45"></div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               {/* Game End Controls */}
