@@ -206,7 +206,11 @@ export function useWebSocket() {
               case "taunt_triggered":
                 // Handle taunt events
                 setTaunts(prev => [...prev, message.payload]);
-                setGlobalTauntCooldown(5);
+                // Only set cooldown for the same team
+                const currentPlayer = gameState?.players.find((p: any) => p.id === playerId);
+                if (currentPlayer && currentPlayer.team === message.payload.team) {
+                  setGlobalTauntCooldown(5);
+                }
                 // Remove taunt after expiry
                 if (message.payload.expiresAt) {
                   const timeout = message.payload.expiresAt - Date.now();
@@ -224,7 +228,11 @@ export function useWebSocket() {
               case "insult_sent":
                 // Handle insult events
                 setInsults(prev => [...prev, message.payload]);
-                setGlobalInsultCooldown(5);
+                // Only set cooldown for the same team
+                const insultPlayer = gameState?.players.find((p: any) => p.id === playerId);
+                if (insultPlayer && insultPlayer.team === message.payload.senderTeam) {
+                  setGlobalInsultCooldown(5);
+                }
                 // Remove insult after 3 seconds
                 setTimeout(() => {
                   setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
