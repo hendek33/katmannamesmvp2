@@ -662,7 +662,7 @@ export default function Game() {
                 
                 {/* Zoom Help Bubble - Mobile */}
                 {showZoomHelp && (
-                  <div className="absolute top-8 right-0 z-50 animate-zoom-help-enter">
+                  <div className="absolute top-full mt-2 right-0 z-[9999] animate-zoom-help-enter">
                     <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-3 shadow-2xl min-w-[200px]">
                       <div className="flex flex-col gap-2">
                         <div className="text-xs font-semibold text-amber-400">Yakınlaştırma</div>
@@ -852,7 +852,7 @@ export default function Game() {
                 
                 {/* Zoom Help Bubble - Desktop */}
                 {showZoomHelp && (
-                  <div className="absolute top-9 left-1/2 transform -translate-x-1/2 z-50 animate-zoom-help-enter">
+                  <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-[9999] animate-zoom-help-enter">
                     <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
                       <div className="flex flex-col gap-3">
                         <div className="text-sm font-semibold text-amber-400">Tahtayı Yakınlaştır/Uzaklaştır</div>
