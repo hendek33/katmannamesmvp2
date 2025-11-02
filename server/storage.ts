@@ -38,6 +38,7 @@ export interface IStorage {
   restartGame(roomCode: string, playerId: string): GameState | null;
   returnToLobby(roomCode: string): GameState | null;
   endTurn(roomCode: string, playerId: string): GameState | null;
+  markPlayerDisconnected(roomCode: string, playerId: string): GameState | null;
   removePlayer(roomCode: string, playerId: string): void;
   cleanupEmptyRooms(): void;
   getCardImages(roomCode: string): Record<number, string> | null;
@@ -86,6 +87,7 @@ export class MemStorage implements IStorage {
   private tauntCooldowns: Map<string, number>; // For taunt system
   private activeUsernames: Map<string, string>; // username -> playerId, tracks active usernames globally
   private playerIdToUsername: Map<string, string>; // playerId -> username for cleanup
+  private disconnectedPlayers: Map<string, { player: Player; roomCode: string; disconnectedAt: number }>; // Track disconnected players with timestamp
 
   constructor() {
     this.rooms = new Map();
@@ -96,8 +98,23 @@ export class MemStorage implements IStorage {
     this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
     this.activeUsernames = new Map(); // Track active usernames globally
     this.playerIdToUsername = new Map(); // Track playerId to username mapping
+    this.disconnectedPlayers = new Map(); // Track disconnected players for reconnection
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
+    setInterval(() => this.cleanupDisconnectedPlayers(), 30000); // Clean up old disconnected players every 30 seconds
+  }
+
+  private cleanupDisconnectedPlayers(): void {
+    const now = Date.now();
+    const DISCONNECT_TIMEOUT = 60000; // 60 seconds timeout for disconnected players
+    
+    Array.from(this.disconnectedPlayers.entries()).forEach(([playerId, data]) => {
+      if (now - data.disconnectedAt > DISCONNECT_TIMEOUT) {
+        // Player has been disconnected for too long, remove them permanently
+        this.disconnectedPlayers.delete(playerId);
+        // Don't release username yet, it's still reserved for the room
+      }
+    });
   }
 
   private generateRoomCode(): string {
@@ -302,12 +319,31 @@ export class MemStorage implements IStorage {
 
     const room = roomData.gameState;
 
+    // First check if this is a disconnected player reconnecting
+    if (reconnectPlayerId && this.disconnectedPlayers.has(reconnectPlayerId)) {
+      const disconnectedData = this.disconnectedPlayers.get(reconnectPlayerId);
+      if (disconnectedData && disconnectedData.roomCode === roomCode && disconnectedData.player.username === username) {
+        // Restore the disconnected player
+        const existingPlayer = room.players.find(p => p.id === reconnectPlayerId);
+        if (existingPlayer) {
+          // Clear disconnected flag
+          delete (existingPlayer as any).isDisconnected;
+          this.disconnectedPlayers.delete(reconnectPlayerId);
+          this.playerToRoom.set(reconnectPlayerId, roomCode);
+          console.log(`[RECONNECT] Player ${reconnectPlayerId} (${username}) reconnected to room ${roomCode}`);
+          return { playerId: reconnectPlayerId, gameState: room, isReconnect: true };
+        }
+      }
+    }
+
     // Check if reconnecting with playerId
     if (reconnectPlayerId) {
       const existingPlayer = room.players.find(p => p.id === reconnectPlayerId && p.username === username);
       if (existingPlayer) {
         // Check if this username belongs to this playerId
         if (this.playerIdToUsername.get(existingPlayer.id) === username.toLowerCase()) {
+          // Clear any disconnected flag
+          delete (existingPlayer as any).isDisconnected;
           this.playerToRoom.set(existingPlayer.id, roomCode);
           return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
         }
@@ -320,6 +356,8 @@ export class MemStorage implements IStorage {
       // Check if this player is in this room
       const existingPlayer = room.players.find(p => p.id === existingPlayerId);
       if (existingPlayer) {
+        // Clear any disconnected flag
+        delete (existingPlayer as any).isDisconnected;
         this.playerToRoom.set(existingPlayer.id, roomCode);
         return { playerId: existingPlayer.id, gameState: room, isReconnect: true };
       }
@@ -931,6 +969,34 @@ export class MemStorage implements IStorage {
     return room;
   }
 
+  markPlayerDisconnected(roomCode: string, playerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) {
+      return null;
+    }
+
+    // Mark the player as disconnected in our tracking, but keep them in the room
+    const disconnectedEntry = {
+      player: { ...player }, // Store a copy of player data
+      roomCode: roomCode,
+      disconnectedAt: Date.now()
+    };
+    this.disconnectedPlayers.set(playerId, disconnectedEntry);
+
+    // Mark player as disconnected in the game state (add a runtime property)
+    (player as any).isDisconnected = true;
+
+    console.log(`[DISCONNECT] Marked player ${playerId} (${player.username}) as disconnected from room ${roomCode}`);
+    
+    // Don't remove them from the room yet - give them time to reconnect
+    // The game continues with the player marked as disconnected
+    return room;
+  }
+
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
@@ -1157,6 +1223,14 @@ export class MemStorage implements IStorage {
     if (!roomData) return;
     const room = roomData.gameState;
 
+    // Clean up disconnected player data if it exists
+    this.disconnectedPlayers.delete(playerId);
+
+    // Check if this player was the owner and if the game is active
+    const removedPlayer = room.players.find(p => p.id === playerId);
+    const wasOwner = removedPlayer?.isRoomOwner;
+    const gameIsActive = room.phase === "playing";
+
     room.players = room.players.filter(p => p.id !== playerId);
     this.playerToRoom.delete(playerId);
 
@@ -1169,8 +1243,26 @@ export class MemStorage implements IStorage {
 
     if (room.players.length === 0) {
       this.rooms.delete(roomCode);
-    } else if (room.players.every(p => !p.isRoomOwner)) {
-      room.players[0].isRoomOwner = true;
+    } else {
+      // Transfer ownership if needed
+      if (wasOwner && room.players.length > 0) {
+        room.players[0].isRoomOwner = true;
+      }
+      
+      // Only return to lobby if:
+      // 1. The owner left during an active game, OR
+      // 2. Both spymasters are gone during an active game
+      if (gameIsActive) {
+        const hasOwner = room.players.some(p => p.isRoomOwner);
+        const darkSpymaster = room.players.some(p => p.team === "dark" && p.role === "spymaster");
+        const lightSpymaster = room.players.some(p => p.team === "light" && p.role === "spymaster");
+        
+        if (wasOwner || (!darkSpymaster || !lightSpymaster)) {
+          // Game cannot continue, return to lobby
+          this.returnToLobby(roomCode);
+          console.log(`[REMOVE] Game returned to lobby - owner left or spymaster missing`);
+        }
+      }
     }
   }
 

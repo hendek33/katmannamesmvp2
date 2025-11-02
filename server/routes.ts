@@ -1138,6 +1138,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           clients.delete(ws);
         }
         
+        // Immediately mark as disconnected (but don't remove yet)
+        const updatedRoom = storage.markPlayerDisconnected(roomCode, playerId);
+        if (updatedRoom) {
+          broadcastToRoom(roomCode, {
+            type: "player_disconnected",
+            payload: { gameState: updatedRoom, disconnectedPlayerId: playerId },
+          });
+        }
+        
+        // Wait 30 seconds before fully removing the player
         setTimeout(() => {
           const currentClients = roomClients.get(roomCode);
           const playerReconnected = currentClients && Array.from(currentClients).some(c => c.playerId === playerId);
@@ -1158,7 +1168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               stopRoomTimer(roomCode); // Clean up timer when room is deleted
             }
           }
-        }, 5000);
+        }, 30000); // Increased to 30 seconds for better reconnection support
       }
     });
 

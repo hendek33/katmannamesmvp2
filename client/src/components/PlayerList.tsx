@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, Crown, Eye, Target, Edit2, Check, X } from "lucide-react";
+import { Users, Crown, Eye, Target, Edit2, Check, X, WifiOff } from "lucide-react";
 import { useState } from "react";
 
 interface PlayerListProps {
@@ -178,10 +178,13 @@ export function PlayerList({
                 data-testid={`player-${spymaster.id}`}
                 className={`flex flex-col items-center p-2 rounded bg-gradient-to-b from-amber-900/40 to-amber-800/30 border border-amber-600/50 ${
                   spymaster.id === currentPlayerId ? 'ring-2 ring-accent' : ''
-                }`}
+                } ${(spymaster as any).isDisconnected ? 'opacity-50' : ''}`}
               >
                 <Eye className="w-4 h-4 text-amber-500 mb-0.5" />
                 <div className="flex items-center gap-1 justify-center w-full">
+                  {(spymaster as any).isDisconnected && (
+                    <WifiOff className="w-3 h-3 text-red-400" />
+                  )}
                   {spymaster.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
@@ -239,10 +242,13 @@ export function PlayerList({
                   agent.id === currentPlayerId 
                     ? 'bg-accent/20 border border-accent/30 shadow-sm' 
                     : 'bg-black/20 hover:bg-black/30'
-                }`}
+                } ${(agent as any).isDisconnected ? 'opacity-50' : ''}`}
               >
                 <Target className="w-3.5 h-3.5 text-muted-foreground mb-0.5" />
                 <div className="flex items-center gap-1 justify-center w-full">
+                  {(agent as any).isDisconnected && (
+                    <WifiOff className="w-3 h-3 text-red-400" />
+                  )}
                   {agent.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}

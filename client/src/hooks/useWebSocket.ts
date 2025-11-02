@@ -106,6 +106,7 @@ export function useWebSocket() {
               case "game_updated":
               case "player_joined":
               case "player_left":
+              case "player_disconnected":
               case "clue_given":
                 setGameState(message.payload.gameState);
                 break;
