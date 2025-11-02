@@ -17,10 +17,9 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Edit2 } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { getPlayerName, getPlayerDisplayName } from "@/lib/playerUtils";
 import Lobby from "./Lobby";
 
 export default function Game() {
@@ -43,8 +42,6 @@ export default function Game() {
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const [showDeveloperNote, setShowDeveloperNote] = useState(true);
-  const [showDisplayNameDialog, setShowDisplayNameDialog] = useState(false);
-  const [newDisplayName, setNewDisplayName] = useState("");
   
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -289,26 +286,6 @@ export default function Game() {
     }
   };
 
-  const handleUpdateDisplayName = () => {
-    const trimmedName = newDisplayName.trim();
-    if (!trimmedName || trimmedName.length > 20) {
-      toast({
-        title: "Hata",
-        description: "İsim 1-20 karakter arasında olmalıdır",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    send("update_display_name", { displayName: trimmedName });
-    setShowDisplayNameDialog(false);
-    setNewDisplayName("");
-    toast({
-      title: "İsim Değiştirildi",
-      description: `Görünen isminiz "${trimmedName}" olarak güncellendi`,
-    });
-  };
-
   const handleRevealCard = (cardId: number) => {
     send("reveal_card", { cardId });
   };
@@ -547,7 +524,6 @@ export default function Game() {
         <TauntBubble
           key={`${taunt.playerId}-${taunt.expiresAt}-${index}`}
           senderUsername={taunt.username}
-          senderDisplayName={(taunt as any).displayName}
           senderTeam={taunt.team}
           videoSrc={taunt.videoSrc}
         />
@@ -558,10 +534,8 @@ export default function Game() {
         <InsultBubble
           key={`${insult.timestamp}-${index}`}
           senderUsername={insult.senderUsername}
-          senderDisplayName={(insult as any).senderDisplayName}
           senderTeam={insult.senderTeam}
           targetUsername={insult.targetUsername}
-          targetDisplayName={(insult as any).targetDisplayName}
           targetTeam={insult.targetTeam}
           message={insult.message}
           timestamp={insult.timestamp}
@@ -735,62 +709,6 @@ export default function Game() {
                   )}
                 </Button>
               </div>
-              {/* Display Name Edit Button */}
-              {currentPlayer && (
-                <Dialog open={showDisplayNameDialog} onOpenChange={setShowDisplayNameDialog}>
-                  <DialogTrigger asChild>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 px-2 hover:bg-primary/10 text-xs ml-2"
-                    >
-                      <Edit2 className="w-3 h-3 mr-1" />
-                      <span className="text-muted-foreground">İsim</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="bg-slate-900/95 border-2 border-orange-900/30 max-w-sm">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
-                        Görünen İsmi Değiştir
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-300">Yeni İsim</Label>
-                        <Input
-                          value={newDisplayName}
-                          onChange={(e) => setNewDisplayName(e.target.value)}
-                          placeholder={currentPlayer.username}
-                          maxLength={20}
-                          className="bg-slate-800/70 border-slate-700 text-white"
-                          onKeyDown={(e) => e.key === "Enter" && handleUpdateDisplayName()}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Bu isim sadece bu oyun içinde görünecektir
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => {
-                            setShowDisplayNameDialog(false);
-                            setNewDisplayName("");
-                          }}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          İptal
-                        </Button>
-                        <Button
-                          onClick={handleUpdateDisplayName}
-                          className="flex-1 bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700"
-                        >
-                          Değiştir
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
             </div>
             </Card>
           </div>
@@ -865,7 +783,7 @@ export default function Game() {
                       <div className="space-y-1">
                         {darkPlayers.map(player => (
                           <div key={player.id} className="flex items-center justify-between p-2 rounded bg-blue-950/50 border border-blue-800/30">
-                            <span className="text-sm text-blue-100">{getPlayerName(player)}</span>
+                            <span className="text-sm text-blue-100">{player.username}</span>
                             <span className="text-xs text-blue-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
                           </div>
                         ))}
@@ -878,7 +796,7 @@ export default function Game() {
                       <div className="space-y-1">
                         {lightPlayers.map(player => (
                           <div key={player.id} className="flex items-center justify-between p-2 rounded bg-red-950/50 border border-red-800/30">
-                            <span className="text-sm text-red-100">{getPlayerName(player)}</span>
+                            <span className="text-sm text-red-100">{player.username}</span>
                             <span className="text-xs text-red-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
                           </div>
                         ))}
@@ -1499,16 +1417,16 @@ export default function Game() {
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                  <h3 className="text-[10px] lg:text-xs xl:text-sm font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
+                  <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-blue-100 group-hover:scale-110 transition-transform">
+                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
                     {gameState.darkCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[10px] lg:text-xs xl:text-sm text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[8px] lg:text-[10px] xl:text-xs text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Player List - Separated by Role */}
                 <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-1">
@@ -1516,11 +1434,11 @@ export default function Game() {
                   {darkPlayers.filter(p => p.role === "spymaster").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {darkPlayers.filter(p => p.role === "spymaster").map(player => (
-                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm text-amber-300 flex items-center gap-1">
+                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
-                            {getPlayerName(player)}
+                            {player.username}
                           </span>
                         </div>
                       ))}
@@ -1530,10 +1448,10 @@ export default function Game() {
                   {darkPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {darkPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm flex items-center gap-1">
+                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-blue-100" : "text-blue-200"}>
-                            {getPlayerName(player)}
+                            {player.username}
                           </span>
                         </div>
                       ))}
@@ -1730,8 +1648,8 @@ export default function Game() {
                   }}
                 >
                   <div className="text-center relative z-10">
-                    <div className="text-xs font-bold text-blue-100">{gameState.darkTeamName}</div>
-                    <div className="text-2xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
+                    <div className="text-[10px] font-bold text-blue-100">{gameState.darkTeamName}</div>
+                    <div className="text-xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
                     {gameState.currentTeam === "dark" && (
                       <div className="text-[9px] font-bold">
                         <span className="text-blue-300">Sıradaki takım: </span>
@@ -1749,8 +1667,8 @@ export default function Game() {
                   }}
                 >
                   <div className="text-center relative z-10">
-                    <div className="text-xs font-bold text-red-100">{gameState.lightTeamName}</div>
-                    <div className="text-2xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
+                    <div className="text-[10px] font-bold text-red-100">{gameState.lightTeamName}</div>
+                    <div className="text-xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
                     {gameState.currentTeam === "light" && (
                       <div className="text-[9px] font-bold">
                         <span className="text-red-300">Sıradaki takım: </span>
@@ -1804,7 +1722,6 @@ export default function Game() {
                     isAssassinCard={card.type === "assassin" && card.revealed && gameState.phase === "ended"}
                     gameEnded={gameState.phase === "ended"}
                     isKnownCard={currentPlayer.secretRole === "prophet" && currentPlayer.knownCards?.includes(card.id)}
-                    players={gameState.players}
                   />
                 </div>
               ))}
@@ -1980,16 +1897,16 @@ export default function Game() {
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-red-600 animate-pulse" />
-                  <h3 className="text-[10px] lg:text-xs xl:text-sm font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
+                  <h3 className="text-[8px] lg:text-[10px] xl:text-xs font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black text-red-100 group-hover:scale-110 transition-transform">
+                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-red-100 group-hover:scale-110 transition-transform">
                     {gameState.lightCardsRemaining}
                   </div>
                   <div className="absolute inset-0 blur-2xl bg-red-600/20 group-hover:bg-red-600/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[10px] lg:text-xs xl:text-sm text-red-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[8px] lg:text-[10px] xl:text-xs text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Player List - Separated by Role */}
                 <div className="mt-2 pt-2 border-t border-red-700/30 space-y-1">
@@ -1997,11 +1914,11 @@ export default function Game() {
                   {lightPlayers.filter(p => p.role === "spymaster").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {lightPlayers.filter(p => p.role === "spymaster").map(player => (
-                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm text-amber-300 flex items-center gap-1">
+                        <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-amber-200" : "text-amber-300"}>
-                            {getPlayerName(player)}
+                            {player.username}
                           </span>
                         </div>
                       ))}
@@ -2011,10 +1928,10 @@ export default function Game() {
                   {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
                       {lightPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm flex items-center gap-1">
+                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[9px] lg:text-[10px] xl:text-xs flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
                           <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
-                            {getPlayerName(player)}
+                            {player.username}
                           </span>
                         </div>
                       ))}
@@ -2052,7 +1969,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Clock className="w-2.5 h-2.5 text-gray-400" />
                                 <span className="text-gray-300">
-                                  {getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)?.length > 6 ? `${getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName).slice(0, 6)}...` : getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)} turu sonlandırdı
+                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} turu sonlandırdı
                                 </span>
                               </div>
                             </div>
@@ -2072,7 +1989,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Users className="w-2.5 h-2.5 text-purple-400" />
                                 <span className="text-purple-300">
-                                  {getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)?.length > 6 ? `${getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName).slice(0, 6)}...` : getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)} takım değiştirdi: 
+                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} takım değiştirdi: 
                                   <span className={entry.fromTeam === "dark" ? "text-blue-400" : "text-red-400"}> {entry.fromTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
                                   <span className="text-gray-400"> → </span>
                                   <span className={entry.toTeam === "dark" ? "text-blue-400" : "text-red-400"}>{entry.toTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}</span>
@@ -2090,7 +2007,7 @@ export default function Game() {
                               <div className="flex items-center gap-1">
                                 <Eye className="w-2.5 h-2.5 text-green-400" />
                                 <span className="text-green-300">
-                                  {getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)?.length > 6 ? `${getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName).slice(0, 6)}...` : getPlayerDisplayName(entry.playerUsername, (entry as any).playerDisplayName)} rol değiştirdi: 
+                                  {entry.playerUsername && entry.playerUsername.length > 6 ? `${entry.playerUsername.slice(0, 6)}...` : entry.playerUsername} rol değiştirdi: 
                                   <span className="text-gray-300"> {entry.fromRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>
                                   <span className="text-gray-400"> → </span>
                                   <span className="text-gray-100">{entry.toRole === "spymaster" ? "İpucu Veren" : "Tahminci"}</span>

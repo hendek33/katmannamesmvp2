@@ -394,31 +394,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
-          case "update_display_name": {
-            if (!ws.roomCode || !ws.playerId) {
-              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
-              return;
-            }
-
-            const displayName = payload.displayName;
-            if (!displayName || typeof displayName !== "string") {
-              sendToClient(ws, { type: "error", payload: { message: "Geçersiz isim" } });
-              return;
-            }
-
-            const gameState = storage.updatePlayerDisplayName(ws.roomCode, ws.playerId, displayName);
-            if (!gameState) {
-              sendToClient(ws, { type: "error", payload: { message: "İsim değiştirilemedi" } });
-              return;
-            }
-
-            broadcastToRoom(ws.roomCode, {
-              type: "game_updated",
-              payload: { gameState },
-            });
-            break;
-          }
-
           case "add_bot": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });

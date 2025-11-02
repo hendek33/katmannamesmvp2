@@ -112,7 +112,7 @@ export function PlayerList({
                   Takım ismi belirle
                 </button>
               ) : (
-                <h3 className="font-bold text-base sm:text-lg text-slate-100">{title}</h3>
+                <h3 className="font-bold text-sm sm:text-base text-slate-100">{title}</h3>
               )}
               {isLobby && onTeamNameChange && !(title === "Mavi Takım" || title === "Kırmızı Takım") && (
                 <Button
@@ -188,8 +188,8 @@ export function PlayerList({
                   {spymaster.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
-                  <span className="text-base font-bold text-center truncate text-amber-200">
-                    {(spymaster as any).displayName || spymaster.username}
+                  <span className="text-sm font-bold text-center truncate text-amber-200">
+                    {spymaster.username}
                   </span>
                 </div>
                 {isLobby && spymaster.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
@@ -252,8 +252,8 @@ export function PlayerList({
                   {agent.isRoomOwner && (
                     <Crown className="w-3 h-3 text-yellow-500" />
                   )}
-                  <span className="text-base font-medium text-center truncate">
-                    {(agent as any).displayName || agent.username}
+                  <span className="text-sm font-medium text-center truncate">
+                    {agent.username}
                   </span>
                 </div>
                 {isLobby && agent.isBot && currentPlayer?.isRoomOwner && onRemoveBot && (
@@ -299,7 +299,7 @@ export function PlayerList({
                 className="flex items-center justify-center gap-0.5 p-1 rounded bg-amber-900/20 border border-amber-700/30"
               >
                 {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400" />}
-                <span className="text-xs font-medium text-slate-200 text-center truncate">{(player as any).displayName || player.username}</span>
+                <span className="text-xs font-medium text-slate-200 text-center truncate">{player.username}</span>
                 {player.id === currentPlayerId && <span className="text-[10px] text-amber-300 ml-0.5">(Sen)</span>}
               </div>
             ))}

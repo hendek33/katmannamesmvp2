@@ -26,7 +26,6 @@ export interface IStorage {
   addBot(roomCode: string, team: Team, role: "spymaster" | "guesser"): GameState | null;
   updatePlayerTeam(roomCode: string, playerId: string, team: Team): GameState | null;
   updatePlayerRole(roomCode: string, playerId: string, role: "spymaster" | "guesser"): GameState | null;
-  updatePlayerDisplayName(roomCode: string, playerId: string, displayName: string): GameState | null;
   updateTeamName(roomCode: string, team: Team, name: string): GameState | null;
   updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
@@ -494,7 +493,7 @@ export class MemStorage implements IStorage {
         const teamChangeEntry: any = {
           type: "team_change",
           playerId: player.id,
-          playerUsername: (player as any).displayName || player.username,
+          playerUsername: player.username,
           fromTeam: oldTeam,
           toTeam: team,
           timestamp: Date.now()
@@ -531,7 +530,7 @@ export class MemStorage implements IStorage {
       const roleChangeEntry: any = {
         type: "role_change",
         playerId: player.id,
-        playerUsername: (player as any).displayName || player.username,
+        playerUsername: player.username,
         team: player.team,
         fromRole: oldRole,
         toRole: role,
@@ -541,42 +540,6 @@ export class MemStorage implements IStorage {
     }
 
     player.role = role;
-    return room;
-  }
-
-  updatePlayerDisplayName(roomCode: string, playerId: string, displayName: string): GameState | null {
-    const roomData = this.rooms.get(roomCode);
-    if (!roomData) return null;
-    const room = roomData.gameState;
-
-    const player = room.players.find(p => p.id === playerId);
-    if (!player) return null;
-
-    // Trim and validate display name
-    displayName = displayName.trim();
-    if (!displayName || displayName.length > 20) {
-      return null;
-    }
-
-    // Store display name as runtime extension
-    const oldDisplayName = (player as any).displayName;
-    (player as any).displayName = displayName;
-
-    // Add display name change log (runtime extension)
-    if (room.phase === "playing" && oldDisplayName !== displayName) {
-      const nameChangeEntry: any = {
-        type: "display_name_change",
-        playerId: player.id,
-        playerUsername: player.username,
-        team: player.team,
-        oldDisplayName: oldDisplayName || player.username,
-        newDisplayName: displayName,
-        timestamp: Date.now()
-      };
-      room.revealHistory.push(nameChangeEntry);
-    }
-
-    console.log(`[DISPLAY_NAME] Player ${playerId} (${player.username}) changed display name to: ${displayName}`);
     return room;
   }
 
@@ -810,7 +773,7 @@ export class MemStorage implements IStorage {
       team: room.currentTeam,
       timestamp: Date.now(),
       playerId: player.id,
-      playerUsername: (player as any).displayName || player.username,
+      playerUsername: player.username,
       // Add clue information for this guess
       clue: room.currentClue ? {
         word: room.currentClue.word,
@@ -974,7 +937,7 @@ export class MemStorage implements IStorage {
       type: "end_turn",
       team: room.currentTeam,
       playerId: player.id,
-      playerUsername: (player as any).displayName || player.username,
+      playerUsername: player.username,
       timestamp: Date.now(),
       clue: room.currentClue ? {
         word: room.currentClue.word,
@@ -1164,7 +1127,7 @@ export class MemStorage implements IStorage {
     // Return taunt data for broadcast
     return {
       playerId: player.id,
-      username: (player as any).displayName || player.username,
+      username: player.username,
       team: player.team,
       videoSrc,
       position,
@@ -1226,7 +1189,7 @@ export class MemStorage implements IStorage {
     
     // Get random insult message
     const message = insultMessages[Math.floor(Math.random() * insultMessages.length)]
-      .replace("{target}", (target as any).displayName || target.username);
+      .replace("{target}", target.username);
     
     // Update cooldowns
     this.playerInsultCooldown.set(playerId, now);
@@ -1235,10 +1198,10 @@ export class MemStorage implements IStorage {
     // Return insult data for broadcast
     const insultData = {
       senderId: player.id,
-      senderUsername: (player as any).displayName || player.username,
+      senderUsername: player.username,
       senderTeam: player.team,
       targetId: target.id,
-      targetUsername: (target as any).displayName || target.username,
+      targetUsername: target.username,
       targetTeam: target.team,
       message,
       timestamp: now
