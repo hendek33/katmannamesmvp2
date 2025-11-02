@@ -317,15 +317,25 @@ export default function Game() {
 
   // Zoom controls
   const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 10, 150));
+    // Trigger browser's native zoom in
+    const newZoom = Math.min(zoomLevel + 10, 150);
+    setZoomLevel(newZoom);
+    // Use browser's native zoom
+    (document.body.style as any).zoom = `${newZoom}%`;
   };
 
   const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 10, 50));
+    // Trigger browser's native zoom out
+    const newZoom = Math.max(zoomLevel - 10, 50);
+    setZoomLevel(newZoom);
+    // Use browser's native zoom
+    (document.body.style as any).zoom = `${newZoom}%`;
   };
 
   const handleZoomReset = () => {
     setZoomLevel(100);
+    // Reset browser's native zoom
+    (document.body.style as any).zoom = '100%';
   };
 
   const handleTriggerTaunt = () => {
@@ -618,18 +628,9 @@ export default function Game() {
         </div>
       )}
       
-      {/* Zoom Container with Overflow */}
-      <div className="relative z-10 h-full overflow-auto">
-        <div 
-          className="flex flex-col p-2 min-h-full"
-          style={{ 
-            transform: `scale(${zoomLevel / 100})`,
-            transformOrigin: 'center center',
-            width: `${100 * (100 / zoomLevel)}%`,
-            height: `${100 * (100 / zoomLevel)}%`
-          }}
-        >
-          <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
+      {/* Main Container */}
+      <div className="relative z-10 h-full flex flex-col p-2">
+        <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Mobile Header */}
         <div className="lg:hidden flex justify-between gap-2 flex-shrink-0 mb-2">
           <Card className="flex-1 px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30">
@@ -2154,8 +2155,7 @@ export default function Game() {
                 </div>
               </div>
             </Card>
-          </div>
-        </div>
+            </div>
           </div>
         </div>
       </div>
