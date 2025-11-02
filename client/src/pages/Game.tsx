@@ -17,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Edit2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -42,6 +42,8 @@ export default function Game() {
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const [showDeveloperNote, setShowDeveloperNote] = useState(true);
+  const [showDisplayNameDialog, setShowDisplayNameDialog] = useState(false);
+  const [newDisplayName, setNewDisplayName] = useState("");
   
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -284,6 +286,26 @@ export default function Game() {
       setClueWord("");
       setClueCount("1");
     }
+  };
+
+  const handleUpdateDisplayName = () => {
+    const trimmedName = newDisplayName.trim();
+    if (!trimmedName || trimmedName.length > 20) {
+      toast({
+        title: "Hata",
+        description: "İsim 1-20 karakter arasında olmalıdır",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    send("update_display_name", { displayName: trimmedName });
+    setShowDisplayNameDialog(false);
+    setNewDisplayName("");
+    toast({
+      title: "İsim Değiştirildi",
+      description: `Görünen isminiz "${trimmedName}" olarak güncellendi`,
+    });
   };
 
   const handleRevealCard = (cardId: number) => {
@@ -709,6 +731,62 @@ export default function Game() {
                   )}
                 </Button>
               </div>
+              {/* Display Name Edit Button */}
+              {currentPlayer && (
+                <Dialog open={showDisplayNameDialog} onOpenChange={setShowDisplayNameDialog}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 px-2 hover:bg-primary/10 text-xs ml-2"
+                    >
+                      <Edit2 className="w-3 h-3 mr-1" />
+                      <span className="text-muted-foreground">İsim</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-slate-900/95 border-2 border-orange-900/30 max-w-sm">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
+                        Görünen İsmi Değiştir
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-300">Yeni İsim</Label>
+                        <Input
+                          value={newDisplayName}
+                          onChange={(e) => setNewDisplayName(e.target.value)}
+                          placeholder={currentPlayer.username}
+                          maxLength={20}
+                          className="bg-slate-800/70 border-slate-700 text-white"
+                          onKeyDown={(e) => e.key === "Enter" && handleUpdateDisplayName()}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Bu isim sadece bu oyun içinde görünecektir
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => {
+                            setShowDisplayNameDialog(false);
+                            setNewDisplayName("");
+                          }}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          İptal
+                        </Button>
+                        <Button
+                          onClick={handleUpdateDisplayName}
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-red-600 hover:from-blue-700 hover:to-red-700"
+                        >
+                          Değiştir
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
             </Card>
           </div>
