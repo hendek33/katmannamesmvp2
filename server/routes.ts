@@ -31,6 +31,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 
   const roomClients = new Map<string, Set<WSClient>>();
+  const roomTimers = new Map<string, NodeJS.Timeout>();
+
+  // Timer management functions
+  function startRoomTimer(roomCode: string) {
+    // Clear existing timer if any
+    stopRoomTimer(roomCode);
+    
+    const interval = setInterval(() => {
+      const room = storage.getRoom(roomCode);
+      if (!room || room.phase !== 'playing' || !room.timedMode || !room.currentTurnStartTime) {
+        stopRoomTimer(roomCode);
+        return;
+      }
+
+      const duration = room.currentClue 
+        ? (room.guesserTime || 180) * 1000 
+        : (room.spymasterTime || 120) * 1000;
+      const elapsed = Date.now() - room.currentTurnStartTime;
+      const remaining = Math.max(0, duration - elapsed);
+      
+      // Broadcast timer update to all clients in the room
+      broadcastToRoom(roomCode, {
+        type: "timer_tick",
+        payload: { 
+          timeRemaining: Math.floor(remaining / 1000),
+          isExpired: remaining === 0
+        }
+      });
+
+      // Auto end turn if timer expired
+      if (remaining === 0) {
+        try {
+          // Get any guesser from the current team to end the turn
+          const currentTeamPlayers = room.players.filter(p => 
+            p.team === room.currentTeam && p.role === 'guesser'
+          );
+          
+          if (currentTeamPlayers.length > 0) {
+            const gameState = storage.endTurn(roomCode, currentTeamPlayers[0].id);
+            if (gameState) {
+              broadcastToRoom(roomCode, {
+                type: "game_updated", 
+                payload: { gameState }
+              });
+              broadcastToRoom(roomCode, {
+                type: "timer_expired",
+                payload: { message: "Süre doldu! Sıra diğer takıma geçti." }
+              });
+              // Restart timer for new turn
+              if (gameState.phase === 'playing' && room.timedMode) {
+                startRoomTimer(roomCode);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error auto-ending turn:", error);
+        }
+        stopRoomTimer(roomCode);
+      }
+    }, 1000); // Update every second
+    
+    roomTimers.set(roomCode, interval);
+  }
+
+  function stopRoomTimer(roomCode: string) {
+    const timer = roomTimers.get(roomCode);
+    if (timer) {
+      clearInterval(timer);
+      roomTimers.delete(roomCode);
+    }
+  }
 
   function broadcastToRoom(roomCode: string, message: any, excludeClient?: WSClient) {
     const clients = roomClients.get(roomCode);
@@ -640,6 +711,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               });
             }
+            
+            // Start timer if timed mode is enabled
+            const room = storage.getRoom(ws.roomCode);
+            if (room && room.timedMode) {
+              startRoomTimer(ws.roomCode);
+            }
             break;
           }
 
@@ -665,6 +742,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "clue_given",
               payload: { gameState },
             });
+            
+            // Timer continues for guessers after clue is given
+            const room = storage.getRoom(ws.roomCode);
+            if (room && room.timedMode) {
+              startRoomTimer(ws.roomCode);
+            }
             break;
           }
 
@@ -772,6 +855,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "votes_updated",
               payload: { votes: {} },
             });
+            
+            // Restart timer if timed mode is enabled
+            const room = storage.getRoom(ws.roomCode);
+            if (room && room.timedMode) {
+              startRoomTimer(ws.roomCode);
+            }
             break;
           }
 
@@ -804,6 +893,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             if (clients && clients.size === 0) {
               roomClients.delete(roomCode);
+              stopRoomTimer(roomCode); // Clean up timer when room is deleted
             }
 
             sendToClient(ws, { type: "left_room", payload: {} });
@@ -832,6 +922,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "votes_updated",
               payload: { votes: {} },
             });
+            
+            // Stop timer when returning to lobby
+            stopRoomTimer(ws.roomCode);
             break;
           }
 
@@ -858,6 +951,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "votes_updated",
               payload: { votes: votes ? Object.fromEntries(votes) : {} },
             });
+            
+            // Restart timer for new turn if timed mode is enabled
+            const room = storage.getRoom(ws.roomCode);
+            if (room && room.timedMode && gameState.phase === 'playing') {
+              startRoomTimer(ws.roomCode);
+            }
             break;
           }
           
@@ -1056,6 +1155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             if (currentClients && currentClients.size === 0) {
               roomClients.delete(roomCode);
+              stopRoomTimer(roomCode); // Clean up timer when room is deleted
             }
           }
         }, 5000);

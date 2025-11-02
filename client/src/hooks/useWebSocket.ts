@@ -16,6 +16,7 @@ export function useWebSocket() {
   const [roomsList, setRoomsList] = useState<RoomListItem[]>([]);
   const [cardVotes, setCardVotes] = useState<Record<number, string[]>>({});
   const [cardImages, setCardImages] = useState<Record<number, string>>({});
+  const [serverTimer, setServerTimer] = useState<{ timeRemaining: number; isExpired: boolean } | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -148,6 +149,16 @@ export function useWebSocket() {
               case "pong":
                 // Server acknowledged our ping, connection is alive
                 break;
+                
+              case "timer_tick":
+                // Handle server-sent timer updates
+                setServerTimer(message.payload);
+                break;
+                
+              case "timer_expired":
+                // Handle timer expiry notification
+                setServerTimer({ timeRemaining: 0, isExpired: true });
+                break;
             }
           } catch (err) {
             console.error("Error parsing WebSocket message:", err);
@@ -227,6 +238,7 @@ export function useWebSocket() {
     roomsList,
     cardVotes,
     cardImages,
+    serverTimer,
     send,
   };
 }

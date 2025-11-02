@@ -11,6 +11,7 @@ interface WebSocketContextType {
   roomsList: RoomListItem[];
   cardVotes: Record<number, string[]>;
   cardImages: Record<number, string>;
+  serverTimer: { timeRemaining: number; isExpired: boolean } | null;
   send: (type: string, payload: any) => void;
 }
 

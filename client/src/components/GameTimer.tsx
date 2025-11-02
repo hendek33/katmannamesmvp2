@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Timer, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 interface GameTimerProps {
   isActive: boolean;
@@ -10,6 +11,7 @@ interface GameTimerProps {
 }
 
 export function GameTimer({ isActive, startTime, duration, label = "Süre" }: GameTimerProps) {
+  const { serverTimer } = useWebSocketContext();
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const [isExpired, setIsExpired] = useState(false);
 
@@ -20,6 +22,14 @@ export function GameTimer({ isActive, startTime, duration, label = "Süre" }: Ga
       return;
     }
 
+    // Use server-synchronized timer if available
+    if (serverTimer) {
+      setTimeRemaining(serverTimer.timeRemaining);
+      setIsExpired(serverTimer.isExpired);
+      return;
+    }
+
+    // Fallback to local timer calculation
     const updateTimer = () => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       const remaining = Math.max(0, duration - elapsed);
@@ -31,7 +41,7 @@ export function GameTimer({ isActive, startTime, duration, label = "Süre" }: Ga
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [isActive, startTime, duration]);
+  }, [isActive, startTime, duration, serverTimer]);
 
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
