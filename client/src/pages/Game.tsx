@@ -1555,9 +1555,11 @@ export default function Game() {
                   {/* Taunt Button */}
                   <div className="relative flex-1">
                     <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      currentPlayer.team === "dark" 
-                        ? "bg-blue-600/40" 
-                        : "bg-red-600/40"
+                      globalTauntCooldown > 0 || !tauntEnabled
+                        ? "bg-gray-600/20"
+                        : currentPlayer.team === "dark" 
+                          ? "bg-blue-600/40" 
+                          : "bg-red-600/40"
                     }`} />
                     <button
                       onClick={handleTriggerTaunt}
@@ -1566,9 +1568,13 @@ export default function Game() {
                         relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                         backdrop-blur-md border shadow-lg
                         ${currentPlayer.team === "dark" 
-                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100 hover:bg-blue-900/80 hover:border-blue-500/60" 
-                          : "bg-red-900/60 border-red-600/50 text-red-100 hover:bg-red-900/80 hover:border-red-500/60"}
-                        ${globalTauntCooldown > 0 || !tauntEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                          ? "bg-blue-900/60 border-blue-600/50 text-blue-100" 
+                          : "bg-red-900/60 border-red-600/50 text-red-100"}
+                        ${globalTauntCooldown > 0 || !tauntEnabled 
+                          ? "opacity-40 cursor-not-allowed grayscale" 
+                          : currentPlayer.team === "dark"
+                            ? "cursor-pointer hover:scale-105 hover:bg-blue-900/80 hover:border-blue-500/60"
+                            : "cursor-pointer hover:scale-105 hover:bg-red-900/80 hover:border-red-500/60"}
                       `}
                       data-testid="button-trigger-taunt"
                     >
@@ -1594,9 +1600,11 @@ export default function Game() {
                   {/* Insult Button */}
                   <div className="relative flex-1 insult-button-container">
                     <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      currentPlayer.team === "dark" 
-                        ? "bg-purple-600/40" 
-                        : "bg-orange-600/40"
+                      globalInsultCooldown > 0 || !insultEnabled
+                        ? "bg-gray-600/20"
+                        : currentPlayer.team === "dark" 
+                          ? "bg-purple-600/40" 
+                          : "bg-orange-600/40"
                     }`} />
                     <button
                       onClick={handleInsultClick}
@@ -1605,9 +1613,13 @@ export default function Game() {
                         relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
                         backdrop-blur-md border shadow-lg
                         ${currentPlayer.team === "dark" 
-                          ? "bg-purple-900/60 border-purple-600/50 text-purple-100 hover:bg-purple-900/80 hover:border-purple-500/60" 
-                          : "bg-orange-900/60 border-orange-600/50 text-orange-100 hover:bg-orange-900/80 hover:border-orange-500/60"}
-                        ${globalInsultCooldown > 0 || !insultEnabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-105"}
+                          ? "bg-purple-900/60 border-purple-600/50 text-purple-100" 
+                          : "bg-orange-900/60 border-orange-600/50 text-orange-100"}
+                        ${globalInsultCooldown > 0 || !insultEnabled 
+                          ? "opacity-40 cursor-not-allowed grayscale" 
+                          : currentPlayer.team === "dark"
+                            ? "cursor-pointer hover:scale-105 hover:bg-purple-900/80 hover:border-purple-500/60"
+                            : "cursor-pointer hover:scale-105 hover:bg-orange-900/80 hover:border-orange-500/60"}
                       `}
                       data-testid="button-send-insult"
                     >
