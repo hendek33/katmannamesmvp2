@@ -297,7 +297,7 @@ function JoinRoomModal({ username, onClose, send }: {
     if (!roomCode.trim()) return;
 
     send("join_room", {
-      roomCode: roomCode.toUpperCase(),
+      roomCode: roomCode.toLocaleUpperCase('tr-TR'),
       username,
       password: needsPassword ? password : undefined,
       playerId: localStorage.getItem("katmannames_player_id") || undefined,
@@ -319,7 +319,7 @@ function JoinRoomModal({ username, onClose, send }: {
               <input 
                 type="text"
                 value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                onChange={(e) => setRoomCode(e.target.value.toLocaleUpperCase('tr-TR'))}
                 placeholder="Örn: ABC123"
                 maxLength={6}
                 className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-center text-2xl font-bold focus:outline-none focus:ring-2 focus:ring-orange-500"
