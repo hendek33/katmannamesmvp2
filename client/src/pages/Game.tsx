@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
 import { GameCard } from "@/components/GameCard";
@@ -54,6 +55,20 @@ export default function Game() {
   const assassinShownRef = useRef<boolean>(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [showZoomHelp, setShowZoomHelp] = useState(false);
+  const [zoomButtonPosition, setZoomButtonPosition] = useState<{ top: number; left: number } | null>(null);
+  const zoomButtonRef = useRef<HTMLButtonElement>(null);
+  
+  // Handle zoom help button click
+  const handleZoomHelpClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    const button = e.currentTarget;
+    const rect = button.getBoundingClientRect();
+    setZoomButtonPosition({
+      top: rect.bottom + 8,
+      left: rect.left + rect.width / 2
+    });
+    setShowZoomHelp(!showZoomHelp);
+  };
   
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -65,8 +80,9 @@ export default function Game() {
       if (!target.closest('.insult-button-container')) {
         setShowInsultV2Dialog(false);
       }
-      if (!target.closest('.zoom-help-container')) {
+      if (!target.closest('.zoom-help-bubble') && !target.closest('[data-zoom-help-button]')) {
         setShowZoomHelp(false);
+        setZoomButtonPosition(null);
       }
     };
     
@@ -649,37 +665,16 @@ export default function Game() {
                 </Button>
               </div>
               {/* Mobile Zoom Info Button */}
-              <div className="relative zoom-help-container">
-                <Button
-                  onClick={() => setShowZoomHelp(!showZoomHelp)}
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0"
-                  title="Yakınlaştırma Bilgisi"
-                >
-                  <Info className="w-3 h-3" />
-                </Button>
-                
-                {/* Zoom Help Bubble - Mobile */}
-                {showZoomHelp && (
-                  <div className="absolute top-full mt-2 right-0 z-[9999] animate-zoom-help-enter">
-                    <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-3 shadow-2xl min-w-[200px]">
-                      <div className="flex flex-col gap-2">
-                        <div className="text-xs font-semibold text-amber-400">Yakınlaştırma</div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1 bg-slate-800/50 rounded px-2 py-1">
-                            <Command className="w-3 h-3 text-blue-400" />
-                            <span className="text-[10px] text-slate-300">+</span>
-                            <Mouse className="w-3 h-3 text-blue-400" />
-                          </div>
-                          <span className="text-[10px] text-slate-400">Kaydır</span>
-                        </div>
-                      </div>
-                      <div className="absolute -top-1 right-2 w-2 h-2 bg-slate-900/95 border-t-2 border-l-2 border-amber-500/30 transform rotate-45"></div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <Button
+                onClick={handleZoomHelpClick}
+                size="sm"
+                variant="ghost"
+                className="h-6 w-6 p-0"
+                title="Yakınlaştırma Bilgisi"
+                data-zoom-help-button
+              >
+                <Info className="w-3 h-3" />
+              </Button>
               <div className="flex items-center gap-1">
                 <Users className="w-3 h-3 text-muted-foreground" />
                 <span className="text-xs">{gameState.players.length}</span>
@@ -838,47 +833,17 @@ export default function Game() {
               
               {/* Desktop Zoom Info Button */}
               <div className="w-px h-5 bg-amber-900/40" />
-              <div className="relative zoom-help-container">
-                <Button
-                  onClick={() => setShowZoomHelp(!showZoomHelp)}
-                  size="sm"
-                  variant="outline"
-                  className="h-7 px-3 border hover:border-amber-500 hover:bg-amber-500/10"
-                  title="Yakınlaştırma Bilgisi"
-                >
-                  <Info className="w-3 h-3 mr-1" />
-                  <span className="text-xs">Büyüt/Küçült</span>
-                </Button>
-                
-                {/* Zoom Help Bubble - Desktop */}
-                {showZoomHelp && (
-                  <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-[9999] animate-zoom-help-enter">
-                    <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
-                      <div className="flex flex-col gap-3">
-                        <div className="text-sm font-semibold text-amber-400">Tahtayı Yakınlaştır/Uzaklaştır</div>
-                        <div className="flex items-center gap-3 justify-center">
-                          <div className="flex items-center gap-2 bg-slate-800/50 rounded px-3 py-2 animate-pulse-subtle">
-                            <Command className="w-4 h-4 text-blue-400" />
-                            <span className="text-xs text-slate-300 font-medium">Ctrl</span>
-                            <span className="text-slate-400">+</span>
-                            <div className="flex flex-col items-center">
-                              <Mouse className="w-4 h-4 text-blue-400" />
-                              <div className="flex flex-col items-center -mt-1">
-                                <div className="w-0.5 h-2 bg-gradient-to-b from-blue-400 to-transparent animate-scroll-up"></div>
-                                <div className="w-0.5 h-2 bg-gradient-to-t from-red-400 to-transparent animate-scroll-down"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="text-[10px] text-slate-500 text-center">
-                          Ctrl tuşunu basılı tutup fare tekerleğini çevirin
-                        </div>
-                      </div>
-                      <div className="absolute -top-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-slate-900/95 border-t-2 border-l-2 border-amber-500/30 rotate-45"></div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <Button
+                onClick={handleZoomHelpClick}
+                size="sm"
+                variant="outline"
+                className="h-7 px-3 border hover:border-amber-500 hover:bg-amber-500/10"
+                title="Yakınlaştırma Bilgisi"
+                data-zoom-help-button
+              >
+                <Info className="w-3 h-3 mr-1" />
+                <span className="text-xs">Büyüt/Küçült</span>
+              </Button>
               
               {/* Game End Controls */}
               {gameState.phase === "ended" ? (
@@ -2179,6 +2144,43 @@ export default function Game() {
         </div>
         </div>
       </div>
+      
+      {/* Zoom Help Bubble Portal - renders outside zoom viewport */}
+      {showZoomHelp && zoomButtonPosition && createPortal(
+        <div 
+          className="fixed zoom-help-bubble z-[10000] animate-zoom-help-enter"
+          style={{
+            top: `${zoomButtonPosition.top}px`,
+            left: `${zoomButtonPosition.left}px`,
+            transform: 'translateX(-50%)'
+          }}
+        >
+          <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
+            <div className="flex flex-col gap-3">
+              <div className="text-sm font-semibold text-amber-400">Tahtayı Yakınlaştır/Uzaklaştır</div>
+              <div className="flex items-center gap-3 justify-center">
+                <div className="flex items-center gap-2 bg-slate-800/50 rounded px-3 py-2 animate-pulse-subtle">
+                  <Command className="w-4 h-4 text-blue-400" />
+                  <span className="text-xs text-slate-300 font-medium">Ctrl</span>
+                  <span className="text-slate-400">+</span>
+                  <div className="flex flex-col items-center">
+                    <Mouse className="w-4 h-4 text-blue-400" />
+                    <div className="flex flex-col items-center -mt-1">
+                      <div className="w-0.5 h-2 bg-gradient-to-b from-blue-400 to-transparent animate-scroll-up"></div>
+                      <div className="w-0.5 h-2 bg-gradient-to-t from-red-400 to-transparent animate-scroll-down"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-[10px] text-slate-500 text-center">
+                Ctrl tuşunu basılı tutup fare tekerleğini çevirin
+              </div>
+            </div>
+            <div className="absolute -top-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-slate-900/95 border-t-2 border-l-2 border-amber-500/30 rotate-45"></div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
