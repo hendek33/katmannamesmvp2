@@ -3,15 +3,23 @@ import { useLocation } from "wouter";
 import type { RoomListItem } from "@shared/schema";
 import { Card } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { Lock, Users, Play } from "lucide-react";
+import { Lock, Users, Play, Edit2, Check, X, Loader2 } from "lucide-react";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RoomList() {
   const [, setLocation] = useLocation();
-  const { isConnected, send, gameState, roomsList, error } = useWebSocketContext();
+  const { isConnected, send, gameState, roomsList, error, usernameChangeStatus, clearUsernameChangeStatus } = useWebSocketContext();
+  const { toast } = useToast();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [username, setUsername] = useState("");
+  const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [isChangingName, setIsChangingName] = useState(false);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem("katmannames_username");
@@ -28,6 +36,38 @@ export default function RoomList() {
       window.location.reload();
     }
   }, [setLocation]);
+
+  // Handle username change response
+  useEffect(() => {
+    if (usernameChangeStatus) {
+      if (usernameChangeStatus.success) {
+        // Success - close dialog and reset
+        setShowChangeNameDialog(false);
+        setNewUsername("");
+        setIsChangingName(false);
+        const newStoredUsername = localStorage.getItem("katmannames_username");
+        if (newStoredUsername) {
+          setUsername(newStoredUsername);
+        }
+        toast({
+          title: "İsim değiştirildi",
+          description: "Yeni isminiz başarıyla kaydedildi",
+          duration: 3000,
+        });
+      } else {
+        // Error - show message and keep dialog open
+        setIsChangingName(false);
+        toast({
+          title: "Hata",
+          description: usernameChangeStatus.message || "İsim değiştirilemedi",
+          variant: "destructive",
+          duration: 4000,
+        });
+      }
+      // Clear the status after handling
+      clearUsernameChangeStatus();
+    }
+  }, [usernameChangeStatus, clearUsernameChangeStatus, toast]);
 
   useEffect(() => {
     if (isConnected) {
@@ -67,6 +107,22 @@ export default function RoomList() {
     }
   };
 
+  const handleChangeName = () => {
+    if (!newUsername.trim() || isChangingName) return;
+    
+    if (newUsername.length < 2 || newUsername.length > 20) {
+      toast({
+        title: "Geçersiz isim",
+        description: "İsim 2-20 karakter arasında olmalıdır",
+        duration: 3000,
+      });
+      return;
+    }
+    
+    setIsChangingName(true);
+    send("change_username", { newUsername: newUsername.trim() });
+  };
+
   const getPhaseText = (phase: string) => {
     switch (phase) {
       case "lobby":
@@ -99,11 +155,26 @@ export default function RoomList() {
       <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 sm:p-6">
         <Card className="w-full max-w-5xl bg-slate-900/90 backdrop-blur-lg border-orange-900/30 shadow-2xl flex flex-col max-h-[90vh]">
           <div className="p-4 sm:p-6 flex flex-col h-full">
-            <h1 className="text-2xl sm:text-3xl font-bold text-center mb-1 text-white">
-              Odalar
-            </h1>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex-1" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-center text-white">
+                Odalar
+              </h1>
+              <div className="flex-1 flex justify-end">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 px-3 border-green-700 hover:border-green-500 hover:bg-green-500/10"
+                  onClick={() => setShowChangeNameDialog(true)}
+                  title="İsim Değiştir"
+                >
+                  <Edit2 className="w-3.5 h-3.5 mr-1.5" />
+                  <span className="text-xs">İsim</span>
+                </Button>
+              </div>
+            </div>
             <p className="text-center text-xs sm:text-sm text-slate-300 mb-4">
-              Bir odaya katıl veya yeni oda oluştur
+              Bir odaya katıl veya yeni oda oluştur - Mevcut isim: <span className="font-semibold text-white">{username}</span>
             </p>
 
             <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
@@ -206,6 +277,73 @@ export default function RoomList() {
           send={send}
         />
       )}
+
+      {/* Change Username Dialog */}
+      <Dialog open={showChangeNameDialog} onOpenChange={setShowChangeNameDialog}>
+        <DialogContent className="bg-slate-900/95 border-2 border-green-900/30 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              İsim Değiştir
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-300">Mevcut İsim</Label>
+              <div className="px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                <span className="text-sm text-slate-200">{username}</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-300">Yeni İsim</Label>
+              <Input
+                type="text"
+                placeholder="Yeni kullanıcı adınız"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                maxLength={20}
+                disabled={isChangingName}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleChangeName();
+                  }
+                }}
+                className="bg-slate-800/50 border-slate-700 focus:border-green-500 text-white"
+              />
+              <p className="text-xs text-slate-500">2-20 karakter arasında olmalıdır</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleChangeName}
+                disabled={isChangingName || !newUsername.trim() || newUsername.trim() === username}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                {isChangingName ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Değiştiriliyor...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Değiştir
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowChangeNameDialog(false);
+                  setNewUsername("");
+                }}
+                variant="outline"
+                className="flex-1 border-slate-700 hover:border-slate-600"
+              >
+                <X className="w-4 h-4 mr-2" />
+                İptal
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

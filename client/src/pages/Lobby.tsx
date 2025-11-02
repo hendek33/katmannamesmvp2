@@ -3,10 +3,12 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Lock, LockOpen } from "lucide-react";
+import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Lock, LockOpen, Edit2, Loader2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { PlayerList } from "@/components/PlayerList";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { type Team } from "@shared/schema";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -24,7 +26,7 @@ import {
 
 export default function Lobby() {
   const [, setLocation] = useLocation();
-  const { isConnected, send, gameState, error } = useWebSocketContext();
+  const { isConnected, send, gameState, error, usernameChangeStatus, clearUsernameChangeStatus } = useWebSocketContext();
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [copied, setCopied] = useState(false);
   const [timedMode, setTimedMode] = useState(false);
@@ -33,6 +35,9 @@ export default function Lobby() {
   const [chaosMode, setChaosMode] = useState(false);
   const [showChaosDetails, setShowChaosDetails] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [isChangingName, setIsChangingName] = useState(false);
   const { toast } = useToast();
   
   const playerId = localStorage.getItem("katmannames_player_id");
@@ -85,6 +90,34 @@ export default function Lobby() {
     }
   }, [gameState]);
 
+  // Handle username change response
+  useEffect(() => {
+    if (usernameChangeStatus) {
+      if (usernameChangeStatus.success) {
+        // Success - close dialog and reset
+        setShowChangeNameDialog(false);
+        setNewUsername("");
+        setIsChangingName(false);
+        toast({
+          title: "İsim değiştirildi",
+          description: "Yeni isminiz başarıyla kaydedildi",
+          duration: 3000,
+        });
+      } else {
+        // Error - show message and keep dialog open
+        setIsChangingName(false);
+        toast({
+          title: "Hata",
+          description: usernameChangeStatus.message || "İsim değiştirilemedi",
+          variant: "destructive",
+          duration: 4000,
+        });
+      }
+      // Clear the status after handling
+      clearUsernameChangeStatus();
+    }
+  }, [usernameChangeStatus, clearUsernameChangeStatus, toast]);
+
   const handleCopyRoomCode = () => {
     if (roomCode) {
       navigator.clipboard.writeText(roomCode);
@@ -95,6 +128,22 @@ export default function Lobby() {
       });
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleChangeName = () => {
+    if (!newUsername.trim() || isChangingName) return;
+    
+    if (newUsername.length < 2 || newUsername.length > 20) {
+      toast({
+        title: "Geçersiz isim",
+        description: "İsim 2-20 karakter arasında olmalıdır",
+        duration: 3000,
+      });
+      return;
+    }
+    
+    setIsChangingName(true);
+    send("change_username", { newUsername: newUsername.trim() });
   };
 
   const handleTeamSelect = (team: Team) => {
@@ -309,22 +358,34 @@ export default function Lobby() {
               </div>
             </div>
             
-            {/* Right Section - Leave */}
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                send("leave_room", {});
-                localStorage.removeItem("katmannames_room_code");
-                localStorage.removeItem("katmannames_player_id");
-                setLocation("/rooms");
-              }}
-              className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border border-red-800/50"
-              data-testid="button-leave-room"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Ayrıl</span>
-            </Button>
+            {/* Right Section - Actions */}
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowChangeNameDialog(true)}
+                className="text-green-400 hover:text-green-300 hover:bg-green-900/20 border border-green-800/50"
+                title="İsim Değiştir"
+              >
+                <Edit2 className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">İsim</span>
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  send("leave_room", {});
+                  localStorage.removeItem("katmannames_room_code");
+                  localStorage.removeItem("katmannames_player_id");
+                  setLocation("/rooms");
+                }}
+                className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border border-red-800/50"
+                data-testid="button-leave-room"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Ayrıl</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -749,6 +810,73 @@ export default function Lobby() {
           roomCode={roomCode}
         />
       )}
+
+      {/* Change Username Dialog */}
+      <Dialog open={showChangeNameDialog} onOpenChange={setShowChangeNameDialog}>
+        <DialogContent className="bg-slate-900/95 border-2 border-green-900/30 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              İsim Değiştir
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-300">Mevcut İsim</Label>
+              <div className="px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                <span className="text-sm text-slate-200">{currentPlayer?.username || ""}</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-slate-300">Yeni İsim</Label>
+              <Input
+                type="text"
+                placeholder="Yeni kullanıcı adınız"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                maxLength={20}
+                disabled={isChangingName}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    handleChangeName();
+                  }
+                }}
+                className="bg-slate-800/50 border-slate-700 focus:border-green-500 text-white"
+              />
+              <p className="text-xs text-slate-500">2-20 karakter arasında olmalıdır</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleChangeName}
+                disabled={isChangingName || !newUsername.trim() || newUsername.trim() === currentPlayer?.username}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                {isChangingName ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Değiştiriliyor...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Değiştir
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowChangeNameDialog(false);
+                  setNewUsername("");
+                }}
+                variant="outline"
+                className="flex-1 border-slate-700 hover:border-slate-600"
+              >
+                <X className="w-4 h-4 mr-2" />
+                İptal
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
