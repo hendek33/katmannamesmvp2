@@ -64,8 +64,8 @@ export default function Game() {
     const button = e.currentTarget;
     const rect = button.getBoundingClientRect();
     setZoomButtonPosition({
-      top: rect.bottom + 8,
-      left: rect.left + rect.width / 2
+      top: rect.bottom + window.scrollY + 12,
+      left: rect.left + rect.width / 2 + window.scrollX
     });
     setShowZoomHelp(!showZoomHelp);
   };
@@ -2155,28 +2155,34 @@ export default function Game() {
             transform: 'translateX(-50%)'
           }}
         >
-          <div className="bg-slate-900/95 backdrop-blur-lg border-2 border-amber-500/30 rounded-lg p-4 shadow-2xl min-w-[280px]">
-            <div className="flex flex-col gap-3">
-              <div className="text-sm font-semibold text-amber-400">Tahtayı Yakınlaştır/Uzaklaştır</div>
-              <div className="flex items-center gap-3 justify-center">
-                <div className="flex items-center gap-2 bg-slate-800/50 rounded px-3 py-2 animate-pulse-subtle">
-                  <Command className="w-4 h-4 text-blue-400" />
-                  <span className="text-xs text-slate-300 font-medium">Ctrl</span>
-                  <span className="text-slate-400">+</span>
-                  <div className="flex flex-col items-center">
-                    <Mouse className="w-4 h-4 text-blue-400" />
-                    <div className="flex flex-col items-center -mt-1">
-                      <div className="w-0.5 h-2 bg-gradient-to-b from-blue-400 to-transparent animate-scroll-up"></div>
-                      <div className="w-0.5 h-2 bg-gradient-to-t from-red-400 to-transparent animate-scroll-down"></div>
+          <div className="bg-slate-900/98 backdrop-blur-xl border-2 border-amber-500/40 rounded-xl p-6 shadow-2xl min-w-[350px]">
+            <div className="flex flex-col gap-4">
+              <div className="text-base font-bold text-amber-400 text-center">Tahtayı Yakınlaştır / Uzaklaştır</div>
+              <div className="flex items-center gap-4 justify-center">
+                <div className="flex items-center gap-3 bg-slate-800/60 rounded-lg px-5 py-3 animate-pulse-subtle">
+                  <Command className="w-6 h-6 text-blue-400" />
+                  <span className="text-sm text-slate-200 font-bold">Ctrl</span>
+                  <span className="text-lg text-slate-400 font-bold">+</span>
+                  <div className="flex flex-col items-center relative">
+                    <Mouse className="w-7 h-7 text-blue-400" />
+                    {/* Scroll wheel animation */}
+                    <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                      <div className="w-1 h-1 bg-blue-400 rounded-full animate-scroll-up opacity-60"></div>
+                      <div className="w-1 h-1 bg-red-400 rounded-full animate-scroll-down opacity-60 mt-0.5"></div>
                     </div>
+                  </div>
+                  <div className="flex flex-col items-center ml-2">
+                    <div className="text-[10px] text-green-400 animate-pulse">↑</div>
+                    <div className="text-[8px] text-slate-400">Scroll</div>
+                    <div className="text-[10px] text-red-400 animate-pulse">↓</div>
                   </div>
                 </div>
               </div>
-              <div className="text-[10px] text-slate-500 text-center">
+              <div className="text-xs text-slate-400 text-center font-medium">
                 Ctrl tuşunu basılı tutup fare tekerleğini çevirin
               </div>
             </div>
-            <div className="absolute -top-1.5 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-slate-900/95 border-t-2 border-l-2 border-amber-500/30 rotate-45"></div>
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-slate-900/98 border-t-2 border-l-2 border-amber-500/40 rotate-45"></div>
           </div>
         </div>,
         document.body

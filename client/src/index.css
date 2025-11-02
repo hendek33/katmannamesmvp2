@@ -1322,27 +1322,39 @@
 
 /* Scroll indication animations */
 @keyframes scroll-up {
-  0%, 100% {
-    opacity: 0.3;
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
   }
   50% {
     opacity: 1;
+    transform: translateY(-2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 }
 
 @keyframes scroll-down {
-  0%, 100% {
-    opacity: 0.3;
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
   }
   50% {
     opacity: 1;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6px);
   }
 }
 
 .animate-scroll-up {
-  animation: scroll-up 1.5s ease-in-out infinite;
+  animation: scroll-up 2s ease-in-out infinite;
 }
 
 .animate-scroll-down {
-  animation: scroll-down 1.5s ease-in-out infinite 0.75s;
+  animation: scroll-down 2s ease-in-out infinite 1s;
 }
