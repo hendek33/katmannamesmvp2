@@ -618,17 +618,10 @@ export default function Game() {
         </div>
       )}
       
-      {/* Main Container with Zoom */}
-      <div 
-        className="relative z-10 h-full flex flex-col p-2"
-        style={{
-          transform: `scale(${zoomLevel / 100})`,
-          transformOrigin: 'center center',
-          width: '100%',
-          height: '100%'
-        }}
-      >
-        <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
+      {/* Zoom Viewport Container */}
+      <div className="zoom-viewport relative z-10 h-full" style={{ '--zoom': zoomLevel / 100 } as React.CSSProperties}>
+        <div className="zoom-layer">
+          <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Mobile Header */}
         <div className="lg:hidden flex justify-between gap-2 flex-shrink-0 mb-2">
           <Card className="flex-1 px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30">
@@ -2155,6 +2148,7 @@ export default function Game() {
             </Card>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
