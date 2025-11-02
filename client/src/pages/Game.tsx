@@ -317,25 +317,15 @@ export default function Game() {
 
   // Zoom controls
   const handleZoomIn = () => {
-    // Trigger browser's native zoom in
-    const newZoom = Math.min(zoomLevel + 10, 150);
-    setZoomLevel(newZoom);
-    // Use browser's native zoom
-    (document.body.style as any).zoom = `${newZoom}%`;
+    setZoomLevel(prev => Math.min(prev + 10, 150));
   };
 
   const handleZoomOut = () => {
-    // Trigger browser's native zoom out
-    const newZoom = Math.max(zoomLevel - 10, 50);
-    setZoomLevel(newZoom);
-    // Use browser's native zoom
-    (document.body.style as any).zoom = `${newZoom}%`;
+    setZoomLevel(prev => Math.max(prev - 10, 50));
   };
 
   const handleZoomReset = () => {
     setZoomLevel(100);
-    // Reset browser's native zoom
-    (document.body.style as any).zoom = '100%';
   };
 
   const handleTriggerTaunt = () => {
@@ -628,8 +618,16 @@ export default function Game() {
         </div>
       )}
       
-      {/* Main Container */}
-      <div className="relative z-10 h-full flex flex-col p-2">
+      {/* Main Container with Zoom */}
+      <div 
+        className="relative z-10 h-full flex flex-col p-2"
+        style={{
+          transform: `scale(${zoomLevel / 100})`,
+          transformOrigin: 'center center',
+          width: '100%',
+          height: '100%'
+        }}
+      >
         <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
         {/* Mobile Header */}
         <div className="lg:hidden flex justify-between gap-2 flex-shrink-0 mb-2">
