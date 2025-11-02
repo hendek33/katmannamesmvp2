@@ -547,6 +547,7 @@ export default function Game() {
         <TauntBubble
           key={`${taunt.playerId}-${taunt.expiresAt}-${index}`}
           senderUsername={taunt.username}
+          senderDisplayName={(taunt as any).displayName}
           senderTeam={taunt.team}
           videoSrc={taunt.videoSrc}
         />
@@ -557,8 +558,10 @@ export default function Game() {
         <InsultBubble
           key={`${insult.timestamp}-${index}`}
           senderUsername={insult.senderUsername}
+          senderDisplayName={(insult as any).senderDisplayName}
           senderTeam={insult.senderTeam}
           targetUsername={insult.targetUsername}
+          targetDisplayName={(insult as any).targetDisplayName}
           targetTeam={insult.targetTeam}
           message={insult.message}
           timestamp={insult.timestamp}
