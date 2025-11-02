@@ -105,16 +105,9 @@ export class MemStorage implements IStorage {
   }
 
   private cleanupDisconnectedPlayers(): void {
-    const now = Date.now();
-    const DISCONNECT_TIMEOUT = 60000; // 60 seconds timeout for disconnected players
-    
-    Array.from(this.disconnectedPlayers.entries()).forEach(([playerId, data]) => {
-      if (now - data.disconnectedAt > DISCONNECT_TIMEOUT) {
-        // Player has been disconnected for too long, remove them permanently
-        this.disconnectedPlayers.delete(playerId);
-        // Don't release username yet, it's still reserved for the room
-      }
-    });
+    // Don't automatically clean up disconnected players
+    // They can reconnect anytime as long as the room exists
+    // Only clean up when the room itself is deleted
   }
 
   private generateRoomCode(): string {
@@ -1226,10 +1219,9 @@ export class MemStorage implements IStorage {
     // Clean up disconnected player data if it exists
     this.disconnectedPlayers.delete(playerId);
 
-    // Check if this player was the owner and if the game is active
+    // Check if this player was the owner
     const removedPlayer = room.players.find(p => p.id === playerId);
     const wasOwner = removedPlayer?.isRoomOwner;
-    const gameIsActive = room.phase === "playing";
 
     room.players = room.players.filter(p => p.id !== playerId);
     this.playerToRoom.delete(playerId);
@@ -1249,20 +1241,8 @@ export class MemStorage implements IStorage {
         room.players[0].isRoomOwner = true;
       }
       
-      // Only return to lobby if:
-      // 1. The owner left during an active game, OR
-      // 2. Both spymasters are gone during an active game
-      if (gameIsActive) {
-        const hasOwner = room.players.some(p => p.isRoomOwner);
-        const darkSpymaster = room.players.some(p => p.team === "dark" && p.role === "spymaster");
-        const lightSpymaster = room.players.some(p => p.team === "light" && p.role === "spymaster");
-        
-        if (wasOwner || (!darkSpymaster || !lightSpymaster)) {
-          // Game cannot continue, return to lobby
-          this.returnToLobby(roomCode);
-          console.log(`[REMOVE] Game returned to lobby - owner left or spymaster missing`);
-        }
-      }
+      // Game continues even if owner or spymasters leave
+      // The game state is preserved for reconnection
     }
   }
 
@@ -1270,6 +1250,19 @@ export class MemStorage implements IStorage {
     Array.from(this.rooms.entries()).forEach(([roomCode, roomData]) => {
       if (roomData.gameState.players.length === 0) {
         this.rooms.delete(roomCode);
+        
+        // Also clean up any disconnected players from this room
+        Array.from(this.disconnectedPlayers.entries()).forEach(([playerId, data]) => {
+          if (data.roomCode === roomCode) {
+            this.disconnectedPlayers.delete(playerId);
+            // Clean up username mappings
+            const username = this.playerIdToUsername.get(playerId);
+            if (username) {
+              this.activeUsernames.delete(username);
+              this.playerIdToUsername.delete(playerId);
+            }
+          }
+        });
       }
     });
   }

@@ -1147,28 +1147,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
-        // Wait 30 seconds before fully removing the player
-        setTimeout(() => {
-          const currentClients = roomClients.get(roomCode);
-          const playerReconnected = currentClients && Array.from(currentClients).some(c => c.playerId === playerId);
-          
-          if (!playerReconnected) {
-            storage.removePlayer(roomCode, playerId);
-            
-            const room = storage.getRoom(roomCode);
-            if (room) {
-              broadcastToRoom(roomCode, {
-                type: "player_left",
-                payload: { gameState: room },
-              });
-            }
-            
-            if (currentClients && currentClients.size === 0) {
-              roomClients.delete(roomCode);
-              stopRoomTimer(roomCode); // Clean up timer when room is deleted
-            }
-          }
-        }, 30000); // Increased to 30 seconds for better reconnection support
+        // Don't automatically remove disconnected players - they can reconnect anytime
+        // Only clean up if the room itself is deleted
       }
     });
 
