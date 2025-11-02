@@ -1,5 +1,6 @@
 import { type Card } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { getPlayerName } from "@/lib/playerUtils";
 import { CheckSquare } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import logoImg from "@assets/logoo.png";
@@ -18,9 +19,10 @@ interface GameCardProps {
   isAssassinCard?: boolean;
   gameEnded?: boolean;
   isKnownCard?: boolean;
+  players?: any[];
 }
 
-export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false, isKnownCard = false }: GameCardProps) {
+export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false, isKnownCard = false, players = [] }: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -292,23 +294,29 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       {voters.length > 0 && !card.revealed && (
         <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 z-[5] max-w-[85%]">
           <div className="flex flex-wrap gap-0.5 justify-end">
-            {voters.map((voter, idx) => (
-              <span
-                key={voter}
-                className={cn(
-                  "inline-block px-0.5 py-0 sm:px-0.5 sm:py-0 md:px-1 md:py-0.5 lg:px-1 lg:py-0.5 xl:px-1.5 xl:py-0.5",
-                  "text-[5px] sm:text-[6px] md:text-[7px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px]",
-                  "rounded animate-pop-in bg-red-950/80 text-red-200",
-                  hasVoted && voter === voters[voters.length - 1] ? "font-bold" : ""
-                )}
-                style={{
-                  animationDelay: `${idx * 0.05}s`
-                }}
-                title={voter}
-              >
-                {voter.length > 6 ? voter.substring(0, 6) + '...' : voter}
-              </span>
-            ))}
+            {voters.map((voter, idx) => {
+              // Find the player object for this voter username to get display name
+              const player = players.find((p: any) => p.username === voter);
+              const displayName = player ? getPlayerName(player) : voter;
+              
+              return (
+                <span
+                  key={voter}
+                  className={cn(
+                    "inline-block px-0.5 py-0 sm:px-0.5 sm:py-0 md:px-1 md:py-0.5 lg:px-1 lg:py-0.5 xl:px-1.5 xl:py-0.5",
+                    "text-[5px] sm:text-[6px] md:text-[7px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px]",
+                    "rounded animate-pop-in bg-red-950/80 text-red-200",
+                    hasVoted && voter === voters[voters.length - 1] ? "font-bold" : ""
+                  )}
+                  style={{
+                    animationDelay: `${idx * 0.05}s`
+                  }}
+                  title={displayName}
+                >
+                  {displayName.length > 6 ? displayName.substring(0, 6) + '...' : displayName}
+                </span>
+              );
+            })}
           </div>
         </div>
       )}

@@ -1804,6 +1804,7 @@ export default function Game() {
                     isAssassinCard={card.type === "assassin" && card.revealed && gameState.phase === "ended"}
                     gameEnded={gameState.phase === "ended"}
                     isKnownCard={currentPlayer.secretRole === "prophet" && currentPlayer.knownCards?.includes(card.id)}
+                    players={gameState.players}
                   />
                 </div>
               ))}
