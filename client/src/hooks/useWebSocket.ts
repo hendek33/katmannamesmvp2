@@ -242,8 +242,8 @@ export function useWebSocket() {
               case "room_features":
                 setTauntEnabled(message.payload.tauntEnabled);
                 setInsultEnabled(message.payload.insultEnabled);
-                setGlobalTauntCooldown(message.payload.globalTauntCooldown || 0);
-                setGlobalInsultCooldown(message.payload.globalInsultCooldown || 0);
+                setGlobalTauntCooldown(message.payload.teamTauntCooldown || 0);
+                setGlobalInsultCooldown(message.payload.teamInsultCooldown || 0);
                 break;
             }
           } catch (err) {

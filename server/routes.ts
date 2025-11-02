@@ -1164,7 +1164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
             
-            const features = storage.getRoomFeatures(ws.roomCode);
+            const features = storage.getRoomFeatures(ws.roomCode, ws.playerId);
             if (!features) {
               sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
               return;

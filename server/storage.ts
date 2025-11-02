@@ -11,8 +11,8 @@ interface RoomData {
   cardImages?: Map<number, string>; // cardId -> image path for revealed cards
   tauntEnabled?: boolean;
   insultEnabled?: boolean;
-  globalTauntCooldown?: number; // Global taunt cooldown timestamp
-  globalInsultCooldown?: number; // Global insult cooldown timestamp
+  teamTauntCooldown?: { dark?: number; light?: number }; // Team-specific taunt cooldown timestamps
+  teamInsultCooldown?: { dark?: number; light?: number }; // Team-specific insult cooldown timestamps
 }
 
 export interface IStorage {
@@ -46,7 +46,7 @@ export interface IStorage {
   sendInsult(roomCode: string, playerId: string, targetId?: string): any;
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
-  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean; globalTauntCooldown?: number; globalInsultCooldown?: number } | null;
+  getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number } | null;
 }
 
 // Insult templates
@@ -1143,14 +1143,19 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player || !player.team) return null;
     
-    // Check GLOBAL cooldown (5 seconds)
+    // Check team-specific cooldown (5 seconds)
     const now = Date.now();
-    if (roomData.globalTauntCooldown && (now - roomData.globalTauntCooldown) < 5000) {
-      return null; // Still on global cooldown
+    if (!roomData.teamTauntCooldown) {
+      roomData.teamTauntCooldown = {};
     }
     
-    // Update global taunt cooldown
-    roomData.globalTauntCooldown = now;
+    const teamCooldown = roomData.teamTauntCooldown[player.team];
+    if (teamCooldown && (now - teamCooldown) < 5000) {
+      return null; // Still on team cooldown
+    }
+    
+    // Update team taunt cooldown
+    roomData.teamTauntCooldown[player.team] = now;
     
     // Generate random position on board (normalized 0-1)
     const position = {
@@ -1401,15 +1406,20 @@ export class MemStorage implements IStorage {
     // Check if insult is enabled
     if (!roomData.insultEnabled) return null;
 
-    // Check GLOBAL cooldown (5 seconds)
-    const now = Date.now();
-    if (roomData.globalInsultCooldown && (now - roomData.globalInsultCooldown) < 5000) {
-      return null; // Still on global cooldown
-    }
-
     // Get sender and target
     const sender = room.players.find(p => p.id === senderId);
     if (!sender || !sender.team) return null;
+
+    // Check team-specific cooldown (5 seconds)
+    const now = Date.now();
+    if (!roomData.teamInsultCooldown) {
+      roomData.teamInsultCooldown = {};
+    }
+    
+    const teamCooldown = roomData.teamInsultCooldown[sender.team];
+    if (teamCooldown && (now - teamCooldown) < 5000) {
+      return null; // Still on team cooldown
+    }
 
     let target: Player | undefined;
     
@@ -1432,8 +1442,8 @@ export class MemStorage implements IStorage {
 
     if (!target) return null;
 
-    // Set global cooldown
-    roomData.globalInsultCooldown = now;
+    // Set team cooldown
+    roomData.teamInsultCooldown[sender.team] = now;
 
     // Create insult - use V1 insult messages
     const insultTemplate = insultMessages[Math.floor(Math.random() * insultMessages.length)];
@@ -1470,23 +1480,36 @@ export class MemStorage implements IStorage {
     return { insultEnabled: enabled };
   }
   
-  getRoomFeatures(roomCode: string): { tauntEnabled: boolean; insultEnabled: boolean; globalTauntCooldown?: number; globalInsultCooldown?: number } | null {
+  getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number } | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
+    const room = roomData.gameState;
     
     const now = Date.now();
-    const tauntRemaining = roomData.globalTauntCooldown && (roomData.globalTauntCooldown + 5000 - now) > 0 
-      ? Math.ceil((roomData.globalTauntCooldown + 5000 - now) / 1000) 
-      : 0;
-    const insultRemaining = roomData.globalInsultCooldown && (roomData.globalInsultCooldown + 5000 - now) > 0
-      ? Math.ceil((roomData.globalInsultCooldown + 5000 - now) / 1000)
-      : 0;
+    let tauntRemaining = 0;
+    let insultRemaining = 0;
+    
+    // If playerId provided, get team-specific cooldowns
+    if (playerId) {
+      const player = room.players.find(p => p.id === playerId);
+      if (player && player.team) {
+        const teamTauntCooldown = roomData.teamTauntCooldown?.[player.team];
+        const teamInsultCooldown = roomData.teamInsultCooldown?.[player.team];
+        
+        tauntRemaining = teamTauntCooldown && (teamTauntCooldown + 5000 - now) > 0
+          ? Math.ceil((teamTauntCooldown + 5000 - now) / 1000)
+          : 0;
+        insultRemaining = teamInsultCooldown && (teamInsultCooldown + 5000 - now) > 0
+          ? Math.ceil((teamInsultCooldown + 5000 - now) / 1000)
+          : 0;
+      }
+    }
     
     return {
       tauntEnabled: roomData.tauntEnabled !== false, // Default to true
       insultEnabled: roomData.insultEnabled !== false, // Default to true
-      globalTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
-      globalInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
+      teamTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
+      teamInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
     };
   }
 }
