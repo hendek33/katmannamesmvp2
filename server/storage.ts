@@ -178,8 +178,22 @@ export class MemStorage implements IStorage {
     roomData.cardImages = cardImages;
   }
 
+  // Fisher-Yates shuffle algoritması - daha iyi karıştırma için
+  private fisherYatesShuffle<T>(array: T[]): T[] {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
   private createGameCards(): Card[] {
-    const words = getRandomWords(25);
+    // Kelimeleri al ve tekrar karıştır (getRandomWords'ün üstüne ekstra karıştırma)
+    let words = getRandomWords(25);
+    // Kelimeleri Fisher-Yates ile tekrar karıştır
+    words = this.fisherYatesShuffle(words);
+    
     const cards: Card[] = [];
     
     const darkFirst = Math.random() > 0.5;
@@ -193,7 +207,8 @@ export class MemStorage implements IStorage {
       "assassin"
     ];
     
-    const shuffledTypes = types.sort(() => Math.random() - 0.5);
+    // Kart tiplerini Fisher-Yates ile karıştır
+    const shuffledTypes = this.fisherYatesShuffle(types);
     
     for (let i = 0; i < 25; i++) {
       cards.push({
