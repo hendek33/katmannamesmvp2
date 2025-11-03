@@ -64,6 +64,16 @@ export interface GameState {
   prophetGuessResult?: { team: Team; success: boolean; targetId?: string }; // Result of prophet guess
   doubleAgentGuessUsed?: boolean; // Track if losing team used double agent guess
   doubleAgentGuessResult?: { success: boolean; targetId?: string }; // Result of double agent guess
+  endGameGuessUsed?: boolean; // Track if end game guess has been used (for both modes)
+  endGameGuessSequence?: { // Dramatic sequence for end game guess
+    guessingTeam: Team;
+    targetPlayer: string;
+    targetTeam: Team;
+    guessType: "prophet" | "double_agent";
+    actualRole?: "prophet" | "double_agent" | null;
+    success?: boolean;
+    finalWinner?: Team;
+  };
 }
 
 export interface RoomListItem {
@@ -132,6 +142,10 @@ export const guessProphetSchema = z.object({
 });
 
 export const guessDoubleAgentSchema = z.object({
+  targetPlayerId: z.string(),
+});
+
+export const endGameGuessSchema = z.object({
   targetPlayerId: z.string(),
 });
 

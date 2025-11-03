@@ -33,6 +33,7 @@ export interface IStorage {
   updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
+  endGameGuess(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   startGame(roomCode: string): GameState | null;
   giveClue(roomCode: string, playerId: string, word: string, count: number): GameState | null;
   revealCard(roomCode: string, playerId: string, cardId: number): GameState | null;
@@ -1136,6 +1137,74 @@ export class MemStorage implements IStorage {
       // Wrong guess means instant loss for the guessing team!
       room.winner = room.currentTeam === "dark" ? "light" : "dark";
       room.phase = "ended";
+    }
+    
+    return room;
+  }
+
+  endGameGuess(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // End game guessing only works after the game ends, in chaos mode
+    if (room.phase !== "ended" || !room.chaosMode || !room.chaosModeType) return null;
+    
+    // Check if there's a winner already (a team won normally)
+    if (!room.winner) return null;
+    
+    // Check if end game guess hasn't been used yet
+    if (room.endGameGuessUsed) return null;
+    
+    // Check if player is on the losing team
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || player.team === room.winner) {
+      return null; // Only losing team can guess
+    }
+    
+    // Get the target player
+    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+    if (!targetPlayer) return null;
+    
+    // Mark that end game guess has been used
+    room.endGameGuessUsed = true;
+    
+    // Initialize the dramatic sequence
+    room.endGameGuessSequence = {
+      guessingTeam: player.team,
+      targetPlayer: targetPlayer.username,
+      targetTeam: targetPlayer.team,
+      guessType: room.chaosModeType,
+      actualRole: targetPlayer.secretRole,
+      success: false,
+      finalWinner: room.winner
+    };
+    
+    let guessCorrect = false;
+    
+    if (room.chaosModeType === "prophet") {
+      // In Prophet mode: Losing team guesses the prophet on the OPPOSING team
+      if (targetPlayer.team !== player.team && targetPlayer.secretRole === "prophet") {
+        guessCorrect = true;
+      }
+    } else if (room.chaosModeType === "double_agent") {
+      // In Double Agent mode: Losing team guesses the double agent on THEIR OWN team
+      if (targetPlayer.team === player.team && targetPlayer.secretRole === "double_agent") {
+        guessCorrect = true;
+      }
+    }
+    
+    // Update the sequence with results
+    room.endGameGuessSequence.success = guessCorrect;
+    
+    if (guessCorrect) {
+      // If guess is correct, the losing team wins!
+      room.winner = player.team;
+      room.endGameGuessSequence.finalWinner = player.team;
+      console.log(`END GAME GUESS CORRECT! ${player.team} team wins by guessing ${targetPlayer.username}`);
+    } else {
+      // If guess is wrong, the original winner remains
+      console.log(`END GAME GUESS WRONG! ${room.winner} team still wins. ${targetPlayer.username} was ${targetPlayer.secretRole || "normal player"}`);
     }
     
     return room;
