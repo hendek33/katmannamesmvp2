@@ -212,15 +212,27 @@ export function useWebSocket() {
               case "taunt_triggered":
                 // Handle taunt events
                 // Prevent duplicates by checking if this exact taunt already exists
+                console.log("TAUNT RECEIVED:", {
+                  playerId: message.payload.playerId,
+                  expiresAt: message.payload.expiresAt,
+                  team: message.payload.team,
+                  timestamp: Date.now()
+                });
                 setTaunts(prev => {
+                  console.log("EXISTING TAUNTS:", prev.map(t => ({
+                    playerId: t.playerId,
+                    expiresAt: t.expiresAt,
+                    team: t.team
+                  })));
                   const isDuplicate = prev.some(t => 
                     t.playerId === message.payload.playerId && 
                     t.expiresAt === message.payload.expiresAt
                   );
                   if (isDuplicate) {
-                    console.log("Duplicate taunt detected, ignoring");
+                    console.log(">>> DUPLICATE TAUNT DETECTED, IGNORING <<<");
                     return prev;
                   }
+                  console.log(">>> ADDING NEW TAUNT <<<");
                   return [...prev, message.payload];
                 });
                 // Only set cooldown for the same team
@@ -251,15 +263,27 @@ export function useWebSocket() {
               case "insult_sent":
                 // Handle insult events
                 // Prevent duplicates by checking if this exact insult already exists
+                console.log("INSULT RECEIVED:", {
+                  senderId: message.payload.senderId,
+                  timestamp: message.payload.timestamp,
+                  senderTeam: message.payload.senderTeam,
+                  receivedAt: Date.now()
+                });
                 setInsults(prev => {
+                  console.log("EXISTING INSULTS:", prev.map(i => ({
+                    senderId: i.senderId,
+                    timestamp: i.timestamp,
+                    senderTeam: i.senderTeam
+                  })));
                   const isDuplicate = prev.some(i => 
                     i.timestamp === message.payload.timestamp && 
                     i.senderId === message.payload.senderId
                   );
                   if (isDuplicate) {
-                    console.log("Duplicate insult detected, ignoring");
+                    console.log(">>> DUPLICATE INSULT DETECTED, IGNORING <<<");
                     return prev;
                   }
+                  console.log(">>> ADDING NEW INSULT <<<");
                   return [...prev, message.payload];
                 });
                 // Only set cooldown for the same team
