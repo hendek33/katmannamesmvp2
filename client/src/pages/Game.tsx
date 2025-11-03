@@ -39,6 +39,7 @@ export default function Game() {
     clearUsernameChangeStatus,
     taunts,
     insults,
+    setInsults,
     tauntEnabled,
     insultEnabled,
     globalTauntCooldown,
@@ -553,9 +554,9 @@ export default function Game() {
       )}
       
       {/* Taunt Bubbles - Show as speech bubbles */}
-      {taunts.map((taunt, index) => (
+      {taunts.map((taunt) => (
         <TauntBubble
-          key={`${taunt.playerId}-${taunt.expiresAt}-${index}`}
+          key={`${taunt.playerId}-${taunt.expiresAt}`}
           senderUsername={taunt.username}
           senderTeam={taunt.team}
           videoSrc={taunt.videoSrc}
@@ -563,15 +564,20 @@ export default function Game() {
       ))}
       
       {/* Insult Bubbles */}
-      {insults.map((insult, index) => (
+      {insults.map((insult) => (
         <InsultBubble
-          key={`${insult.timestamp}-${index}`}
+          key={`${insult.senderId}-${insult.timestamp}`}
           senderUsername={insult.senderUsername}
           senderTeam={insult.senderTeam}
           targetUsername={insult.targetUsername}
           targetTeam={insult.targetTeam}
           message={insult.message}
           timestamp={insult.timestamp}
+          onRemove={() => {
+            setInsults(prev => prev.filter(i => 
+              !(i.senderId === insult.senderId && i.timestamp === insult.timestamp)
+            ));
+          }}
         />
       ))}
 

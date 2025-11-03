@@ -16,6 +16,7 @@ interface WebSocketContextType {
   clearUsernameChangeStatus: () => void;
   taunts: any[];
   insults: any[];
+  setInsults: (value: any[] | ((prev: any[]) => any[])) => void;
   tauntEnabled: boolean;
   insultEnabled: boolean;
   globalTauntCooldown: number;

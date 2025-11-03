@@ -246,18 +246,8 @@ export function useWebSocket() {
                     setGlobalTauntCooldown(5);
                   }
                 }
-                // Remove taunt after expiry
-                if (message.payload.expiresAt) {
-                  const timeout = message.payload.expiresAt - Date.now();
-                  if (timeout > 0) {
-                    setTimeout(() => {
-                      setTaunts(prev => prev.filter(t => 
-                        t.expiresAt !== message.payload.expiresAt || 
-                        t.playerId !== message.payload.playerId
-                      ));
-                    }, timeout);
-                  }
-                }
+                // Remove taunt after expiry - don't set duplicate timeouts
+                // The TauntOverlay component already handles cleanup
                 break;
                 
               case "insult_sent":
@@ -297,10 +287,7 @@ export function useWebSocket() {
                     setGlobalInsultCooldown(5);
                   }
                 }
-                // Remove insult after 3 seconds
-                setTimeout(() => {
-                  setInsults(prev => prev.filter(i => i.timestamp !== message.payload.timestamp));
-                }, 3000);
+                // Don't remove insult here - let InsultBubble component handle its own lifecycle
                 break;
                 
               case "taunt_toggled":
@@ -405,6 +392,7 @@ export function useWebSocket() {
     clearUsernameChangeStatus,
     taunts,
     insults,
+    setInsults,
     tauntEnabled,
     insultEnabled,
     globalTauntCooldown,
