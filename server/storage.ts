@@ -676,13 +676,13 @@ export class MemStorage implements IStorage {
       return Math.floor((Math.random() * seed + Math.random() * (1000 - seed)) / 1000 * max);
     };
 
-    // Only assign roles to human players (not bots) who are guessers
+    // Assign roles to all players (including bots) who are guessers
     // Shuffle the arrays first to ensure randomness
     const darkGuessers = room.players
-      .filter(p => !p.isBot && p.team === "dark" && p.role === "guesser")
+      .filter(p => p.team === "dark" && p.role === "guesser")
       .sort(() => Math.random() - 0.5);
     const lightGuessers = room.players
-      .filter(p => !p.isBot && p.team === "light" && p.role === "guesser")
+      .filter(p => p.team === "light" && p.role === "guesser")
       .sort(() => Math.random() - 0.5);
     
     if (room.chaosModeType === "prophet") {
