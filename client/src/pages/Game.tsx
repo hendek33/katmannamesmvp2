@@ -333,8 +333,29 @@ export default function Game() {
   }, [gameState?.phase, gameState?.winner]);
 
   // Handle end game guess sequence animation
+  const endGameGuessRef = useRef<any>(null);
   useEffect(() => {
-    if (!gameState?.endGameGuessSequence) return;
+    // Reset when game restarts or goes back to lobby
+    if (gameState?.phase === "lobby" || gameState?.phase === "playing") {
+      endGameGuessRef.current = null;
+      setShowEndGameGuessSequence(false);
+      setSequenceStep(0);
+      return;
+    }
+    
+    if (!gameState?.endGameGuessSequence) {
+      endGameGuessRef.current = null;
+      return;
+    }
+    
+    // Only trigger if it's a new sequence (not the same one from before)
+    const sequenceKey = `${gameState.endGameGuessSequence.targetPlayer}-${gameState.endGameGuessSequence.guessType}`;
+    if (endGameGuessRef.current === sequenceKey) {
+      return; // Already shown this sequence
+    }
+    
+    // Mark this sequence as shown
+    endGameGuessRef.current = sequenceKey;
     
     // Start the dramatic sequence
     setShowEndGameGuessSequence(true);
@@ -350,7 +371,7 @@ export default function Game() {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [gameState?.endGameGuessSequence]);
+  }, [gameState?.endGameGuessSequence, gameState?.phase]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {

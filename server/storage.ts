@@ -983,6 +983,8 @@ export class MemStorage implements IStorage {
     room.prophetGuessResult = undefined;
     room.doubleAgentGuessUsed = undefined;
     room.doubleAgentGuessResult = undefined;
+    room.endGameGuessUsed = undefined;
+    room.endGameGuessSequence = undefined;
 
     return room;
   }
@@ -1009,6 +1011,10 @@ export class MemStorage implements IStorage {
     
     // Clear timer when returning to lobby
     room.currentTurnStartTime = null;
+    
+    // Clear end game guess tracking
+    room.endGameGuessUsed = undefined;
+    room.endGameGuessSequence = undefined;
 
     return room;
   }
