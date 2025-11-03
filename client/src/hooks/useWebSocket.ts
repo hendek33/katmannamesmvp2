@@ -209,7 +209,6 @@ export function useWebSocket() {
                 }
                 break;
                 
-              case "taunt_fired":
               case "taunt_triggered":
                 // Handle taunt events
                 // Prevent duplicates by checking if this exact taunt already exists
@@ -251,7 +250,18 @@ export function useWebSocket() {
                 
               case "insult_sent":
                 // Handle insult events
-                setInsults(prev => [...prev, message.payload]);
+                // Prevent duplicates by checking if this exact insult already exists
+                setInsults(prev => {
+                  const isDuplicate = prev.some(i => 
+                    i.timestamp === message.payload.timestamp && 
+                    i.senderId === message.payload.senderId
+                  );
+                  if (isDuplicate) {
+                    console.log("Duplicate insult detected, ignoring");
+                    return prev;
+                  }
+                  return [...prev, message.payload];
+                });
                 // Only set cooldown for the same team
                 // Use gameState from payload if available, or the latest state
                 const insultGameState = message.payload.gameState;
