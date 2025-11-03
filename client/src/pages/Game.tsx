@@ -687,8 +687,9 @@ export default function Game() {
                   )}
                 </Button>
               </div>
-              {/* Mobile Prophet Guess Button - Only show in Chaos Mode during play */}
-              {gameState.chaosMode && gameState.phase === "playing" && 
+              {/* Mobile Prophet Guess Button - Only show in Prophet Chaos Mode during play */}
+              {gameState.chaosMode && gameState.chaosModeType === "prophet" && 
+               gameState.phase === "playing" && 
                currentPlayer.role === "guesser" && 
                currentPlayer.team === gameState.currentTeam &&
                (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) && (
@@ -947,8 +948,9 @@ export default function Game() {
               
               <div className="w-px h-5 bg-amber-900/40" />
               
-              {/* Prophet Guess Button - Only show in Chaos Mode during play */}
-              {gameState.chaosMode && gameState.phase === "playing" && 
+              {/* Prophet Guess Button - Only show in Prophet Chaos Mode during play */}
+              {gameState.chaosMode && gameState.chaosModeType === "prophet" && 
+               gameState.phase === "playing" && 
                currentPlayer.role === "guesser" && 
                currentPlayer.team === gameState.currentTeam &&
                (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) && (
@@ -1474,8 +1476,9 @@ export default function Game() {
                 </DialogContent>
               </Dialog>
               
-              {/* Double Agent Guess Button - Only show after game ends for losing team */}
-              {gameState.chaosMode && gameState.phase === "ended" && gameState.winner &&
+              {/* Double Agent Guess Button - Only show after game ends for losing team in Double Agent mode */}
+              {gameState.chaosMode && gameState.chaosModeType === "double_agent" && 
+               gameState.phase === "ended" && gameState.winner &&
                currentPlayer.team !== gameState.winner && !gameState.doubleAgentGuessUsed && (
                 <Dialog>
                   <DialogTrigger asChild>

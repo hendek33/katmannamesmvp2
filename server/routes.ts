@@ -15,6 +15,7 @@ import {
   updateTeamNameSchema,
   updateTimerSettingsSchema,
   updateChaosModeSchema,
+  updateChaosModeTypeSchema,
   guessProphetSchema,
   guessDoubleAgentSchema,
 } from "@shared/schema";
@@ -623,6 +624,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "update_chaos_mode_type": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi Kaos Modu tipini değiştirebilir" } });
+              return;
+            }
+
+            const validation = updateChaosModeTypeSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz Kaos Modu tipi" } });
+              return;
+            }
+
+            const gameState = storage.updateChaosModeType(ws.roomCode, validation.data.type);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Kaos Modu tipi güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
           case "update_password": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
@@ -710,6 +743,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`Oda Kodu: ${ws.roomCode}`);
             console.log(`Başlatan: ${ws.playerId}`);
             console.log(`Tarih/Saat: ${new Date().toLocaleString('tr-TR')}`);
+
+            // Check if chaos mode type is selected when chaos mode is enabled
+            const currentRoom = storage.getRoom(ws.roomCode);
+            if (currentRoom?.chaosMode && !currentRoom?.chaosModeType) {
+              sendToClient(ws, { type: "error", payload: { message: "Kaos Modu açık ancak rol tipi seçilmedi! Lütfen Kahin veya Çift Ajan modunu seçin." } });
+              return;
+            }
 
             const gameState = storage.startGame(ws.roomCode);
             if (!gameState) {

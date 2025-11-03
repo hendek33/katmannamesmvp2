@@ -33,6 +33,7 @@ export default function Lobby() {
   const [spymasterTime, setSpymasterTime] = useState(120);
   const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
+  const [chaosModeType, setChaosModeType] = useState<"prophet" | "double_agent" | null>(null);
   const [showChaosDetails, setShowChaosDetails] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
@@ -87,6 +88,7 @@ export default function Lobby() {
       setSpymasterTime(gameState.spymasterTime);
       setGuesserTime(gameState.guesserTime);
       setChaosMode(gameState.chaosMode || false);
+      setChaosModeType(gameState.chaosModeType || null);
     }
   }, [gameState]);
 
@@ -161,6 +163,17 @@ export default function Lobby() {
   const [showTeamNameWarning, setShowTeamNameWarning] = useState(false);
 
   const handleStartGame = () => {
+    // Check if Chaos Mode is enabled but type is not selected
+    if (gameState?.chaosMode && !gameState?.chaosModeType) {
+      toast({
+        title: "Kaos Modu Tipi Seçilmeli",
+        description: "Lütfen Kahin veya Çift Ajan modunu seçin",
+        variant: "destructive",
+        duration: 4000,
+      });
+      return;
+    }
+    
     // Check if team names are still default
     if (gameState?.darkTeamName === "Mavi Takım" || gameState?.lightTeamName === "Kırmızı Takım") {
       setShowTeamNameWarning(true);
@@ -193,6 +206,14 @@ export default function Lobby() {
 
   const handleChaosModeUpdate = (enabled: boolean) => {
     send("update_chaos_mode", { chaosMode: enabled });
+    // Reset type when disabling chaos mode
+    if (!enabled) {
+      setChaosModeType(null);
+    }
+  };
+
+  const handleChaosModeTypeUpdate = (type: "prophet" | "double_agent") => {
+    send("update_chaos_mode_type", { type });
   };
 
   if (!isConnected) {
@@ -257,7 +278,8 @@ export default function Lobby() {
     lightHasSpymaster &&
     darkTeam.length >= 2 &&
     lightTeam.length >= 2 &&
-    noTeam.length === 0;
+    noTeam.length === 0 &&
+    (!gameState?.chaosMode || gameState?.chaosModeType); // If chaos mode is on, type must be selected
 
   const playerCount = gameState.players.length;
 
@@ -667,9 +689,64 @@ export default function Lobby() {
                       data-testid="switch-chaos-mode"
                     />
                   </div>
-                  <p className={`text-xs font-medium ${chaosMode ? 'text-purple-300/90' : 'text-amber-700/70'}`}>
+                  {/* Chaos Mode Type Selection */}
+                  {chaosMode && (
+                    <div className="mt-3 p-3 bg-purple-900/20 rounded-lg border border-purple-600/30">
+                      <p className="text-xs font-medium text-purple-300 mb-2">Gizli Rol Tipi Seç:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          size="sm"
+                          variant={chaosModeType === "prophet" ? "default" : "outline"}
+                          className={`text-xs h-8 ${
+                            chaosModeType === "prophet"
+                              ? "bg-purple-600 hover:bg-purple-700 border-purple-500"
+                              : "border-purple-600/50 text-purple-300 hover:bg-purple-900/30"
+                          }`}
+                          onClick={() => {
+                            if (currentPlayer?.isRoomOwner) {
+                              setChaosModeType("prophet");
+                              handleChaosModeTypeUpdate("prophet");
+                            }
+                          }}
+                          disabled={!currentPlayer?.isRoomOwner}
+                        >
+                          🔮 Kahin
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={chaosModeType === "double_agent" ? "default" : "outline"}
+                          className={`text-xs h-8 ${
+                            chaosModeType === "double_agent"
+                              ? "bg-purple-600 hover:bg-purple-700 border-purple-500"
+                              : "border-purple-600/50 text-purple-300 hover:bg-purple-900/30"
+                          }`}
+                          onClick={() => {
+                            if (currentPlayer?.isRoomOwner) {
+                              setChaosModeType("double_agent");
+                              handleChaosModeTypeUpdate("double_agent");
+                            }
+                          }}
+                          disabled={!currentPlayer?.isRoomOwner}
+                        >
+                          🎭 Çift Ajan
+                        </Button>
+                      </div>
+                      <p className="text-[10px] text-purple-200/70 mt-2">
+                        {chaosModeType === "prophet" 
+                          ? "🔮 Kahinler 3 kendi takım kartını bilir, rakip kahin tahmini yapabilir."
+                          : chaosModeType === "double_agent"
+                          ? "🎭 Çift ajanlar karşı takım için oy kullanır, son şans tahmini vardır."
+                          : "Oyun başlamadan önce bir tip seçmelisiniz!"}
+                      </p>
+                    </div>
+                  )}
+                  <p className={`text-xs font-medium mt-2 ${chaosMode ? 'text-purple-300/90' : 'text-amber-700/70'}`}>
                     {chaosMode 
-                      ? "🎲 Gizli roller aktif! Çift ajanlar, kahinler ve daha fazlası oyuna dahil olacak!" 
+                      ? chaosModeType === "prophet"
+                        ? "🔮 Kahin modu aktif! Oyuncular 3 kendi takım kartını bilecek."
+                        : chaosModeType === "double_agent"
+                        ? "🎭 Çift Ajan modu aktif! Gizli ajanlar karşı takım için çalışacak."
+                        : "⚠️ Gizli rol tipi seçilmeli!"
                       : "Klasik oyun modu. Gizli roller yok."}
                   </p>
                 </div>

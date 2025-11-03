@@ -29,6 +29,7 @@ export interface IStorage {
   updateTeamName(roomCode: string, team: Team, name: string): GameState | null;
   updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
+  updateChaosModeType(roomCode: string, type: "prophet" | "double_agent"): GameState | null;
   updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -618,6 +619,23 @@ export class MemStorage implements IStorage {
     if (room.phase !== "lobby") return null;
 
     room.chaosMode = chaosMode;
+    // Reset type when disabling
+    if (!chaosMode) {
+      room.chaosModeType = null;
+    }
+
+    return room;
+  }
+
+  updateChaosModeType(roomCode: string, type: "prophet" | "double_agent"): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow chaos mode type to be changed in lobby
+    if (room.phase !== "lobby") return null;
+
+    room.chaosModeType = type;
 
     return room;
   }
@@ -646,43 +664,50 @@ export class MemStorage implements IStorage {
       p.knownCards = undefined;
     });
 
+    // Only assign roles if chaos mode is enabled and a type is selected
+    if (!room.chaosMode || !room.chaosModeType) {
+      return;
+    }
+
     // Only assign roles to human players (not bots) who are guessers
     const darkGuessers = room.players.filter(p => !p.isBot && p.team === "dark" && p.role === "guesser");
     const lightGuessers = room.players.filter(p => !p.isBot && p.team === "light" && p.role === "guesser");
     
-    // Assign Prophet to one player from each team (if there are guessers)
-    if (darkGuessers.length > 0) {
-      const darkProphet = darkGuessers[Math.floor(Math.random() * darkGuessers.length)];
-      darkProphet.secretRole = "prophet";
-      // Give prophet 3 random cards from their team
-      const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
-      const shuffled = darkCards.sort(() => Math.random() - 0.5);
-      darkProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
-    }
-    
-    if (lightGuessers.length > 0) {
-      const lightProphet = lightGuessers[Math.floor(Math.random() * lightGuessers.length)];
-      lightProphet.secretRole = "prophet";
-      // Give prophet 3 random cards from their team
-      const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
-      const shuffled = lightCards.sort(() => Math.random() - 0.5);
-      lightProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
-    }
-    
-    // Assign Double Agent to one remaining player from each team
-    const remainingDarkGuessers = darkGuessers.filter(p => p.secretRole !== "prophet");
-    const remainingLightGuessers = lightGuessers.filter(p => p.secretRole !== "prophet");
-    
-    // Assign Double Agent to one player from Dark team
-    if (remainingDarkGuessers.length > 0) {
-      const darkDoubleAgent = remainingDarkGuessers[Math.floor(Math.random() * remainingDarkGuessers.length)];
-      darkDoubleAgent.secretRole = "double_agent";
-    }
-    
-    // Assign Double Agent to one player from Light team  
-    if (remainingLightGuessers.length > 0) {
-      const lightDoubleAgent = remainingLightGuessers[Math.floor(Math.random() * remainingLightGuessers.length)];
-      lightDoubleAgent.secretRole = "double_agent";
+    if (room.chaosModeType === "prophet") {
+      // Prophet mode: Assign Prophet to one player from each team (if there are guessers)
+      if (darkGuessers.length > 0) {
+        const darkProphet = darkGuessers[Math.floor(Math.random() * darkGuessers.length)];
+        darkProphet.secretRole = "prophet";
+        // Give prophet 3 random cards from their team
+        const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
+        const shuffled = darkCards.sort(() => Math.random() - 0.5);
+        darkProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
+      }
+      
+      if (lightGuessers.length > 0) {
+        const lightProphet = lightGuessers[Math.floor(Math.random() * lightGuessers.length)];
+        lightProphet.secretRole = "prophet";
+        // Give prophet 3 random cards from their team
+        const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
+        const shuffled = lightCards.sort(() => Math.random() - 0.5);
+        lightProphet.knownCards = shuffled.slice(0, Math.min(3, shuffled.length));
+      }
+    } else if (room.chaosModeType === "double_agent") {
+      // Double Agent mode: Assign Double Agent to one player from each team
+      const remainingDarkGuessers = darkGuessers;
+      const remainingLightGuessers = lightGuessers;
+      
+      // Assign Double Agent to one player from Dark team
+      if (remainingDarkGuessers.length > 0) {
+        const darkDoubleAgent = remainingDarkGuessers[Math.floor(Math.random() * remainingDarkGuessers.length)];
+        darkDoubleAgent.secretRole = "double_agent";
+      }
+      
+      // Assign Double Agent to one player from Light team  
+      if (remainingLightGuessers.length > 0) {
+        const lightDoubleAgent = remainingLightGuessers[Math.floor(Math.random() * remainingLightGuessers.length)];
+        lightDoubleAgent.secretRole = "double_agent";
+      }
     }
   }
 
@@ -691,6 +716,12 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     if (room.phase !== "lobby") return null;
+
+    // If Chaos Mode is enabled, a type must be selected
+    if (room.chaosMode && !room.chaosModeType) {
+      console.log("Chaos Mode enabled but no type selected, cannot start game");
+      return null;
+    }
 
     const darkTeam = room.players.filter(p => p.team === "dark");
     const lightTeam = room.players.filter(p => p.team === "light");
