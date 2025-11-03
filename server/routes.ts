@@ -711,9 +711,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            const gameState = storage.getRoom(ws.roomCode);
             broadcastToRoom(ws.roomCode, {
               type: "taunt_fired",
-              payload: tauntData,
+              payload: { ...tauntData, gameState },
             });
             break;
           }
@@ -730,9 +731,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            const gameState = storage.getRoom(ws.roomCode);
             broadcastToRoom(ws.roomCode, {
               type: "insult_sent",
-              payload: insultData,
+              payload: { ...insultData, gameState },
             });
             break;
           }
@@ -1052,9 +1054,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            const gameState = storage.getRoom(ws.roomCode);
             broadcastToRoom(ws.roomCode, {
               type: "insult_sent",
-              payload: insultData,
+              payload: { ...insultData, gameState },
             });
             break;
           }
@@ -1113,9 +1116,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            const gameState = storage.getRoom(ws.roomCode);
             broadcastToRoom(ws.roomCode, {
               type: "insult_sent",
-              payload: insultData,
+              payload: { ...insultData, gameState },
             });
             break;
           }
