@@ -28,6 +28,7 @@ export function useWebSocket() {
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
   const pingInterval = useRef<NodeJS.Timeout>();
+  const playerIdRef = useRef<string>("");
 
   useEffect(() => {
     let isCleanedUp = false;
@@ -69,6 +70,10 @@ export function useWebSocket() {
           const savedUsername = localStorage.getItem("katmannames_username");
           
           if (savedRoomCode && savedUsername && ws.current) {
+            if (savedPlayerId) {
+              playerIdRef.current = savedPlayerId;
+              setPlayerId(savedPlayerId);
+            }
             ws.current.send(JSON.stringify({
               type: "join_room",
               payload: { 
@@ -91,6 +96,7 @@ export function useWebSocket() {
 
               case "room_created":
                 setPlayerId(message.payload.playerId);
+                playerIdRef.current = message.payload.playerId;
                 setRoomCode(message.payload.roomCode);
                 setGameState(message.payload.gameState);
                 setError(""); // Clear any previous errors
@@ -100,6 +106,7 @@ export function useWebSocket() {
 
               case "room_joined":
                 setPlayerId(message.payload.playerId);
+                playerIdRef.current = message.payload.playerId;
                 setGameState(message.payload.gameState);
                 setRoomCode(message.payload.gameState.roomCode);
                 setError(""); // Clear any previous errors
@@ -208,11 +215,14 @@ export function useWebSocket() {
                 setTaunts(prev => [...prev, message.payload]);
                 // Only set cooldown for the same team
                 // Use gameState from payload if available, or the latest state
-                const tauntGameState = message.payload.gameState || gameState;
-                const currentPlayerForTaunt = tauntGameState?.players?.find((p: any) => p.id === playerId);
-                if (currentPlayerForTaunt && currentPlayerForTaunt.team === message.payload.team) {
-                  console.log("Setting taunt cooldown for team:", message.payload.team);
-                  setGlobalTauntCooldown(5);
+                const tauntGameState = message.payload.gameState;
+                if (tauntGameState && tauntGameState.players) {
+                  const currentPlayerForTaunt = tauntGameState.players.find((p: any) => p.id === playerIdRef.current);
+                  console.log("TAUNT DEBUG - playerId:", playerIdRef.current, "currentPlayer:", currentPlayerForTaunt, "tauntTeam:", message.payload.team);
+                  if (currentPlayerForTaunt && currentPlayerForTaunt.team === message.payload.team) {
+                    console.log("Setting taunt cooldown for team:", message.payload.team);
+                    setGlobalTauntCooldown(5);
+                  }
                 }
                 // Remove taunt after expiry
                 if (message.payload.expiresAt) {
@@ -233,11 +243,14 @@ export function useWebSocket() {
                 setInsults(prev => [...prev, message.payload]);
                 // Only set cooldown for the same team
                 // Use gameState from payload if available, or the latest state
-                const insultGameState = message.payload.gameState || gameState;
-                const currentPlayerForInsult = insultGameState?.players?.find((p: any) => p.id === playerId);
-                if (currentPlayerForInsult && currentPlayerForInsult.team === message.payload.senderTeam) {
-                  console.log("Setting insult cooldown for team:", message.payload.senderTeam);
-                  setGlobalInsultCooldown(10);
+                const insultGameState = message.payload.gameState;
+                if (insultGameState && insultGameState.players) {
+                  const currentPlayerForInsult = insultGameState.players.find((p: any) => p.id === playerIdRef.current);
+                  console.log("INSULT DEBUG - playerId:", playerIdRef.current, "currentPlayer:", currentPlayerForInsult, "senderTeam:", message.payload.senderTeam);
+                  if (currentPlayerForInsult && currentPlayerForInsult.team === message.payload.senderTeam) {
+                    console.log("Setting insult cooldown for team:", message.payload.senderTeam);
+                    setGlobalInsultCooldown(10);
+                  }
                 }
                 // Remove insult after 3 seconds
                 setTimeout(() => {
