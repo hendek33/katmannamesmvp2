@@ -628,31 +628,49 @@ export default function Lobby() {
                 )}
                 
                 {/* Chaos Mode - Codenames Style */}
-                <div className="backdrop-blur-lg bg-black/60 rounded-xl border border-amber-900/40 p-4 opacity-90">
+                <div className={`backdrop-blur-lg rounded-xl border p-4 transition-all ${
+                  chaosMode 
+                    ? 'bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-red-900/40 border-purple-500/60 shadow-lg shadow-purple-500/20' 
+                    : 'bg-black/60 border-amber-900/40 opacity-90'
+                }`}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {/* Custom Chaos Mode Icon */}
-                      <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg className={`w-5 h-5 ${chaosMode ? 'text-purple-400 animate-pulse' : 'text-amber-600'}`} fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                           d="M12 2L9 7H4l4 5-2 7 6-5 6 5-2-7 4-5h-5l-3-5z"/>
                         <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.6"/>
                       </svg>
-                      <h3 className="text-base font-bold text-amber-700/60">KAOS MODU</h3>
+                      <h3 className={`text-base font-bold ${chaosMode ? 'text-purple-300' : 'text-amber-700/60'}`}>
+                        {chaosMode ? '🎭 KAOS MODU AKTİF 🎭' : 'KAOS MODU'}
+                      </h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
-                        className="px-2 py-0.5 text-sm text-amber-400 hover:text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-700/50 rounded transition-all"
+                        className={`px-2 py-0.5 text-sm rounded transition-all ${
+                          chaosMode 
+                            ? 'text-purple-300 hover:text-purple-200 bg-purple-900/30 hover:bg-purple-900/50 border border-purple-600/50' 
+                            : 'text-amber-400 hover:text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-700/50'
+                        }`}
                       >
                         ?
                       </button>
                     </div>
                     <Switch
-                      checked={false}
-                      disabled={true}
+                      checked={chaosMode}
+                      disabled={!currentPlayer?.isRoomOwner}
+                      onCheckedChange={(checked) => {
+                        if (currentPlayer?.isRoomOwner) {
+                          setChaosMode(checked);
+                          handleChaosModeUpdate(checked);
+                        }
+                      }}
                       data-testid="switch-chaos-mode"
                     />
                   </div>
-                  <p className="text-xs text-amber-700/70 font-medium">
-                    Geliştirme aşamasında - Yakında!
+                  <p className={`text-xs font-medium ${chaosMode ? 'text-purple-300/90' : 'text-amber-700/70'}`}>
+                    {chaosMode 
+                      ? "🎲 Gizli roller aktif! Çift ajanlar, kahinler ve daha fazlası oyuna dahil olacak!" 
+                      : "Klasik oyun modu. Gizli roller yok."}
                   </p>
                 </div>
               </div>
