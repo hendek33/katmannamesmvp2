@@ -1565,32 +1565,46 @@ export default function Game() {
                       onClick={handleTriggerTaunt}
                       disabled={globalTauntCooldown > 0 || !tauntEnabled}
                       className={`
-                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                        relative w-full px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
                         backdrop-blur-md border shadow-lg
                         ${globalTauntCooldown > 0 || !tauntEnabled 
-                          ? "bg-gray-800/60 border-gray-600/50 text-gray-400 opacity-50 cursor-not-allowed saturate-0" 
+                          ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
                             ? "bg-blue-900/60 border-blue-600/50 text-blue-100 cursor-pointer hover:scale-105 hover:bg-blue-900/80 hover:border-blue-500/60"
                             : "bg-red-900/60 border-red-600/50 text-red-100 cursor-pointer hover:scale-105 hover:bg-red-900/80 hover:border-red-500/60"}
                       `}
                       data-testid="button-trigger-taunt"
                     >
-                      {!tauntEnabled ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <EyeOff className="w-4 h-4" />
-                          Devre Dışı
-                        </span>
-                      ) : globalTauntCooldown > 0 ? (
-                        <span className="flex items-center justify-center gap-1.5 text-gray-300">
-                          <Timer className="w-4 h-4 text-gray-300" />
-                          <span className="font-mono text-base">{globalTauntCooldown}s</span>
-                        </span>
-                      ) : (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <Zap className="w-4 h-4" />
-                          Hareket Çek
-                        </span>
+                      {/* Animated progress bar for cooldown */}
+                      {globalTauntCooldown > 0 && (
+                        <div 
+                          className="absolute inset-0 bg-gradient-to-r from-red-900/90 via-orange-900/90 to-yellow-900/90 transition-transform duration-1000"
+                          style={{
+                            transformOrigin: 'left',
+                            transform: `scaleX(${(5 - globalTauntCooldown) / 5})`,
+                            transition: 'transform 1s linear'
+                          }}
+                        />
                       )}
+                      
+                      <span className="relative z-10">
+                        {!tauntEnabled ? (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <EyeOff className="w-4 h-4" />
+                            Devre Dışı
+                          </span>
+                        ) : globalTauntCooldown > 0 ? (
+                          <span className="flex items-center justify-center gap-1.5 text-white">
+                            <Timer className="w-4 h-4 text-white animate-pulse" />
+                            <span className="font-mono text-lg font-bold">{globalTauntCooldown}s</span>
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <Zap className="w-4 h-4" />
+                            Hareket Çek
+                          </span>
+                        )}
+                      </span>
                     </button>
                   </div>
 
@@ -1607,32 +1621,46 @@ export default function Game() {
                       onClick={handleInsultClick}
                       disabled={globalInsultCooldown > 0 || !insultEnabled}
                       className={`
-                        relative w-full px-4 py-3 rounded-lg font-bold text-sm transition-all
+                        relative w-full px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
                         backdrop-blur-md border shadow-lg
                         ${globalInsultCooldown > 0 || !insultEnabled 
-                          ? "bg-gray-800/60 border-gray-600/50 text-gray-400 opacity-50 cursor-not-allowed saturate-0" 
+                          ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
                             ? "bg-purple-900/60 border-purple-600/50 text-purple-100 cursor-pointer hover:scale-105 hover:bg-purple-900/80 hover:border-purple-500/60"
                             : "bg-orange-900/60 border-orange-600/50 text-orange-100 cursor-pointer hover:scale-105 hover:bg-orange-900/80 hover:border-orange-500/60"}
                       `}
                       data-testid="button-send-insult"
                     >
-                      {!insultEnabled ? (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <EyeOff className="w-4 h-4" />
-                          Devre Dışı
-                        </span>
-                      ) : globalInsultCooldown > 0 ? (
-                        <span className="flex items-center justify-center gap-1.5 text-gray-300">
-                          <Timer className="w-4 h-4 text-gray-300" />
-                          <span className="font-mono text-base">{globalInsultCooldown}s</span>
-                        </span>
-                      ) : (
-                        <span className="flex items-center justify-center gap-1.5">
-                          <MessageCircle className="w-4 h-4" />
-                          Laf Sok
-                        </span>
+                      {/* Animated progress bar for cooldown */}
+                      {globalInsultCooldown > 0 && (
+                        <div 
+                          className="absolute inset-0 bg-gradient-to-r from-red-900/90 via-orange-900/90 to-yellow-900/90 transition-transform duration-1000"
+                          style={{
+                            transformOrigin: 'left',
+                            transform: `scaleX(${(10 - globalInsultCooldown) / 10})`,
+                            transition: 'transform 1s linear'
+                          }}
+                        />
                       )}
+                      
+                      <span className="relative z-10">
+                        {!insultEnabled ? (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <EyeOff className="w-4 h-4" />
+                            Devre Dışı
+                          </span>
+                        ) : globalInsultCooldown > 0 ? (
+                          <span className="flex items-center justify-center gap-1.5 text-white">
+                            <Timer className="w-4 h-4 text-white animate-pulse" />
+                            <span className="font-mono text-lg font-bold">{globalInsultCooldown}s</span>
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <MessageCircle className="w-4 h-4" />
+                            Laf Sok
+                          </span>
+                        )}
+                      </span>
                     </button>
                     
                     {/* Player Selection List */}
