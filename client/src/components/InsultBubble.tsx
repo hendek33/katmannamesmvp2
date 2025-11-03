@@ -17,19 +17,26 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
 
   useEffect(() => {
     // Fade in
-    setTimeout(() => setIsVisible(true), 10);
+    const fadeInTimer = setTimeout(() => setIsVisible(true), 10);
     
     // Start fade out after 2.5 seconds
     const fadeOutTimer = setTimeout(() => {
       setIsLeaving(true);
-      // Remove from parent state after animation
-      if (onRemove) {
-        setTimeout(onRemove, 700); // Wait for fade animation
-      }
     }, 2500);
 
-    return () => clearTimeout(fadeOutTimer);
-  }, [onRemove]);
+    // Remove completely after animation completes (3.2 seconds total)
+    const removeTimer = setTimeout(() => {
+      if (onRemove) {
+        onRemove();
+      }
+    }, 3200);
+
+    return () => {
+      clearTimeout(fadeInTimer);
+      clearTimeout(fadeOutTimer);
+      clearTimeout(removeTimer);
+    };
+  }, []); // Empty dependency array - run only once on mount
 
   // Determine position based on team
   const isLeftSide = senderTeam === 'dark';

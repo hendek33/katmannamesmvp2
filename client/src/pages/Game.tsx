@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
 import { Logo } from "@/components/Logo";
@@ -564,22 +564,26 @@ export default function Game() {
       ))}
       
       {/* Insult Bubbles */}
-      {insults.map((insult) => (
-        <InsultBubble
-          key={`${insult.senderId}-${insult.timestamp}`}
-          senderUsername={insult.senderUsername}
-          senderTeam={insult.senderTeam}
-          targetUsername={insult.targetUsername}
-          targetTeam={insult.targetTeam}
-          message={insult.message}
-          timestamp={insult.timestamp}
-          onRemove={() => {
-            setInsults(prev => prev.filter(i => 
-              !(i.senderId === insult.senderId && i.timestamp === insult.timestamp)
-            ));
-          }}
-        />
-      ))}
+      {insults.map((insult) => {
+        const handleRemove = () => {
+          setInsults(prev => prev.filter(i => 
+            !(i.senderId === insult.senderId && i.timestamp === insult.timestamp)
+          ));
+        };
+        
+        return (
+          <InsultBubble
+            key={`${insult.senderId}-${insult.timestamp}`}
+            senderUsername={insult.senderUsername}
+            senderTeam={insult.senderTeam}
+            targetUsername={insult.targetUsername}
+            targetTeam={insult.targetTeam}
+            message={insult.message}
+            timestamp={insult.timestamp}
+            onRemove={handleRemove}
+          />
+        );
+      })}
 
 
       {/* Normal Win Video */}
