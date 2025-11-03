@@ -1565,8 +1565,8 @@ export default function Game() {
                       onClick={handleTriggerTaunt}
                       disabled={globalTauntCooldown > 0 || !tauntEnabled}
                       className={`
-                        relative w-full px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
-                        backdrop-blur-md border shadow-lg
+                        relative w-full h-12 px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
+                        backdrop-blur-md border shadow-lg transition-colors
                         ${globalTauntCooldown > 0 || !tauntEnabled 
                           ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
@@ -1578,11 +1578,12 @@ export default function Game() {
                       {/* Animated progress bar for cooldown */}
                       {globalTauntCooldown > 0 && (
                         <div 
-                          className="absolute inset-0 bg-gradient-to-r from-red-900/90 via-orange-900/90 to-yellow-900/90 transition-transform duration-1000"
+                          className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700"
                           style={{
-                            transformOrigin: 'left',
-                            transform: `scaleX(${(5 - globalTauntCooldown) / 5})`,
-                            transition: 'transform 1s linear'
+                            transformOrigin: 'right',
+                            transform: `scaleX(${globalTauntCooldown / 5})`,
+                            transition: 'transform 1s linear',
+                            opacity: 0.9
                           }}
                         />
                       )}
@@ -1621,8 +1622,8 @@ export default function Game() {
                       onClick={handleInsultClick}
                       disabled={globalInsultCooldown > 0 || !insultEnabled}
                       className={`
-                        relative w-full px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
-                        backdrop-blur-md border shadow-lg
+                        relative w-full h-12 px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
+                        backdrop-blur-md border shadow-lg transition-colors
                         ${globalInsultCooldown > 0 || !insultEnabled 
                           ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
@@ -1634,11 +1635,12 @@ export default function Game() {
                       {/* Animated progress bar for cooldown */}
                       {globalInsultCooldown > 0 && (
                         <div 
-                          className="absolute inset-0 bg-gradient-to-r from-red-900/90 via-orange-900/90 to-yellow-900/90 transition-transform duration-1000"
+                          className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700"
                           style={{
-                            transformOrigin: 'left',
-                            transform: `scaleX(${(10 - globalInsultCooldown) / 10})`,
-                            transition: 'transform 1s linear'
+                            transformOrigin: 'right',
+                            transform: `scaleX(${globalInsultCooldown / 5})`,
+                            transition: 'transform 1s linear',
+                            opacity: 0.9
                           }}
                         />
                       )}

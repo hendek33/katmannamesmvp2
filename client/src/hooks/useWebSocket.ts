@@ -249,7 +249,7 @@ export function useWebSocket() {
                   console.log("INSULT DEBUG - playerId:", playerIdRef.current, "currentPlayer:", currentPlayerForInsult, "senderTeam:", message.payload.senderTeam);
                   if (currentPlayerForInsult && currentPlayerForInsult.team === message.payload.senderTeam) {
                     console.log("Setting insult cooldown for team:", message.payload.senderTeam);
-                    setGlobalInsultCooldown(10);
+                    setGlobalInsultCooldown(5);
                   }
                 }
                 // Remove insult after 3 seconds
