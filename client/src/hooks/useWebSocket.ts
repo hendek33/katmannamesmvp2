@@ -212,7 +212,18 @@ export function useWebSocket() {
               case "taunt_fired":
               case "taunt_triggered":
                 // Handle taunt events
-                setTaunts(prev => [...prev, message.payload]);
+                // Prevent duplicates by checking if this exact taunt already exists
+                setTaunts(prev => {
+                  const isDuplicate = prev.some(t => 
+                    t.playerId === message.payload.playerId && 
+                    t.expiresAt === message.payload.expiresAt
+                  );
+                  if (isDuplicate) {
+                    console.log("Duplicate taunt detected, ignoring");
+                    return prev;
+                  }
+                  return [...prev, message.payload];
+                });
                 // Only set cooldown for the same team
                 // Use gameState from payload if available, or the latest state
                 const tauntGameState = message.payload.gameState;
