@@ -27,8 +27,8 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const cardRef = useRef<HTMLDivElement>(null);
 
   const getCardColors = () => {
-    // Show colors for: revealed cards, spymasters, or unrevealed cards when game ends
-    if (card.revealed || isSpymaster || (gameEnded && !card.revealed)) {
+    // Show colors for: revealed cards, spymasters, prophets (isKnownCard), or unrevealed cards when game ends
+    if (card.revealed || isSpymaster || isKnownCard || (gameEnded && !card.revealed)) {
       switch (card.type) {
         case "dark":
           return {
