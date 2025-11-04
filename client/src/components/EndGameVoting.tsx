@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Player, Team } from "@shared/schema";
+import { motion } from "framer-motion";
 
 interface EndGameVotingProps {
   winningTeam: "dark" | "light";
@@ -30,6 +31,15 @@ export function EndGameVoting({
   chaosType
 }: EndGameVotingProps) {
   const [hasVoted, setHasVoted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Show with delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Get current player
   const currentPlayer = players.find(p => p.id === currentPlayerId);
@@ -73,9 +83,26 @@ export function EndGameVoting({
     onConfirm(playerId);
   };
   
+  if (!isVisible) return null;
+
   return (
-    <div className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <Card className="max-w-4xl w-full p-6 bg-slate-900/95 border-2 border-purple-500/50">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+    >
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ 
+          duration: 0.5,
+          type: "spring",
+          stiffness: 200,
+          damping: 20
+        }}
+      >
+        <Card className="max-w-4xl w-full p-6 bg-slate-900/95 border-2 border-purple-500/50">
         <div className="space-y-6">
           {/* Title */}
           <div className="text-center space-y-2">
@@ -108,64 +135,70 @@ export function EndGameVoting({
               const isMostVoted = player.id === mostVotedPlayer;
               
               return (
-                <button
+                <div
                   key={player.id}
-                  onClick={() => handlePlayerClick(player.id)}
-                  disabled={!isOnLosingTeam}
                   className={cn(
-                    "relative p-4 rounded-lg border-2 transition-all duration-300",
+                    "relative rounded-lg border-2 transition-all duration-300 flex flex-col",
                     "hover:scale-105 hover:shadow-xl",
-                    isOnLosingTeam && "cursor-pointer",
-                    !isOnLosingTeam && !isRoomOwner && "cursor-not-allowed opacity-75",
                     isSelected && "border-purple-400 bg-purple-900/30",
                     !isSelected && isMostVoted && "border-amber-400/50 bg-amber-900/20",
-                    !isSelected && !isMostVoted && "border-slate-600 bg-slate-800/50",
-                    isRoomOwner && "pb-14" // Extra padding for select button
+                    !isSelected && !isMostVoted && "border-slate-600 bg-slate-800/50"
                   )}
                 >
-                  {/* Player Avatar */}
-                  <div className={cn(
-                    "w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center text-2xl font-bold",
-                    winningTeam === "dark" ? "bg-blue-600" : "bg-red-600"
-                  )}>
-                    {player.username.substring(0, 2).toUpperCase()}
-                  </div>
+                  {/* Clickable Card Content */}
+                  <button
+                    onClick={() => handlePlayerClick(player.id)}
+                    disabled={!isOnLosingTeam}
+                    className={cn(
+                      "flex-1 p-4 text-center",
+                      isOnLosingTeam && "cursor-pointer",
+                      !isOnLosingTeam && "cursor-not-allowed opacity-75"
+                    )}
+                  >
+                    {/* Player Avatar */}
+                    <div className={cn(
+                      "w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center text-2xl font-bold",
+                      winningTeam === "dark" ? "bg-blue-600" : "bg-red-600"
+                    )}>
+                      {player.username.substring(0, 2).toUpperCase()}
+                    </div>
+                    
+                    {/* Player Name */}
+                    <p className="text-white font-semibold text-lg">
+                      {player.username}
+                    </p>
+                    
+                    {/* Role Badge */}
+                    <div className={cn(
+                      "mt-2 px-2 py-1 rounded text-xs font-medium inline-block",
+                      player.role === "spymaster" 
+                        ? "bg-purple-600/30 text-purple-300"
+                        : "bg-slate-600/30 text-slate-300"
+                    )}>
+                      {player.role === "spymaster" ? "İpucu Veren" : "Ajan"}
+                    </div>
+                    
+                    {/* Voters List */}
+                    {playerVotes.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-slate-600">
+                        <div className="flex flex-wrap gap-1 justify-center">
+                          {playerVotes.map(voter => (
+                            <span
+                              key={voter}
+                              className="text-xs bg-purple-600/30 text-purple-300 px-1.5 py-0.5 rounded"
+                            >
+                              {voter}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </button>
                   
-                  {/* Player Name */}
-                  <p className="text-white font-semibold text-lg">
-                    {player.username}
-                  </p>
-                  
-                  {/* Role Badge */}
-                  <div className={cn(
-                    "mt-2 px-2 py-1 rounded text-xs font-medium",
-                    player.role === "spymaster" 
-                      ? "bg-purple-600/30 text-purple-300"
-                      : "bg-slate-600/30 text-slate-300"
-                  )}>
-                    {player.role === "spymaster" ? "İpucu Veren" : "Ajan"}
-                  </div>
-                  
-                  {/* Vote Count */}
+                  {/* Vote Count Badge */}
                   {playerVotes.length > 0 && (
                     <div className="absolute -top-2 -right-2 bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">
                       {playerVotes.length}
-                    </div>
-                  )}
-                  
-                  {/* Voters List */}
-                  {playerVotes.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-slate-600">
-                      <div className="flex flex-wrap gap-1">
-                        {playerVotes.map(voter => (
-                          <span
-                            key={voter}
-                            className="text-xs bg-purple-600/30 text-purple-300 px-1.5 py-0.5 rounded"
-                          >
-                            {voter}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   )}
                   
@@ -174,20 +207,19 @@ export function EndGameVoting({
                     <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-pulse pointer-events-none" />
                   )}
                   
-                  {/* Select Button for Room Owner */}
+                  {/* Select Button for Room Owner - At Bottom */}
                   {isRoomOwner && (
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelectPlayer(player.id);
-                      }}
-                      className="absolute bottom-2 left-2 right-2 h-8 text-xs bg-purple-600 hover:bg-purple-700"
-                      data-testid={`button-select-${player.id}`}
-                    >
-                      Bu Oyuncuyu Seç
-                    </Button>
+                    <div className="px-2 pb-2">
+                      <Button
+                        onClick={() => handleSelectPlayer(player.id)}
+                        className="w-full h-8 text-xs bg-purple-600 hover:bg-purple-700"
+                        data-testid={`button-select-${player.id}`}
+                      >
+                        Bu Oyuncuyu Seç
+                      </Button>
+                    </div>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
@@ -210,6 +242,7 @@ export function EndGameVoting({
           </div>
         </div>
       </Card>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
