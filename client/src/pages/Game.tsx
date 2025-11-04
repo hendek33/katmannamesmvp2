@@ -13,6 +13,8 @@ import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
+import { EndGameVoting } from "@/components/EndGameVoting";
+import { EndGameGuessSequence } from "@/components/EndGameGuessSequence";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -35,7 +37,8 @@ export default function Game() {
     error, 
     send, 
     cardVotes, 
-    cardImages, 
+    cardImages,
+    endGameGuessVotes, 
     usernameChangeStatus, 
     clearUsernameChangeStatus,
     taunts,
@@ -67,6 +70,8 @@ export default function Game() {
   const [showNormalWinVideo, setShowNormalWinVideo] = useState(false);
   const [showEndGameGuessSequence, setShowEndGameGuessSequence] = useState(false);
   const [sequenceStep, setSequenceStep] = useState(0);
+  const [showEndGameVoting, setShowEndGameVoting] = useState(false);
+  const normalWinShownRef = useRef<boolean>(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
@@ -321,7 +326,7 @@ export default function Game() {
 
   // Detect normal win and show video
   useEffect(() => {
-    if (!gameState || gameState.phase !== "ended" || !gameState.winner) return;
+    if (!gameState || gameState.phase !== "ended" || !gameState.winner || normalWinShownRef.current) return;
     
     const lastReveal = gameState.revealHistory.length > 0 
       ? gameState.revealHistory[gameState.revealHistory.length - 1] as any
@@ -330,6 +335,7 @@ export default function Game() {
     // If last revealed card is NOT assassin, show normal win video immediately
     if (lastReveal && lastReveal.type !== "assassin") {
       // Show video immediately to prevent duplicate win text
+      normalWinShownRef.current = true;
       setShowNormalWinVideo(true);
     }
   }, [gameState?.phase, gameState?.winner]);
@@ -423,8 +429,20 @@ export default function Game() {
   const handleRestart = () => {
     send("restart_game", {});
     assassinShownRef.current = false;
+    normalWinShownRef.current = false;
     previousTurnRef.current = null; // Reset turn tracking for new game
     setShowNormalWinVideo(false); // Reset normal win video
+    setShowEndGameVoting(false);
+    setShowEndGameGuessSequence(false);
+  };
+  
+  const handleVoteEndGameGuess = (targetPlayerId: string) => {
+    send("vote_end_game_guess", { targetPlayerId });
+  };
+  
+  const handleConfirmEndGameGuess = (targetPlayerId: string) => {
+    send("end_game_guess", { targetPlayerId });
+    setShowEndGameVoting(false);
   };
 
   // Memoize the onComplete callbacks to prevent re-renders
@@ -448,7 +466,17 @@ export default function Game() {
 
   const handleNormalWinVideoComplete = useCallback(() => {
     setShowNormalWinVideo(false);
-  }, []);
+    
+    // Show end game voting if chaos mode is enabled, there's a winner, and no guess has been made yet
+    if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
+        gameState.winner && !gameState.endGameGuessUsed) {
+      const currentPlayer = gameState.players.find(p => p.id === playerId);
+      const isOnLosingTeam = currentPlayer?.team !== gameState.winner;
+      
+      // Show voting UI for all players (losing team can vote, winning team can watch)
+      setShowEndGameVoting(true);
+    }
+  }, [gameState, playerId]);
 
   const handleProphetVideoComplete = useCallback(() => {
     setShowProphetVideo(false);
@@ -661,113 +689,28 @@ export default function Game() {
         />
       )}
 
+      {/* End Game Prophet Voting */}
+      {showEndGameVoting && gameState && gameState.winner && (
+        <EndGameVoting
+          winningTeam={gameState.winner as "dark" | "light"}
+          losingTeam={gameState.winner === "dark" ? "light" : "dark"}
+          winningTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          losingTeamName={gameState.winner === "dark" ? gameState.lightTeamName : gameState.darkTeamName}
+          players={gameState.players}
+          currentPlayerId={playerId}
+          votes={endGameGuessVotes}
+          onVote={handleVoteEndGameGuess}
+          onConfirm={handleConfirmEndGameGuess}
+          chaosType={gameState.chaosModeType || "prophet"}
+        />
+      )}
+
       {/* End Game Guess Dramatic Sequence */}
       {showEndGameGuessSequence && gameState?.endGameGuessSequence && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
-          
-          {/* Sequence Content */}
-          <div className="relative w-full max-w-2xl mx-4">
-            <div
-              className="bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 p-8 rounded-2xl border-2 border-purple-500/30 shadow-2xl animate-in fade-in zoom-in-95 duration-500"
-            >
-              {/* Step 0: Initial announcement */}
-              {sequenceStep >= 0 && (
-                <div className="text-center mb-6 animate-in slide-in-from-bottom-4 fade-in duration-500">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-                    SON ŞANS TAHMİNİ!
-                  </h2>
-                  <p className="text-slate-400 mt-2">
-                    {gameState.endGameGuessSequence.guessingTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} takımı tahmin yapıyor...
-                  </p>
-                </div>
-              )}
-
-              {/* Step 1: Show the guess */}
-              {sequenceStep >= 1 && (
-                <div
-                  className="bg-slate-800/50 rounded-lg p-6 mb-6 border border-purple-500/20 animate-in zoom-in-75 fade-in duration-700"
-                >
-                  <p className="text-center text-lg text-slate-300">
-                    Tahmin edilen oyuncu:
-                  </p>
-                  <p className="text-center text-2xl font-bold text-purple-300 mt-2">
-                    {gameState.endGameGuessSequence.targetPlayer}
-                  </p>
-                  <p className="text-center text-sm text-slate-400 mt-2">
-                    ({gameState.endGameGuessSequence.targetTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName} Takımı)
-                  </p>
-                </div>
-              )}
-
-              {/* Step 2: Reveal actual role */}
-              {sequenceStep >= 2 && (
-                <div
-                  className="bg-gradient-to-br from-purple-900/30 to-red-900/30 rounded-lg p-6 mb-6 border border-red-500/30 animate-in spin-in-90 fade-in duration-700"
-                >
-                  <p className="text-center text-lg text-slate-300">
-                    Gerçek Rolü:
-                  </p>
-                  <p className="text-center text-3xl font-bold mt-2">
-                    {gameState.endGameGuessSequence.actualRole === "prophet" ? (
-                      <span className="text-cyan-300">🔮 KAHİN</span>
-                    ) : gameState.endGameGuessSequence.actualRole === "double_agent" ? (
-                      <span className="text-red-300">🎭 ÇİFT AJAN</span>
-                    ) : (
-                      <span className="text-slate-300">Normal Oyuncu</span>
-                    )}
-                  </p>
-                </div>
-              )}
-
-              {/* Step 3: Show result */}
-              {sequenceStep >= 3 && (
-                <div
-                  className="text-center animate-in zoom-in-50 fade-in duration-700"
-                >
-                  {gameState.endGameGuessSequence.success ? (
-                    <>
-                      <div
-                        className="text-6xl font-bold text-green-400 mb-4 animate-pulse"
-                      >
-                        ✓ DOĞRU TAHMİN!
-                      </div>
-                      <p className="text-2xl font-bold text-white">
-                        {gameState.endGameGuessSequence.finalWinner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                      </p>
-                      <p className="text-xl text-green-300 mt-2">
-                        OYUNU KAZANDI!
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div
-                        className="text-5xl font-bold text-red-400 mb-4 animate-bounce"
-                      >
-                        ✗ YANLIŞ TAHMİN!
-                      </div>
-                      <p className="text-2xl font-bold text-white">
-                        {gameState.endGameGuessSequence.finalWinner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                      </p>
-                      <p className="text-xl text-red-300 mt-2">
-                        OYUNU KAZANDI!
-                      </p>
-                    </>
-                  )}
-
-                  {/* Close button after full reveal */}
-                  <Button
-                    onClick={() => setShowEndGameGuessSequence(false)}
-                    className="mt-6 bg-purple-600 hover:bg-purple-700"
-                  >
-                    Kapat
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <EndGameGuessSequence
+          sequence={gameState.endGameGuessSequence}
+          onComplete={() => setShowEndGameGuessSequence(false)}
+        />
       )}
 
       {/* Game End Notification - Auto disappears (only for non-assassin wins, if video is not showing) */}

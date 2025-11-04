@@ -19,6 +19,7 @@ import {
   guessProphetSchema,
   guessDoubleAgentSchema,
   endGameGuessSchema,
+  voteEndGameGuessSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -705,6 +706,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
             broadcastToRoom(ws.roomCode, {
               type: "game_updated",
               payload: { gameState },
+            });
+            break;
+          }
+
+          case "vote_end_game_guess": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = voteEndGameGuessSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz oy" } });
+              return;
+            }
+
+            const result = storage.voteEndGameGuess(ws.roomCode, ws.playerId, validation.data.targetPlayerId);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Oy verilemedi" } });
+              return;
+            }
+
+            // Broadcast updated votes to all clients in room
+            broadcastToRoom(ws.roomCode, {
+              type: "end_game_votes_updated",
+              payload: { 
+                votes: Object.fromEntries(result.votes),
+                gameState: result.gameState
+              },
             });
             break;
           }

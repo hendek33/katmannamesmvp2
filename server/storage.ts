@@ -13,6 +13,7 @@ interface RoomData {
   insultEnabled?: boolean;
   teamTauntCooldown?: { dark?: number; light?: number }; // Team-specific taunt cooldown timestamps
   teamInsultCooldown?: { dark?: number; light?: number }; // Team-specific insult cooldown timestamps
+  endGameGuessVotes?: Map<string, Set<string>>; // targetPlayerId -> Set of playerIds who voted
 }
 
 export interface IStorage {
@@ -1148,6 +1149,86 @@ export class MemStorage implements IStorage {
     return room;
   }
 
+  voteEndGameGuess(roomCode: string, playerId: string, targetPlayerId: string): { gameState: GameState; votes: Map<string, string[]> } | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // End game voting only works after the game ends, in chaos mode
+    if (room.phase !== "ended" || !room.chaosMode || !room.chaosModeType) return null;
+    
+    // Check if there's a winner already (a team won normally)
+    if (!room.winner) return null;
+    
+    // Check if end game guess hasn't been used yet
+    if (room.endGameGuessUsed) return null;
+    
+    // Check if player is on the losing team
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || player.team === room.winner) {
+      return null; // Only losing team can vote
+    }
+    
+    // Get the target player and verify they're on the winning team
+    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+    if (!targetPlayer || targetPlayer.team !== room.winner) {
+      return null; // Can only vote for players on the winning team
+    }
+    
+    // Initialize votes map if not exists
+    if (!roomData.endGameGuessVotes) {
+      roomData.endGameGuessVotes = new Map();
+    }
+    
+    // Clear player's previous vote from all targets
+    roomData.endGameGuessVotes.forEach((voters, targetId) => {
+      voters.delete(playerId);
+      if (voters.size === 0) {
+        roomData.endGameGuessVotes!.delete(targetId);
+      }
+    });
+    
+    // Add new vote
+    if (!roomData.endGameGuessVotes.has(targetPlayerId)) {
+      roomData.endGameGuessVotes.set(targetPlayerId, new Set());
+    }
+    roomData.endGameGuessVotes.get(targetPlayerId)!.add(playerId);
+    
+    // Convert votes to format for frontend (Map of playerId to array of usernames)
+    const votesWithUsernames = new Map<string, string[]>();
+    roomData.endGameGuessVotes.forEach((voterIds, targetId) => {
+      const usernames = Array.from(voterIds).map(voterId => {
+        const voter = room.players.find(p => p.id === voterId);
+        return voter?.username || 'Unknown';
+      });
+      if (usernames.length > 0) {
+        votesWithUsernames.set(targetId, usernames);
+      }
+    });
+    
+    return { gameState: room, votes: votesWithUsernames };
+  }
+  
+  getEndGameGuessVotes(roomCode: string): Map<string, string[]> | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData || !roomData.endGameGuessVotes) return null;
+    const room = roomData.gameState;
+    
+    // Convert votes to format for frontend
+    const votesWithUsernames = new Map<string, string[]>();
+    roomData.endGameGuessVotes.forEach((voterIds, targetId) => {
+      const usernames = Array.from(voterIds).map(voterId => {
+        const voter = room.players.find(p => p.id === voterId);
+        return voter?.username || 'Unknown';
+      });
+      if (usernames.length > 0) {
+        votesWithUsernames.set(targetId, usernames);
+      }
+    });
+    
+    return votesWithUsernames;
+  }
+
   endGameGuess(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
@@ -1175,15 +1256,27 @@ export class MemStorage implements IStorage {
     // Mark that end game guess has been used
     room.endGameGuessUsed = true;
     
+    // Clear votes after guess is made
+    if (roomData.endGameGuessVotes) {
+      roomData.endGameGuessVotes.clear();
+    }
+    
+    // Get team names
+    const guessingTeamName = player.team === "dark" ? room.darkTeamName : room.lightTeamName;
+    const targetTeamName = targetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName;
+    
     // Initialize the dramatic sequence
     room.endGameGuessSequence = {
       guessingTeam: player.team,
+      guessingTeamName: guessingTeamName,
       targetPlayer: targetPlayer.username,
       targetTeam: targetPlayer.team,
+      targetTeamName: targetTeamName,
       guessType: room.chaosModeType,
       actualRole: targetPlayer.secretRole,
       success: false,
-      finalWinner: room.winner
+      finalWinner: room.winner,
+      finalWinnerName: room.winner === "dark" ? room.darkTeamName : room.lightTeamName
     };
     
     let guessCorrect = false;
@@ -1207,9 +1300,11 @@ export class MemStorage implements IStorage {
       // If guess is correct, the losing team wins!
       room.winner = player.team;
       room.endGameGuessSequence.finalWinner = player.team;
+      room.endGameGuessSequence.finalWinnerName = guessingTeamName;
       console.log(`END GAME GUESS CORRECT! ${player.team} team wins by guessing ${targetPlayer.username}`);
     } else {
       // If guess is wrong, the original winner remains
+      room.endGameGuessSequence.finalWinnerName = room.winner === "dark" ? room.darkTeamName : room.lightTeamName;
       console.log(`END GAME GUESS WRONG! ${room.winner} team still wins. ${targetPlayer.username} was ${targetPlayer.secretRole || "normal player"}`);
     }
     

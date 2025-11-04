@@ -11,6 +11,7 @@ interface WebSocketContextType {
   roomsList: RoomListItem[];
   cardVotes: Record<number, string[]>;
   cardImages: Record<number, string>;
+  endGameGuessVotes: Record<string, string[]>;
   serverTimer: { timeRemaining: number; isExpired: boolean } | null;
   usernameChangeStatus: { success: boolean; message?: string } | null;
   clearUsernameChangeStatus: () => void;

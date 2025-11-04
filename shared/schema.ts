@@ -67,12 +67,15 @@ export interface GameState {
   endGameGuessUsed?: boolean; // Track if end game guess has been used (for both modes)
   endGameGuessSequence?: { // Dramatic sequence for end game guess
     guessingTeam: Team;
+    guessingTeamName?: string;
     targetPlayer: string;
     targetTeam: Team;
+    targetTeamName?: string;
     guessType: "prophet" | "double_agent";
     actualRole?: "prophet" | "double_agent" | null;
     success?: boolean;
     finalWinner?: Team;
+    finalWinnerName?: string;
   };
 }
 
@@ -146,6 +149,10 @@ export const guessDoubleAgentSchema = z.object({
 });
 
 export const endGameGuessSchema = z.object({
+  targetPlayerId: z.string(),
+});
+
+export const voteEndGameGuessSchema = z.object({
   targetPlayerId: z.string(),
 });
 

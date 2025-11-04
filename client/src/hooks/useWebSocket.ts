@@ -16,6 +16,7 @@ export function useWebSocket() {
   const [roomsList, setRoomsList] = useState<RoomListItem[]>([]);
   const [cardVotes, setCardVotes] = useState<Record<number, string[]>>({});
   const [cardImages, setCardImages] = useState<Record<number, string>>({});
+  const [endGameGuessVotes, setEndGameGuessVotes] = useState<Record<string, string[]>>({});
   const [serverTimer, setServerTimer] = useState<{ timeRemaining: number; isExpired: boolean } | null>(null);
   const [usernameChangeStatus, setUsernameChangeStatus] = useState<{ success: boolean; message?: string } | null>(null);
   const [taunts, setTaunts] = useState<any[]>([]);
@@ -155,6 +156,13 @@ export function useWebSocket() {
 
               case "votes_updated":
                 setCardVotes(message.payload.votes || {});
+                break;
+
+              case "end_game_votes_updated":
+                setEndGameGuessVotes(message.payload.votes || {});
+                if (message.payload.gameState) {
+                  setGameState(message.payload.gameState);
+                }
                 break;
                 
               case "error":
@@ -387,6 +395,7 @@ export function useWebSocket() {
     roomsList,
     cardVotes,
     cardImages,
+    endGameGuessVotes,
     serverTimer,
     usernameChangeStatus,
     clearUsernameChangeStatus,
