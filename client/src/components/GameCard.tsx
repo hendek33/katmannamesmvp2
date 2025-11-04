@@ -26,13 +26,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const [isRevealing, setIsRevealing] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Debug: Log only once per card
-  useEffect(() => {
-    if (isKnownCard && !card.revealed) {
-      console.log(`Prophet view - Card: ${card.word}, Type: ${card.type}, isKnownCard: ${isKnownCard}, isSpymaster: ${isSpymaster}`);
-      console.log('Card object:', card);
-    }
-  }, [isKnownCard, card.word, card.type, card.revealed, isSpymaster]);
 
   const getCardColors = () => {
     // Show colors for: revealed cards, spymasters, prophets (isKnownCard), or unrevealed cards when game ends
@@ -166,75 +159,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
         }}
       />
       
-      {/* Prophet indicator - enhanced visual effects */}
-      {isKnownCard && !card.revealed && (
-        <>
-          {/* Team color glow effect */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-lg" 
-            style={{ 
-              zIndex: 14,
-              animation: 'prophetGlow 2s ease-in-out infinite',
-              boxShadow: card.type === "dark" 
-                ? '0 0 20px rgba(59, 130, 246, 0.8), inset 0 0 20px rgba(59, 130, 246, 0.3)'
-                : card.type === "light"
-                ? '0 0 20px rgba(239, 68, 68, 0.8), inset 0 0 20px rgba(239, 68, 68, 0.3)'
-                : card.type === "neutral"
-                ? '0 0 20px rgba(212, 192, 160, 0.8), inset 0 0 20px rgba(212, 192, 160, 0.3)'
-                : card.type === "assassin"
-                ? '0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.3)'
-                : 'none'
-            }}
-          />
-          
-          {/* Animated border */}
-          <div 
-            className="absolute inset-0 pointer-events-none rounded-lg" 
-            style={{ zIndex: 15 }}
-          >
-            <div className={cn(
-              "absolute inset-0 rounded-lg border-2 animate-pulse",
-              card.type === "dark" ? "border-blue-400" : 
-              card.type === "light" ? "border-red-400" :
-              card.type === "neutral" ? "border-[#b8a483]" :
-              card.type === "assassin" ? "border-gray-700" : ""
-            )} />
-            
-            {/* Prophet badge */}
-            <div className="absolute top-0.5 right-0.5">
-              <div className={cn(
-                "backdrop-blur-sm rounded px-1 py-0.5",
-                card.type === "dark" ? "bg-blue-600/80" : 
-                card.type === "light" ? "bg-red-600/80" :
-                card.type === "neutral" ? "bg-[#9b8872]/80" :
-                card.type === "assassin" ? "bg-black/80" : ""
-              )}>
-                <span className="text-[8px] text-white font-bold">🔮</span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Particle effects */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg" style={{ zIndex: 16 }}>
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "absolute w-1 h-1 rounded-full animate-prophet-particle",
-                  card.type === "dark" ? "bg-blue-400" : 
-                  card.type === "light" ? "bg-red-400" :
-                  card.type === "neutral" ? "bg-[#b8a483]" :
-                  card.type === "assassin" ? "bg-gray-600" : ""
-                )}
-                style={{
-                  left: `${20 + i * 30}%`,
-                  animationDelay: `${i * 0.7}s`
-                }}
-              />
-            ))}
-          </div>
-        </>
-      )}
       
       {/* Logo watermark - lower z-index for revealed cards */}
       <div 
