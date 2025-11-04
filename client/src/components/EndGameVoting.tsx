@@ -30,8 +30,6 @@ export function EndGameVoting({
   chaosType
 }: EndGameVotingProps) {
   const [hasVoted, setHasVoted] = useState(false);
-  const [countdown, setCountdown] = useState(15); // 15 second countdown
-  const [autoConfirmed, setAutoConfirmed] = useState(false);
   
   // Get current player
   const currentPlayer = players.find(p => p.id === currentPlayerId);
@@ -70,45 +68,23 @@ export function EndGameVoting({
     setHasVoted(true);
   };
   
-  const handleConfirm = () => {
-    if (mostVotedPlayer && isRoomOwner) {
-      onConfirm(mostVotedPlayer);
-    }
-  };
+  // Check if voting threshold is reached (majority)
+  const votingThreshold = Math.ceil(totalLosingPlayers / 2);
+  const hasReachedThreshold = maxVotes >= votingThreshold;
   
-  // Countdown timer and auto-confirm
+  // Auto-confirm when majority is reached
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) {
-          // Auto-confirm after countdown
-          if (mostVotedPlayer && isRoomOwner && !autoConfirmed) {
-            setAutoConfirmed(true);
-            onConfirm(mostVotedPlayer);
-          }
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [mostVotedPlayer, isRoomOwner, onConfirm, autoConfirmed]);
-  
-  // Auto-confirm when all players have voted
-  useEffect(() => {
-    if (totalVotes === totalLosingPlayers && totalVotes > 0 && mostVotedPlayer && isRoomOwner && !autoConfirmed) {
-      // Give 2 seconds for dramatic effect
+    if (hasReachedThreshold && mostVotedPlayer && isRoomOwner) {
+      // Auto-confirm after a short delay for dramatic effect
       const timer = setTimeout(() => {
         if (mostVotedPlayer) {
-          setAutoConfirmed(true);
           onConfirm(mostVotedPlayer);
         }
-      }, 2000);
+      }, 1000);
       
       return () => clearTimeout(timer);
     }
-  }, [totalVotes, totalLosingPlayers, mostVotedPlayer, isRoomOwner, onConfirm, autoConfirmed]);
+  }, [hasReachedThreshold, mostVotedPlayer, isRoomOwner, onConfirm]);
   
   return (
     <div className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -123,14 +99,16 @@ export function EndGameVoting({
               {losingTeamName} takımı, {winningTeamName} takımındaki kahini tahmin ediyor!
             </p>
             
-            {/* Countdown Timer */}
-            <div className="flex justify-center items-center gap-2">
-              <div className={cn(
-                "text-2xl font-bold",
-                countdown <= 5 ? "text-red-400 animate-pulse" : "text-amber-400"
-              )}>
-                {countdown} saniye kaldı
+            {/* Voting Status */}
+            <div className="flex justify-center items-center gap-4">
+              <div className="text-lg text-amber-400">
+                {totalVotes}/{totalLosingPlayers} oyuncu oy kullandı
               </div>
+              {hasReachedThreshold && (
+                <div className="text-lg text-green-400 animate-pulse">
+                  ✓ Çoğunluk sağlandı!
+                </div>
+              )}
             </div>
             
             {!isOnLosingTeam && (
@@ -217,43 +195,19 @@ export function EndGameVoting({
             })}
           </div>
           
-          {/* Vote Status and Confirm Button */}
-          <div className="space-y-4">
-            {/* Voting Progress */}
-            <div className="text-center text-sm text-slate-400">
-              {totalVotes}/{totalLosingPlayers} oyuncu oy kullandı
-            </div>
-            
-            {/* Confirm Button - Only for room owner after votes */}
-            {isRoomOwner && mostVotedPlayer && totalVotes > 0 && (
-              <div className="flex justify-center">
-                <Button
-                  onClick={handleConfirm}
-                  className={cn(
-                    "px-8 py-3 text-lg font-bold",
-                    "bg-purple-600 hover:bg-purple-700",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
-                  )}
-                  data-testid="button-confirm-prophet-guess"
-                >
-                  {`${players.find(p => p.id === mostVotedPlayer)?.username} Olarak Tahmin Et!`}
-                </Button>
-              </div>
-            )}
-            
-            {/* Waiting for Owner */}
-            {!isRoomOwner && totalVotes === totalLosingPlayers && (
-              <div className="text-center">
-                <p className="text-amber-400 text-lg animate-pulse">
-                  Tüm oyuncular oy kullandı. Oda sahibinin onayını bekleniyor...
-                </p>
-              </div>
-            )}
-            
+          {/* Vote Status */}
+          <div className="space-y-2">
             {/* Current Vote Display */}
             {currentPlayerVote && (
               <div className="text-center text-sm text-purple-300">
-                Oyunuz: {players.find(p => p.id === currentPlayerVote)?.username}
+                Oyunuz: <span className="font-bold">{players.find(p => p.id === currentPlayerVote)?.username}</span>
+              </div>
+            )}
+            
+            {/* Waiting for votes message */}
+            {!hasReachedThreshold && totalVotes > 0 && (
+              <div className="text-center text-sm text-slate-400">
+                Çoğunluk için {votingThreshold - maxVotes} oy daha gerekli
               </div>
             )}
           </div>

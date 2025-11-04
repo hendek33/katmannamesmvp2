@@ -462,7 +462,13 @@ export default function Game() {
 
   const handleAssassinVideoComplete = useCallback(() => {
     setShowAssassinVideo({ show: false });
-  }, []);
+    
+    // Show end game voting if chaos mode is enabled and assassin revealed
+    if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
+        gameState.winner && !gameState.endGameGuessUsed) {
+      setShowEndGameVoting(true);
+    }
+  }, [gameState]);
 
   const handleNormalWinVideoComplete = useCallback(() => {
     setShowNormalWinVideo(false);
