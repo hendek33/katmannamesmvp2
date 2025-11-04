@@ -757,8 +757,8 @@ export default function Lobby() {
                             : "bg-red-900/20 text-red-200/80 border border-red-600/20"
                         }`}>
                           {chaosModeType === "prophet" 
-                            ? "3 kendi takım kartını bilir • Rakip kahin tahmini yapabilir"
-                            : "Karşı takım için çalışır • Son şans tahmini vardır"}
+                            ? "Tüm kartları görür • Oylama ve kart seçimi yapabilir"
+                            : "Karşı takım için çalışır • Oylama ve kart seçimi yapabilir"}
                         </div>
                       )}
                     </div>

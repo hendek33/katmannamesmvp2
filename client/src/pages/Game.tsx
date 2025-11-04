@@ -548,10 +548,9 @@ export default function Game() {
   const isCurrentTurn = currentPlayer.team === gameState.currentTeam;
   const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended";
   
-  // In Chaos Mode, Double Agents can only vote, not reveal cards
+  // In Chaos Mode, Prophets and Double Agents can reveal and vote
   const canRevealCardBase = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null && gameState.phase !== "ended";
-  const canRevealCard = canRevealCardBase && (!gameState.chaosMode || 
-    currentPlayer.secretRole !== "double_agent");
+  const canRevealCard = canRevealCardBase; // Both prophets and double agents can reveal cards now
 
   const darkPlayers = gameState.players.filter(p => p.team === "dark");
   const lightPlayers = gameState.players.filter(p => p.team === "light");
@@ -1617,8 +1616,8 @@ export default function Game() {
                               }
                             </div>
                             <div className="text-[10px] mt-1 text-slate-500">
-                              {currentPlayer.secretRole === "prophet" && "3 takım kartını biliyorsun"}
-                              {currentPlayer.secretRole === "double_agent" && "Karşı takım için çalış (sadece oy)"}
+                              {currentPlayer.secretRole === "prophet" && "Tüm kartları görüyorsun"}
+                              {currentPlayer.secretRole === "double_agent" && "Karşı takım için çalış"}
                             </div>
                           </div>
                         )}
@@ -1698,7 +1697,7 @@ export default function Game() {
                       <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
                         <p className="text-xs text-amber-400">
                           {gameState.chaosModeType === "prophet"
-                            ? "💡 İpucu: Kahin 3 kendi takım kartını biliyordu. Doğru tahminler yapmış olabilir!"
+                            ? "💡 İpucu: Kahin tüm kartları görüyordu. Doğru tahminler yapmış olabilir!"
                             : "💡 İpucu: Çift ajan karşı takım için çalışıyordu. Yanlış seçimler yapmış olabilir!"}
                         </p>
                       </div>
@@ -2084,7 +2083,7 @@ export default function Game() {
                     isLastCard={card.id === lastCardId && gameState.phase === "ended"}
                     isAssassinCard={card.type === "assassin" && card.revealed && gameState.phase === "ended"}
                     gameEnded={gameState.phase === "ended"}
-                    isKnownCard={currentPlayer.secretRole === "prophet" && currentPlayer.knownCards?.includes(card.id)}
+                    isKnownCard={currentPlayer.secretRole === "prophet"} // Prophets see all cards
                   />
                 </div>
               ))}
