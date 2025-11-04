@@ -126,8 +126,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   function getFilteredGameState(gameState: GameState, playerId: string): GameState {
     const player = gameState.players.find(p => p.id === playerId);
     const isSpymaster = player?.role === "spymaster";
+    const isProphet = player?.secretRole === "prophet"; // Prophets can see all cards
 
-    if (isSpymaster || gameState.phase !== "playing") {
+    if (isSpymaster || isProphet || gameState.phase !== "playing") {
       return gameState;
     }
 
