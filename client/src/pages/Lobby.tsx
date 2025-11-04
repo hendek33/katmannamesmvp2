@@ -209,6 +209,13 @@ export default function Lobby() {
     // Reset type when disabling chaos mode
     if (!enabled) {
       setChaosModeType(null);
+    } else if (!chaosModeType) {
+      // Automatically select first option (prophet) when enabling chaos mode
+      setChaosModeType("prophet");
+      // Small delay to ensure chaos mode is updated first
+      setTimeout(() => {
+        send("update_chaos_mode_type", { type: "prophet" });
+      }, 100);
     }
   };
 
