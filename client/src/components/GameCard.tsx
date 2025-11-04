@@ -29,9 +29,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   // Debug: Log only once per card
   useEffect(() => {
     if (isKnownCard && !card.revealed) {
-      console.log(`Prophet view - Card: ${card.word}, Type: ${card.type}, isKnownCard: ${isKnownCard}`);
+      console.log(`Prophet view - Card: ${card.word}, Type: ${card.type}, isKnownCard: ${isKnownCard}, isSpymaster: ${isSpymaster}`);
+      console.log('Card object:', card);
     }
-  }, [isKnownCard, card.word, card.type, card.revealed]);
+  }, [isKnownCard, card.word, card.type, card.revealed, isSpymaster]);
 
   const getCardColors = () => {
     // Show colors for: revealed cards, spymasters, prophets (isKnownCard), or unrevealed cards when game ends
