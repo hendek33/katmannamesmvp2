@@ -657,21 +657,28 @@ export default function Lobby() {
                 )}
                 
                 {/* Chaos Mode - Codenames Style */}
-                <div className={`backdrop-blur-lg rounded-xl border p-4 transition-all ${
+                <div className={`rounded-xl border p-4 transition-all duration-500 ${
                   chaosMode 
-                    ? 'bg-gradient-to-r from-purple-900/40 via-pink-900/40 to-red-900/40 border-purple-500/60 shadow-lg shadow-purple-500/20' 
-                    : 'bg-black/60 border-amber-900/40 opacity-90'
+                    ? 'bg-gradient-to-br from-violet-950/30 to-fuchsia-950/30 border-violet-600/30 shadow-xl backdrop-blur-sm' 
+                    : 'bg-slate-900/40 border-slate-700/30 backdrop-blur-sm'
                 }`}>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {/* Custom Chaos Mode Icon */}
-                      <svg className={`w-5 h-5 ${chaosMode ? 'text-purple-400 animate-pulse' : 'text-amber-600'}`} fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                          d="M12 2L9 7H4l4 5-2 7 6-5 6 5-2-7 4-5h-5l-3-5z"/>
-                        <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.6"/>
-                      </svg>
-                      <h3 className={`text-base font-bold ${chaosMode ? 'text-purple-300' : 'text-amber-700/60'}`}>
-                        {chaosMode ? '🎭 KAOS MODU AKTİF 🎭' : 'KAOS MODU'}
+                    <div className="flex items-center gap-3">
+                      {/* Minimalist Chaos Mode Badge */}
+                      <div className={`px-3 py-1.5 rounded-full transition-all duration-500 ${
+                        chaosMode 
+                          ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-lg' 
+                          : 'bg-slate-700/50'
+                      }`}>
+                        <span className={`text-sm font-semibold ${chaosMode ? 'text-white' : 'text-slate-400'}`}>
+                          {chaosMode ? '✨' : '○'} KAOS
+                        </span>
+                      </div>
+                      <h3 className={`text-sm font-medium transition-colors ${chaosMode ? 'text-violet-200' : 'text-slate-400'}`}>
+                        {chaosMode && chaosModeType === "prophet" && "Kahin Modu"}
+                        {chaosMode && chaosModeType === "double_agent" && "Çift Ajan Modu"}
+                        {chaosMode && !chaosModeType && "Tip Seçin"}
+                        {!chaosMode && "Gizli Roller"}
                       </h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
@@ -696,19 +703,11 @@ export default function Lobby() {
                       data-testid="switch-chaos-mode"
                     />
                   </div>
-                  {/* Chaos Mode Type Selection */}
+                  {/* Chaos Mode Type Selection - Modern Style */}
                   {chaosMode && (
-                    <div className="mt-3 p-3 bg-purple-900/20 rounded-lg border border-purple-600/30">
-                      <p className="text-xs font-medium text-purple-300 mb-2">Gizli Rol Tipi Seç:</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          size="sm"
-                          variant={chaosModeType === "prophet" ? "default" : "outline"}
-                          className={`text-xs h-8 ${
-                            chaosModeType === "prophet"
-                              ? "bg-purple-600 hover:bg-purple-700 border-purple-500"
-                              : "border-purple-600/50 text-purple-300 hover:bg-purple-900/30"
-                          }`}
+                    <div className="mt-4 space-y-3">
+                      <div className="flex gap-2">
+                        <button
                           onClick={() => {
                             if (currentPlayer?.isRoomOwner) {
                               setChaosModeType("prophet");
@@ -716,17 +715,20 @@ export default function Lobby() {
                             }
                           }}
                           disabled={!currentPlayer?.isRoomOwner}
-                        >
-                          🔮 Kahin
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant={chaosModeType === "double_agent" ? "default" : "outline"}
-                          className={`text-xs h-8 ${
-                            chaosModeType === "double_agent"
-                              ? "bg-purple-600 hover:bg-purple-700 border-purple-500"
-                              : "border-purple-600/50 text-purple-300 hover:bg-purple-900/30"
+                          className={`flex-1 py-3 px-4 rounded-lg border transition-all duration-300 ${
+                            chaosModeType === "prophet"
+                              ? "bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-cyan-500/50 shadow-lg"
+                              : "bg-slate-800/30 border-slate-600/30 hover:bg-slate-700/30"
                           }`}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="text-2xl">🔮</span>
+                            <span className={`text-xs font-medium ${
+                              chaosModeType === "prophet" ? "text-cyan-300" : "text-slate-400"
+                            }`}>Kahin</span>
+                          </div>
+                        </button>
+                        <button
                           onClick={() => {
                             if (currentPlayer?.isRoomOwner) {
                               setChaosModeType("double_agent");
@@ -734,17 +736,31 @@ export default function Lobby() {
                             }
                           }}
                           disabled={!currentPlayer?.isRoomOwner}
+                          className={`flex-1 py-3 px-4 rounded-lg border transition-all duration-300 ${
+                            chaosModeType === "double_agent"
+                              ? "bg-gradient-to-r from-red-600/20 to-pink-600/20 border-red-500/50 shadow-lg"
+                              : "bg-slate-800/30 border-slate-600/30 hover:bg-slate-700/30"
+                          }`}
                         >
-                          🎭 Çift Ajan
-                        </Button>
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="text-2xl">🎭</span>
+                            <span className={`text-xs font-medium ${
+                              chaosModeType === "double_agent" ? "text-red-300" : "text-slate-400"
+                            }`}>Çift Ajan</span>
+                          </div>
+                        </button>
                       </div>
-                      <p className="text-[10px] text-purple-200/70 mt-2">
-                        {chaosModeType === "prophet" 
-                          ? "🔮 Kahinler 3 kendi takım kartını bilir, rakip kahin tahmini yapabilir."
-                          : chaosModeType === "double_agent"
-                          ? "🎭 Çift ajanlar karşı takım için oy kullanır, son şans tahmini vardır."
-                          : "Oyun başlamadan önce bir tip seçmelisiniz!"}
-                      </p>
+                      {chaosModeType && (
+                        <div className={`p-2 rounded-lg text-[10px] leading-relaxed transition-all duration-300 ${
+                          chaosModeType === "prophet"
+                            ? "bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20"
+                            : "bg-red-900/20 text-red-200/80 border border-red-600/20"
+                        }`}>
+                          {chaosModeType === "prophet" 
+                            ? "3 kendi takım kartını bilir • Rakip kahin tahmini yapabilir"
+                            : "Karşı takım için çalışır • Son şans tahmini vardır"}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
