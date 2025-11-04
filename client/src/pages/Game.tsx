@@ -8,6 +8,7 @@ import { ClueDisplay } from "@/components/ClueDisplay";
 import { PlayerList } from "@/components/PlayerList";
 import { TurnVideo } from "@/components/TurnVideo";
 import { AssassinVideo } from "@/components/AssassinVideo";
+import { ProphetVideo } from "@/components/ProphetVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { TauntBubble } from "@/components/TauntBubble";
@@ -598,34 +599,12 @@ export default function Game() {
       )}
 
       {/* Prophet Information Video */}
-      {showProphetVideo && currentPlayer && (
-        <div className="fixed inset-0 z-[101] flex items-center justify-center bg-black/95 backdrop-blur-sm">
-          <div className="relative">
-            <video
-              autoPlay
-              muted
-              onEnded={handleProphetVideoComplete}
-              className="w-[80vw] max-w-4xl h-auto rounded-lg shadow-2xl"
-              style={{ 
-                filter: 'drop-shadow(0 0 30px rgba(139, 92, 246, 0.5))',
-              }}
-            >
-              <source 
-                src={currentPlayer.team === "dark" 
-                  ? "/kahin bilgilendirme mavi.mp4" 
-                  : "/kahin bilgilendirme kırmızı.mp4"} 
-                type="video/mp4" 
-              />
-            </video>
-            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
-              <div className="text-purple-400 text-xl font-bold animate-pulse flex items-center gap-2">
-                <span className="text-2xl">🔮</span>
-                <span>Kahin Bilgilendirmesi</span>
-                <span className="text-2xl">🔮</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      {showProphetVideo && currentPlayer && gameState && (
+        <ProphetVideo
+          team={currentPlayer.team}
+          teamName={currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+          onComplete={handleProphetVideoComplete}
+        />
       )}
 
       {/* Assassin Video for black card */}
