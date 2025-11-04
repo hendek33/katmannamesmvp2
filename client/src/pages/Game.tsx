@@ -810,7 +810,10 @@ export default function Game() {
                gameState.phase === "playing" && 
                currentPlayer.role === "guesser" && 
                currentPlayer.team === gameState.currentTeam &&
-               (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) && (
+               (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) &&
+               !showEndGameVoting &&
+               !showEndGameGuessSequence &&
+               !gameState.endGameGuessSequence && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button
@@ -1071,7 +1074,10 @@ export default function Game() {
                gameState.phase === "playing" && 
                currentPlayer.role === "guesser" && 
                currentPlayer.team === gameState.currentTeam &&
-               (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) && (
+               (!gameState.prophetGuessUsed || !gameState.prophetGuessUsed[currentPlayer.team as "dark" | "light"]) &&
+               !showEndGameVoting &&
+               !showEndGameGuessSequence &&
+               !gameState.endGameGuessSequence && (
                 <>
                   <Dialog>
                     <DialogTrigger asChild>
