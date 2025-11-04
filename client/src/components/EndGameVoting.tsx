@@ -68,23 +68,10 @@ export function EndGameVoting({
     setHasVoted(true);
   };
   
-  // Check if voting threshold is reached (majority)
-  const votingThreshold = Math.ceil(totalLosingPlayers / 2);
-  const hasReachedThreshold = maxVotes >= votingThreshold;
-  
-  // Auto-confirm when majority is reached
-  useEffect(() => {
-    if (hasReachedThreshold && mostVotedPlayer && isRoomOwner) {
-      // Auto-confirm after a short delay for dramatic effect
-      const timer = setTimeout(() => {
-        if (mostVotedPlayer) {
-          onConfirm(mostVotedPlayer);
-        }
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [hasReachedThreshold, mostVotedPlayer, isRoomOwner, onConfirm]);
+  const handleSelectPlayer = (playerId: string) => {
+    if (!isRoomOwner) return;
+    onConfirm(playerId);
+  };
   
   return (
     <div className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -104,11 +91,6 @@ export function EndGameVoting({
               <div className="text-lg text-amber-400">
                 {totalVotes}/{totalLosingPlayers} oyuncu oy kullandı
               </div>
-              {hasReachedThreshold && (
-                <div className="text-lg text-green-400 animate-pulse">
-                  ✓ Çoğunluk sağlandı!
-                </div>
-              )}
             </div>
             
             {!isOnLosingTeam && (
@@ -134,10 +116,11 @@ export function EndGameVoting({
                     "relative p-4 rounded-lg border-2 transition-all duration-300",
                     "hover:scale-105 hover:shadow-xl",
                     isOnLosingTeam && "cursor-pointer",
-                    !isOnLosingTeam && "cursor-not-allowed opacity-75",
+                    !isOnLosingTeam && !isRoomOwner && "cursor-not-allowed opacity-75",
                     isSelected && "border-purple-400 bg-purple-900/30",
                     !isSelected && isMostVoted && "border-amber-400/50 bg-amber-900/20",
-                    !isSelected && !isMostVoted && "border-slate-600 bg-slate-800/50"
+                    !isSelected && !isMostVoted && "border-slate-600 bg-slate-800/50",
+                    isRoomOwner && "pb-14" // Extra padding for select button
                   )}
                 >
                   {/* Player Avatar */}
@@ -190,6 +173,20 @@ export function EndGameVoting({
                   {isSelected && (
                     <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-pulse pointer-events-none" />
                   )}
+                  
+                  {/* Select Button for Room Owner */}
+                  {isRoomOwner && (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectPlayer(player.id);
+                      }}
+                      className="absolute bottom-2 left-2 right-2 h-8 text-xs bg-purple-600 hover:bg-purple-700"
+                      data-testid={`button-select-${player.id}`}
+                    >
+                      Bu Oyuncuyu Seç
+                    </Button>
+                  )}
                 </button>
               );
             })}
@@ -204,10 +201,10 @@ export function EndGameVoting({
               </div>
             )}
             
-            {/* Waiting for votes message */}
-            {!hasReachedThreshold && totalVotes > 0 && (
+            {/* Most voted player */}
+            {mostVotedPlayer && (
               <div className="text-center text-sm text-slate-400">
-                Çoğunluk için {votingThreshold - maxVotes} oy daha gerekli
+                En çok oy alan: <span className="font-bold text-purple-300">{players.find(p => p.id === mostVotedPlayer)?.username}</span> ({maxVotes} oy)
               </div>
             )}
           </div>
