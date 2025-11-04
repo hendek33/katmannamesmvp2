@@ -26,6 +26,13 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
   const [isRevealing, setIsRevealing] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // Debug: Log only once per card
+  useEffect(() => {
+    if (isKnownCard && !card.revealed) {
+      console.log(`Prophet view - Card: ${card.word}, Type: ${card.type}, isKnownCard: ${isKnownCard}`);
+    }
+  }, [isKnownCard, card.word, card.type, card.revealed]);
+
   const getCardColors = () => {
     // Show colors for: revealed cards, spymasters, prophets (isKnownCard), or unrevealed cards when game ends
     if (card.revealed || isSpymaster || isKnownCard || (gameEnded && !card.revealed)) {
@@ -62,9 +69,20 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             textColor: "text-white",
             shadow: "",
           };
+        default:
+          // This should not happen, but if it does, return neutral colors
+          console.warn("Unknown card type:", card.type);
+          return {
+            bg: "bg-gradient-to-br from-[#d4c0a0] to-[#c9b592]",
+            border: "border-[#b8a483]",
+            panel: "bg-[#9b8872]",
+            textColor: "text-white",
+            shadow: "",
+          };
       }
     }
     
+    // Unrevealed cards for regular players (not spymasters, not prophets)
     return {
       bg: "bg-gradient-to-br from-[#d4c0a0] to-[#c9b592]",
       border: "border-[#b8a483]",
