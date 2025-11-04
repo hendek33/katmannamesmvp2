@@ -747,15 +747,6 @@ export default function Lobby() {
                       </p>
                     </div>
                   )}
-                  <p className={`text-xs font-medium mt-2 ${chaosMode ? 'text-purple-300/90' : 'text-amber-700/70'}`}>
-                    {chaosMode 
-                      ? chaosModeType === "prophet"
-                        ? "🔮 Kahin modu aktif! Oyuncular 3 kendi takım kartını bilecek."
-                        : chaosModeType === "double_agent"
-                        ? "🎭 Çift Ajan modu aktif! Gizli ajanlar karşı takım için çalışacak."
-                        : "⚠️ Gizli rol tipi seçilmeli!"
-                      : "Klasik oyun modu. Gizli roller yok."}
-                  </p>
                 </div>
               </div>
               
