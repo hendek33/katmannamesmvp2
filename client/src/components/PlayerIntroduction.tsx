@@ -114,8 +114,8 @@ export function PlayerIntroduction({
   const { likes, dislikes } = getLikesAndDislikes();
   
   return (
-    <Card className="relative w-full max-w-6xl mx-auto bg-slate-900/95 backdrop-blur-lg border-2 border-purple-500/30 shadow-2xl overflow-hidden">
-      <div className="relative flex flex-col max-h-[70vh] overflow-y-auto p-6">
+    <Card className="relative w-full max-w-6xl mx-auto bg-slate-900/95 backdrop-blur-lg border-2 border-purple-500/30 shadow-2xl">
+      <div className="relative flex flex-col p-4">
         {/* Title Animation */}
         <AnimatePresence>
           {showTitle && (
@@ -124,7 +124,7 @@ export function PlayerIntroduction({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.5 }}
-              className="flex items-center justify-center py-12"
+              className="flex items-center justify-center py-6"
             >
               <div className="relative">
                 <motion.div
@@ -132,13 +132,13 @@ export function PlayerIntroduction({
                   transition={{ repeat: 2, duration: 0.5 }}
                   className="text-center"
                 >
-                  <h1 className="text-5xl md:text-6xl font-black mb-4 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent drop-shadow-2xl">
+                  <h1 className="text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent drop-shadow-2xl">
                     TANIŞMA ZAMANI!
                   </h1>
-                  <p className="text-xl text-white/90 font-semibold">
+                  <p className="text-lg text-white/90 font-semibold">
                     Oyuncular kendilerini tanıtacak
                   </p>
-                  <Sparkles className="w-10 h-10 text-yellow-400 mx-auto mt-4 animate-pulse" />
+                  <Sparkles className="w-8 h-8 text-yellow-400 mx-auto mt-2 animate-pulse" />
                 </motion.div>
               </div>
             </motion.div>
@@ -150,15 +150,16 @@ export function PlayerIntroduction({
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex justify-end mb-4"
+            className="flex justify-end mb-2"
           >
             <Button
               onClick={onSkipIntroduction}
               variant="outline"
+              size="sm"
               className="bg-slate-900/80 hover:bg-slate-900/90 border-white/20 text-white backdrop-blur-md"
               data-testid="skip-introduction-button"
             >
-              <SkipForward className="w-4 h-4 mr-2" />
+              <SkipForward className="w-3 h-3 mr-2" />
               Tanıtımı Atla ve Oyuna Başla
             </Button>
           </motion.div>
@@ -166,7 +167,7 @@ export function PlayerIntroduction({
         
         {/* Main Content Area */}
         {!showTitle && (
-          <div className="flex items-center justify-center">
+          <div className="flex items-start justify-center">
             {!currentIntroducingPlayer ? (
               /* Player Selection Grid */
               <motion.div 
@@ -178,28 +179,28 @@ export function PlayerIntroduction({
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-8"
+                    className="text-center mb-3"
                   >
-                    <Badge className="text-lg px-6 py-2 bg-red-600 text-white border-0">
-                      <Crown className="w-5 h-5 mr-2" />
+                    <Badge className="text-sm px-4 py-1.5 bg-red-600 text-white border-0">
+                      <Crown className="w-4 h-4 mr-2" />
                       Bir oyuncu seçerek tanıtımını başlat
                     </Badge>
                   </motion.div>
                 )}
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                   {/* Dark Team (Blue) */}
                   <div>
-                    <div className="flex items-center justify-center mb-4">
-                      <div className="bg-blue-600/20 backdrop-blur-md rounded-xl px-4 py-2 border border-blue-500/30">
-                        <h2 className="text-xl font-bold text-blue-400 flex items-center">
-                          <Users className="w-5 h-5 mr-2" />
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="bg-blue-600/20 backdrop-blur-md rounded-lg px-3 py-1.5 border border-blue-500/30">
+                        <h2 className="text-lg font-bold text-blue-400 flex items-center">
+                          <Users className="w-4 h-4 mr-2" />
                           {gameState.darkTeamName}
                         </h2>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {darkTeamPlayers.map((player, index) => {
                         const isInBubbles = playerBubbles.some(p => p.id === player.id);
                         const hasBeenIntroduced = player.introduced;
@@ -213,7 +214,7 @@ export function PlayerIntroduction({
                           >
                             <Card
                               className={`
-                                relative p-3 cursor-pointer transition-all duration-300
+                                relative p-2 cursor-pointer transition-all duration-300
                                 ${hasBeenIntroduced 
                                   ? 'bg-blue-900/20 border-blue-800/30' 
                                   : 'bg-blue-900/40 hover:bg-blue-900/60 border-blue-600/50 hover:border-blue-500/70'
@@ -229,17 +230,17 @@ export function PlayerIntroduction({
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center space-x-2 min-w-0 flex-1">
-                                  <div className={`w-8 h-8 rounded-full bg-blue-600/50 flex items-center justify-center flex-shrink-0 ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
-                                    <UserCircle className="w-5 h-5 text-blue-300" />
+                                  <div className={`w-7 h-7 rounded-full bg-blue-600/50 flex items-center justify-center flex-shrink-0 ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
+                                    <UserCircle className="w-4 h-4 text-blue-300" />
                                   </div>
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1 flex-wrap">
-                                      <span className={`text-base font-bold truncate ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
+                                      <span className={`text-sm font-bold truncate ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
                                         {player.username}
                                       </span>
                                       {player.role === "spymaster" && (
-                                        <Badge variant="outline" className="text-xs border-blue-500/50 text-blue-400 flex-shrink-0">
-                                          <Crown className="w-3 h-3 mr-1" />
+                                        <Badge variant="outline" className="text-[10px] border-blue-500/50 text-blue-400 flex-shrink-0 px-1 py-0">
+                                          <Crown className="w-2.5 h-2.5 mr-0.5" />
                                           Kahin
                                         </Badge>
                                       )}
@@ -247,7 +248,7 @@ export function PlayerIntroduction({
                                   </div>
                                 </div>
                                 {hasBeenIntroduced && (
-                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50 text-xs flex-shrink-0">
+                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50 text-[10px] flex-shrink-0 px-1.5 py-0">
                                     Tanıtıldı
                                   </Badge>
                                 )}
@@ -261,16 +262,16 @@ export function PlayerIntroduction({
                   
                   {/* Light Team (Red) */}
                   <div>
-                    <div className="flex items-center justify-center mb-4">
-                      <div className="bg-red-600/20 backdrop-blur-md rounded-xl px-4 py-2 border border-red-500/30">
-                        <h2 className="text-xl font-bold text-red-400 flex items-center">
-                          <Users className="w-5 h-5 mr-2" />
+                    <div className="flex items-center justify-center mb-2">
+                      <div className="bg-red-600/20 backdrop-blur-md rounded-lg px-3 py-1.5 border border-red-500/30">
+                        <h2 className="text-lg font-bold text-red-400 flex items-center">
+                          <Users className="w-4 h-4 mr-2" />
                           {gameState.lightTeamName}
                         </h2>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {lightTeamPlayers.map((player, index) => {
                         const isInBubbles = playerBubbles.some(p => p.id === player.id);
                         const hasBeenIntroduced = player.introduced;
@@ -284,7 +285,7 @@ export function PlayerIntroduction({
                           >
                             <Card
                               className={`
-                                relative p-3 cursor-pointer transition-all duration-300
+                                relative p-2 cursor-pointer transition-all duration-300
                                 ${hasBeenIntroduced 
                                   ? 'bg-red-900/20 border-red-800/30' 
                                   : 'bg-red-900/40 hover:bg-red-900/60 border-red-600/50 hover:border-red-500/70'
@@ -300,17 +301,17 @@ export function PlayerIntroduction({
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center space-x-2 min-w-0 flex-1">
-                                  <div className={`w-8 h-8 rounded-full bg-red-600/50 flex items-center justify-center flex-shrink-0 ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
-                                    <UserCircle className="w-5 h-5 text-red-300" />
+                                  <div className={`w-7 h-7 rounded-full bg-red-600/50 flex items-center justify-center flex-shrink-0 ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
+                                    <UserCircle className="w-4 h-4 text-red-300" />
                                   </div>
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1 flex-wrap">
-                                      <span className={`text-base font-bold truncate ${hasBeenIntroduced ? 'text-red-400/60' : 'text-red-300'}`}>
+                                      <span className={`text-sm font-bold truncate ${hasBeenIntroduced ? 'text-red-400/60' : 'text-red-300'}`}>
                                         {player.username}
                                       </span>
                                       {player.role === "spymaster" && (
-                                        <Badge variant="outline" className="text-xs border-red-500/50 text-red-400 flex-shrink-0">
-                                          <Crown className="w-3 h-3 mr-1" />
+                                        <Badge variant="outline" className="text-[10px] border-red-500/50 text-red-400 flex-shrink-0 px-1 py-0">
+                                          <Crown className="w-2.5 h-2.5 mr-0.5" />
                                           Kahin
                                         </Badge>
                                       )}
@@ -318,7 +319,7 @@ export function PlayerIntroduction({
                                   </div>
                                 </div>
                                 {hasBeenIntroduced && (
-                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50 text-xs flex-shrink-0">
+                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50 text-[10px] flex-shrink-0 px-1.5 py-0">
                                     Tanıtıldı
                                   </Badge>
                                 )}
