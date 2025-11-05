@@ -26,6 +26,7 @@ export function PlayerIntroduction({
   const [showTitle, setShowTitle] = useState(true);
   const [playerBubbles, setPlayerBubbles] = useState<Player[]>([]);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
+  const [dots, setDots] = useState(1);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team (light) spymaster controls
@@ -41,6 +42,15 @@ export function PlayerIntroduction({
     (introducingPlayer.introductionLikes && playerId in introducingPlayer.introductionLikes) ||
     (introducingPlayer.introductionDislikes && playerId in introducingPlayer.introductionDislikes)
   );
+  
+  useEffect(() => {
+    // Animate dots for "kendini tanıtıyor..."
+    const dotsInterval = setInterval(() => {
+      setDots(prev => (prev >= 3 ? 1 : prev + 1));
+    }, 500);
+    
+    return () => clearInterval(dotsInterval);
+  }, []);
   
   useEffect(() => {
     // Hide title after 3 seconds
@@ -376,11 +386,11 @@ export function PlayerIntroduction({
                       
                       <motion.div
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ repeat: Infinity, duration: 1.5, delay: 0.3 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
                         className="text-lg text-white/70"
                       >
-                        kendini tanıtıyor...
+                        kendini tanıtıyor{'.'.repeat(dots)}
                       </motion.div>
                       
                       <motion.div
@@ -394,7 +404,7 @@ export function PlayerIntroduction({
                             : 'bg-red-600/30 text-red-300 border-red-500/50'
                         }`}>
                           {introducingPlayer?.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                          {introducingPlayer?.role === "spymaster" && " - İstihbarat Şefi"}
+                          {introducingPlayer?.role === "spymaster" && " - Kahin"}
                         </Badge>
                       </motion.div>
                     </div>
@@ -415,14 +425,14 @@ export function PlayerIntroduction({
                           <div className="flex flex-wrap justify-center gap-1.5 min-h-[40px]">
                             {likes.map((like, index) => (
                               <motion.div
-                                key={index}
+                                key={`like-${like.username}-${index}`}
                                 initial={{ scale: 0, rotate: -180 }}
                                 animate={{ scale: 1, rotate: 0 }}
                                 transition={{ 
                                   type: "spring",
-                                  stiffness: 200,
-                                  damping: 12,
-                                  delay: 0.6 + index * 0.1 
+                                  stiffness: 300,
+                                  damping: 15,
+                                  delay: index * 0.05
                                 }}
                               >
                                 <Badge className={`text-xs ${
@@ -453,14 +463,14 @@ export function PlayerIntroduction({
                           <div className="flex flex-wrap justify-center gap-1.5 min-h-[40px]">
                             {dislikes.map((dislike, index) => (
                               <motion.div
-                                key={index}
+                                key={`dislike-${dislike.username}-${index}`}
                                 initial={{ scale: 0, rotate: 180 }}
                                 animate={{ scale: 1, rotate: 0 }}
                                 transition={{ 
                                   type: "spring",
-                                  stiffness: 200,
-                                  damping: 12,
-                                  delay: 0.6 + index * 0.1 
+                                  stiffness: 300,
+                                  damping: 15,
+                                  delay: index * 0.05
                                 }}
                               >
                                 <Badge className={`text-xs ${
@@ -487,24 +497,44 @@ export function PlayerIntroduction({
                       {/* Voting buttons for non-introducing players */}
                       {playerId !== currentIntroducingPlayer && !hasVoted && (
                         <>
-                          <Button
-                            onClick={() => handleLikeDislike(true)}
-                            size="lg"
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                            data-testid="like-button"
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                           >
-                            <ThumbsUp className="w-5 h-5 mr-2" />
-                            Beğendim
-                          </Button>
-                          <Button
-                            onClick={() => handleLikeDislike(false)}
-                            size="lg"
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                            data-testid="dislike-button"
+                            <Button
+                              onClick={() => handleLikeDislike(true)}
+                              size="lg"
+                              className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/50 transition-all duration-200"
+                              data-testid="like-button"
+                            >
+                              <motion.div
+                                animate={{ rotate: [0, -10, 10, -10, 0] }}
+                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                              >
+                                <ThumbsUp className="w-5 h-5 mr-2" />
+                              </motion.div>
+                              Beğendim
+                            </Button>
+                          </motion.div>
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                           >
-                            <ThumbsDown className="w-5 h-5 mr-2" />
-                            Beğenmedim
-                          </Button>
+                            <Button
+                              onClick={() => handleLikeDislike(false)}
+                              size="lg"
+                              className="bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-red-500/50 transition-all duration-200"
+                              data-testid="dislike-button"
+                            >
+                              <motion.div
+                                animate={{ rotate: [0, 10, -10, 10, 0] }}
+                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                              >
+                                <ThumbsDown className="w-5 h-5 mr-2" />
+                              </motion.div>
+                              Beğenmedim
+                            </Button>
+                          </motion.div>
                         </>
                       )}
                       
