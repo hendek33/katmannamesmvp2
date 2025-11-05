@@ -1878,7 +1878,7 @@ export default function Game() {
             </div>
             
             {gameState.phase === "introduction" ? (
-              <div className="w-full h-full flex items-center justify-center px-4">
+              <div className="w-full h-full flex items-start justify-center px-4 pt-4">
                 <PlayerIntroduction
                   gameState={gameState}
                   playerId={playerId}
@@ -2403,7 +2403,6 @@ export default function Game() {
         </div>,
         document.body
       )}
-    </div>
     </>
   );
 }
