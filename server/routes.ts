@@ -63,58 +63,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
 
-      // Auto end turn if timer expired
+      // Timer expired - just notify, don't end turn
       if (remaining === 0) {
-        try {
-          // Check if chaos mode is active and current team has agents
-          const hasAgentsOnCurrentTeam = room.chaosMode && room.chaosModeType && 
-            room.players.some(p => 
-              p.team === room.currentTeam && 
-              p.role === 'guesser' && 
-              (p.secretRole === 'prophet' || p.secretRole === 'double_agent')
-            );
-
-          // If there are agents on the current team in chaos mode, don't auto-end turn
-          if (hasAgentsOnCurrentTeam) {
-            // Just notify that time expired, but don't end the turn
-            broadcastToRoom(roomCode, {
-              type: "timer_expired",
-              payload: { 
-                message: "Süre doldu! Takımınızdaki ajanlar oynamaya devam edebilir.",
-                autoEndDisabled: true 
-              }
-            });
-            stopRoomTimer(roomCode);
-          } else {
-            // Normal auto-end behavior for non-agent teams
-            // Get any guesser from the current team to end the turn
-            const currentTeamPlayers = room.players.filter(p => 
-              p.team === room.currentTeam && p.role === 'guesser'
-            );
-            
-            if (currentTeamPlayers.length > 0) {
-              const gameState = storage.endTurn(roomCode, currentTeamPlayers[0].id);
-              if (gameState) {
-                broadcastToRoom(roomCode, {
-                  type: "game_updated", 
-                  payload: { gameState }
-                });
-                broadcastToRoom(roomCode, {
-                  type: "timer_expired",
-                  payload: { message: "Süre doldu! Sıra diğer takıma geçti." }
-                });
-                // Restart timer for new turn
-                if (gameState.phase === 'playing' && room.timedMode) {
-                  startRoomTimer(roomCode);
-                }
-              }
-            }
-            stopRoomTimer(roomCode);
+        // Just notify that time expired, but don't end the turn
+        broadcastToRoom(roomCode, {
+          type: "timer_expired",
+          payload: { 
+            message: "Süre doldu! Oynamaya devam edebilirsiniz.",
+            autoEndDisabled: true 
           }
-        } catch (error) {
-          console.error("Error auto-ending turn:", error);
-          stopRoomTimer(roomCode);
-        }
+        });
+        stopRoomTimer(roomCode);
       }
     }, 1000); // Update every second
     
