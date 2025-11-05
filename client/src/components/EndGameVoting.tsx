@@ -121,9 +121,14 @@ export function EndGameVoting({
             </div>
             
             {!isOnLosingTeam && (
-              <p className="text-amber-400 mt-2">
-                Sadece kaybeden takım oy kullanabilir
-              </p>
+              <div className="mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                <p className="text-amber-400 text-lg font-semibold">
+                  👁️ İzleyici Modu
+                </p>
+                <p className="text-slate-400 text-sm mt-1">
+                  Kazanan takım olarak sadece izleyebilirsiniz
+                </p>
+              </div>
             )}
           </div>
           
@@ -145,14 +150,13 @@ export function EndGameVoting({
                     !isSelected && !isMostVoted && "border-slate-600 bg-slate-800/50"
                   )}
                 >
-                  {/* Clickable Card Content */}
-                  <button
-                    onClick={() => handlePlayerClick(player.id)}
-                    disabled={!isOnLosingTeam}
+                  {/* Clickable Card Content - Only for losing team */}
+                  <div
+                    onClick={isOnLosingTeam ? () => handlePlayerClick(player.id) : undefined}
                     className={cn(
                       "flex-1 p-4 text-center",
                       isOnLosingTeam && "cursor-pointer",
-                      !isOnLosingTeam && "cursor-not-allowed opacity-75"
+                      !isOnLosingTeam && "cursor-default"
                     )}
                   >
                     {/* Player Avatar */}
@@ -193,7 +197,7 @@ export function EndGameVoting({
                         </div>
                       </div>
                     )}
-                  </button>
+                  </div>
                   
                   {/* Vote Count Badge */}
                   {playerVotes.length > 0 && (
@@ -207,8 +211,8 @@ export function EndGameVoting({
                     <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-pulse pointer-events-none" />
                   )}
                   
-                  {/* Select Button for Room Owner - At Bottom */}
-                  {isRoomOwner && (
+                  {/* Select Button for Room Owner - Only if on losing team */}
+                  {isRoomOwner && isOnLosingTeam && (
                     <div className="px-2 pb-2">
                       <Button
                         onClick={() => handleSelectPlayer(player.id)}
