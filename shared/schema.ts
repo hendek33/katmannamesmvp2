@@ -3,7 +3,7 @@ import { z } from "zod";
 export type Team = "dark" | "light" | null;
 export type Role = "spymaster" | "guesser";
 export type CardType = "dark" | "light" | "neutral" | "assassin";
-export type GamePhase = "lobby" | "playing" | "ended";
+export type GamePhase = "lobby" | "introduction" | "playing" | "ended";
 export type SecretRole = "prophet" | "double_agent" | null;
 
 export interface Player {
@@ -16,6 +16,9 @@ export interface Player {
   secretRole?: SecretRole; // Secret role in Chaos Mode
   knownCards?: number[]; // Card IDs known to prophet
   lastTauntAt?: number; // Timestamp of last taunt for cooldown
+  introduced?: boolean; // Whether player has been introduced
+  introductionLikes?: { [playerId: string]: Team }; // Who liked during introduction
+  introductionDislikes?: { [playerId: string]: Team }; // Who disliked during introduction
 }
 
 export interface Card {
@@ -76,6 +79,12 @@ export interface GameState {
     success?: boolean;
     finalWinner?: Team;
     finalWinnerName?: string;
+  };
+  introductionPhase?: { // Introduction phase state
+    hasOccurred: boolean; // Whether introduction has happened this session
+    currentIntroducingPlayer?: string; // ID of currently introducing player
+    introductionStarted?: boolean; // Whether introduction phase has started
+    playersIntroduced?: string[]; // IDs of players who have been introduced
   };
 }
 
@@ -160,6 +169,22 @@ export const triggerTauntSchema = z.object({
   playerId: z.string(),
 });
 
+// Introduction schemas
+export const selectPlayerForIntroductionSchema = z.object({
+  playerId: z.string(),
+});
+
+export const finishIntroductionSchema = z.object({
+  playerId: z.string(),
+});
+
+export const likeIntroductionSchema = z.object({
+  targetPlayerId: z.string(),
+  isLike: z.boolean(), // true for like, false for dislike
+});
+
+export const skipIntroductionSchema = z.object({});
+
 // Taunt broadcast payload
 export interface TauntBroadcast {
   playerId: string;
@@ -183,3 +208,7 @@ export type UpdateChaosModeInput = z.infer<typeof updateChaosModeSchema>;
 export type GuessProphetInput = z.infer<typeof guessProphetSchema>;
 export type GuessDoubleAgentInput = z.infer<typeof guessDoubleAgentSchema>;
 export type TriggerTauntInput = z.infer<typeof triggerTauntSchema>;
+export type SelectPlayerForIntroductionInput = z.infer<typeof selectPlayerForIntroductionSchema>;
+export type FinishIntroductionInput = z.infer<typeof finishIntroductionSchema>;
+export type LikeIntroductionInput = z.infer<typeof likeIntroductionSchema>;
+export type SkipIntroductionInput = z.infer<typeof skipIntroductionSchema>;

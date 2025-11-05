@@ -50,6 +50,12 @@ export interface IStorage {
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number } | null;
+  // Introduction phase methods
+  startIntroduction(roomCode: string): GameState | null;
+  selectPlayerForIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
+  finishPlayerIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
+  likeIntroduction(roomCode: string, playerId: string, targetPlayerId: string, isLike: boolean): GameState | null;
+  skipIntroduction(roomCode: string, playerId: string): GameState | null;
 }
 
 // Insult templates
@@ -760,6 +766,12 @@ export class MemStorage implements IStorage {
     if (darkTeam.length === 0 || lightTeam.length === 0) return null;
     if (!darkTeam.some(p => p.role === "spymaster")) return null;
     if (!lightTeam.some(p => p.role === "spymaster")) return null;
+
+    // Check if we should go to introduction phase first
+    if (!room.introductionPhase?.hasOccurred && room.players.length > 2) {
+      // Start introduction phase for first game
+      return this.startIntroduction(roomCode);
+    }
 
     room.cards = this.createGameCards();
     room.phase = "playing";
@@ -1741,6 +1753,197 @@ export class MemStorage implements IStorage {
       teamTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
       teamInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
     };
+  }
+
+  startIntroduction(roomCode: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Can only start introduction from lobby phase
+    if (room.phase !== "lobby") return null;
+    
+    // Check if introduction has already occurred
+    if (room.introductionPhase?.hasOccurred) return null;
+    
+    // Check teams are ready
+    const darkTeam = room.players.filter(p => p.team === "dark");
+    const lightTeam = room.players.filter(p => p.team === "light");
+    
+    if (darkTeam.length === 0 || lightTeam.length === 0) return null;
+    if (!darkTeam.some(p => p.role === "spymaster")) return null;
+    if (!lightTeam.some(p => p.role === "spymaster")) return null;
+    
+    // Move to introduction phase
+    room.phase = "introduction";
+    room.introductionPhase = {
+      hasOccurred: false,
+      introductionStarted: true,
+      playersIntroduced: [],
+      currentIntroducingPlayer: undefined
+    };
+    
+    // Reset all player introduction states
+    room.players.forEach(player => {
+      player.introduced = false;
+      player.introductionLikes = {};
+      player.introductionDislikes = {};
+    });
+    
+    return room;
+  }
+
+  selectPlayerForIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Must be in introduction phase
+    if (room.phase !== "introduction") return null;
+    if (!room.introductionPhase) return null;
+    
+    // Only red team spymaster can control introductions
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) return null;
+    if (player.team !== "dark" || player.role !== "spymaster") return null;
+    
+    // Target must exist and not be introduced yet
+    const target = room.players.find(p => p.id === targetPlayerId);
+    if (!target) return null;
+    if (target.introduced) return null;
+    
+    // Set current introducing player
+    room.introductionPhase.currentIntroducingPlayer = targetPlayerId;
+    
+    return room;
+  }
+
+  finishPlayerIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Must be in introduction phase
+    if (room.phase !== "introduction") return null;
+    if (!room.introductionPhase) return null;
+    
+    // Only red team spymaster can control introductions
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) return null;
+    if (player.team !== "dark" || player.role !== "spymaster") return null;
+    
+    // Must be introducing the specified player
+    if (room.introductionPhase.currentIntroducingPlayer !== targetPlayerId) return null;
+    
+    // Mark player as introduced
+    const target = room.players.find(p => p.id === targetPlayerId);
+    if (!target) return null;
+    target.introduced = true;
+    
+    // Add to introduced list
+    if (!room.introductionPhase.playersIntroduced) {
+      room.introductionPhase.playersIntroduced = [];
+    }
+    room.introductionPhase.playersIntroduced.push(targetPlayerId);
+    
+    // Clear current introducing player
+    room.introductionPhase.currentIntroducingPlayer = undefined;
+    
+    // Check if all players have been introduced (if we want to auto-end)
+    const allIntroduced = room.players.every(p => p.introduced);
+    if (allIntroduced) {
+      // Can optionally auto-transition to playing phase
+      // For now, let the controller decide when to skip/finish
+    }
+    
+    return room;
+  }
+
+  likeIntroduction(roomCode: string, playerId: string, targetPlayerId: string, isLike: boolean): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Must be in introduction phase
+    if (room.phase !== "introduction") return null;
+    if (!room.introductionPhase) return null;
+    
+    // Must be introducing someone
+    if (!room.introductionPhase.currentIntroducingPlayer) return null;
+    
+    // Can only like/dislike the currently introducing player
+    if (room.introductionPhase.currentIntroducingPlayer !== targetPlayerId) return null;
+    
+    // Cannot like/dislike yourself
+    if (playerId === targetPlayerId) return null;
+    
+    const player = room.players.find(p => p.id === playerId);
+    const target = room.players.find(p => p.id === targetPlayerId);
+    if (!player || !target) return null;
+    
+    // Initialize like/dislike maps if not exists
+    if (!target.introductionLikes) target.introductionLikes = {};
+    if (!target.introductionDislikes) target.introductionDislikes = {};
+    
+    // Remove previous vote if exists
+    delete target.introductionLikes[playerId];
+    delete target.introductionDislikes[playerId];
+    
+    // Add new vote
+    if (isLike) {
+      target.introductionLikes[playerId] = player.team;
+    } else {
+      target.introductionDislikes[playerId] = player.team;
+    }
+    
+    return room;
+  }
+
+  skipIntroduction(roomCode: string, playerId: string): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Must be in introduction phase
+    if (room.phase !== "introduction") return null;
+    if (!room.introductionPhase) return null;
+    
+    // Only red team spymaster can skip
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) return null;
+    if (player.team !== "dark" || player.role !== "spymaster") return null;
+    
+    // Mark introduction as occurred and start the game
+    room.introductionPhase.hasOccurred = true;
+    
+    // Transition to playing phase
+    room.cards = this.createGameCards();
+    room.phase = "playing";
+    room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
+    room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
+    
+    // Assign unique images to cards when game starts
+    this.assignCardImages(roomData);
+    room.currentTeam = room.darkCardsRemaining === 9 ? "dark" : "light";
+    room.currentClue = null;
+    room.winner = null;
+    room.revealHistory = [];
+
+    // Assign secret roles for Chaos Mode
+    if (room.chaosMode) {
+      this.assignSecretRoles(room);
+    }
+    
+    // Reset guess tracking
+    roomData.guessesRemaining = 0;
+    roomData.maxGuesses = 0;
+    
+    // Start timer if timed mode is enabled
+    if (room.timedMode) {
+      room.currentTurnStartTime = Date.now();
+    }
+    
+    return room;
   }
 }
 
