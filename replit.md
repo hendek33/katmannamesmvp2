@@ -20,6 +20,13 @@ Do not make changes to file `server/words.ts`.
 - **Memory-Based Playback**: Videos are loaded into memory as base64 strings, eliminating network delays during playback
 - **Multiple Optimization Layers**: SimpleVideoOptimizer, VideoCache, and Base64Converter working together for maximum performance
 
+### Player Introduction Feature (November 5, 2025)
+- **Introduction Phase**: New game phase where players introduce themselves before game starts
+- **Controller System**: Red team (light) spymaster controls the introduction sequence
+- **Interactive Cards**: Beautiful glassmorphism card design with hover effects for player selection
+- **Like/Dislike System**: Players can vote on introductions with animated like/dislike badges
+- **Visual Polish**: Rich animations, particle effects, team-colored cards with proper theming
+
 ## System Architecture
 
 ### UI/UX Decisions
