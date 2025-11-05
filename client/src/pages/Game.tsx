@@ -151,35 +151,35 @@ export default function Game() {
   useEffect(() => {
     const allCardImages = [
       // Dark/Blue team cards
-      '/acilmiskartgorsel/ali mavi.png',
-      '/acilmiskartgorsel/blush mavi.png',
-      '/acilmiskartgorsel/hasan mavi.png',
-      '/acilmiskartgorsel/kasım mavi.png',
-      '/acilmiskartgorsel/mami mavi.png',
-      '/acilmiskartgorsel/noeldayı mavi.png',
-      '/acilmiskartgorsel/nuriben mavi.png',
-      '/acilmiskartgorsel/çağrı mavi.png',
-      '/acilmiskartgorsel/şinasi mavi.png',
+      '/acilmiskartgorsel/ali mavi.webp',
+      '/acilmiskartgorsel/blush mavi.webp',
+      '/acilmiskartgorsel/hasan mavi.webp',
+      '/acilmiskartgorsel/kasım mavi.webp',
+      '/acilmiskartgorsel/mami mavi.webp',
+      '/acilmiskartgorsel/noeldayı mavi.webp',
+      '/acilmiskartgorsel/nuriben mavi.webp',
+      '/acilmiskartgorsel/çağrı mavi.webp',
+      '/acilmiskartgorsel/triel2 mavi.webp',
       // Light/Red team cards
-      '/acilmiskartgorsel/alik kırmızı.png',
-      '/acilmiskartgorsel/begüm kırmızı.png',
-      '/acilmiskartgorsel/dobby kırmızı.png',
-      '/acilmiskartgorsel/karaman kırmızı.png',
-      '/acilmiskartgorsel/neswin kırmızı.png',
-      '/acilmiskartgorsel/noeldayı kırmızı.png',
-      '/acilmiskartgorsel/perver kırmızı.png',
-      '/acilmiskartgorsel/triel kırmızı.png',
-      '/acilmiskartgorsel/şinasi kırmızı.png',
+      '/acilmiskartgorsel/alik kırmızı.webp',
+      '/acilmiskartgorsel/begüm kırmızı.webp',
+      '/acilmiskartgorsel/dobby kırmızı.webp',
+      '/acilmiskartgorsel/karaman kırmızı.webp',
+      '/acilmiskartgorsel/neswin kırmızı.webp',
+      '/acilmiskartgorsel/noeldayı kırmızı.webp',
+      '/acilmiskartgorsel/perver kırmızı.webp',
+      '/acilmiskartgorsel/triel kırmızı.webp',
+      '/acilmiskartgorsel/şinasi kırmızı.webp',
       // Neutral cards
-      '/acilmiskartgorsel/blush beyaz.png',
-      '/acilmiskartgorsel/hasan beyaz.png',
-      '/acilmiskartgorsel/mami beyaz.png',
-      '/acilmiskartgorsel/perver beyaz.png',
-      '/acilmiskartgorsel/çağrı normal beyaz.png',
-      '/acilmiskartgorsel/çağrı sigara beyaz.png',
-      '/acilmiskartgorsel/şinasi su beyaz.png',
+      '/acilmiskartgorsel/blush beyaz.webp',
+      '/acilmiskartgorsel/hasan beyaz.webp',
+      '/acilmiskartgorsel/mami beyaz.webp',
+      '/acilmiskartgorsel/perver beyaz.webp',
+      '/acilmiskartgorsel/çağrı normal beyaz.webp',
+      '/acilmiskartgorsel/çağrı sigara beyaz.webp',
+      '/acilmiskartgorsel/şinasi su beyaz.webp',
       // Assassin card
-      '/ajan siyah.png'
+      '/acilmiskartgorsel/arda siyah.webp'
     ];
 
     let loadedCount = 0;
@@ -1549,7 +1549,7 @@ export default function Game() {
             <Card 
               className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:rotate-1"
               style={{
-                backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.png')`,
+                backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.webp')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 transformStyle: 'preserve-3d',
@@ -1820,7 +1820,7 @@ export default function Game() {
                 <Card 
                   className="p-1.5 border-2 border-blue-700/50 relative overflow-hidden"
                   style={{
-                    backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.6), rgba(30, 58, 138, 0.6)), url('/mavi takım.png')`,
+                    backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.6), rgba(30, 58, 138, 0.6)), url('/mavi takım.webp')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -1839,7 +1839,7 @@ export default function Game() {
                 <Card 
                   className="p-1.5 border-2 border-red-800/50 relative overflow-hidden"
                   style={{
-                    backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.6), rgba(127, 29, 29, 0.6)), url('/kırmızı takım.png')`,
+                    backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.6), rgba(127, 29, 29, 0.6)), url('/kırmızı takım.webp')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'
                   }}
@@ -2065,7 +2065,7 @@ export default function Game() {
             <Card 
               className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:-rotate-1"
               style={{
-                backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.7), rgba(127, 29, 29, 0.7)), url('/kırmızı takım.png')`,
+                backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.7), rgba(127, 29, 29, 0.7)), url('/kırmızı takım.webp')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 transformStyle: 'preserve-3d',
