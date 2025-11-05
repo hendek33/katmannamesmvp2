@@ -1393,7 +1393,7 @@ export class MemStorage implements IStorage {
     };
     
     // Determine video source based on team
-    const videoSrc = player.team === "dark" ? "/mavi taunt yeni.mp4" : "/kırmızı taunt.mp4";
+    const videoSrc = player.team === "dark" ? "/mavi taunt.webm" : "/kırmızı taunt.webm";
     
     // Return taunt data for broadcast
     return {
