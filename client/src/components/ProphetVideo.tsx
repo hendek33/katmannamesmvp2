@@ -103,7 +103,7 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
                 : '0 2px 20px rgba(239,68,68,0.8)',
             }}
             >
-              {teamName} Takımının kahin ajanı seçildin, bütün kartları görebiliyorsun!
+              {teamName} Takımının KAHİN AJANI seçildin, bütün kartları görebiliyorsun!
             </div>
             <div className="text-xl md:text-2xl font-bold text-orange-400 mt-3"
               style={{

@@ -862,10 +862,10 @@ export default function Lobby() {
                       <h4 className="font-bold text-yellow-500">Kahin Ajan</h4>
                     </div>
                     <p className="text-xs">
-                      Her takımda 1 tane bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
-                      Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Oyun boyunca karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır, oyun bittikten sonra tahmin yapılamaz!</span>
-                      <span className="text-red-400 font-bold"> DİKKAT: Yanlış tahmin anında kaybettirir!</span>
+                      Her takımda 1 tane bulunur. Oyunda kendi tahtadaki bütün kartların yerini bilir. 
+                      Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır, karşı takıma asla belli etmemelidir.
+                      <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Doğru tahmin oyunu kazandırır!</span>
+                      <span className="text-red-400 font-bold"> Yanlış tahmin kayıp ile sonuçlanır.</span>
                     </p>
                   </div>
                   
@@ -887,12 +887,11 @@ export default function Lobby() {
                   <ul className="text-xs space-y-1">
                     <li>• Takımlardaki ajan sayıları eşit olması ve toplamda minimum 10 kişi olunması önerilir.</li>
                     <li>• Roller oyun başında rastgele atanır ve gizlidir.</li>
-                    <li>• Oyun sonunda tahminler yapıldıktan sonra roller açığa çıkar.</li>
                   </ul>
                 </div>
                 
                 <div className="text-xs text-slate-400 italic">
-                  Bu mod henüz geliştirme aşamasındadır ve yakında aktif olacaktır!
+                  Bu mod deneysel bir eğlence modudur. Oyun deneyimini ve stratejisini tamamen değiştirir.
                 </div>
               </div>
             </AlertDialogDescription>
