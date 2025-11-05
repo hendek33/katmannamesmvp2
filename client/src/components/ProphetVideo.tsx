@@ -55,11 +55,11 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
     // Load the video
     video.load();
     
-    // Emergency timeout (5 seconds) in case video never loads
+    // Emergency timeout (10 seconds) in case video never loads
     emergencyTimeoutRef.current = setTimeout(() => {
       console.warn('Emergency timeout triggered for prophet video');
       handleVideoEnd();
-    }, 5000);
+    }, 10000);
 
     return () => {
       if (emergencyTimeoutRef.current) {
