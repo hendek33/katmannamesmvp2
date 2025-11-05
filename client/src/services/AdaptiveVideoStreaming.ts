@@ -153,7 +153,7 @@ export class AdaptiveVideoStreaming {
     }
     
     // Fallback: Fetch a small test video chunk to measure real network speed
-    const testUrl = '/mavi takım video tur.mp4';
+    const testUrl = '/mavi takım video tur.webm';
     const startTime = performance.now();
     
     try {

@@ -15,8 +15,8 @@ export function TurnVideoInline({ team, teamName, onComplete, isGameStart = fals
   const [videoStarted, setVideoStarted] = useState(false);
   
   const videoSrc = team === "dark" 
-    ? "/mavi takım video tur.mp4"
-    : "/kırmızı takım video tur.mp4";
+    ? "/mavi takım video tur.webm"
+    : "/kırmızı takım video tur.webm";
   
   const { videoRef, isLoading, base64Url } = useInlineVideo(videoSrc, {
     autoPlay: true,

@@ -38,11 +38,11 @@ export class VideoBase64Converter {
    */
   static async preloadAllAsBase64(): Promise<void> {
     const videoPaths = [
-      '/mavi takım video tur.mp4',
-      '/kırmızı takım video tur.mp4', 
-      '/siyah kelime seçme yeni.mp4',
-      '/mavi takım normal kazanma.mp4',
-      '/kırmızı takım normal kazanma.mp4'
+      '/mavi takım video tur.webm',
+      '/kırmızı takım video tur.webm', 
+      '/siyah kelime seçme yeni.webm',
+      '/mavi takım normal kazanma.webm',
+      '/kırmızı takım normal kazanma.webm'
     ];
     
     console.log('Converting videos to base64...');
@@ -76,9 +76,9 @@ export class VideoBase64Converter {
 // NOTE: These are placeholders - actual base64 strings would be much longer
 export const PRELOADED_VIDEO_BASE64: Record<string, string> = {
   // These will be populated at build time or runtime
-  '/mavi takım video tur.mp4': '',
-  '/kırmızı takım video tur.mp4': '',
-  '/siyah kelime seçme yeni.mp4': '',
-  '/mavi takım normal kazanma.mp4': '',
-  '/kırmızı takım normal kazanma.mp4': ''
+  '/mavi takım video tur.webm': '',
+  '/kırmızı takım video tur.webm': '',
+  '/siyah kelime seçme yeni.webm': '',
+  '/mavi takım normal kazanma.webm': '',
+  '/kırmızı takım normal kazanma.webm': ''
 };

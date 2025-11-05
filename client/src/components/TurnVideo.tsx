@@ -17,8 +17,8 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
   const emergencyTimeoutRef = useRef<NodeJS.Timeout>();
 
   const videoSrc = team === "dark" 
-    ? "/mavi takım video tur.mp4"
-    : "/kırmızı takım video tur.mp4";
+    ? "/mavi takım video tur.webm"
+    : "/kırmızı takım video tur.webm";
 
   useEffect(() => {
     if (!videoRef.current) return;

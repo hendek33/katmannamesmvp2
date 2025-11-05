@@ -59,11 +59,11 @@ export class SimpleVideoOptimizer {
    */
   async preloadAllVideos(): Promise<void> {
     const videoPaths = [
-      '/mavi takım video tur.mp4',
-      '/kırmızı takım video tur.mp4',
-      '/siyah kelime seçme yeni.mp4',
-      '/mavi takım normal kazanma.mp4',
-      '/kırmızı takım normal kazanma.mp4'
+      '/mavi takım video tur.webm',
+      '/kırmızı takım video tur.webm',
+      '/siyah kelime seçme yeni.webm',
+      '/mavi takım normal kazanma.webm',
+      '/kırmızı takım normal kazanma.webm'
     ];
     
     // Load all in parallel

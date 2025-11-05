@@ -15,8 +15,8 @@ export function NormalWinVideo({ winnerTeam, winnerTeamName, onComplete }: Norma
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const videoSrc = winnerTeam === "dark" 
-    ? "/mavi takım normal kazanma.mp4"
-    : "/kırmızı takım normal kazanma.mp4";
+    ? "/mavi takım normal kazanma.webm"
+    : "/kırmızı takım normal kazanma.webm";
 
   useEffect(() => {
     // Simple play logic
