@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { videoCache } from "@/services/VideoCache";
+import { enhancedVideoCache } from "@/services/EnhancedVideoCache";
 import { VideoPreloader } from "@/components/VideoPreloader";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
@@ -32,9 +33,15 @@ function App() {
     // Preload all videos when app starts
     videoCache.preloadAllVideos();
     
+    // Also start enhanced video preloading for better buffering
+    enhancedVideoCache.preloadAllVideos().catch(err => {
+      console.error('Enhanced video preloading failed:', err);
+    });
+    
     // Cleanup on unmount
     return () => {
       videoCache.dispose();
+      enhancedVideoCache.dispose();
     };
   }, []);
   
