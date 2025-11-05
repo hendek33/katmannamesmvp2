@@ -438,7 +438,7 @@ export default function Lobby() {
                             Geliştiriciden not:
                           </div>
                           <div className="italic text-amber-400/60">
-                            Gerizekalılar takımının mavi takım olamsı gerekiyor.  
+                            Gerizekalılar takımı kırmızı takım olabilirler, iyi oyunlar!  
                           </div>
                         </div>
                       </div>
