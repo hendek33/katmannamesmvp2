@@ -90,16 +90,7 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
     function loadImages(paths: string[]) {
       if (!paths || paths.length === 0) return Promise.resolve([] as HTMLImageElement[]);
       return Promise.all(paths.map(src => new Promise<HTMLImageElement>((res, rej) => {
-        const im = new Image(); 
-        im.loading = 'lazy'; // Add lazy loading attribute
-        im.decoding = 'async'; // Add async decoding
-        im.src = src; 
-        im.onload = () => res(im); 
-        im.onerror = () => {
-          console.warn(`Failed to load image: ${src}`);
-          // Return placeholder on error
-          res(makePlaceholder());
-        };
+        const im = new Image(); im.src = src; im.onload = () => res(im); im.onerror = rej;
       })));
     }
 

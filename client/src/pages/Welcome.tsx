@@ -57,28 +57,21 @@ export default function Welcome() {
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
   
-  // Track when all card images are loaded (with optimization)
+  // Track when all card images are loaded
   useEffect(() => {
     const loadImages = async () => {
       try {
-        // Load images with lazy loading attributes
         const imagePromises = cardImageNames.map(imageName => {
           return new Promise((resolve, reject) => {
             const img = new Image();
-            img.loading = 'lazy'; // Enable browser lazy loading
-            img.decoding = 'async'; // Enable async decoding
             img.onload = resolve;
-            img.onerror = () => {
-              console.warn(`Failed to load: ${imageName}`);
-              resolve(null); // Still resolve to not block others
-            };
+            img.onerror = reject;
             img.src = `/acilmiskartgorselküçültülmüş/${imageName}`;
           });
         });
         
         await Promise.all(imagePromises);
         setCardsLoaded(true);
-        console.log("Card images loaded for welcome screen");
       } catch (error) {
         console.error("Error loading card images:", error);
         // Still allow button to be clickable even if some images fail
