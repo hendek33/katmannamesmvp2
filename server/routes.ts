@@ -21,6 +21,10 @@ import {
   guessDoubleAgentSchema,
   endGameGuessSchema,
   voteEndGameGuessSchema,
+  selectPlayerForIntroductionSchema,
+  finishIntroductionSchema,
+  likeIntroductionSchema,
+  skipIntroductionSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -1336,6 +1340,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
             sendToClient(ws, {
               type: "room_features",
               payload: features,
+            });
+            break;
+          }
+
+          // Introduction phase handlers
+          case "select_player_for_introduction": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = selectPlayerForIntroductionSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+
+            const result = storage.selectPlayerForIntroduction(ws.roomCode, ws.playerId, validation.data.playerId);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Oyuncu seçilemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "player_introducing",
+              payload: { gameState: result },
+            });
+            break;
+          }
+
+          case "finish_introduction": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = finishIntroductionSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+
+            const result = storage.finishPlayerIntroduction(ws.roomCode, ws.playerId, validation.data.playerId);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Tanıtım bitirilemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "introduction_finished",
+              payload: { gameState: result },
+            });
+            break;
+          }
+
+          case "like_introduction": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = likeIntroductionSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+
+            const result = storage.likeIntroduction(ws.roomCode, ws.playerId, validation.data.targetPlayerId, validation.data.isLike);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Oy kullanılamadı" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "introduction_liked",
+              payload: { gameState: result },
+            });
+            break;
+          }
+
+          case "skip_introduction": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const result = storage.skipIntroduction(ws.roomCode, ws.playerId);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Tanıtım atlanamadı" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_started",
+              payload: { gameState: result },
             });
             break;
           }
