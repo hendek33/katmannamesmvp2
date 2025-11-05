@@ -159,6 +159,10 @@ export function useOptimizedVideo(videoSrc: string, priority: 'high' | 'medium' 
           videoRef.current.remove();
         }
       }
+      
+      // Unregister from buffer manager to prevent memory leaks
+      const srcToUnregister = VideoBase64Converter.getBase64(videoSrc) || videoSrc;
+      videoBufferManager.unregisterVideo(srcToUnregister);
     };
   }, [videoSrc, priority]);
   

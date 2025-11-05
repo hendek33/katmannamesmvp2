@@ -95,16 +95,25 @@ export class VideoBufferManager {
     const video = document.createElement('video');
     video.src = src;
     
+    // Common optimizations - MUST be set before any play attempt
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    
     // Apply strategy-specific settings
     switch (state.preloadStrategy) {
       case 'aggressive':
         video.preload = 'auto';
         video.load();
-        // Force buffering by playing and immediately pausing
+        // Force buffering by playing and immediately pausing (after muted is set)
         video.play().then(() => {
           video.pause();
           video.currentTime = 0;
-        }).catch(() => {});
+        }).catch((err) => {
+          console.warn('Aggressive preload failed, falling back to standard load:', err);
+          // Fallback to just loading without play
+          video.load();
+        });
         break;
         
       case 'moderate':
@@ -120,11 +129,6 @@ export class VideoBufferManager {
         // Only load when explicitly requested
         break;
     }
-    
-    // Common optimizations
-    video.muted = true;
-    video.playsInline = true;
-    video.setAttribute('playsinline', '');
     
     // Hide video element
     video.style.position = 'fixed';
@@ -307,6 +311,14 @@ export class VideoBufferManager {
       
       console.log(`Released video buffer for: ${src}`);
     }
+  }
+  
+  /**
+   * Unregister a video and clean up resources
+   */
+  unregisterVideo(src: string): void {
+    this.releaseVideo(src);
+    this.bufferStates.delete(src);
   }
   
   /**

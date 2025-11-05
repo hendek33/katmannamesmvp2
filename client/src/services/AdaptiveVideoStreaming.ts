@@ -145,26 +145,43 @@ export class AdaptiveVideoStreaming {
    * Measure current bandwidth
    */
   private async measureBandwidth(): Promise<void> {
-    const testSize = 100000; // 100KB test
-    const testData = new ArrayBuffer(testSize);
-    const blob = new Blob([testData]);
-    const url = URL.createObjectURL(blob);
+    // Use navigator.connection if available for immediate estimate
+    const connection = (navigator as any).connection;
+    if (connection?.downlink) {
+      this.networkMetrics.bandwidth = this.smoothBandwidth(connection.downlink);
+      return;
+    }
     
+    // Fallback: Fetch a small test video chunk to measure real network speed
+    const testUrl = '/mavi takım video tur.mp4';
     const startTime = performance.now();
     
     try {
-      await fetch(url);
-      const endTime = performance.now();
-      const duration = (endTime - startTime) / 1000; // seconds
-      const bitsTransferred = testSize * 8;
-      const bandwidth = (bitsTransferred / duration) / 1000000; // Mbps
+      // Fetch first 200KB of video with range request
+      const response = await fetch(testUrl, {
+        headers: {
+          'Range': 'bytes=0-204799' // 200KB
+        },
+        cache: 'no-store' // Bypass cache for accurate measurement
+      });
       
-      // Smooth the measurement with history
-      this.networkMetrics.bandwidth = this.smoothBandwidth(bandwidth);
+      if (response.ok) {
+        const data = await response.arrayBuffer();
+        const endTime = performance.now();
+        const duration = (endTime - startTime) / 1000; // seconds
+        const bitsTransferred = data.byteLength * 8;
+        const bandwidth = (bitsTransferred / duration) / 1000000; // Mbps
+        
+        // Smooth the measurement with history
+        this.networkMetrics.bandwidth = this.smoothBandwidth(bandwidth);
+      } else {
+        // If range request fails, use conservative estimate
+        this.networkMetrics.bandwidth = this.smoothBandwidth(2); // 2 Mbps fallback
+      }
     } catch (error) {
-      console.warn('Bandwidth measurement failed:', error);
-    } finally {
-      URL.revokeObjectURL(url);
+      console.warn('Bandwidth measurement failed, using conservative estimate:', error);
+      // Use conservative bandwidth estimate on failure
+      this.networkMetrics.bandwidth = this.smoothBandwidth(1); // 1 Mbps fallback
     }
   }
   
