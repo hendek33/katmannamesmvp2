@@ -630,6 +630,7 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
+    <>
     <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
@@ -1936,10 +1937,11 @@ export default function Game() {
               </div>
             )}
 
-            {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 9999 }}>
-              {/* Clue Display Card - Shows after clue is given */}
-              {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
+            {/* Clue Input/Display - Overlay at Bottom (Hidden during introduction) */}
+            {gameState.phase !== "introduction" && (
+              <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 9999 }}>
+                {/* Clue Display Card - Shows after clue is given */}
+                {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
                 <Card className="px-5 py-3 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
@@ -2086,11 +2088,13 @@ export default function Game() {
                   </div>
                 </Card>
               ) : null}
-            </div>
-
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Right Side - Dark Team (Blue) */}
+
+      {/* Right Side - Dark Team (Blue) */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
@@ -2400,5 +2404,6 @@ export default function Game() {
         document.body
       )}
     </div>
+    </>
   );
 }

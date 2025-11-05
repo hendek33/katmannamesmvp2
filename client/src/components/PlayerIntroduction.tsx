@@ -1,10 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { GameState, Player } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
+  size: number;
+  velocity: { x: number; y: number };
+}
 
 interface PlayerIntroductionProps {
   gameState: GameState;
@@ -27,6 +36,7 @@ export function PlayerIntroduction({
   const [playerBubbles, setPlayerBubbles] = useState<Player[]>([]);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
   const [dots, setDots] = useState(1);
+  const [particles, setParticles] = useState<Particle[]>([]);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team (light) spymaster controls
@@ -98,8 +108,39 @@ export function PlayerIntroduction({
     }
   };
   
-  const handleLikeDislike = (isLike: boolean) => {
+  const createParticles = useCallback((isLike: boolean, event: React.MouseEvent) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const colors = isLike 
+      ? ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#86efac']
+      : ['#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fb923c'];
+    
+    const newParticles: Particle[] = [];
+    for (let i = 0; i < 30; i++) {
+      const angle = (Math.PI * 2 * i) / 30;
+      const velocity = 3 + Math.random() * 4;
+      newParticles.push({
+        id: Date.now() + i,
+        x: centerX,
+        y: centerY,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 4 + Math.random() * 6,
+        velocity: {
+          x: Math.cos(angle) * velocity,
+          y: Math.sin(angle) * velocity - 2,
+        },
+      });
+    }
+    
+    setParticles(newParticles);
+    setTimeout(() => setParticles([]), 1000);
+  }, []);
+
+  const handleLikeDislike = (isLike: boolean, event: React.MouseEvent) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer && !hasVoted) {
+      createParticles(isLike, event);
       onLikeDislike(currentIntroducingPlayer, isLike);
     }
   };
@@ -124,7 +165,31 @@ export function PlayerIntroduction({
   const { likes, dislikes } = getLikesAndDislikes();
   
   return (
-    <Card className="relative w-full max-w-6xl mx-auto bg-slate-900/95 backdrop-blur-lg border-2 border-purple-500/30 shadow-2xl">
+    <Card className="relative w-full max-w-6xl mx-auto bg-slate-900/95 backdrop-blur-lg border-2 border-purple-500/30 shadow-2xl overflow-hidden">
+      {/* Particle System */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 9999 }}>
+        {particles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{ x: particle.x, y: particle.y, opacity: 1, scale: 1 }}
+            animate={{ 
+              x: particle.x + particle.velocity.x * 100, 
+              y: particle.y + particle.velocity.y * 100 + 200,
+              opacity: 0,
+              scale: 0
+            }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            style={{
+              position: 'fixed',
+              width: particle.size,
+              height: particle.size,
+              backgroundColor: particle.color,
+              borderRadius: '50%',
+              boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
+            }}
+          />
+        ))}
+      </div>
       <div className="relative flex flex-col p-4">
         {/* Title Animation */}
         <AnimatePresence>
@@ -251,7 +316,7 @@ export function PlayerIntroduction({
                                       {player.role === "spymaster" && (
                                         <Badge variant="outline" className="text-[10px] border-blue-500/50 text-blue-400 flex-shrink-0 px-1 py-0">
                                           <Crown className="w-2.5 h-2.5 mr-0.5" />
-                                          Kahin
+                                          İstihbarat Şefi
                                         </Badge>
                                       )}
                                     </div>
@@ -322,7 +387,7 @@ export function PlayerIntroduction({
                                       {player.role === "spymaster" && (
                                         <Badge variant="outline" className="text-[10px] border-red-500/50 text-red-400 flex-shrink-0 px-1 py-0">
                                           <Crown className="w-2.5 h-2.5 mr-0.5" />
-                                          Kahin
+                                          İstihbarat Şefi
                                         </Badge>
                                       )}
                                     </div>
@@ -404,7 +469,7 @@ export function PlayerIntroduction({
                             : 'bg-red-600/30 text-red-300 border-red-500/50'
                         }`}>
                           {introducingPlayer?.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                          {introducingPlayer?.role === "spymaster" && " - Kahin"}
+                          {introducingPlayer?.role === "spymaster" && " - İstihbarat Şefi"}
                         </Badge>
                       </motion.div>
                     </div>
@@ -502,7 +567,7 @@ export function PlayerIntroduction({
                             whileTap={{ scale: 0.95 }}
                           >
                             <Button
-                              onClick={() => handleLikeDislike(true)}
+                              onClick={(e) => handleLikeDislike(true, e)}
                               size="lg"
                               className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/50 transition-all duration-200"
                               data-testid="like-button"
@@ -521,7 +586,7 @@ export function PlayerIntroduction({
                             whileTap={{ scale: 0.95 }}
                           >
                             <Button
-                              onClick={() => handleLikeDislike(false)}
+                              onClick={(e) => handleLikeDislike(false, e)}
                               size="lg"
                               className="bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-red-500/50 transition-all duration-200"
                               data-testid="dislike-button"
