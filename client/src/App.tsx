@@ -33,15 +33,15 @@ function App() {
     // Preload all videos when app starts
     videoCache.preloadAllVideos();
     
-    // Also start enhanced video preloading for better buffering
-    enhancedVideoCache.preloadAllVideos().catch(err => {
-      console.error('Enhanced video preloading failed:', err);
-    });
+    // TEMPORARILY DISABLED: Enhanced video cache is causing loading issues
+    // enhancedVideoCache.preloadAllVideos().catch(err => {
+    //   console.error('Enhanced video preloading failed:', err);
+    // });
     
     // Cleanup on unmount
     return () => {
       videoCache.dispose();
-      enhancedVideoCache.dispose();
+      // enhancedVideoCache.dispose();
     };
   }, []);
   
