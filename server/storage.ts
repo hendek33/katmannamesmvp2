@@ -126,37 +126,38 @@ export class MemStorage implements IStorage {
     // Image pools for each card type - using ALL available images from both folders
     const imagePools = {
       dark: [
-        '/acilmiskartgorsel/ali mavi.png',
-        '/acilmiskartgorsel/blush mavi.png',
-        '/acilmiskartgorsel/hasan mavi.png',
-        '/acilmiskartgorsel/kasım mavi.png',
-        '/acilmiskartgorsel/mami mavi.png',
-        '/acilmiskartgorsel/noeldayı mavi.png',
-        '/acilmiskartgorsel/nuriben mavi.png',
-        '/acilmiskartgorsel/çağrı mavi.png',
-        '/acilmiskartgorsel/triel2 mavi.png'  // 9 total blue/dark cards!
+        '/acilmiskartgorsel/ali mavi.webp',
+        '/acilmiskartgorsel/blush mavi.webp',
+        '/acilmiskartgorsel/hasan mavi.webp',
+        '/acilmiskartgorsel/kasım mavi.webp',
+        '/acilmiskartgorsel/mami mavi.webp',
+        '/acilmiskartgorsel/noeldayı mavi.webp',
+        '/acilmiskartgorsel/nuriben mavi.webp',
+        '/acilmiskartgorsel/çağrı mavi.webp',
+        '/acilmiskartgorsel/triel2 mavi.webp'  // 9 total blue/dark cards!
       ],
       light: [
-        '/acilmiskartgorsel/alik kırmızı.png',
-        '/acilmiskartgorsel/begüm kırmızı.png',
-        '/acilmiskartgorsel/dobby kırmızı.png',
-        '/acilmiskartgorsel/karaman kırmızı.png',
-        '/acilmiskartgorsel/neswin kırmızı.png',
-        '/acilmiskartgorsel/noeldayı kırmızı.png',
-        '/acilmiskartgorsel/perver kırmızı.png',
-        '/acilmiskartgorsel/triel kırmızı.png',
-        '/acilmiskartgorsel/şinasi kırmızı.png'  // 9 total red/light cards!
+        '/acilmiskartgorsel/alik kırmızı.webp',
+        '/acilmiskartgorsel/begüm kırmızı.webp',
+        '/acilmiskartgorsel/dobby kırmızı.webp',
+        '/acilmiskartgorsel/karaman kırmızı.webp',
+        '/acilmiskartgorsel/neswin kırmızı.webp',
+        '/acilmiskartgorsel/noeldayı kırmızı.webp',
+        '/acilmiskartgorsel/perver kırmızı.webp',
+        '/acilmiskartgorsel/triel kırmızı.webp',
+        '/acilmiskartgorsel/şinasi kırmızı.webp',
+        '/acilmiskartgorsel/timoçin kırmızı.webp'  // 10 total red/light cards!
       ],
       neutral: [
-        '/acilmiskartgorsel/blush beyaz.png',
-        '/acilmiskartgorsel/hasan beyaz.png',
-        '/acilmiskartgorsel/mami beyaz.png',
-        '/acilmiskartgorsel/perver beyaz.png',
-        '/acilmiskartgorsel/çağrı normal beyaz.png',
-        '/acilmiskartgorsel/çağrı sigara beyaz.png',
-        '/acilmiskartgorsel/şinasi su beyaz.png'  // 7 total neutral cards!
+        '/acilmiskartgorsel/blush beyaz.webp',
+        '/acilmiskartgorsel/hasan beyaz.webp',
+        '/acilmiskartgorsel/mami beyaz.webp',
+        '/acilmiskartgorsel/perver beyaz.webp',
+        '/acilmiskartgorsel/çağrı normal beyaz.webp',
+        '/acilmiskartgorsel/çağrı sigara beyaz.webp',
+        '/acilmiskartgorsel/şinasi su beyaz.webp'  // 7 total neutral cards!
       ],
-      assassin: ['/ajan siyah.png']
+      assassin: ['/ajan siyah.webp', '/acilmiskartgorsel/arda siyah.webp']
     };
 
     // Shuffle each pool
