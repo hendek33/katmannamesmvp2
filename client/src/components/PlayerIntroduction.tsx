@@ -114,24 +114,8 @@ export function PlayerIntroduction({
   const { likes, dislikes } = getLikesAndDislikes();
   
   return (
-    <div className="fixed inset-0 bg-slate-900 z-50" style={{ 
-      backgroundImage: 'url(/arkaplan.webp)', 
-      backgroundSize: 'cover', 
-      backgroundPosition: 'center' 
-    }}>
-      {/* Dark overlay for better contrast */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-900/95" />
-      
-      {/* Particles */}
-      {[...Array(12)].map((_, i) => (
-        <div key={i} className={`particle particle-${i + 1}`} />
-      ))}
-      
-      {/* Light effects */}
-      <div className="light-effect light-1" />
-      <div className="light-effect light-2" />
-      
-      <div className="relative h-full flex flex-col">
+    <div className="relative w-full max-w-6xl mx-auto">
+      <div className="relative flex flex-col">
         {/* Title Animation */}
         <AnimatePresence>
           {showTitle && (
@@ -140,7 +124,7 @@ export function PlayerIntroduction({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.5 }}
-              className="absolute inset-0 flex items-center justify-center z-50"
+              className="flex items-center justify-center py-12"
             >
               <div className="relative">
                 <motion.div
@@ -148,13 +132,13 @@ export function PlayerIntroduction({
                   transition={{ repeat: 2, duration: 0.5 }}
                   className="text-center"
                 >
-                  <h1 className="text-7xl font-black mb-4 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent drop-shadow-2xl">
+                  <h1 className="text-5xl md:text-6xl font-black mb-4 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent drop-shadow-2xl">
                     TANIŞMA ZAMANI!
                   </h1>
-                  <p className="text-2xl text-white/90 font-semibold">
+                  <p className="text-xl text-white/90 font-semibold">
                     Oyuncular kendilerini tanıtacak
                   </p>
-                  <Sparkles className="w-12 h-12 text-yellow-400 mx-auto mt-4 animate-pulse" />
+                  <Sparkles className="w-10 h-10 text-yellow-400 mx-auto mt-4 animate-pulse" />
                 </motion.div>
               </div>
             </motion.div>
@@ -166,7 +150,7 @@ export function PlayerIntroduction({
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute top-4 right-4 z-40"
+            className="flex justify-end mb-4"
           >
             <Button
               onClick={onSkipIntroduction}
@@ -182,7 +166,7 @@ export function PlayerIntroduction({
         
         {/* Main Content Area */}
         {!showTitle && (
-          <div className="flex-1 flex items-center justify-center p-8">
+          <div className="flex items-center justify-center">
             {!currentIntroducingPlayer ? (
               /* Player Selection Grid */
               <motion.div 
