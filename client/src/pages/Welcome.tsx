@@ -137,7 +137,7 @@ export default function Welcome() {
   return (
     <div className="h-screen bg-slate-900 relative overflow-hidden" 
          style={{ 
-           backgroundImage: 'url(/arkaplan.png)', 
+           backgroundImage: 'url(/arkaplan.webp)', 
            backgroundSize: 'cover', 
            backgroundPosition: 'center', 
            backgroundRepeat: 'no-repeat',
@@ -170,7 +170,7 @@ export default function Welcome() {
             {/* Logo */}
             <div className="flex justify-center animate-in fade-in slide-in-from-top-4 duration-700 pointer-events-auto">
               <img 
-                src="/logo.png" 
+                src="/logo.webp" 
                 alt="Katmannames Logo" 
                 className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)] hover:drop-shadow-[0_15px_50px_rgba(255,255,255,0.6)] hover:scale-110 cursor-pointer"
               />

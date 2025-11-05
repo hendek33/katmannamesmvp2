@@ -6,7 +6,7 @@ export function Logo({ className = "", size = "normal" }: { className?: string; 
   return (
     <div className={`flex items-center ${className}`}>
       <img 
-        src="/logo.png" 
+        src="/logo.webp" 
         alt="Katmannames Logo" 
         className={`${sizeClasses} object-contain`}
       />

@@ -221,7 +221,7 @@ export default function Lobby() {
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center opacity-30" />
+        <div className="absolute inset-0 bg-[url('/arkaplan.webp')] bg-cover bg-center opacity-30" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
         
@@ -244,7 +244,7 @@ export default function Lobby() {
   if (!gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center opacity-30" />
+        <div className="absolute inset-0 bg-[url('/arkaplan.webp')] bg-cover bg-center opacity-30" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
         
@@ -289,7 +289,7 @@ export default function Lobby() {
     <div className="h-screen bg-slate-900 relative overflow-hidden flex flex-col">
       {/* Animated Background - Full visibility */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('/arkaplan.png')] bg-cover bg-center" />
+        <div className="absolute inset-0 bg-[url('/arkaplan.webp')] bg-cover bg-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
       </div>
       

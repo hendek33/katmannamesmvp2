@@ -86,7 +86,7 @@ export default function RoomList() {
     <div className="h-screen relative overflow-hidden flex flex-col">
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat" 
-        style={{ backgroundImage: 'url(/arkaplan.png)' }}
+        style={{ backgroundImage: 'url(/arkaplan.webp)' }}
       />
 
       {/* Reduced Particles for better performance */}
