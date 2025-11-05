@@ -8,7 +8,6 @@ import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users,
 import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { CardImageOptimizer } from "@/services/CardImageOptimizer";
 
 export default function Welcome() {
   const [, navigate] = useLocation();
@@ -58,33 +57,36 @@ export default function Welcome() {
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
   
-  // Track when critical card images are loaded (lazy load approach)
+  // Track when all card images are loaded (with optimization)
   useEffect(() => {
-    const loadCriticalImages = async () => {
+    const loadImages = async () => {
       try {
-        // Only preload the first 5 images that will be visible
-        console.log("Starting lazy load for card images...");
-        await CardImageOptimizer.preloadCritical(cardImageNames);
+        // Load images with lazy loading attributes
+        const imagePromises = cardImageNames.map(imageName => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.loading = 'lazy'; // Enable browser lazy loading
+            img.decoding = 'async'; // Enable async decoding
+            img.onload = resolve;
+            img.onerror = () => {
+              console.warn(`Failed to load: ${imageName}`);
+              resolve(null); // Still resolve to not block others
+            };
+            img.src = `/acilmiskartgorselküçültülmüş/${imageName}`;
+          });
+        });
+        
+        await Promise.all(imagePromises);
         setCardsLoaded(true);
-        
-        // Log cache stats
-        const stats = CardImageOptimizer.getCacheStats();
-        console.log(`Card images loaded: ${stats.imagesLoaded}, Converting: ${stats.currentlyLoading}`);
-        
-        // Load remaining images in background after a delay
-        setTimeout(() => {
-          const remaining = cardImageNames.slice(5);
-          console.log(`Loading ${remaining.length} remaining card images in background...`);
-          remaining.forEach(name => CardImageOptimizer.lazyLoadImage(name));
-        }, 500);
+        console.log("Card images loaded for welcome screen");
       } catch (error) {
-        console.error("Error loading critical card images:", error);
+        console.error("Error loading card images:", error);
         // Still allow button to be clickable even if some images fail
         setCardsLoaded(true);
       }
     };
     
-    loadCriticalImages();
+    loadImages();
   }, [cardImageNames]);
 
   // Check username availability
