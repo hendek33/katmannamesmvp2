@@ -93,17 +93,41 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
                 : 'fadeInDown 0.6s ease-out forwards'
             }}
           >
-            <div className={cn(
-              "text-3xl md:text-4xl font-black tracking-wide",
-              team === "dark" ? "text-blue-400" : "text-red-400"
-            )}
-            style={{
-              textShadow: team === "dark" 
-                ? '0 2px 20px rgba(59,130,246,0.8)' 
-                : '0 2px 20px rgba(239,68,68,0.8)',
-            }}
-            >
-              {teamName} Takımının kahin ajanı seçildin, bütün kartları görebiliyorsun!
+            <div className="text-3xl md:text-4xl font-black tracking-wide">
+              <span 
+                className={cn(
+                  team === "dark" ? "text-blue-400" : "text-red-400"
+                )}
+                style={{
+                  textShadow: team === "dark" 
+                    ? '0 2px 20px rgba(59,130,246,0.8)' 
+                    : '0 2px 20px rgba(239,68,68,0.8)',
+                }}
+              >
+                {teamName} Takımının{' '}
+              </span>
+              <span 
+                className="text-purple-400 inline-block"
+                style={{
+                  textShadow: '0 0 25px rgba(168,85,247,0.9), 0 0 50px rgba(168,85,247,0.6), 0 2px 20px rgba(168,85,247,0.8)',
+                  animation: 'purpleGlow 2s ease-in-out infinite alternate',
+                  filter: 'brightness(1.2)',
+                }}
+              >
+                KAHİN AJANI
+              </span>
+              <span 
+                className={cn(
+                  team === "dark" ? "text-blue-400" : "text-red-400"
+                )}
+                style={{
+                  textShadow: team === "dark" 
+                    ? '0 2px 20px rgba(59,130,246,0.8)' 
+                    : '0 2px 20px rgba(239,68,68,0.8)',
+                }}
+              >
+                {' '}seçildin!
+              </span>
             </div>
             <div className="text-xl md:text-2xl font-bold text-orange-400 mt-3"
               style={{
@@ -227,6 +251,21 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
           to {
             opacity: 0;
             transform: translateY(-20px);
+          }
+        }
+        
+        @keyframes purpleGlow {
+          0% {
+            filter: brightness(1.2) saturate(1.2);
+            transform: scale(1);
+          }
+          50% {
+            filter: brightness(1.4) saturate(1.5);
+            transform: scale(1.05);
+          }
+          100% {
+            filter: brightness(1.2) saturate(1.2);
+            transform: scale(1);
           }
         }
       `}</style>
