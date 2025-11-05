@@ -32,27 +32,27 @@ export default function Welcome() {
   
   // Memoize props for HeroPhysicsCards to prevent re-initialization
   const cardImageNames = useMemo(() => [
-    "ali mavi.png",
-    "alik kırmızı.png",
-    "arda siyah.png",
-    "begüm kırmızı.png",
-    "blush beyaz.png",
-    "blush mavi.png",
-    "dobby kırmızı.png",
-    "hasan beyaz.png",
-    "hasan mavi.png",
-    "karaman kırmızı.png",
-    "kasım mavi.png",
-    "mami beyaz.png",
-    "mami mavi.png",
-    "neswin kırmızı.png",
-    "noeldayı kırmızı.png",
-    "noeldayı mavi.png",
-    "nuriben mavi.png",
-    "perver beyaz.png",
-    "çağrı mavi.png",
-    "çağrı normal beyaz.png",
-    "çağrı sigara beyaz.png"
+    "ali mavi.webp",
+    "alik kırmızı.webp",
+    "arda siyah.webp",
+    "begüm kırmızı.webp",
+    "blush beyaz.webp",
+    "blush mavi.webp",
+    "dobby kırmızı.webp",
+    "hasan beyaz.webp",
+    "hasan mavi.webp",
+    "karaman kırmızı.webp",
+    "kasım mavi.webp",
+    "mami beyaz.webp",
+    "mami mavi.webp",
+    "neswin kırmızı.webp",
+    "noeldayı kırmızı.webp",
+    "noeldayı mavi.webp",
+    "nuriben mavi.webp",
+    "perver beyaz.webp",
+    "çağrı mavi.webp",
+    "çağrı normal beyaz.webp",
+    "çağrı sigara beyaz.webp"
   ], []);
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
