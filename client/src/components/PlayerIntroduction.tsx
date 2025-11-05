@@ -60,8 +60,25 @@ export function PlayerIntroduction({
   }, [darkTeamPlayers.length, lightTeamPlayers.length]);
   
   const handlePlayerClick = (player: Player) => {
+    console.log('🔍 Player clicked:', {
+      playerName: player.username,
+      playerId: player.id,
+      isController,
+      playerIntroduced: player.introduced,
+      currentIntroducingPlayer,
+      currentPlayerTeam: currentPlayer?.team,
+      currentPlayerRole: currentPlayer?.role
+    });
+    
     if (isController && !player.introduced && !currentIntroducingPlayer) {
+      console.log('✅ Sending select_player_for_introduction for:', player.username);
       onSelectPlayer(player.id);
+    } else {
+      console.log('❌ Click ignored - conditions not met:', {
+        isController,
+        playerIntroduced: player.introduced,
+        hasCurrentIntroducingPlayer: !!currentIntroducingPlayer
+      });
     }
   };
   
