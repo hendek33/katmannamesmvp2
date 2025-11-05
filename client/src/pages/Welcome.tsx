@@ -8,6 +8,7 @@ import { Play, ChevronRight, ChevronUp, ChevronDown, ChevronLeft, Shield, Users,
 import HeroPhysicsCards from "@/components/HeroPhysicsCards";
 import { cn } from "@/lib/utils";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
+import { CardImageOptimizer } from "@/services/CardImageOptimizer";
 
 export default function Welcome() {
   const [, navigate] = useLocation();
@@ -57,29 +58,33 @@ export default function Welcome() {
   
   const canvasHeight = useMemo(() => window.innerHeight || 720, []);
   
-  // Track when all card images are loaded
+  // Track when critical card images are loaded (lazy load approach)
   useEffect(() => {
-    const loadImages = async () => {
+    const loadCriticalImages = async () => {
       try {
-        const imagePromises = cardImageNames.map(imageName => {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = `/acilmiskartgorselküçültülmüş/${imageName}`;
-          });
-        });
-        
-        await Promise.all(imagePromises);
+        // Only preload the first 5 images that will be visible
+        console.log("Starting lazy load for card images...");
+        await CardImageOptimizer.preloadCritical(cardImageNames);
         setCardsLoaded(true);
+        
+        // Log cache stats
+        const stats = CardImageOptimizer.getCacheStats();
+        console.log(`Card images loaded: ${stats.imagesLoaded}, Converting: ${stats.currentlyLoading}`);
+        
+        // Load remaining images in background after a delay
+        setTimeout(() => {
+          const remaining = cardImageNames.slice(5);
+          console.log(`Loading ${remaining.length} remaining card images in background...`);
+          remaining.forEach(name => CardImageOptimizer.lazyLoadImage(name));
+        }, 500);
       } catch (error) {
-        console.error("Error loading card images:", error);
+        console.error("Error loading critical card images:", error);
         // Still allow button to be clickable even if some images fail
         setCardsLoaded(true);
       }
     };
     
-    loadImages();
+    loadCriticalImages();
   }, [cardImageNames]);
 
   // Check username availability

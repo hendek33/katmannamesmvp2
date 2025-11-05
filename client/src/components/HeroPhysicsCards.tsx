@@ -1,4 +1,5 @@
 import { useEffect, useRef, memo } from "react";
+import { CardImageOptimizer } from "@/services/CardImageOptimizer";
 
 /**
  * HeroPhysicsCards
@@ -83,15 +84,34 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
 
     function buildPaths(names?: string[]) {
       const safe = Array.isArray(names) ? names : [];
-      // public altında olduğundan, runtime yolu "/acilmiskartgorselküçültülmüş/<name>"
-      return safe.map((n) => `/acilmiskartgorselküçültülmüş/${n}`);
+      // Use optimizer to get correct paths
+      return safe.map((n) => CardImageOptimizer.getOptimizedPath(n));
     }
 
-    function loadImages(paths: string[]) {
-      if (!paths || paths.length === 0) return Promise.resolve([] as HTMLImageElement[]);
-      return Promise.all(paths.map(src => new Promise<HTMLImageElement>((res, rej) => {
-        const im = new Image(); im.src = src; im.onload = () => res(im); im.onerror = rej;
-      })));
+    async function loadImages(imageNames: string[]) {
+      if (!imageNames || imageNames.length === 0) return Promise.resolve([] as HTMLImageElement[]);
+      
+      // Use lazy loading with priority
+      const visibleCount = Math.min(5, imageNames.length); // Only load first 5 images initially
+      const visible = imageNames.slice(0, visibleCount);
+      const rest = imageNames.slice(visibleCount);
+      
+      // Load visible images first
+      const visibleImages = await Promise.all(
+        visible.map(name => CardImageOptimizer.lazyLoadImage(name))
+      );
+      
+      // Load rest in background
+      if (rest.length > 0) {
+        setTimeout(() => {
+          rest.forEach(name => CardImageOptimizer.lazyLoadImage(name));
+        }, 100);
+      }
+      
+      // For now, return visible images and placeholders for the rest
+      const placeholders = rest.map(() => CardImageOptimizer.createPlaceholder());
+      
+      return [...visibleImages, ...placeholders];
     }
 
     function makePlaceholder(): HTMLImageElement {
@@ -318,8 +338,8 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
 
     (async () => {
       // Güvenli: imageNames undefined ise []
-      const paths = buildPaths(imageNames);
-      images = await loadImages(paths);
+      // Optimize image loading - use names directly
+      images = await loadImages(imageNames);
       resize();
       resetCards();
       raf = requestAnimationFrame(loop);

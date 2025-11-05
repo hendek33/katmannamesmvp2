@@ -14,11 +14,14 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
-### Video Performance Optimizations (November 5, 2025)
+### Performance Optimizations (November 5, 2025)
 - **Base64 Video Conversion**: Implemented VideoBase64Converter service to convert all videos to base64 format on app load
 - **Inline Video Playback**: Created TurnVideoInline component using useInlineVideo hook for stutter-free video playback
-- **Memory-Based Playback**: Videos are loaded into memory as base64 strings, eliminating network delays during playback
-- **Multiple Optimization Layers**: SimpleVideoOptimizer, VideoCache, and Base64Converter working together for maximum performance
+- **Memory-Based Video Playback**: Videos are loaded into memory as base64 strings, eliminating network delays during playback
+- **Card Image Optimization**: Implemented CardImageOptimizer service with lazy loading for card images
+- **Progressive Image Loading**: Only loads first 5 visible card images initially, rest loads in background
+- **Placeholder System**: Shows placeholder cards while images load asynchronously
+- **Multiple Optimization Layers**: SimpleVideoOptimizer, VideoCache, Base64Converter, and CardImageOptimizer working together
 
 ## System Architecture
 
