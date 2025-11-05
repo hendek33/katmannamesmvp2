@@ -4,6 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import { z } from "zod";
 import { storage } from "./storage";
 import type { GameState } from "@shared/schema";
+import { sanitizeUsername, sanitizePassword, sanitizeRoomCode, isXssSafe } from "./sanitize";
 import {
   createRoomSchema,
   joinRoomSchema,
@@ -154,11 +155,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           case "check_username": {
-            const username = payload.username;
-            if (!username || typeof username !== "string") {
+            const rawUsername = payload.username;
+            if (!rawUsername || typeof rawUsername !== "string") {
               sendToClient(ws, {
                 type: "username_availability",
-                payload: { available: false, username },
+                payload: { available: false, username: rawUsername },
+              });
+              return;
+            }
+            
+            // Sanitize username to prevent XSS
+            const username = sanitizeUsername(rawUsername);
+            
+            // Check if sanitization changed the username (potential XSS attempt)
+            if (username !== rawUsername || !isXssSafe(rawUsername)) {
+              sendToClient(ws, {
+                type: "username_availability",
+                payload: { 
+                  available: false, 
+                  username: rawUsername,
+                  message: "Kullanıcı adı geçersiz karakterler içeriyor" 
+                },
               });
               return;
             }
@@ -172,11 +189,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           case "reserve_username": {
-            const username = payload.username;
-            if (!username || typeof username !== "string") {
+            const rawUsername = payload.username;
+            if (!rawUsername || typeof rawUsername !== "string") {
               sendToClient(ws, {
                 type: "username_reserved",
-                payload: { success: false, username },
+                payload: { success: false, username: rawUsername },
+              });
+              return;
+            }
+            
+            // Sanitize username to prevent XSS
+            const username = sanitizeUsername(rawUsername);
+            
+            // Check if sanitization changed the username (potential XSS attempt)
+            if (username !== rawUsername || !isXssSafe(rawUsername)) {
+              sendToClient(ws, {
+                type: "username_reserved",
+                payload: { 
+                  success: false, 
+                  username: rawUsername,
+                  message: "Kullanıcı adı geçersiz karakterler içeriyor" 
+                },
               });
               return;
             }
@@ -202,14 +235,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           
           case "change_username": {
-            const { newUsername } = payload;
-            if (!newUsername || typeof newUsername !== "string" || !ws.playerId || !ws.roomCode) {
+            const { newUsername: rawNewUsername } = payload;
+            if (!rawNewUsername || typeof rawNewUsername !== "string" || !ws.playerId || !ws.roomCode) {
               sendToClient(ws, { 
                 type: "username_changed", 
                 payload: { 
                   success: false, 
                   message: "Geçersiz veri veya oturum" 
                 } 
+              });
+              return;
+            }
+            
+            // Sanitize username to prevent XSS
+            const newUsername = sanitizeUsername(rawNewUsername);
+            
+            // Check if sanitization changed the username (potential XSS attempt)
+            if (newUsername !== rawNewUsername || !isXssSafe(rawNewUsername)) {
+              sendToClient(ws, {
+                type: "username_changed",
+                payload: { 
+                  success: false,
+                  message: "Kullanıcı adı geçersiz karakterler içeriyor"
+                }
               });
               return;
             }
@@ -275,9 +323,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            // Sanitize inputs to prevent XSS
+            const sanitizedUsername = sanitizeUsername(validation.data.username);
+            const sanitizedPassword = validation.data.password ? sanitizePassword(validation.data.password) : undefined;
+            
+            // Check if sanitization changed the inputs (potential XSS attempt)
+            if (sanitizedUsername !== validation.data.username || !isXssSafe(validation.data.username)) {
+              sendToClient(ws, { 
+                type: "error", 
+                payload: { 
+                  message: "Kullanıcı adı geçersiz karakterler içeriyor",
+                  code: "INVALID_USERNAME" 
+                } 
+              });
+              return;
+            }
+            
+            if (validation.data.password && sanitizedPassword !== validation.data.password) {
+              sendToClient(ws, { 
+                type: "error", 
+                payload: { 
+                  message: "Şifre geçersiz karakterler içeriyor",
+                  code: "INVALID_PASSWORD" 
+                } 
+              });
+              return;
+            }
+
             const result = storage.createRoom(
-              validation.data.username,
-              validation.data.password
+              sanitizedUsername,
+              sanitizedPassword
             );
             
             if (!result) {
@@ -315,10 +390,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
+            // Sanitize inputs to prevent XSS
+            const sanitizedRoomCode = sanitizeRoomCode(validation.data.roomCode);
+            const sanitizedUsername = sanitizeUsername(validation.data.username);
+            const sanitizedPassword = validation.data.password ? sanitizePassword(validation.data.password) : undefined;
+            
+            // Check if sanitization changed the inputs (potential XSS attempt)
+            if (sanitizedUsername !== validation.data.username || !isXssSafe(validation.data.username)) {
+              sendToClient(ws, { 
+                type: "error", 
+                payload: { 
+                  message: "Kullanıcı adı geçersiz karakterler içeriyor",
+                  code: "INVALID_USERNAME" 
+                } 
+              });
+              return;
+            }
+            
+            if (validation.data.password && sanitizedPassword !== validation.data.password) {
+              sendToClient(ws, { 
+                type: "error", 
+                payload: { 
+                  message: "Şifre geçersiz karakterler içeriyor",
+                  code: "INVALID_PASSWORD" 
+                } 
+              });
+              return;
+            }
+
             const result = storage.joinRoom(
-              validation.data.roomCode, 
-              validation.data.username,
-              validation.data.password,
+              sanitizedRoomCode, 
+              sanitizedUsername,
+              sanitizedPassword,
               validation.data.playerId
             );
             if (!result) {
@@ -654,7 +757,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            const gameState = storage.updatePassword(ws.roomCode, payload.password);
+            // Sanitize password to prevent XSS
+            const sanitizedPassword = payload.password ? sanitizePassword(payload.password) : undefined;
+            
+            // Check if sanitization changed the password (potential XSS attempt)
+            if (payload.password && sanitizedPassword !== payload.password) {
+              sendToClient(ws, { 
+                type: "error", 
+                payload: { 
+                  message: "Şifre geçersiz karakterler içeriyor",
+                  code: "INVALID_PASSWORD" 
+                } 
+              });
+              return;
+            }
+
+            const gameState = storage.updatePassword(ws.roomCode, sanitizedPassword || null);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Şifre güncellenemedi" } });
               return;
