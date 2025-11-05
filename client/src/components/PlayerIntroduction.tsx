@@ -335,111 +335,155 @@ export function PlayerIntroduction({
             ) : (
               /* Active Introduction View */
               <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+                initial={{ scale: 0.8, opacity: 0, y: 50 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
                 className="w-full"
               >
                 <Card className="bg-slate-900/60 backdrop-blur-xl border-2 border-white/10 shadow-2xl">
-                  <div className="p-12">
+                  <div className="p-8">
                     {/* Introducing Player Info */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-6">
                       <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
-                        transition={{ repeat: Infinity, duration: 2 }}
-                        className="inline-block"
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
                       >
-                        <div className={`
-                          w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center
-                          ${introducingPlayer?.team === "dark" ? 'bg-blue-600/50' : 'bg-red-600/50'}
-                        `}>
-                          <UserCircle className="w-16 h-16 text-white/80" />
-                        </div>
+                        <motion.div
+                          animate={{ scale: [1, 1.05, 1] }}
+                          transition={{ repeat: Infinity, duration: 2 }}
+                          className="inline-block"
+                        >
+                          <div className={`
+                            w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center
+                            ${introducingPlayer?.team === "dark" ? 'bg-blue-600/50' : 'bg-red-600/50'}
+                          `}>
+                            <UserCircle className="w-14 h-14 text-white/80" />
+                          </div>
+                        </motion.div>
                       </motion.div>
                       
-                      <h2 className="text-5xl font-black mb-2">
+                      <motion.h2 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-4xl font-black mb-2"
+                      >
                         <span className={`${introducingPlayer?.team === "dark" ? 'text-blue-400' : 'text-red-400'}`}>
                           {introducingPlayer?.username}
                         </span>
-                      </h2>
+                      </motion.h2>
                       
                       <motion.div
+                        initial={{ opacity: 0 }}
                         animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ repeat: Infinity, duration: 1.5 }}
-                        className="text-xl text-white/70"
+                        transition={{ repeat: Infinity, duration: 1.5, delay: 0.3 }}
+                        className="text-lg text-white/70"
                       >
                         kendini tanıtıyor...
                       </motion.div>
                       
-                      <Badge className={`mt-4 text-lg px-4 py-2 ${
-                        introducingPlayer?.team === "dark" 
-                          ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                          : 'bg-red-600/30 text-red-300 border-red-500/50'
-                      }`}>
-                        {introducingPlayer?.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                        {introducingPlayer?.role === "spymaster" && " - İstihbarat Şefi"}
-                      </Badge>
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        <Badge className={`mt-3 text-base px-3 py-1.5 ${
+                          introducingPlayer?.team === "dark" 
+                            ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                            : 'bg-red-600/30 text-red-300 border-red-500/50'
+                        }`}>
+                          {introducingPlayer?.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                          {introducingPlayer?.role === "spymaster" && " - İstihbarat Şefi"}
+                        </Badge>
+                      </motion.div>
                     </div>
                     
                     {/* Voting Stats */}
-                    <div className="grid grid-cols-2 gap-8 mb-8">
+                    <div className="grid grid-cols-2 gap-6 mb-6">
                       {/* Likes */}
-                      <Card className="bg-green-600/10 border-green-500/30 backdrop-blur-sm p-6">
-                        <div className="flex items-center justify-center mb-4">
-                          <ThumbsUp className="w-10 h-10 text-green-400 mr-3" />
-                          <span className="text-4xl font-bold text-green-400">{likes.length}</span>
-                        </div>
-                        <div className="space-y-2 max-h-32 overflow-y-auto">
-                          {likes.map((like, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ x: -20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 1 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-center justify-center"
-                            >
-                              <Badge className={`${
-                                like.team === "dark" 
-                                  ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                                  : 'bg-red-600/30 text-red-300 border-red-500/50'
-                              }`}>
-                                <Heart className="w-3 h-3 mr-1" />
-                                {like.username}
-                              </Badge>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </Card>
+                      <motion.div
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <Card className="bg-green-600/10 border-green-500/30 backdrop-blur-sm p-4">
+                          <div className="flex items-center justify-center mb-3">
+                            <ThumbsUp className="w-8 h-8 text-green-400 mr-2" />
+                            <span className="text-3xl font-bold text-green-400">{likes.length}</span>
+                          </div>
+                          <div className="flex flex-wrap justify-center gap-1.5 min-h-[40px]">
+                            {likes.map((like, index) => (
+                              <motion.div
+                                key={index}
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ 
+                                  type: "spring",
+                                  stiffness: 200,
+                                  damping: 12,
+                                  delay: 0.6 + index * 0.1 
+                                }}
+                              >
+                                <Badge className={`text-xs ${
+                                  like.team === "dark" 
+                                    ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                                    : 'bg-red-600/30 text-red-300 border-red-500/50'
+                                }`}>
+                                  <Heart className="w-2.5 h-2.5 mr-1" />
+                                  {like.username}
+                                </Badge>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </Card>
+                      </motion.div>
                       
                       {/* Dislikes */}
-                      <Card className="bg-red-600/10 border-red-500/30 backdrop-blur-sm p-6">
-                        <div className="flex items-center justify-center mb-4">
-                          <ThumbsDown className="w-10 h-10 text-red-400 mr-3" />
-                          <span className="text-4xl font-bold text-red-400">{dislikes.length}</span>
-                        </div>
-                        <div className="space-y-2 max-h-32 overflow-y-auto">
-                          {dislikes.map((dislike, index) => (
-                            <motion.div
-                              key={index}
-                              initial={{ x: 20, opacity: 0 }}
-                              animate={{ x: 0, opacity: 1 }}
-                              transition={{ delay: index * 0.1 }}
-                              className="flex items-center justify-center"
-                            >
-                              <Badge className={`${
-                                dislike.team === "dark" 
-                                  ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                                  : 'bg-red-600/30 text-red-300 border-red-500/50'
-                              }`}>
-                                {dislike.username}
-                              </Badge>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </Card>
+                      <motion.div
+                        initial={{ x: 50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <Card className="bg-red-600/10 border-red-500/30 backdrop-blur-sm p-4">
+                          <div className="flex items-center justify-center mb-3">
+                            <ThumbsDown className="w-8 h-8 text-red-400 mr-2" />
+                            <span className="text-3xl font-bold text-red-400">{dislikes.length}</span>
+                          </div>
+                          <div className="flex flex-wrap justify-center gap-1.5 min-h-[40px]">
+                            {dislikes.map((dislike, index) => (
+                              <motion.div
+                                key={index}
+                                initial={{ scale: 0, rotate: 180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ 
+                                  type: "spring",
+                                  stiffness: 200,
+                                  damping: 12,
+                                  delay: 0.6 + index * 0.1 
+                                }}
+                              >
+                                <Badge className={`text-xs ${
+                                  dislike.team === "dark" 
+                                    ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                                    : 'bg-red-600/30 text-red-300 border-red-500/50'
+                                }`}>
+                                  {dislike.username}
+                                </Badge>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </Card>
+                      </motion.div>
                     </div>
                     
                     {/* Action Buttons */}
-                    <div className="flex justify-center gap-4">
+                    <motion.div 
+                      initial={{ y: 30, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.7 }}
+                      className="flex justify-center gap-4"
+                    >
                       {/* Voting buttons for non-introducing players */}
                       {playerId !== currentIntroducingPlayer && !hasVoted && (
                         <>
@@ -466,7 +510,7 @@ export function PlayerIntroduction({
                       
                       {/* Already voted indicator */}
                       {hasVoted && playerId !== currentIntroducingPlayer && (
-                        <Badge className="text-lg px-6 py-3 bg-slate-700/50 text-white/70">
+                        <Badge className="text-base px-4 py-2 bg-slate-700/50 text-white/70">
                           Oyunu Kullandın ✓
                         </Badge>
                       )}
@@ -484,7 +528,7 @@ export function PlayerIntroduction({
                           <ChevronRight className="w-5 h-5 ml-2" />
                         </Button>
                       )}
-                    </div>
+                    </motion.div>
                   </div>
                 </Card>
               </motion.div>
