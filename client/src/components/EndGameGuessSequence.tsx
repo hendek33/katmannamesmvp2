@@ -61,7 +61,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
               opacity: 0,
             }}
           >
-            <span className="text-purple-400">KAHİN TAHMİNİ YAPILDI!</span>
+            <span className="text-purple-400">KAHİN TAHMİNİ</span>
           </div>
         )}
         
