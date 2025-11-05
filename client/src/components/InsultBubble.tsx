@@ -38,8 +38,8 @@ export function InsultBubble({ senderUsername, senderTeam, targetUsername, targe
     };
   }, []); // Empty dependency array - run only once on mount
 
-  // Determine position based on team
-  const isLeftSide = senderTeam === 'dark';
+  // Determine position based on team (red/light is now on left, blue/dark is on right)
+  const isLeftSide = senderTeam === 'light';
 
   return (
     <div 

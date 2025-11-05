@@ -39,8 +39,8 @@ export function TauntBubble({ senderUsername, senderTeam, videoSrc }: TauntBubbl
     return () => clearTimeout(fadeOutTimer);
   }, []);
 
-  // Determine position based on team
-  const isLeftSide = senderTeam === 'dark';
+  // Determine position based on team (red/light is now on left, blue/dark is on right)
+  const isLeftSide = senderTeam === 'light';
 
   // Don't show until video is loaded
   if (!isVideoLoaded) {
