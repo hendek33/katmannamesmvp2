@@ -1543,13 +1543,13 @@ export default function Game() {
 
         {/* Main Game Area */}
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(250px,20vw)_1fr_minmax(250px,20vw)] xl:grid-cols-[minmax(280px,18vw)_1fr_minmax(280px,18vw)] 2xl:grid-cols-[minmax(320px,16vw)_1fr_minmax(320px,16vw)] gap-2 flex-1 min-h-0">
-          {/* Left Side - Dark Team */}
+          {/* Left Side - Light Team (Red) */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
-              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:rotate-1"
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:-rotate-1"
               style={{
-                backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.webp')`,
+                backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.7), rgba(127, 29, 29, 0.7)), url('/kırmızı takım.webp')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 transformStyle: 'preserve-3d',
@@ -1558,24 +1558,24 @@ export default function Game() {
             >
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
-                  <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                  <h3 className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
+                  <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-red-600 animate-pulse" />
+                  <h3 className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
-                    {gameState.darkCardsRemaining}
+                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-red-100 group-hover:scale-110 transition-transform">
+                    {gameState.lightCardsRemaining}
                   </div>
-                  <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
+                  <div className="absolute inset-0 blur-2xl bg-red-600/20 group-hover:bg-red-600/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-red-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Player List - Separated by Role */}
-                <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-1">
+                <div className="mt-2 pt-2 border-t border-red-700/30 space-y-1">
                   {/* Spymaster */}
-                  {darkPlayers.filter(p => p.role === "spymaster").length > 0 && (
+                  {lightPlayers.filter(p => p.role === "spymaster").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
-                      {darkPlayers.filter(p => p.role === "spymaster").map(player => (
+                      {lightPlayers.filter(p => p.role === "spymaster").map(player => (
                         <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
@@ -1587,12 +1587,12 @@ export default function Game() {
                     </div>
                   )}
                   {/* Guessers */}
-                  {darkPlayers.filter(p => p.role === "guesser").length > 0 && (
+                  {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
-                      {darkPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm 2xl:text-base flex items-center gap-1">
+                      {lightPlayers.filter(p => p.role === "guesser").map(player => (
+                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm 2xl:text-base flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
-                          <span className={player.id === playerId ? "font-bold text-blue-100" : "text-blue-200"}>
+                          <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
                             {player.username}
                           </span>
                         </div>
@@ -2059,13 +2059,13 @@ export default function Game() {
 
           </div>
 
-          {/* Right Side - Light Team */}
+          {/* Right Side - Dark Team (Blue) */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
-              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-red-800/50 hover:shadow-red-600/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:-rotate-1"
+              className="p-1 lg:p-2 xl:p-3 border-2 shadow-2xl border-blue-700/50 hover:shadow-blue-500/30 transition-all group relative overflow-visible cursor-pointer transform hover:scale-105 hover:rotate-1"
               style={{
-                backgroundImage: `linear-gradient(to bottom right, rgba(127, 29, 29, 0.7), rgba(127, 29, 29, 0.7)), url('/kırmızı takım.webp')`,
+                backgroundImage: `linear-gradient(to bottom right, rgba(23, 37, 84, 0.7), rgba(30, 58, 138, 0.7)), url('/mavi takım.webp')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 transformStyle: 'preserve-3d',
@@ -2074,24 +2074,24 @@ export default function Game() {
             >
               <div className="text-center space-y-0.5 lg:space-y-1 relative z-10">
                 <div className="flex items-center justify-center gap-0.5 lg:gap-1">
-                  <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-red-600 animate-pulse" />
-                  <h3 className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base font-bold text-red-100 uppercase tracking-wider">{gameState.lightTeamName}</h3>
+                  <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                  <h3 className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base font-bold text-blue-100 uppercase tracking-wider">{gameState.darkTeamName}</h3>
                 </div>
                 <div className="relative">
-                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-red-100 group-hover:scale-110 transition-transform">
-                    {gameState.lightCardsRemaining}
+                  <div className="text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-black text-blue-100 group-hover:scale-110 transition-transform">
+                    {gameState.darkCardsRemaining}
                   </div>
-                  <div className="absolute inset-0 blur-2xl bg-red-600/20 group-hover:bg-red-600/40 transition-all" />
+                  <div className="absolute inset-0 blur-2xl bg-blue-500/20 group-hover:bg-blue-500/40 transition-all" />
                 </div>
                 <div className="space-y-0.5">
-                  <p className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-red-200/80 font-semibold uppercase">Kalan Kart</p>
+                  <p className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
                 </div>
                 {/* Player List - Separated by Role */}
-                <div className="mt-2 pt-2 border-t border-red-700/30 space-y-1">
+                <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-1">
                   {/* Spymaster */}
-                  {lightPlayers.filter(p => p.role === "spymaster").length > 0 && (
+                  {darkPlayers.filter(p => p.role === "spymaster").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
-                      {lightPlayers.filter(p => p.role === "spymaster").map(player => (
+                      {darkPlayers.filter(p => p.role === "spymaster").map(player => (
                         <div key={player.id} className="bg-black/60 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-amber-300 flex items-center gap-1">
                           <Eye className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-amber-400" />
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
@@ -2103,12 +2103,12 @@ export default function Game() {
                     </div>
                   )}
                   {/* Guessers */}
-                  {lightPlayers.filter(p => p.role === "guesser").length > 0 && (
+                  {darkPlayers.filter(p => p.role === "guesser").length > 0 && (
                     <div className="flex flex-wrap justify-center gap-1">
-                      {lightPlayers.filter(p => p.role === "guesser").map(player => (
-                        <div key={player.id} className="bg-red-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm 2xl:text-base flex items-center gap-1">
+                      {darkPlayers.filter(p => p.role === "guesser").map(player => (
+                        <div key={player.id} className="bg-blue-950/80 backdrop-blur-sm rounded px-1 py-0.5 text-[10px] lg:text-xs xl:text-sm 2xl:text-base flex items-center gap-1">
                           {player.isRoomOwner && <Crown className="w-2.5 h-2.5 lg:w-3 lg:h-3 text-yellow-500" />}
-                          <span className={player.id === playerId ? "font-bold text-red-100" : "text-red-200"}>
+                          <span className={player.id === playerId ? "font-bold text-blue-100" : "text-blue-200"}>
                             {player.username}
                           </span>
                         </div>
