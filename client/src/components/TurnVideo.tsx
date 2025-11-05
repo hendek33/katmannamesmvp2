@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { videoOptimizer } from "@/services/SimpleVideoOptimizer";
 
 interface TurnVideoProps {
   team: "dark" | "light";
@@ -24,21 +25,23 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
     
     const video = videoRef.current;
     
+    // Apply optimized attributes
+    videoOptimizer.getOptimizedAttributes(video);
+    
     // Reset video for new playback
     video.currentTime = 0;
     setVideoReady(false);
     
-    const handleLoadedData = () => {
+    const handleLoadedData = async () => {
       // Video data is loaded and ready to play
-      video.play()
-        .then(() => {
-          setVideoReady(true);
-        })
-        .catch(err => {
-          console.error('Video play error:', err);
-          // If play fails, still show the overlay
-          setVideoReady(true);
-        });
+      try {
+        await videoOptimizer.playVideoSafely(video);
+        setVideoReady(true);
+      } catch (err) {
+        console.error('Video play error:', err);
+        // If play fails, still show the overlay
+        setVideoReady(true);
+      }
     };
     
     const handleVideoEnd = () => {
@@ -53,14 +56,14 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
     video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('ended', handleVideoEnd);
     
-    // Load the video
+    // Force load the video
     video.load();
     
-    // Emergency timeout (5 seconds) in case video never loads
+    // Emergency timeout (3 seconds) in case video never loads
     emergencyTimeoutRef.current = setTimeout(() => {
       console.warn('Emergency timeout triggered for turn video');
       handleVideoEnd();
-    }, 5000);
+    }, 3000);
 
     return () => {
       if (emergencyTimeoutRef.current) {

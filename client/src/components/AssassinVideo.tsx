@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { videoOptimizer } from "@/services/SimpleVideoOptimizer";
 
 interface AssassinVideoProps {
   winnerTeam: "dark" | "light";
@@ -20,14 +21,24 @@ export function AssassinVideo({ winnerTeam, winnerTeamName, loserTeamName, onCom
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Simple play logic
-    if (videoRef.current) {
-      videoRef.current.play().catch(err => {
+    // Optimized play logic
+    const playVideo = async () => {
+      if (!videoRef.current) return;
+      
+      const video = videoRef.current;
+      // Apply optimized attributes
+      videoOptimizer.getOptimizedAttributes(video);
+      
+      try {
+        await videoOptimizer.playVideoSafely(video);
+      } catch (err) {
         console.error('Assassin video play error:', err);
         // If video fails, still show winner
         handleVideoEnd();
-      });
-    }
+      }
+    };
+    
+    playVideo();
     
     return () => {
       if (videoRef.current) {

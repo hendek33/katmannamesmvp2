@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { videoCache } from "@/services/VideoCache";
 import { enhancedVideoCache } from "@/services/EnhancedVideoCache";
+import { videoOptimizer } from "@/services/SimpleVideoOptimizer";
 import { VideoPreloader } from "@/components/VideoPreloader";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
@@ -33,6 +34,11 @@ function App() {
     // Preload all videos when app starts
     videoCache.preloadAllVideos();
     
+    // Also use simple optimizer for better playback
+    videoOptimizer.preloadAllVideos().catch(err => {
+      console.error('Simple video optimizer preloading failed:', err);
+    });
+    
     // TEMPORARILY DISABLED: Enhanced video cache is causing loading issues
     // enhancedVideoCache.preloadAllVideos().catch(err => {
     //   console.error('Enhanced video preloading failed:', err);
@@ -41,6 +47,7 @@ function App() {
     // Cleanup on unmount
     return () => {
       videoCache.dispose();
+      videoOptimizer.dispose();
       // enhancedVideoCache.dispose();
     };
   }, []);
