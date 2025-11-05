@@ -15,8 +15,8 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
   const emergencyTimeoutRef = useRef<NodeJS.Timeout>();
 
   const videoSrc = team === "dark" 
-    ? "/kahin bilgilendirme mavi.mp4"
-    : "/kahin bilgilendirme kırmızı.mp4";
+    ? "/kahin bilgilendirme mavi.webm"
+    : "/kahin bilgilendirme kırmızı.webm";
 
   useEffect(() => {
     if (!videoRef.current) return;
