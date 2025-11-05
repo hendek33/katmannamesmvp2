@@ -6,7 +6,7 @@ import { GameCard } from "@/components/GameCard";
 import { GameStatus } from "@/components/GameStatus";
 import { ClueDisplay } from "@/components/ClueDisplay";
 import { PlayerList } from "@/components/PlayerList";
-import { TurnVideo } from "@/components/TurnVideo";
+import { TurnVideoInline } from "@/components/TurnVideoInline";
 import { AssassinVideo } from "@/components/AssassinVideo";
 import { ProphetVideo } from "@/components/ProphetVideo";
 import { NormalWinVideo } from "@/components/NormalWinVideo";
@@ -622,9 +622,9 @@ export default function Game() {
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
       
-      {/* Turn Change Video */}
+      {/* Turn Change Video - Using inline base64 for no stuttering */}
       {showTurnVideo && currentTurn && gameState && (
-        <TurnVideo
+        <TurnVideoInline
           team={currentTurn}
           teamName={currentTurn === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
           isGameStart={isGameStart}
@@ -633,7 +633,7 @@ export default function Game() {
       )}
 
       {/* Prophet Information Video */}
-      {showProphetVideo && currentPlayer && gameState && (
+      {showProphetVideo && currentPlayer && currentPlayer.team && gameState && (
         <ProphetVideo
           team={currentPlayer.team}
           teamName={currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}

@@ -12,6 +12,14 @@ Ask before making major changes.
 Do not make changes to folder `shared/`.
 Do not make changes to file `server/words.ts`.
 
+## Recent Updates
+
+### Video Performance Optimizations (November 5, 2025)
+- **Base64 Video Conversion**: Implemented VideoBase64Converter service to convert all videos to base64 format on app load
+- **Inline Video Playback**: Created TurnVideoInline component using useInlineVideo hook for stutter-free video playback
+- **Memory-Based Playback**: Videos are loaded into memory as base64 strings, eliminating network delays during playback
+- **Multiple Optimization Layers**: SimpleVideoOptimizer, VideoCache, and Base64Converter working together for maximum performance
+
 ## System Architecture
 
 ### UI/UX Decisions

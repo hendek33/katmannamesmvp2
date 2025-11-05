@@ -8,6 +8,7 @@ import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { videoCache } from "@/services/VideoCache";
 import { enhancedVideoCache } from "@/services/EnhancedVideoCache";
 import { videoOptimizer } from "@/services/SimpleVideoOptimizer";
+import { VideoBase64Converter } from "@/services/VideoBase64Converter";
 import { VideoPreloader } from "@/components/VideoPreloader";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
@@ -34,6 +35,15 @@ function App() {
     // Preload all videos when app starts
     videoCache.preloadAllVideos();
     
+    // Convert videos to base64 for inline playback - this prevents stuttering
+    VideoBase64Converter.preloadAllAsBase64()
+      .then(() => {
+        console.log('✅ All videos converted to base64 - no more network delays!');
+      })
+      .catch(err => {
+        console.error('Base64 conversion failed, falling back to normal loading:', err);
+      });
+    
     // Also use simple optimizer for better playback
     videoOptimizer.preloadAllVideos().catch(err => {
       console.error('Simple video optimizer preloading failed:', err);
@@ -48,6 +58,7 @@ function App() {
     return () => {
       videoCache.dispose();
       videoOptimizer.dispose();
+      VideoBase64Converter.clearCache();
       // enhancedVideoCache.dispose();
     };
   }, []);
