@@ -41,11 +41,14 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
     };
     
     const handleVideoEnd = () => {
-      setIsClosing(true);
+      // Wait 1 second after video ends before closing
       setTimeout(() => {
-        setShow(false);
-        onComplete?.();
-      }, 500);
+        setIsClosing(true);
+        setTimeout(() => {
+          setShow(false);
+          onComplete?.();
+        }, 500);
+      }, 1000);
     };
     
     // Add event listeners
