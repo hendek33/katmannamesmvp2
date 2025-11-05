@@ -133,6 +133,13 @@ export function useWebSocket() {
                   setCardImages(message.payload.cardImages);
                 }
                 break;
+
+              // Introduction phase handlers
+              case "player_introducing":
+              case "introduction_finished":
+              case "introduction_liked":
+                setGameState(message.payload.gameState);
+                break;
                 
               case "card_revealed":
                 setGameState(message.payload.gameState);

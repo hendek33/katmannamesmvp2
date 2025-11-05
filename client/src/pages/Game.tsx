@@ -15,6 +15,7 @@ import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
 import { EndGameVoting } from "@/components/EndGameVoting";
 import { EndGameGuessSequence } from "@/components/EndGameGuessSequence";
+import { PlayerIntroduction } from "@/components/PlayerIntroduction";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -577,6 +578,37 @@ export default function Game() {
 
   if (gameState.phase === "lobby") {
     return <Lobby />;
+  }
+
+  // Introduction phase handlers
+  const handleSelectPlayerForIntroduction = (targetPlayerId: string) => {
+    send("select_player_for_introduction", { playerId: targetPlayerId });
+  };
+
+  const handleFinishIntroduction = (targetPlayerId: string) => {
+    send("finish_introduction", { playerId: targetPlayerId });
+  };
+
+  const handleLikeDislike = (targetPlayerId: string, isLike: boolean) => {
+    send("like_introduction", { targetPlayerId, isLike });
+  };
+
+  const handleSkipIntroduction = () => {
+    send("skip_introduction", {});
+  };
+
+  // Render introduction phase
+  if (gameState.phase === "introduction") {
+    return (
+      <PlayerIntroduction
+        gameState={gameState}
+        playerId={playerId}
+        onSelectPlayer={handleSelectPlayerForIntroduction}
+        onFinishIntroduction={handleFinishIntroduction}
+        onLikeDislike={handleLikeDislike}
+        onSkipIntroduction={handleSkipIntroduction}
+      />
+    );
   }
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
