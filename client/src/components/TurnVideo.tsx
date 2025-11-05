@@ -42,14 +42,11 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
     };
     
     const handleVideoEnd = () => {
-      // Wait 1 second after video ends before closing
+      setIsClosing(true);
       setTimeout(() => {
-        setIsClosing(true);
-        setTimeout(() => {
-          setShow(false);
-          onComplete?.();
-        }, 500);
-      }, 1000);
+        setShow(false);
+        onComplete?.();
+      }, 500);
     };
     
     // Add event listeners
@@ -59,11 +56,11 @@ export function TurnVideo({ team, teamName, isGameStart, onComplete }: TurnVideo
     // Load the video
     video.load();
     
-    // Emergency timeout (10 seconds) in case video never loads
+    // Emergency timeout (5 seconds) in case video never loads
     emergencyTimeoutRef.current = setTimeout(() => {
       console.warn('Emergency timeout triggered for turn video');
       handleVideoEnd();
-    }, 10000);
+    }, 5000);
 
     return () => {
       if (emergencyTimeoutRef.current) {

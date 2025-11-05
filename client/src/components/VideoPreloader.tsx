@@ -12,7 +12,13 @@ export function VideoPreloader() {
     ];
 
     const preloadVideo = (src: string) => {
-      // Video elementini oluştur ve yükle - link preload kaldırıldı çünkü 'video' desteklenmiyor
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'video';
+      link.href = src;
+      document.head.appendChild(link);
+      
+      // Video elementini oluştur ve yükle
       const video = document.createElement('video');
       video.src = src;
       video.preload = 'auto';

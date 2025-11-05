@@ -151,33 +151,33 @@ export default function Game() {
   useEffect(() => {
     const allCardImages = [
       // Dark/Blue team cards
-      '/acilmiskartgorselküçültülmüş/ali mavi.png',
-      '/acilmiskartgorselküçültülmüş/blush mavi.png',
-      '/acilmiskartgorselküçültülmüş/hasan mavi.png',
-      '/acilmiskartgorselküçültülmüş/kasım mavi.png',
-      '/acilmiskartgorselküçültülmüş/mami mavi.png',
-      '/acilmiskartgorselküçültülmüş/noeldayı mavi.png',
-      '/acilmiskartgorselküçültülmüş/nuriben mavi.png',
-      '/acilmiskartgorselküçültülmüş/çağrı mavi.png',
-      '/acilmiskartgorselküçültülmüş/şinasi mavi.png',
+      '/acilmiskartgorsel/ali mavi.png',
+      '/acilmiskartgorsel/blush mavi.png',
+      '/acilmiskartgorsel/hasan mavi.png',
+      '/acilmiskartgorsel/kasım mavi.png',
+      '/acilmiskartgorsel/mami mavi.png',
+      '/acilmiskartgorsel/noeldayı mavi.png',
+      '/acilmiskartgorsel/nuriben mavi.png',
+      '/acilmiskartgorsel/çağrı mavi.png',
+      '/acilmiskartgorsel/şinasi mavi.png',
       // Light/Red team cards
-      '/acilmiskartgorselküçültülmüş/alik kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/begüm kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/dobby kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/karaman kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/neswin kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/noeldayı kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/perver kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/triel kırmızı.png',
-      '/acilmiskartgorselküçültülmüş/şinasi kırmızı.png',
+      '/acilmiskartgorsel/alik kırmızı.png',
+      '/acilmiskartgorsel/begüm kırmızı.png',
+      '/acilmiskartgorsel/dobby kırmızı.png',
+      '/acilmiskartgorsel/karaman kırmızı.png',
+      '/acilmiskartgorsel/neswin kırmızı.png',
+      '/acilmiskartgorsel/noeldayı kırmızı.png',
+      '/acilmiskartgorsel/perver kırmızı.png',
+      '/acilmiskartgorsel/triel kırmızı.png',
+      '/acilmiskartgorsel/şinasi kırmızı.png',
       // Neutral cards
-      '/acilmiskartgorselküçültülmüş/blush beyaz.png',
-      '/acilmiskartgorselküçültülmüş/hasan beyaz.png',
-      '/acilmiskartgorselküçültülmüş/mami beyaz.png',
-      '/acilmiskartgorselküçültülmüş/perver beyaz.png',
-      '/acilmiskartgorselküçültülmüş/çağrı normal beyaz.png',
-      '/acilmiskartgorselküçültülmüş/çağrı sigara beyaz.png',
-      '/acilmiskartgorselküçültülmüş/şinasi su beyaz.png',
+      '/acilmiskartgorsel/blush beyaz.png',
+      '/acilmiskartgorsel/hasan beyaz.png',
+      '/acilmiskartgorsel/mami beyaz.png',
+      '/acilmiskartgorsel/perver beyaz.png',
+      '/acilmiskartgorsel/çağrı normal beyaz.png',
+      '/acilmiskartgorsel/çağrı sigara beyaz.png',
+      '/acilmiskartgorsel/şinasi su beyaz.png',
       // Assassin card
       '/ajan siyah.png'
     ];
@@ -633,7 +633,7 @@ export default function Game() {
       )}
 
       {/* Prophet Information Video */}
-      {showProphetVideo && currentPlayer && currentPlayer.team && gameState && (
+      {showProphetVideo && currentPlayer && gameState && (
         <ProphetVideo
           team={currentPlayer.team}
           teamName={currentPlayer.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
