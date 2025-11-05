@@ -309,17 +309,17 @@ export function PlayerList({
       )}
 
         <TeamSection 
-          team="dark"
-          title={darkTeamName}
-          players={darkTeam}
-          gradient="bg-gradient-to-r from-blue-600 to-blue-400"
-        />
-        
-        <TeamSection 
           team="light"
           title={lightTeamName}
           players={lightTeam}
           gradient="bg-gradient-to-r from-red-600 to-red-400"
+        />
+        
+        <TeamSection 
+          team="dark"
+          title={darkTeamName}
+          players={darkTeam}
+          gradient="bg-gradient-to-r from-blue-600 to-blue-400"
         />
       </div>
     </div>
