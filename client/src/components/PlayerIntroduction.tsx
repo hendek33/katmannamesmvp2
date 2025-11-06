@@ -689,15 +689,35 @@ export function PlayerIntroduction({
                 </div>
               </div>
               
-              {/* Voting Stats */}
+              {/* Voting Stats - Clickable Cards */}
               <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
-                {/* Likes */}
-                <div className="relative bg-green-900/30 border border-green-500/50 rounded-lg p-4">
+                {/* Likes - Clickable Card */}
+                <motion.div
+                  className={`relative bg-green-900/30 border-2 border-green-500/50 rounded-lg p-4 
+                    ${!hasVoted && playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-green-900/40 hover:border-green-500/70' : ''}`}
+                  onClick={(e) => {
+                    if (!hasVoted && playerId !== currentIntroducingPlayer) {
+                      handleLikeDislike(true, e);
+                    }
+                  }}
+                  whileHover={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
+                  whileTap={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
+                  data-testid="like-card"
+                >
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsUp className="w-6 h-6 text-green-400 mr-2" />
                     <span className="text-2xl font-bold text-green-400">{likes.length}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1 max-h-24">
+                  {!hasVoted && playerId !== currentIntroducingPlayer && (
+                    <motion.div 
+                      className="text-center text-sm text-green-400 font-medium mb-2"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      Beğenmek için tıkla
+                    </motion.div>
+                  )}
+                  <div className="flex flex-wrap gap-1 max-h-20 overflow-hidden">
                     {likes.map((like, index) => (
                       <div
                         key={`like-${like.username}`}
@@ -717,15 +737,35 @@ export function PlayerIntroduction({
                       </div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
                 
-                {/* Dislikes */}
-                <div className="relative bg-red-900/30 border border-red-500/50 rounded-lg p-4">
+                {/* Dislikes - Clickable Card */}
+                <motion.div
+                  className={`relative bg-red-900/30 border-2 border-red-500/50 rounded-lg p-4 
+                    ${!hasVoted && playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-red-900/40 hover:border-red-500/70' : ''}`}
+                  onClick={(e) => {
+                    if (!hasVoted && playerId !== currentIntroducingPlayer) {
+                      handleLikeDislike(false, e);
+                    }
+                  }}
+                  whileHover={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
+                  whileTap={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
+                  data-testid="dislike-card"
+                >
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsDown className="w-6 h-6 text-red-400 mr-2" />
                     <span className="text-2xl font-bold text-red-400">{dislikes.length}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1 max-h-24">
+                  {!hasVoted && playerId !== currentIntroducingPlayer && (
+                    <motion.div 
+                      className="text-center text-sm text-red-400 font-medium mb-2"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      Beğenmemek için tıkla
+                    </motion.div>
+                  )}
+                  <div className="flex flex-wrap gap-1 max-h-20 overflow-hidden">
                     {dislikes.map((dislike, index) => (
                       <div
                         key={`dislike-${dislike.username}`}
@@ -744,33 +784,11 @@ export function PlayerIntroduction({
                       </div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               </div>
               
               {/* Action Buttons */}
               <div className="flex justify-center gap-3">
-                {/* Voting buttons for non-introducing players */}
-                {playerId !== currentIntroducingPlayer && !hasVoted && (
-                  <>
-                    <Button
-                      onClick={(e) => handleLikeDislike(true, e)}
-                      size="icon"
-                      className="w-12 h-12 bg-green-600 hover:bg-green-700 text-white transition-all transform hover:scale-110 active:scale-95 rounded-full shadow-lg"
-                      data-testid="like-button"
-                    >
-                      <ThumbsUp className="w-6 h-6" />
-                    </Button>
-                    <Button
-                      onClick={(e) => handleLikeDislike(false, e)}
-                      size="icon"
-                      className="w-12 h-12 bg-red-600 hover:bg-red-700 text-white transition-all transform hover:scale-110 active:scale-95 rounded-full shadow-lg"
-                      data-testid="dislike-button"
-                    >
-                      <ThumbsDown className="w-6 h-6" />
-                    </Button>
-                  </>
-                )}
-                
                 {/* Already voted indicator */}
                 {hasVoted && playerId !== currentIntroducingPlayer && (
                   <div 
