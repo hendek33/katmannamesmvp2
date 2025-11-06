@@ -632,7 +632,7 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
-    <div className="h-screen overflow-x-hidden overflow-y-auto bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
@@ -893,7 +893,7 @@ export default function Game() {
           
           {/* Center Section - Game Status and Players */}
           <div className="flex-1 flex justify-center">
-            <div className="w-[calc(min(68vw,70vh*1.5))] min-[1200px]:w-[calc(min(63vw,72vh*1.5))] min-[1400px]:w-[calc(min(58vw,74vh*1.5))] min-[1600px]:w-[calc(min(53vw,75vh*1.5))] max-w-[900px]">
+            <div className="w-[calc(min(70vw,70vh*1.5))] min-[1200px]:w-[calc(min(65vw,72vh*1.5))] min-[1400px]:w-[calc(min(60vw,74vh*1.5))] min-[1600px]:w-[calc(min(55vw,75vh*1.5))] max-w-[1000px]">
               <Card className="w-full px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-amber-900/30 hover:shadow-amber-500/20 transition-all">
             <div className="flex justify-center items-center gap-1 h-full">
               {/* Moderator Controls for Taunt/Insult */}
@@ -1876,19 +1876,19 @@ export default function Game() {
             
             {/* Show introduction phase or game cards based on phase */}
             {gameState.phase === "introduction" ? (
-              <div className="w-[calc(min(88vw,55vh*1.5))] 
-                   min-[360px]:w-[calc(min(83vw,58vh*1.5))]
-                   min-[400px]:w-[calc(min(83vw,60vh*1.5))]
-                   min-[500px]:w-[calc(min(78vw,62vh*1.5))]
-                   min-[600px]:w-[calc(min(78vw,64vh*1.5))]
-                   min-[700px]:w-[calc(min(73vw,66vh*1.5))]
-                   min-[800px]:w-[calc(min(73vw,68vh*1.5))]
-                   min-[900px]:w-[calc(min(68vw,70vh*1.5))]
-                   min-[1024px]:w-[calc(min(68vw,70vh*1.5))]
-                   min-[1200px]:w-[calc(min(63vw,72vh*1.5))]
-                   min-[1400px]:w-[calc(min(58vw,74vh*1.5))]
-                   min-[1600px]:w-[calc(min(53vw,75vh*1.5))]
-                   max-w-[900px]
+              <div className="w-[calc(min(90vw,55vh*1.5))] 
+                   min-[360px]:w-[calc(min(85vw,58vh*1.5))]
+                   min-[400px]:w-[calc(min(85vw,60vh*1.5))]
+                   min-[500px]:w-[calc(min(80vw,62vh*1.5))]
+                   min-[600px]:w-[calc(min(80vw,64vh*1.5))]
+                   min-[700px]:w-[calc(min(75vw,66vh*1.5))]
+                   min-[800px]:w-[calc(min(75vw,68vh*1.5))]
+                   min-[900px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
+                   min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
+                   min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
+                   max-w-[1000px]
                    mb-14">
                 <PlayerIntroduction
                   gameState={gameState}
@@ -1902,19 +1902,19 @@ export default function Game() {
             ) : (
               <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
                    overflow-visible
-                   w-[calc(min(88vw,55vh*1.5))] 
-                   min-[360px]:w-[calc(min(83vw,58vh*1.5))]
-                   min-[400px]:w-[calc(min(83vw,60vh*1.5))]
-                   min-[500px]:w-[calc(min(78vw,62vh*1.5))]
-                   min-[600px]:w-[calc(min(78vw,64vh*1.5))]
-                   min-[700px]:w-[calc(min(73vw,66vh*1.5))]
-                   min-[800px]:w-[calc(min(73vw,68vh*1.5))]
-                   min-[900px]:w-[calc(min(68vw,70vh*1.5))]
-                   min-[1024px]:w-[calc(min(68vw,70vh*1.5))]
-                   min-[1200px]:w-[calc(min(63vw,72vh*1.5))]
-                   min-[1400px]:w-[calc(min(58vw,74vh*1.5))]
-                   min-[1600px]:w-[calc(min(53vw,75vh*1.5))]
-                   max-w-[900px]
+                   w-[calc(min(90vw,55vh*1.5))] 
+                   min-[360px]:w-[calc(min(85vw,58vh*1.5))]
+                   min-[400px]:w-[calc(min(85vw,60vh*1.5))]
+                   min-[500px]:w-[calc(min(80vw,62vh*1.5))]
+                   min-[600px]:w-[calc(min(80vw,64vh*1.5))]
+                   min-[700px]:w-[calc(min(75vw,66vh*1.5))]
+                   min-[800px]:w-[calc(min(75vw,68vh*1.5))]
+                   min-[900px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
+                   min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
+                   min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
+                   max-w-[1000px]
                    mb-14" 
                    data-testid="game-grid">
                 {gameState.cards.map((card, index) => (
