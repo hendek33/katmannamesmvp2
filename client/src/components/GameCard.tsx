@@ -1,26 +1,44 @@
-import { type Card } from "@shared/schema";
-import { cn } from "@/lib/utils";
-import { CheckSquare } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import logoImg from "@assets/logoo.png";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Users, Eye, Target } from "lucide-react";
 
 interface GameCardProps {
-  card: Card;
+  card: {
+    id: string;
+    word: string;
+    type: "dark" | "light" | "neutral" | "assassin";
+    revealed: boolean;
+  };
   onReveal?: () => void;
   onVote?: () => void;
   isSpymaster: boolean;
   disabled?: boolean;
   voters?: string[];
   hasVoted?: boolean;
-  revealedImage?: string;
-  rowIndex?: number;
+  revealedImage?: string | null;
+  rowIndex: number;
   isLastCard?: boolean;
   isAssassinCard?: boolean;
   gameEnded?: boolean;
-  isKnownCard?: boolean;
+  isKnownCard?: boolean; // For prophets who can see all cards
 }
 
-export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters = [], hasVoted = false, revealedImage, rowIndex = 0, isLastCard = false, isAssassinCard = false, gameEnded = false, isKnownCard = false }: GameCardProps) {
+export function GameCard({
+  card,
+  onReveal,
+  onVote,
+  isSpymaster,
+  disabled = false,
+  voters = [],
+  hasVoted = false,
+  revealedImage,
+  rowIndex,
+  isLastCard = false,
+  isAssassinCard = false,
+  gameEnded = false,
+  isKnownCard = false,
+}: GameCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isLifted, setIsLifted] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
@@ -151,152 +169,130 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       <div 
         className="absolute -inset-[2px] rounded-lg pointer-events-none"
         style={{
-          background: `linear-gradient(to bottom left, 
-            rgba(255,255,255,0.15) 0%, 
-            transparent 70%)`,
-          zIndex: 11
+          background: 'linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.05) 100%)',
+          mixBlendMode: 'screen'
         }}
       />
       
-      
-      {/* Logo watermark - lower z-index for revealed cards */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `url(${logoImg})`,
-          backgroundSize: '85%',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.15,
-          filter: 'grayscale(100%)',
-          zIndex: card.revealed ? 1 : 10
-        }}
-      />
-      
-      {/* Black particles for assassin card */}
-      {isAssassinCard && gameEnded && (
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 200 }}>
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={`particle-${i}`}
-              className="absolute w-2 h-2 bg-black rounded-full animate-assassin-particle"
-              style={{
-                left: '50%',
-                top: '50%',
-                animationDelay: `${i * 0.1}s`,
-                '--particle-x': `${(Math.random() - 0.5) * 200}px`,
-                '--particle-y': `${(Math.random() - 0.5) * 200}px`,
-              } as React.CSSProperties}
-            />
-          ))}
-        </div>
-      )}
-      
-      {/* Revealed card overlay with 3D container - drops in after image loads */}
-      {card.revealed && imageLoaded && revealedImage && (
-        <div 
-          className="absolute inset-0 card-3d-container"
+      {/* Inner content wrapper */}
+      <div className="relative h-full flex flex-col">
+        {/* Top panel with word */}
+        <div
+          className={cn(
+            "relative rounded-md p-2 sm:p-3 min-h-0 flex-1 flex items-center justify-center",
+            colors.panel,
+            "transition-all duration-200",
+            "shadow-lg"
+          )}
           style={{
-            zIndex: isLifted ? 999 : 15,
-            pointerEvents: 'none'
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)',
+            borderRadius: '4px'
           }}
         >
-          <div 
-            className={cn(
-              "absolute cursor-pointer animate-card-drop rounded-lg",
-              isLifted ? "card-lifted" : "card-not-lifted"
-            )}
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsLifted(!isLifted);
-            }}
-            title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
-            style={{
-              top: card.type === 'assassin' ? '0px' : '-6px',
-              left: card.type === 'assassin' ? '0px' : '-6px',
-              right: card.type === 'assassin' ? '0px' : '-6px', 
-              bottom: card.type === 'assassin' ? '0px' : '-6px',
-              backgroundImage: `url('${revealedImage}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              boxShadow: isLifted 
-                ? '0 20px 40px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.3)'
-                : '0 4px 8px rgba(0,0,0,0.3)',
-              pointerEvents: 'auto'
-            }}
-          />
-        </div>
-      )}
-      
-      {/* Reveal button in top-left corner */}
-      {canReveal && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onReveal();
-          }}
-          className="absolute top-1 left-1 z-20 p-1 bg-green-600/80 hover:bg-green-500 rounded transition-colors"
-          title="Kartı Aç"
-        >
-          <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-        </button>
-      )}
-
-      {/* Voters display */}
-      {voters.length > 0 && !card.revealed && (
-        <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 z-[5] max-w-[85%]">
-          <div className="flex flex-wrap gap-0.5 justify-end">
-            {voters.map((voter, idx) => (
-              <span
-                key={voter}
+          {/* Revealed Image */}
+          {card.revealed && revealedImage && (
+            <div className="absolute inset-0">
+              <img 
+                src={revealedImage}
+                alt={card.word}
                 className={cn(
-                  "inline-block px-0.5 py-0 sm:px-0.5 sm:py-0 md:px-1 md:py-0.5 lg:px-1 lg:py-0.5 xl:px-1.5 xl:py-0.5",
-                  "text-[5px] sm:text-[6px] md:text-[7px] lg:text-[9px] xl:text-[10px] 2xl:text-[11px]",
-                  "rounded animate-pop-in bg-red-950/80 text-red-200",
-                  hasVoted && voter === voters[voters.length - 1] ? "font-bold" : ""
+                  "w-full h-full object-cover rounded-md transition-opacity duration-500",
+                  imageLoaded ? "opacity-100" : "opacity-0"
                 )}
-                style={{
-                  animationDelay: `${idx * 0.05}s`
-                }}
-                title={voter}
-              >
-                {voter.length > 6 ? voter.substring(0, 6) + '...' : voter}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      <button
-        onClick={canVote ? onVote : undefined}
-        disabled={!canVote}
-        data-testid={`card-${card.id}`}
-        className={cn(
-          "flex-1 w-full flex flex-col"
-        )}
-      >
-        <div className="flex-1" />
-        
-        {/* Word panel - always show */}
-        <div className={cn(
-          "relative rounded-md px-0.5 py-0 sm:px-0.5 sm:py-0.5 md:px-1 md:py-0.5 lg:px-1.5 lg:py-0.5 xl:px-2 xl:py-1 2xl:px-3 2xl:py-1",
-          "flex items-center justify-center",
-          "border-t border-black/20",
-          "backdrop-blur-none bg-opacity-100",
-          colors.panel
-        )} style={{ position: 'relative', zIndex: 12 }}>
-          <span className={cn(
-            "font-bold text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base 2xl:text-lg uppercase tracking-wide text-center leading-tight drop-shadow-md",
-            colors.textColor
-          )}>
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-md" />
+            </div>
+          )}
+
+          {/* Word Text */}
+          <span
+            className={cn(
+              "select-none transition-all duration-200 text-center relative z-10",
+              "font-bold break-all leading-tight px-1",
+              // Dynamic font sizes based on word length
+              card.word.length <= 5 && "text-lg sm:text-2xl md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl",
+              card.word.length > 5 && card.word.length <= 8 && "text-base sm:text-xl md:text-2xl lg:text-lg xl:text-xl 2xl:text-2xl",
+              card.word.length > 8 && card.word.length <= 11 && "text-sm sm:text-lg md:text-xl lg:text-base xl:text-lg 2xl:text-xl",
+              card.word.length > 11 && card.word.length <= 14 && "text-xs sm:text-base md:text-lg lg:text-sm xl:text-base 2xl:text-lg",
+              card.word.length > 14 && "text-[10px] sm:text-sm md:text-base lg:text-xs xl:text-sm 2xl:text-base",
+              // Word display
+              card.revealed ? "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : colors.textColor,
+              !card.revealed && "shadow-sm"
+            )}
+            style={{
+              textShadow: card.revealed ? '0 1px 2px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)' : '0 1px 2px rgba(0,0,0,0.3)',
+              letterSpacing: '0.05em',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
             {card.word}
           </span>
+
+          {/* Eye icon for prophets who can see the card type */}
+          {isKnownCard && !card.revealed && !isSpymaster && (
+            <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1">
+              <Eye className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-300 opacity-40" />
+            </div>
+          )}
         </div>
-      </button>
-      
-      {/* Bottom edge shadow for depth */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-black/30 to-transparent" />
+
+        {/* Bottom action panel (only for unrevealed cards) */}
+        {!card.revealed && (
+          <div className="mt-1 px-1 py-0.5 sm:py-1 flex justify-between items-center">
+            {/* Vote Button */}
+            {canVote && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onVote();
+                }}
+                disabled={disabled}
+                className={cn(
+                  "h-5 sm:h-6 px-1 sm:px-1.5 bg-slate-800/40 hover:bg-slate-800/60 flex items-center gap-0.5 rounded-md",
+                  hasVoted && "bg-green-900/50 border border-green-600/50"
+                )}
+              >
+                <Users className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white/80" />
+                {voters.length > 0 && (
+                  <span className="text-[8px] sm:text-[10px] text-white/80 font-medium">
+                    {voters.length}
+                  </span>
+                )}
+              </Button>
+            )}
+
+            {/* Reveal Button */}
+            {canReveal && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onReveal) {
+                    // Lift card first
+                    setIsLifted(true);
+                    // Small delay then trigger reveal
+                    setTimeout(() => {
+                      onReveal();
+                      setTimeout(() => {
+                        setIsLifted(false); // Return to normal position after reveal
+                      }, 300);
+                    }, 200);
+                  }
+                }}
+                disabled={disabled}
+                className="ml-auto h-5 sm:h-6 px-1 sm:px-1.5 bg-amber-700/40 hover:bg-amber-700/60 text-white/90 rounded-md"
+              >
+                <Target className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                <span className="ml-0.5 text-[8px] sm:text-[10px] font-medium">SEÇ</span>
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
