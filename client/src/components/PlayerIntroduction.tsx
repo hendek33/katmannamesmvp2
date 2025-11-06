@@ -200,12 +200,12 @@ export function PlayerIntroduction({
                         className={`
                           p-3 cursor-pointer transition-all duration-200
                           ${hasBeenIntroduced 
-                            ? 'bg-gray-800 border-gray-700' 
-                            : 'bg-red-900/40 hover:bg-red-900/60 border-red-600/50 hover:border-red-500/70'
+                            ? 'bg-red-900/40 border-red-600/50' 
+                            : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-gray-600'
                           }
-                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-red-600/20' : ''}
-                          ${hoveredPlayer === player.id ? 'ring-1 ring-red-400' : ''}
-                          ${hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
+                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-gray-600/20' : ''}
+                          ${hoveredPlayer === player.id ? 'ring-1 ring-gray-400' : ''}
+                          ${!hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
                         onClick={() => handlePlayerClick(player)}
                         onMouseEnter={() => setHoveredPlayer(player.id)}
@@ -291,12 +291,12 @@ export function PlayerIntroduction({
                         className={`
                           p-3 cursor-pointer transition-all duration-200
                           ${hasBeenIntroduced 
-                            ? 'bg-gray-800 border-gray-700' 
-                            : 'bg-blue-900/40 hover:bg-blue-900/60 border-blue-600/50 hover:border-blue-500/70'
+                            ? 'bg-blue-900/40 border-blue-600/50' 
+                            : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-gray-600'
                           }
-                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-blue-600/20' : ''}
-                          ${hoveredPlayer === player.id ? 'ring-1 ring-blue-400' : ''}
-                          ${hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
+                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-gray-600/20' : ''}
+                          ${hoveredPlayer === player.id ? 'ring-1 ring-gray-400' : ''}
+                          ${!hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
                         onClick={() => handlePlayerClick(player)}
                         onMouseEnter={() => setHoveredPlayer(player.id)}
