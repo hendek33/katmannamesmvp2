@@ -1446,14 +1446,10 @@ export default function Game() {
                         {gameState.chaosMode && currentPlayer.secretRole && (
                           <div className="mt-2 pt-2 border-t border-slate-700/50">
                             <div className="text-purple-400 font-bold">
-                              Gizli Rol: {
-                                currentPlayer.secretRole === "prophet" ? "🔮 Kahin" :
-                                currentPlayer.secretRole === "double_agent" ? "🎭 Çift Ajan" : ""
-                              }
+                              Gizli Rol: 🔮 Kahin
                             </div>
                             <div className="text-[10px] mt-1 text-slate-500">
-                              {currentPlayer.secretRole === "prophet" && "Tüm kartları görüyorsun"}
-                              {currentPlayer.secretRole === "double_agent" && "Karşı takım için çalış"}
+                              Kendi takımının 3 kartını biliyorsun
                             </div>
                           </div>
                         )}
@@ -1477,7 +1473,7 @@ export default function Game() {
                     >
                       <Sparkles className="w-2.5 h-2.5 mr-0.5 text-red-500" />
                       <span className="text-[10px] text-red-400 font-bold">
-                        Son Şans: {gameState.chaosModeType === "prophet" ? "Kahin" : "Çift Ajan"} Tahmini
+                        Son Şans: Kahin Tahmini
                       </span>
                     </Button>
                   </DialogTrigger>

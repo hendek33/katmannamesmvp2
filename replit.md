@@ -14,6 +14,24 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
+### Chaos Mode Simplification (November 6, 2025)
+- **Prophet Mode Only**: Simplified chaos mode to only include Prophet (Kahin) mode
+- **Removed Double Agent**: Temporarily removed Double Agent (Çift Ajan) option for simpler gameplay
+- **Automatic Mode Selection**: When chaos mode is enabled, Prophet mode is automatically selected
+- **UI Improvements**: Cleaner chaos mode interface with instant activation and clear visual feedback
+
+### Voting System Updates (November 6, 2025)
+- **Vote Changing**: Players can now change their votes anytime during introduction phase
+- **Clickable Vote Cards**: Like/dislike counts are now clickable cards with particle effects
+- **Visual Feedback**: Selected vote shows with highlighted border and "Seçildi ✓" text
+- **Removed Vote Lock**: Eliminated the voting lock mechanism for better flexibility
+
+### Introduction UI Enhancements (November 6, 2025)
+- **Enhanced Team Headers**: Premium glassmorphism design with animated gradients and pulsing icons
+- **Improved Instructions**: Better visual hierarchy for spymaster instructions with glowing effects
+- **Cleaner Animations**: Removed distracting background particles from "Tanışma Zamanı" title
+- **Extended Display Time**: Introduction title now displays for 3.5 seconds (increased by 1 second)
+
 ### Video Performance Optimizations (November 5, 2025)
 - **Base64 Video Conversion**: Implemented VideoBase64Converter service to convert all videos to base64 format on app load
 - **Inline Video Playback**: Created TurnVideoInline component using useInlineVideo hook for stutter-free video playback

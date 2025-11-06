@@ -39,11 +39,9 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
   
   if (!sequence || !show) return null;
   
-  const roleText = sequence.guessType === "prophet" ? "Kahin" : "Çift Ajan";
+  const roleText = "Kahin";
   const actualRoleText = sequence.actualRole === "prophet" 
     ? "KAHİN" 
-    : sequence.actualRole === "double_agent"
-    ? "ÇİFT AJAN"
     : "NORMAL AJAN";
   
   const isCorrect = sequence.success;
@@ -100,9 +98,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
             <div 
               className={cn(
                 "text-5xl md:text-7xl font-black mt-4",
-                sequence.actualRole === "prophet" && "text-purple-500",
-                sequence.actualRole === "double_agent" && "text-orange-500",
-                !sequence.actualRole && "text-slate-500"
+                sequence.actualRole === "prophet" ? "text-purple-500" : "text-slate-500"
               )}
               style={{
                 animation: 'zoomInRotate 0.8s ease-out forwards',

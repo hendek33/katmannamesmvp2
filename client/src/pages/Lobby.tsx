@@ -33,7 +33,6 @@ export default function Lobby() {
   const [spymasterTime, setSpymasterTime] = useState(120);
   const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
-  const [chaosModeType, setChaosModeType] = useState<"prophet" | "double_agent" | null>(null);
   const [showChaosDetails, setShowChaosDetails] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
@@ -88,7 +87,6 @@ export default function Lobby() {
       setSpymasterTime(gameState.spymasterTime);
       setGuesserTime(gameState.guesserTime);
       setChaosMode(gameState.chaosMode || false);
-      setChaosModeType(gameState.chaosModeType || null);
     }
   }, [gameState]);
 
@@ -163,17 +161,6 @@ export default function Lobby() {
   const [showTeamNameWarning, setShowTeamNameWarning] = useState(false);
 
   const handleStartGame = () => {
-    // Check if Chaos Mode is enabled but type is not selected
-    if (gameState?.chaosMode && !gameState?.chaosModeType) {
-      toast({
-        title: "Kaos Modu Tipi Seçilmeli",
-        description: "Lütfen Kahin veya Çift Ajan modunu seçin",
-        variant: "destructive",
-        duration: 4000,
-      });
-      return;
-    }
-    
     // Check if team names are still default
     if (gameState?.darkTeamName === "Mavi Takım" || gameState?.lightTeamName === "Kırmızı Takım") {
       setShowTeamNameWarning(true);
@@ -206,16 +193,10 @@ export default function Lobby() {
 
   const handleChaosModeUpdate = (enabled: boolean) => {
     send("update_chaos_mode", { chaosMode: enabled });
-    // Reset type when disabling chaos mode
-    if (!enabled) {
-      setChaosModeType(null);
+    // When enabling chaos mode, automatically set type to prophet
+    if (enabled) {
+      send("update_chaos_mode_type", { type: "prophet" });
     }
-    // Don't automatically select any option when enabling chaos mode
-    // User must manually choose between Prophet and Double Agent
-  };
-
-  const handleChaosModeTypeUpdate = (type: "prophet" | "double_agent") => {
-    send("update_chaos_mode_type", { type });
   };
 
   if (!isConnected) {
@@ -670,10 +651,7 @@ export default function Lobby() {
                         </span>
                       </div>
                       <h3 className={`text-sm font-medium transition-colors ${chaosMode ? 'text-violet-200' : 'text-slate-400'}`}>
-                        {chaosMode && chaosModeType === "prophet" && "Kahin Modu"}
-                        {chaosMode && chaosModeType === "double_agent" && "Çift Ajan Modu"}
-                        {chaosMode && !chaosModeType && "Tip Seçin"}
-                        {!chaosMode && "Gizli Roller"}
+                        {chaosMode ? "🔮 Kahin Modu Aktif" : "Kahin Modu"}
                       </h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
@@ -698,64 +676,12 @@ export default function Lobby() {
                       data-testid="switch-chaos-mode"
                     />
                   </div>
-                  {/* Chaos Mode Type Selection - Modern Style */}
+                  {/* Chaos Mode Info when enabled */}
                   {chaosMode && (
-                    <div className="mt-4 space-y-3">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            if (currentPlayer?.isRoomOwner) {
-                              setChaosModeType("prophet");
-                              handleChaosModeTypeUpdate("prophet");
-                            }
-                          }}
-                          disabled={!currentPlayer?.isRoomOwner}
-                          className={`flex-1 py-3 px-4 rounded-lg border transition-all duration-300 ${
-                            chaosModeType === "prophet"
-                              ? "bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-cyan-500/50 shadow-lg"
-                              : "bg-slate-800/30 border-slate-600/30 hover:bg-slate-700/30"
-                          }`}
-                        >
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-2xl">🔮</span>
-                            <span className={`text-xs font-medium ${
-                              chaosModeType === "prophet" ? "text-cyan-300" : "text-slate-400"
-                            }`}>Kahin</span>
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (currentPlayer?.isRoomOwner) {
-                              setChaosModeType("double_agent");
-                              handleChaosModeTypeUpdate("double_agent");
-                            }
-                          }}
-                          disabled={!currentPlayer?.isRoomOwner}
-                          className={`flex-1 py-3 px-4 rounded-lg border transition-all duration-300 ${
-                            chaosModeType === "double_agent"
-                              ? "bg-gradient-to-r from-red-600/20 to-pink-600/20 border-red-500/50 shadow-lg"
-                              : "bg-slate-800/30 border-slate-600/30 hover:bg-slate-700/30"
-                          }`}
-                        >
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="text-2xl">🎭</span>
-                            <span className={`text-xs font-medium ${
-                              chaosModeType === "double_agent" ? "text-red-300" : "text-slate-400"
-                            }`}>Çift Ajan</span>
-                          </div>
-                        </button>
+                    <div className="mt-4">
+                      <div className="p-2 rounded-lg text-[10px] leading-relaxed bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20">
+                        Her takıma gizli bir Kahin atanacak • Kahinler kendi takımlarının 3 kartını bilir
                       </div>
-                      {chaosModeType && (
-                        <div className={`p-2 rounded-lg text-[10px] leading-relaxed transition-all duration-300 ${
-                          chaosModeType === "prophet"
-                            ? "bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20"
-                            : "bg-red-900/20 text-red-200/80 border border-red-600/20"
-                        }`}>
-                          {chaosModeType === "prophet" 
-                            ? "Tüm kartları görür • Oylama ve kart seçimi yapabilir"
-                            : "Karşı takım için çalışır • Oylama ve kart seçimi yapabilir"}
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -845,54 +771,41 @@ export default function Lobby() {
       <AlertDialog open={showChaosDetails} onOpenChange={setShowChaosDetails}>
         <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-              🎯 KAOS MODU NEDİR?
+            <AlertDialogTitle className="text-xl bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+              🔮 KAHİN MODU NEDİR?
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-4 pt-4">
                 <p className="text-sm">
-                  Kaos Modu, klasik Katmannames oyununa gizli roller ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
-                  Her oyuncuya gizlice atanan bu roller, oyunun dinamiğini tamamen değiştirir!
+                  Kahin Modu, klasik Katmannames oyununa gizli bir rol ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
+                  Her takıma atanan gizli Kahin, oyunun dinamiğini tamamen değiştirir!
                 </p>
                 
                 <div className="space-y-3">
-                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                  <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xl">🔮</span>
-                      <h4 className="font-bold text-yellow-500">Kahin Ajan</h4>
+                      <h4 className="font-bold text-cyan-500">Kahin Rolü</h4>
                     </div>
                     <p className="text-xs">
-                      Her takımda 1 tane bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
+                      Her takımda 1 tane gizli Kahin bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
                       Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Oyun boyunca karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır, oyun bittikten sonra tahmin yapılamaz!</span>
+                      <span className="text-amber-400 font-bold"> Oyun boyunca karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır!</span>
                       <span className="text-red-400 font-bold"> DİKKAT: Yanlış tahmin anında kaybettirir!</span>
-                    </p>
-                  </div>
-                  
-                  <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">🎭</span>
-                      <h4 className="font-bold text-purple-500">Çift Ajan</h4>
-                    </div>
-                    <p className="text-xs">
-                      <span className="text-purple-400 font-bold">Her takımda 1 tane bulunur.</span> Karşı takım için gizlice çalışan casus! 
-                      Görünüşte kendi takımında ama aslında karşı takım için çalışır. Takımını yanlış kartlara yönlendirmeye çalışır.  
-                      <span className="text-red-400 font-bold">Oyun bittiğinde: Kaybeden takım, kendi içlerindeki haini (karşı takım için çalışan Çift Ajanı) bulursa oyunu kazanır!</span>
                     </p>
                   </div>
                 </div>
                 
                 <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <h4 className="font-semibold text-amber-400 mb-2">⚡ Notlar</h4>
+                  <h4 className="font-semibold text-amber-400 mb-2">⚡ Oyun Kuralları</h4>
                   <ul className="text-xs space-y-1">
-                    <li>• Takımlardaki ajan sayıları eşit olması ve toplamda minimum 10 kişi olunması önerilir.</li>
-                    <li>• Roller oyun başında rastgele atanır ve gizlidir.</li>
-                    <li>• Oyun sonunda tahminler yapıldıktan sonra roller açığa çıkar.</li>
+                    <li>• Her takıma oyun başında rastgele bir Kahin atanır (kimliği gizlidir)</li>
+                    <li>• Kahinler kendi takımlarının 3 kartını bilir (mor ışıltı ile gösterilir)</li>
+                    <li>• Oyun sırasında karşı takımın Kahinini tahmin etme hakkınız var</li>
+                    <li>• Doğru tahmin = Anında kazanırsınız ✅</li>
+                    <li>• Yanlış tahmin = Anında kaybedersiniz ❌</li>
+                    <li>• Oyun sonunda tahmin hakkı kalmaz, roller açığa çıkar</li>
                   </ul>
-                </div>
-                
-                <div className="text-xs text-slate-400 italic">
-                  Bu mod henüz geliştirme aşamasındadır ve yakında aktif olacaktır!
                 </div>
               </div>
             </AlertDialogDescription>
