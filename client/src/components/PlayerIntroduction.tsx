@@ -227,9 +227,16 @@ export function PlayerIntroduction({
                             </div>
                           </div>
                           {hasBeenIntroduced && (
-                            <Badge className="text-xs bg-green-600/30 text-green-400 border-green-500/50">
-                              ✓
-                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <Badge className="text-xs bg-green-600/30 text-green-300 border-green-500/50">
+                                <ThumbsUp className="w-3 h-3 mr-0.5" />
+                                {Object.keys(player.introductionLikes || {}).length}
+                              </Badge>
+                              <Badge className="text-xs bg-red-600/30 text-red-300 border-red-500/50">
+                                <ThumbsDown className="w-3 h-3 mr-0.5" />
+                                {Object.keys(player.introductionDislikes || {}).length}
+                              </Badge>
+                            </div>
                           )}
                         </div>
                       </Card>
@@ -292,9 +299,16 @@ export function PlayerIntroduction({
                             </div>
                           </div>
                           {hasBeenIntroduced && (
-                            <Badge className="text-xs bg-green-600/30 text-green-400 border-green-500/50">
-                              ✓
-                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <Badge className="text-xs bg-green-600/30 text-green-300 border-green-500/50">
+                                <ThumbsUp className="w-3 h-3 mr-0.5" />
+                                {Object.keys(player.introductionLikes || {}).length}
+                              </Badge>
+                              <Badge className="text-xs bg-red-600/30 text-red-300 border-red-500/50">
+                                <ThumbsDown className="w-3 h-3 mr-0.5" />
+                                {Object.keys(player.introductionDislikes || {}).length}
+                              </Badge>
+                            </div>
                           )}
                         </div>
                       </Card>
