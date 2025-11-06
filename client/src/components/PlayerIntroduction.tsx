@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import type { GameState, Player } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -166,10 +165,13 @@ export function PlayerIntroduction({
         <div className="space-y-3">
           {isController && (
             <div className="text-center mb-3">
-              <Badge className="text-sm px-4 py-1 bg-red-600 text-white border-0">
-                <Crown className="w-4 h-4 mr-1" />
-                Bir oyuncu seçerek tanıtımını başlat
-              </Badge>
+              <div 
+                className="inline-flex items-center text-sm px-4 py-1 rounded-md font-semibold"
+                style={{ backgroundColor: '#dc2626', color: 'white' }}
+              >
+                <Crown className="w-4 h-4 mr-1" style={{ color: 'white' }} />
+                <span>Bir oyuncu seçerek tanıtımını başlat</span>
+              </div>
             </div>
           )}
           
@@ -220,9 +222,10 @@ export function PlayerIntroduction({
                                 {player.username}
                               </span>
                               {player.role === "spymaster" && (
-                                <Badge variant="outline" className="ml-1 text-xs border-red-500/50 text-red-400 px-1 py-0">
+                                <span className="ml-1 inline-flex items-center px-1 text-xs rounded" 
+                                      style={{ border: '1px solid #ef4444', color: '#ef4444' }}>
                                   <Crown className="w-3 h-3" />
-                                </Badge>
+                                </span>
                               )}
                             </div>
                           </div>
@@ -294,9 +297,10 @@ export function PlayerIntroduction({
                                 {player.username}
                               </span>
                               {player.role === "spymaster" && (
-                                <Badge variant="outline" className="ml-1 text-xs border-blue-500/50 text-blue-400 px-1 py-0">
+                                <span className="ml-1 inline-flex items-center px-1 text-xs rounded" 
+                                      style={{ border: '1px solid #3b82f6', color: '#3b82f6' }}>
                                   <Crown className="w-3 h-3" />
-                                </Badge>
+                                </span>
                               )}
                             </div>
                           </div>
@@ -403,14 +407,16 @@ export function PlayerIntroduction({
                   kendini tanıtıyor{".".repeat(dotCount)}
                 </motion.div>
                 
-                <Badge className={`mt-2 text-sm px-3 py-1 ${
-                  introducingPlayer?.team === "dark" 
-                    ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                    : 'bg-red-600/30 text-red-300 border-red-500/50'
-                }`}>
+                <div 
+                  className="inline-flex items-center mt-2 text-sm px-3 py-1 rounded-md font-semibold"
+                  style={{ 
+                    backgroundColor: introducingPlayer?.team === "dark" ? '#1d4ed8' : '#b91c1c',
+                    color: 'white'
+                  }}
+                >
                   {introducingPlayer?.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
                   {introducingPlayer?.role === "spymaster" && " - İstihbarat Şefi"}
-                </Badge>
+                </div>
               </div>
               
               {/* Voting Stats */}
@@ -513,9 +519,12 @@ export function PlayerIntroduction({
                 
                 {/* Already voted indicator */}
                 {hasVoted && playerId !== currentIntroducingPlayer && (
-                  <Badge className="text-sm px-4 py-2 bg-slate-700/50 text-white/70">
+                  <div 
+                    className="inline-flex items-center text-sm px-4 py-2 rounded-md font-semibold"
+                    style={{ backgroundColor: '#475569', color: 'white' }}
+                  >
                     Oyunu Kullandın ✓
-                  </Badge>
+                  </div>
                 )}
                 
                 {/* Finish button for controller */}
