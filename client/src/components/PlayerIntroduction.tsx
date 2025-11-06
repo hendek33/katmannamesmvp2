@@ -174,72 +174,7 @@ export function PlayerIntroduction({
           )}
           
           <div className="grid grid-cols-2 gap-4">
-            {/* Dark Team (Blue) */}
-            <div>
-              <div className="bg-blue-600/20 backdrop-blur-sm rounded-lg px-3 py-1 mb-2 border border-blue-500/30">
-                <h3 className="text-sm font-bold text-blue-400 flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  {gameState.darkTeamName}
-                </h3>
-              </div>
-              
-              <div className="space-y-2">
-                {darkTeamPlayers.map((player) => {
-                  const hasBeenIntroduced = player.introduced;
-                  
-                  return (
-                    <motion.div
-                      key={player.id}
-                      initial={{ x: -50, opacity: 0 }}
-                      animate={{ x: 0, opacity: hasBeenIntroduced ? 0.5 : 1 }}
-                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { scale: 1.05 } : {}}
-                    >
-                      <Card
-                        className={`
-                          p-3 cursor-pointer transition-all duration-200
-                          ${hasBeenIntroduced 
-                            ? 'bg-blue-900/20 border-blue-800/30' 
-                            : 'bg-blue-900/40 hover:bg-blue-900/60 border-blue-600/50 hover:border-blue-500/70'
-                          }
-                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-blue-600/20' : ''}
-                          ${hoveredPlayer === player.id ? 'ring-1 ring-blue-400' : ''}
-                          backdrop-blur-sm
-                        `}
-                        onClick={() => handlePlayerClick(player)}
-                        onMouseEnter={() => setHoveredPlayer(player.id)}
-                        onMouseLeave={() => setHoveredPlayer(null)}
-                        data-testid={`player-card-${player.id}`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className={`w-8 h-8 rounded-full bg-blue-600/50 flex items-center justify-center ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
-                              <UserCircle className="w-5 h-5 text-blue-300" />
-                            </div>
-                            <div>
-                              <span className={`text-sm font-bold ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
-                                {player.username}
-                              </span>
-                              {player.role === "spymaster" && (
-                                <Badge variant="outline" className="ml-1 text-xs border-blue-500/50 text-blue-400 px-1 py-0">
-                                  <Crown className="w-3 h-3" />
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          {hasBeenIntroduced && (
-                            <Badge className="text-xs bg-green-600/30 text-green-400 border-green-500/50">
-                              ✓
-                            </Badge>
-                          )}
-                        </div>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </div>
-            
-            {/* Light Team (Red) */}
+            {/* Light Team (Red) - Left Side */}
             <div>
               <div className="bg-red-600/20 backdrop-blur-sm rounded-lg px-3 py-1 mb-2 border border-red-500/30">
                 <h3 className="text-sm font-bold text-red-400 flex items-center">
@@ -255,7 +190,7 @@ export function PlayerIntroduction({
                   return (
                     <motion.div
                       key={player.id}
-                      initial={{ x: 50, opacity: 0 }}
+                      initial={{ x: -50, opacity: 0 }}
                       animate={{ x: 0, opacity: hasBeenIntroduced ? 0.5 : 1 }}
                       whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { scale: 1.05 } : {}}
                     >
@@ -286,6 +221,71 @@ export function PlayerIntroduction({
                               </span>
                               {player.role === "spymaster" && (
                                 <Badge variant="outline" className="ml-1 text-xs border-red-500/50 text-red-400 px-1 py-0">
+                                  <Crown className="w-3 h-3" />
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          {hasBeenIntroduced && (
+                            <Badge className="text-xs bg-green-600/30 text-green-400 border-green-500/50">
+                              ✓
+                            </Badge>
+                          )}
+                        </div>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+            
+            {/* Dark Team (Blue) - Right Side */}
+            <div>
+              <div className="bg-blue-600/20 backdrop-blur-sm rounded-lg px-3 py-1 mb-2 border border-blue-500/30">
+                <h3 className="text-sm font-bold text-blue-400 flex items-center">
+                  <Users className="w-4 h-4 mr-1" />
+                  {gameState.darkTeamName}
+                </h3>
+              </div>
+              
+              <div className="space-y-2">
+                {darkTeamPlayers.map((player) => {
+                  const hasBeenIntroduced = player.introduced;
+                  
+                  return (
+                    <motion.div
+                      key={player.id}
+                      initial={{ x: 50, opacity: 0 }}
+                      animate={{ x: 0, opacity: hasBeenIntroduced ? 0.5 : 1 }}
+                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { scale: 1.05 } : {}}
+                    >
+                      <Card
+                        className={`
+                          p-3 cursor-pointer transition-all duration-200
+                          ${hasBeenIntroduced 
+                            ? 'bg-blue-900/20 border-blue-800/30' 
+                            : 'bg-blue-900/40 hover:bg-blue-900/60 border-blue-600/50 hover:border-blue-500/70'
+                          }
+                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-blue-600/20' : ''}
+                          ${hoveredPlayer === player.id ? 'ring-1 ring-blue-400' : ''}
+                          backdrop-blur-sm
+                        `}
+                        onClick={() => handlePlayerClick(player)}
+                        onMouseEnter={() => setHoveredPlayer(player.id)}
+                        onMouseLeave={() => setHoveredPlayer(null)}
+                        data-testid={`player-card-${player.id}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-8 h-8 rounded-full bg-blue-600/50 flex items-center justify-center ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
+                              <UserCircle className="w-5 h-5 text-blue-300" />
+                            </div>
+                            <div>
+                              <span className={`text-sm font-bold ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
+                                {player.username}
+                              </span>
+                              {player.role === "spymaster" && (
+                                <Badge variant="outline" className="ml-1 text-xs border-blue-500/50 text-blue-400 px-1 py-0">
                                   <Crown className="w-3 h-3" />
                                 </Badge>
                               )}
@@ -419,12 +419,12 @@ export function PlayerIntroduction({
                           }}
                           className="flex"
                         >
-                          <Badge className={`text-xs ${
+                          <Badge className={`text-xs text-white font-semibold ${
                             like.team === "dark" 
-                              ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                              : 'bg-red-600/30 text-red-300 border-red-500/50'
+                              ? 'bg-blue-700/90 border-blue-600' 
+                              : 'bg-red-700/90 border-red-600'
                           }`}>
-                            <Heart className="w-3 h-3 mr-1" />
+                            <Heart className="w-3 h-3 mr-1 text-white" />
                             {like.username}
                           </Badge>
                         </motion.div>
@@ -455,10 +455,10 @@ export function PlayerIntroduction({
                           }}
                           className="flex"
                         >
-                          <Badge className={`text-xs ${
+                          <Badge className={`text-xs text-white font-semibold ${
                             dislike.team === "dark" 
-                              ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                              : 'bg-red-600/30 text-red-300 border-red-500/50'
+                              ? 'bg-blue-700/90 border-blue-600' 
+                              : 'bg-red-700/90 border-red-600'
                           }`}>
                             {dislike.username}
                           </Badge>
