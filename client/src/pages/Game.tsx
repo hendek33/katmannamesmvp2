@@ -597,19 +597,7 @@ export default function Game() {
     send("skip_introduction", {});
   };
 
-  // Render introduction phase
-  if (gameState.phase === "introduction") {
-    return (
-      <PlayerIntroduction
-        gameState={gameState}
-        playerId={playerId}
-        onSelectPlayer={handleSelectPlayerForIntroduction}
-        onFinishIntroduction={handleFinishIntroduction}
-        onLikeDislike={handleLikeDislike}
-        onSkipIntroduction={handleSkipIntroduction}
-      />
-    );
-  }
+  // Don't render introduction phase as separate page, it will be inline
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
   if (!currentPlayer) {
@@ -1890,24 +1878,50 @@ export default function Game() {
               </div>
             </div>
             
-            <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
-                 overflow-visible
-                 w-[calc(min(90vw,55vh*1.5))] 
-                 min-[360px]:w-[calc(min(85vw,58vh*1.5))]
-                 min-[400px]:w-[calc(min(85vw,60vh*1.5))]
-                 min-[500px]:w-[calc(min(80vw,62vh*1.5))]
-                 min-[600px]:w-[calc(min(80vw,64vh*1.5))]
-                 min-[700px]:w-[calc(min(75vw,66vh*1.5))]
-                 min-[800px]:w-[calc(min(75vw,68vh*1.5))]
-                 min-[900px]:w-[calc(min(70vw,70vh*1.5))]
-                 min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
-                 min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
-                 min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
-                 min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
-                 max-w-[1000px]
-                 mb-14" 
-                 data-testid="game-grid">
-              {gameState.cards.map((card, index) => (
+            {/* Show introduction phase or game cards based on phase */}
+            {gameState.phase === "introduction" ? (
+              <div className="w-[calc(min(90vw,55vh*1.5))] 
+                   min-[360px]:w-[calc(min(85vw,58vh*1.5))]
+                   min-[400px]:w-[calc(min(85vw,60vh*1.5))]
+                   min-[500px]:w-[calc(min(80vw,62vh*1.5))]
+                   min-[600px]:w-[calc(min(80vw,64vh*1.5))]
+                   min-[700px]:w-[calc(min(75vw,66vh*1.5))]
+                   min-[800px]:w-[calc(min(75vw,68vh*1.5))]
+                   min-[900px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
+                   min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
+                   min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
+                   max-w-[1000px]
+                   mb-14">
+                <PlayerIntroduction
+                  gameState={gameState}
+                  playerId={playerId}
+                  onSelectPlayer={handleSelectPlayerForIntroduction}
+                  onFinishIntroduction={handleFinishIntroduction}
+                  onLikeDislike={handleLikeDislike}
+                  onSkipIntroduction={handleSkipIntroduction}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-5 gap-[1px] min-[400px]:gap-[2px] min-[600px]:gap-[3px] min-[900px]:gap-1 min-[1200px]:gap-1.5 min-[1600px]:gap-2 
+                   overflow-visible
+                   w-[calc(min(90vw,55vh*1.5))] 
+                   min-[360px]:w-[calc(min(85vw,58vh*1.5))]
+                   min-[400px]:w-[calc(min(85vw,60vh*1.5))]
+                   min-[500px]:w-[calc(min(80vw,62vh*1.5))]
+                   min-[600px]:w-[calc(min(80vw,64vh*1.5))]
+                   min-[700px]:w-[calc(min(75vw,66vh*1.5))]
+                   min-[800px]:w-[calc(min(75vw,68vh*1.5))]
+                   min-[900px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1024px]:w-[calc(min(70vw,70vh*1.5))]
+                   min-[1200px]:w-[calc(min(65vw,72vh*1.5))]
+                   min-[1400px]:w-[calc(min(60vw,74vh*1.5))]
+                   min-[1600px]:w-[calc(min(55vw,75vh*1.5))]
+                   max-w-[1000px]
+                   mb-14" 
+                   data-testid="game-grid">
+                {gameState.cards.map((card, index) => (
                 <div 
                   key={`wrapper-${index}`}
                   className="animate-card-drop overflow-visible"
@@ -1936,6 +1950,7 @@ export default function Game() {
                 </div>
               ))}
             </div>
+            )}
 
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 9999 }}>
