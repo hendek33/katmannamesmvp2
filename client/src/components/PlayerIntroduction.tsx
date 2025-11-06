@@ -415,7 +415,7 @@ export function PlayerIntroduction({
                               <UserCircle className="w-5 h-5 text-red-300" />
                             </div>
                             <div>
-                              <span className={`text-sm font-bold ${hasBeenIntroduced ? 'text-red-400/60' : 'text-red-300'}`}>
+                              <span className={`text-lg font-bold ${hasBeenIntroduced ? 'text-red-400/60' : 'text-red-300'}`}>
                                 {player.username}
                               </span>
                               {player.role === "spymaster" && (
@@ -554,7 +554,7 @@ export function PlayerIntroduction({
                               <UserCircle className="w-5 h-5 text-blue-300" />
                             </div>
                             <div>
-                              <span className={`text-sm font-bold ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
+                              <span className={`text-lg font-bold ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
                                 {player.username}
                               </span>
                               {player.role === "spymaster" && (
