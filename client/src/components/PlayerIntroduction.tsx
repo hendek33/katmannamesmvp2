@@ -476,21 +476,19 @@ export function PlayerIntroduction({
                   <>
                     <Button
                       onClick={(e) => handleLikeDislike(true, e)}
-                      size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white transition-all transform hover:scale-105 active:scale-95"
+                      size="icon"
+                      className="w-12 h-12 bg-green-600 hover:bg-green-700 text-white transition-all transform hover:scale-110 active:scale-95 rounded-full shadow-lg"
                       data-testid="like-button"
                     >
-                      <ThumbsUp className="w-4 h-4 mr-1" />
-                      Beğen
+                      <ThumbsUp className="w-6 h-6" />
                     </Button>
                     <Button
                       onClick={(e) => handleLikeDislike(false, e)}
-                      size="sm"
-                      className="bg-red-600 hover:bg-red-700 text-white transition-all transform hover:scale-105 active:scale-95"
+                      size="icon"
+                      className="w-12 h-12 bg-red-600 hover:bg-red-700 text-white transition-all transform hover:scale-110 active:scale-95 rounded-full shadow-lg"
                       data-testid="dislike-button"
                     >
-                      <ThumbsDown className="w-4 h-4 mr-1" />
-                      Beğenme
+                      <ThumbsDown className="w-6 h-6" />
                     </Button>
                   </>
                 )}
