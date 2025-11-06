@@ -65,7 +65,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
           };
         default:
           // This should not happen, but if it does, return neutral colors
-          console.warn("Unknown card type:", card.type);
           return {
             bg: "bg-gradient-to-br from-[#d4c0a0] to-[#c9b592]",
             border: "border-[#b8a483]",

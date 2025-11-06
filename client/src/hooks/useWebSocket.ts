@@ -54,7 +54,6 @@ export function useWebSocket() {
           setIsConnected(true);
           setError("");
           reconnectAttempts.current = 0;
-          console.log("WebSocket connected");
           
           // Start ping interval to keep connection alive
           if (pingInterval.current) {
@@ -227,27 +226,14 @@ export function useWebSocket() {
               case "taunt_triggered":
                 // Handle taunt events
                 // Prevent duplicates by checking if this exact taunt already exists
-                console.log("TAUNT RECEIVED:", {
-                  playerId: message.payload.playerId,
-                  expiresAt: message.payload.expiresAt,
-                  team: message.payload.team,
-                  timestamp: Date.now()
-                });
                 setTaunts(prev => {
-                  console.log("EXISTING TAUNTS:", prev.map(t => ({
-                    playerId: t.playerId,
-                    expiresAt: t.expiresAt,
-                    team: t.team
-                  })));
                   const isDuplicate = prev.some(t => 
                     t.playerId === message.payload.playerId && 
                     t.expiresAt === message.payload.expiresAt
                   );
                   if (isDuplicate) {
-                    console.log(">>> DUPLICATE TAUNT DETECTED, IGNORING <<<");
                     return prev;
                   }
-                  console.log(">>> ADDING NEW TAUNT <<<");
                   return [...prev, message.payload];
                 });
                 // Only set cooldown for the same team
@@ -255,9 +241,7 @@ export function useWebSocket() {
                 const tauntGameState = message.payload.gameState;
                 if (tauntGameState && tauntGameState.players) {
                   const currentPlayerForTaunt = tauntGameState.players.find((p: any) => p.id === playerIdRef.current);
-                  console.log("TAUNT DEBUG - playerId:", playerIdRef.current, "currentPlayer:", currentPlayerForTaunt, "tauntTeam:", message.payload.team);
                   if (currentPlayerForTaunt && currentPlayerForTaunt.team === message.payload.team) {
-                    console.log("Setting taunt cooldown for team:", message.payload.team);
                     setGlobalTauntCooldown(5);
                   }
                 }
@@ -268,27 +252,14 @@ export function useWebSocket() {
               case "insult_sent":
                 // Handle insult events
                 // Prevent duplicates by checking if this exact insult already exists
-                console.log("INSULT RECEIVED:", {
-                  senderId: message.payload.senderId,
-                  timestamp: message.payload.timestamp,
-                  senderTeam: message.payload.senderTeam,
-                  receivedAt: Date.now()
-                });
                 setInsults(prev => {
-                  console.log("EXISTING INSULTS:", prev.map(i => ({
-                    senderId: i.senderId,
-                    timestamp: i.timestamp,
-                    senderTeam: i.senderTeam
-                  })));
                   const isDuplicate = prev.some(i => 
                     i.timestamp === message.payload.timestamp && 
                     i.senderId === message.payload.senderId
                   );
                   if (isDuplicate) {
-                    console.log(">>> DUPLICATE INSULT DETECTED, IGNORING <<<");
                     return prev;
                   }
-                  console.log(">>> ADDING NEW INSULT <<<");
                   return [...prev, message.payload];
                 });
                 // Only set cooldown for the same team
@@ -296,9 +267,7 @@ export function useWebSocket() {
                 const insultGameState = message.payload.gameState;
                 if (insultGameState && insultGameState.players) {
                   const currentPlayerForInsult = insultGameState.players.find((p: any) => p.id === playerIdRef.current);
-                  console.log("INSULT DEBUG - playerId:", playerIdRef.current, "currentPlayer:", currentPlayerForInsult, "senderTeam:", message.payload.senderTeam);
                   if (currentPlayerForInsult && currentPlayerForInsult.team === message.payload.senderTeam) {
-                    console.log("Setting insult cooldown for team:", message.payload.senderTeam);
                     setGlobalInsultCooldown(5);
                   }
                 }
@@ -321,12 +290,10 @@ export function useWebSocket() {
                 break;
             }
           } catch (err) {
-            console.error("Error parsing WebSocket message:", err);
           }
         };
 
         ws.current.onclose = (event) => {
-          console.log(`WebSocket closed. Code: ${event.code}, Reason: ${event.reason}`);
           setIsConnected(false);
           
           // Clear ping interval
@@ -344,7 +311,6 @@ export function useWebSocket() {
           if (reconnectAttempts.current < maxReconnectAttempts) {
             reconnectAttempts.current++;
             const delay = Math.min(3000 * reconnectAttempts.current, 10000);
-            console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current}/${maxReconnectAttempts})...`);
             
             reconnectTimeout.current = setTimeout(() => {
               connect();

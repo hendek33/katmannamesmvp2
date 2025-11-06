@@ -28,7 +28,6 @@ export class VideoBase64Converter {
         reader.readAsDataURL(blob);
       });
     } catch (error) {
-      console.error(`Failed to convert video to base64: ${videoPath}`, error);
       return videoPath; // Fallback to original path
     }
   }
@@ -45,16 +44,11 @@ export class VideoBase64Converter {
       '/kırmızı takım normal kazanma.webm'
     ];
     
-    console.log('Converting videos to base64...');
-    
     await Promise.all(
       videoPaths.map(async (path) => {
         const base64 = await this.convertToBase64(path);
-        console.log(`✅ Converted ${path} (${(base64.length / 1024 / 1024).toFixed(2)} MB)`);
       })
     );
-    
-    console.log('All videos converted to base64');
   }
   
   /**

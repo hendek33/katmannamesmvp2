@@ -61,9 +61,7 @@ export function PlayerIntroduction({
   }, [currentIntroducingPlayer]);
   
   const handlePlayerClick = (player: Player) => {
-    console.log("Player clicked:", player.id, "Controller:", isController, "Introduced:", player.introduced, "Current:", currentIntroducingPlayer);
     if (isController && !player.introduced && !currentIntroducingPlayer) {
-      console.log("Selecting player for introduction:", player.id);
       onSelectPlayer(player.id);
     }
   };

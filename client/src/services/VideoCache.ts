@@ -24,9 +24,7 @@ class VideoCache {
     
     try {
       await Promise.all(promises);
-      console.log('All videos preloaded');
     } catch (error) {
-      console.error('Some videos failed to preload:', error);
     }
   }
   
@@ -52,11 +50,9 @@ class VideoCache {
         this.preloadedVideos.add(src);
         cleanup();
         resolve();
-        console.log(`Preloaded: ${src}`);
       };
       
       const handleError = () => {
-        console.error(`Failed to preload: ${src}`);
         cleanup();
         resolve(); // Continue even on error
       };

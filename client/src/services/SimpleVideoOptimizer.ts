@@ -102,7 +102,6 @@ export class SimpleVideoOptimizer {
         await videoElement.play();
         return;
       } catch (error) {
-        console.warn(`Play attempt ${retries + 1} failed:`, error);
         retries++;
         
         if (retries < maxRetries) {
@@ -112,7 +111,6 @@ export class SimpleVideoOptimizer {
       }
     }
     
-    console.error('Failed to play video after all retries');
   }
   
   /**

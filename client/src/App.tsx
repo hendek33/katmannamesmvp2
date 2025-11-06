@@ -37,16 +37,13 @@ function App() {
     
     // Convert videos to base64 for inline playback - this prevents stuttering
     VideoBase64Converter.preloadAllAsBase64()
-      .then(() => {
-        console.log('✅ All videos converted to base64 - no more network delays!');
-      })
       .catch(err => {
-        console.error('Base64 conversion failed, falling back to normal loading:', err);
+        // Base64 conversion failed, falling back to normal loading
       });
     
     // Also use simple optimizer for better playback
     videoOptimizer.preloadAllVideos().catch(err => {
-      console.error('Simple video optimizer preloading failed:', err);
+      // Simple video optimizer preloading failed
     });
     
     // TEMPORARILY DISABLED: Enhanced video cache is causing loading issues

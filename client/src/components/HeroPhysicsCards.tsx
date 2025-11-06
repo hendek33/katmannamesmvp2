@@ -324,12 +324,6 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
       resetCards();
       raf = requestAnimationFrame(loop);
 
-      // --- Basit runtime testleri ---
-      try {
-        console.assert(Array.isArray(buildPaths(undefined)), 'TEST1: buildPaths undefined ile array dönmeli');
-        console.assert((await loadImages([])).length === 0, 'TEST2: loadImages([]) boş dizi dönmeli');
-        console.assert(cards.length === (window.matchMedia && window.matchMedia('(max-width: 768px)').matches ? countMobile : (params as any).count), 'TEST3: kart sayısı beklendiği gibi');
-      } catch (e) { console.warn('Self-tests warning', e); }
     })();
 
     return () => {

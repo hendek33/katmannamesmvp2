@@ -35,7 +35,6 @@ export function VideoPreloader() {
     // Tüm videoları yükle
     videos.forEach(preloadVideo);
     
-    console.log('Videos preloaded via link tags');
   }, []);
 
   return null;
