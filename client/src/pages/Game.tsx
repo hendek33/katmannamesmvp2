@@ -615,7 +615,7 @@ export default function Game() {
 
   const isSpymaster = currentPlayer.role === "spymaster";
   const isCurrentTurn = currentPlayer.team === gameState.currentTeam;
-  const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended";
+  const canGiveClue = isSpymaster && isCurrentTurn && !gameState.currentClue && gameState.phase !== "ended" && gameState.phase !== "introduction";
   
   // In Chaos Mode, Prophets and Double Agents can reveal and vote
   const canRevealCardBase = !isSpymaster && isCurrentTurn && gameState?.currentClue !== null && gameState.phase !== "ended";

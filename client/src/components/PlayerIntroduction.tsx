@@ -25,6 +25,8 @@ export function PlayerIntroduction({
 }: PlayerIntroductionProps) {
   const [showTitle, setShowTitle] = useState(true);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
+  const [particles, setParticles] = useState<{id: number, x: number, y: number, type: 'like' | 'dislike'}[]>([]);
+  const [dotCount, setDotCount] = useState(1);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team (light) spymaster controls
@@ -49,6 +51,16 @@ export function PlayerIntroduction({
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Animate dots for "kendini tanıtıyor..."
+  useEffect(() => {
+    if (currentIntroducingPlayer) {
+      const interval = setInterval(() => {
+        setDotCount(prev => prev >= 3 ? 1 : prev + 1);
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [currentIntroducingPlayer]);
   
   const handlePlayerClick = (player: Player) => {
     console.log("Player clicked:", player.id, "Controller:", isController, "Introduced:", player.introduced, "Current:", currentIntroducingPlayer);
@@ -64,8 +76,23 @@ export function PlayerIntroduction({
     }
   };
   
-  const handleLikeDislike = (isLike: boolean) => {
+  const handleLikeDislike = (isLike: boolean, event: React.MouseEvent) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer && !hasVoted) {
+      // Add particle effect
+      const rect = event.currentTarget.getBoundingClientRect();
+      const newParticle = {
+        id: Date.now(),
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        type: isLike ? 'like' as const : 'dislike' as const
+      };
+      setParticles(prev => [...prev, newParticle]);
+      
+      // Remove particle after animation
+      setTimeout(() => {
+        setParticles(prev => prev.filter(p => p.id !== newParticle.id));
+      }, 1000);
+      
       onLikeDislike(currentIntroducingPlayer, isLike);
     }
   };
@@ -281,10 +308,52 @@ export function PlayerIntroduction({
       ) : (
         /* Active Introduction View */
         <motion.div 
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="h-full flex flex-col"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 300,
+            damping: 30
+          }}
+          className="h-full flex flex-col relative"
         >
+          {/* Particle Effects */}
+          <AnimatePresence>
+            {particles.map((particle) => (
+              <motion.div
+                key={particle.id}
+                initial={{ 
+                  scale: 0,
+                  x: 0,
+                  y: 0
+                }}
+                animate={{ 
+                  scale: [1, 1.5, 0],
+                  x: particle.type === 'like' ? -50 : 50,
+                  y: -100
+                }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8 }}
+                className="fixed pointer-events-none z-50"
+                style={{ 
+                  left: particle.x, 
+                  top: particle.y,
+                }}
+              >
+                {particle.type === 'like' ? (
+                  <div className="flex items-center">
+                    <Heart className="w-8 h-8 text-green-500 fill-green-500" />
+                    <Sparkles className="w-6 h-6 text-yellow-400 ml-1 animate-pulse" />
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <ThumbsDown className="w-8 h-8 text-red-500 fill-red-500" />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          
           <Card className="bg-slate-900/60 backdrop-blur-xl border-2 border-white/10 shadow-2xl flex-1">
             <div className="p-6 h-full flex flex-col">
               {/* Introducing Player Info */}
@@ -313,7 +382,7 @@ export function PlayerIntroduction({
                   transition={{ repeat: Infinity, duration: 1.5 }}
                   className="text-lg text-white/70"
                 >
-                  kendini tanıtıyor...
+                  kendini tanıtıyor{".".repeat(dotCount)}
                 </motion.div>
                 
                 <Badge className={`mt-2 text-sm px-3 py-1 ${
@@ -329,57 +398,73 @@ export function PlayerIntroduction({
               {/* Voting Stats */}
               <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
                 {/* Likes */}
-                <Card className="bg-green-600/10 border-green-500/30 backdrop-blur-sm p-4">
+                <Card className="bg-green-600/10 border-green-500/30 backdrop-blur-sm p-4 overflow-hidden">
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsUp className="w-6 h-6 text-green-400 mr-2" />
                     <span className="text-2xl font-bold text-green-400">{likes.length}</span>
                   </div>
-                  <div className="space-y-1 max-h-24 overflow-y-auto">
-                    {likes.map((like, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex justify-center"
-                      >
-                        <Badge className={`text-xs ${
-                          like.team === "dark" 
-                            ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                            : 'bg-red-600/30 text-red-300 border-red-500/50'
-                        }`}>
-                          <Heart className="w-3 h-3 mr-1" />
-                          {like.username}
-                        </Badge>
-                      </motion.div>
-                    ))}
+                  <div className="flex flex-wrap gap-1 max-h-24 overflow-hidden">
+                    <AnimatePresence mode="popLayout">
+                      {likes.map((like, index) => (
+                        <motion.div
+                          key={`like-${like.username}`}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ 
+                            delay: index * 0.05,
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 25
+                          }}
+                          className="flex"
+                        >
+                          <Badge className={`text-xs ${
+                            like.team === "dark" 
+                              ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                              : 'bg-red-600/30 text-red-300 border-red-500/50'
+                          }`}>
+                            <Heart className="w-3 h-3 mr-1" />
+                            {like.username}
+                          </Badge>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
                 </Card>
                 
                 {/* Dislikes */}
-                <Card className="bg-red-600/10 border-red-500/30 backdrop-blur-sm p-4">
+                <Card className="bg-red-600/10 border-red-500/30 backdrop-blur-sm p-4 overflow-hidden">
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsDown className="w-6 h-6 text-red-400 mr-2" />
                     <span className="text-2xl font-bold text-red-400">{dislikes.length}</span>
                   </div>
-                  <div className="space-y-1 max-h-24 overflow-y-auto">
-                    {dislikes.map((dislike, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ x: 20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="flex justify-center"
-                      >
-                        <Badge className={`text-xs ${
-                          dislike.team === "dark" 
-                            ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                            : 'bg-red-600/30 text-red-300 border-red-500/50'
-                        }`}>
-                          {dislike.username}
-                        </Badge>
-                      </motion.div>
-                    ))}
+                  <div className="flex flex-wrap gap-1 max-h-24 overflow-hidden">
+                    <AnimatePresence mode="popLayout">
+                      {dislikes.map((dislike, index) => (
+                        <motion.div
+                          key={`dislike-${dislike.username}`}
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 0, opacity: 0 }}
+                          transition={{ 
+                            delay: index * 0.05,
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 25
+                          }}
+                          className="flex"
+                        >
+                          <Badge className={`text-xs ${
+                            dislike.team === "dark" 
+                              ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                              : 'bg-red-600/30 text-red-300 border-red-500/50'
+                          }`}>
+                            {dislike.username}
+                          </Badge>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
                 </Card>
               </div>
@@ -390,18 +475,18 @@ export function PlayerIntroduction({
                 {playerId !== currentIntroducingPlayer && !hasVoted && (
                   <>
                     <Button
-                      onClick={() => handleLikeDislike(true)}
+                      onClick={(e) => handleLikeDislike(true, e)}
                       size="sm"
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-green-600 hover:bg-green-700 text-white transition-all transform hover:scale-105 active:scale-95"
                       data-testid="like-button"
                     >
                       <ThumbsUp className="w-4 h-4 mr-1" />
                       Beğen
                     </Button>
                     <Button
-                      onClick={() => handleLikeDislike(false)}
+                      onClick={(e) => handleLikeDislike(false, e)}
                       size="sm"
-                      className="bg-red-600 hover:bg-red-700 text-white"
+                      className="bg-red-600 hover:bg-red-700 text-white transition-all transform hover:scale-105 active:scale-95"
                       data-testid="dislike-button"
                     >
                       <ThumbsDown className="w-4 h-4 mr-1" />
