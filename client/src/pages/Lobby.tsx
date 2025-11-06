@@ -513,6 +513,60 @@ export default function Lobby() {
               
               {/* Game Settings - Codenames Style */}
               <div className="space-y-4">
+                {/* Chaos Mode - Codenames Style */}
+                <div className={`rounded-xl border p-4 transition-all duration-500 ${
+                  chaosMode 
+                    ? 'bg-gradient-to-br from-violet-950/30 to-fuchsia-950/30 border-violet-600/30 shadow-xl backdrop-blur-sm' 
+                    : 'bg-slate-900/40 border-slate-700/30 backdrop-blur-sm'
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      {/* Minimalist Chaos Mode Badge */}
+                      <div className={`px-3 py-1.5 rounded-full transition-all duration-500 ${
+                        chaosMode 
+                          ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-lg' 
+                          : 'bg-slate-700/50'
+                      }`}>
+                        <span className={`text-sm font-semibold ${chaosMode ? 'text-white' : 'text-slate-400'}`}>
+                          {chaosMode ? '✨' : '○'} KAOS
+                        </span>
+                      </div>
+                      <h3 className={`text-sm font-medium transition-colors ${chaosMode ? 'text-violet-200' : 'text-slate-400'}`}>
+                        {chaosMode ? "🔮 Kahin Modu Aktif" : "Kahin Modu"}
+                      </h3>
+                      <button
+                        onClick={() => setShowChaosDetails(!showChaosDetails)}
+                        className={`px-2 py-0.5 text-sm rounded transition-all ${
+                          chaosMode 
+                            ? 'text-purple-300 hover:text-purple-200 bg-purple-900/30 hover:bg-purple-900/50 border border-purple-600/50' 
+                            : 'text-amber-400 hover:text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-700/50'
+                        }`}
+                      >
+                        ?
+                      </button>
+                    </div>
+                    <Switch
+                      checked={chaosMode}
+                      disabled={!currentPlayer?.isRoomOwner}
+                      onCheckedChange={(checked) => {
+                        if (currentPlayer?.isRoomOwner) {
+                          setChaosMode(checked);
+                          handleChaosModeUpdate(checked);
+                        }
+                      }}
+                      data-testid="switch-chaos-mode"
+                    />
+                  </div>
+                  {/* Chaos Mode Info when enabled */}
+                  {chaosMode && (
+                    <div className="mt-4">
+                      <div className="p-2 rounded-lg text-[10px] leading-relaxed bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20">
+                        Her takıma gizli bir Kahin atanacak • Kahinler oyundaki kartların yerlerini bilir.
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                 {/* Timer Settings - Enhanced Glassmorphism */}
                 <div className="relative group">
                   <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
@@ -631,60 +685,6 @@ export default function Lobby() {
                     </div>
                   </div>
                 )}
-                
-                {/* Chaos Mode - Codenames Style */}
-                <div className={`rounded-xl border p-4 transition-all duration-500 ${
-                  chaosMode 
-                    ? 'bg-gradient-to-br from-violet-950/30 to-fuchsia-950/30 border-violet-600/30 shadow-xl backdrop-blur-sm' 
-                    : 'bg-slate-900/40 border-slate-700/30 backdrop-blur-sm'
-                }`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                      {/* Minimalist Chaos Mode Badge */}
-                      <div className={`px-3 py-1.5 rounded-full transition-all duration-500 ${
-                        chaosMode 
-                          ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-lg' 
-                          : 'bg-slate-700/50'
-                      }`}>
-                        <span className={`text-sm font-semibold ${chaosMode ? 'text-white' : 'text-slate-400'}`}>
-                          {chaosMode ? '✨' : '○'} KAOS
-                        </span>
-                      </div>
-                      <h3 className={`text-sm font-medium transition-colors ${chaosMode ? 'text-violet-200' : 'text-slate-400'}`}>
-                        {chaosMode ? "🔮 Kahin Modu Aktif" : "Kahin Modu"}
-                      </h3>
-                      <button
-                        onClick={() => setShowChaosDetails(!showChaosDetails)}
-                        className={`px-2 py-0.5 text-sm rounded transition-all ${
-                          chaosMode 
-                            ? 'text-purple-300 hover:text-purple-200 bg-purple-900/30 hover:bg-purple-900/50 border border-purple-600/50' 
-                            : 'text-amber-400 hover:text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-700/50'
-                        }`}
-                      >
-                        ?
-                      </button>
-                    </div>
-                    <Switch
-                      checked={chaosMode}
-                      disabled={!currentPlayer?.isRoomOwner}
-                      onCheckedChange={(checked) => {
-                        if (currentPlayer?.isRoomOwner) {
-                          setChaosMode(checked);
-                          handleChaosModeUpdate(checked);
-                        }
-                      }}
-                      data-testid="switch-chaos-mode"
-                    />
-                  </div>
-                  {/* Chaos Mode Info when enabled */}
-                  {chaosMode && (
-                    <div className="mt-4">
-                      <div className="p-2 rounded-lg text-[10px] leading-relaxed bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20">
-                        Her takıma gizli bir Kahin atanacak • Kahinler oyundaki kartların yerlerini bilir.
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
               
               {/* Bot Controls - Enhanced Glassmorphism */}
