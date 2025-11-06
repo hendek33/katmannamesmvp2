@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { GameState, Player } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight } from "lucide-react";
+import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight, Star, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PlayerIntroductionProps {
@@ -192,9 +192,23 @@ export function PlayerIntroduction({
                   return (
                     <motion.div
                       key={player.id}
-                      initial={{ x: -50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { scale: 1.05 } : {}}
+                      initial={{ x: -100, opacity: 0, rotate: -10 }}
+                      animate={{ 
+                        x: 0, 
+                        opacity: 1, 
+                        rotate: 0,
+                        transition: { 
+                          type: "spring",
+                          stiffness: 200,
+                          damping: 20,
+                          delay: lightTeamPlayers.indexOf(player) * 0.1
+                        }
+                      }}
+                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
+                        scale: 1.08, 
+                        rotate: 2,
+                        transition: { type: "spring", stiffness: 300 }
+                      } : {}}
                     >
                       <Card
                         className={`
@@ -283,9 +297,23 @@ export function PlayerIntroduction({
                   return (
                     <motion.div
                       key={player.id}
-                      initial={{ x: 50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { scale: 1.05 } : {}}
+                      initial={{ x: 100, opacity: 0, rotate: 10 }}
+                      animate={{ 
+                        x: 0, 
+                        opacity: 1, 
+                        rotate: 0,
+                        transition: { 
+                          type: "spring",
+                          stiffness: 200,
+                          damping: 20,
+                          delay: darkTeamPlayers.indexOf(player) * 0.1
+                        }
+                      }}
+                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
+                        scale: 1.08, 
+                        rotate: -2,
+                        transition: { type: "spring", stiffness: 300 }
+                      } : {}}
                     >
                       <Card
                         className={`
@@ -411,32 +439,137 @@ export function PlayerIntroduction({
           <Card className="bg-slate-900/60 backdrop-blur-xl border-2 border-white/10 shadow-2xl flex-1">
             <div className="p-6 h-full flex flex-col">
               {/* Introducing Player Info */}
-              <div className="text-center mb-4">
+              <div className="text-center mb-4 relative">
+                {/* Animated background rays */}
                 <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="inline-block"
+                  className="absolute inset-0 -z-10"
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 >
-                  <div className={`
-                    w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center
-                    ${introducingPlayer?.team === "dark" ? 'bg-blue-600/50' : 'bg-red-600/50'}
-                  `}>
-                    <UserCircle className="w-14 h-14 text-white/80" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    {[...Array(8)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-32 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/20 to-transparent"
+                        style={{
+                          transform: `rotate(${i * 45}deg)`,
+                          transformOrigin: 'center',
+                        }}
+                        animate={{ 
+                          opacity: [0, 1, 0],
+                          width: ['8rem', '20rem', '8rem']
+                        }}
+                        transition={{ 
+                          duration: 3, 
+                          repeat: Infinity, 
+                          delay: i * 0.2 
+                        }}
+                      />
+                    ))}
                   </div>
                 </motion.div>
                 
-                <h2 className="text-3xl font-black mb-1">
-                  <span className={`${introducingPlayer?.team === "dark" ? 'text-blue-400' : 'text-red-400'}`}>
-                    {introducingPlayer?.username}
-                  </span>
-                </h2>
-                
+                {/* Player avatar with glow effect */}
                 <motion.div
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                  className="text-lg text-white/70"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                    rotate: 0
+                  }}
+                  transition={{ 
+                    scale: { repeat: Infinity, duration: 2, ease: "easeInOut" },
+                    rotate: { type: "spring", stiffness: 200 }
+                  }}
+                  className="inline-block relative"
                 >
-                  kendini tanıtıyor{".".repeat(dotCount)}
+                  {/* Animated glow ring */}
+                  <motion.div
+                    className={`absolute -inset-2 rounded-full ${introducingPlayer?.team === "dark" ? 'bg-blue-400' : 'bg-red-400'}`}
+                    animate={{ 
+                      opacity: [0.3, 0.6, 0.3],
+                      scale: [0.95, 1.05, 0.95]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    style={{ filter: 'blur(8px)' }}
+                  />
+                  
+                  <div className={`
+                    relative w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center shadow-2xl
+                    ${introducingPlayer?.team === "dark" ? 'bg-gradient-to-br from-blue-600 to-blue-800' : 'bg-gradient-to-br from-red-600 to-red-800'}
+                  `}>
+                    <motion.div
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <UserCircle className="w-14 h-14 text-white" />
+                    </motion.div>
+                  </div>
+                </motion.div>
+                
+                {/* Player name with gradient animation */}
+                <motion.h2 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3, type: "spring" }}
+                  className="text-3xl font-black mb-1 relative"
+                >
+                  <motion.span 
+                    className={`inline-block ${introducingPlayer?.team === "dark" ? 'text-blue-400' : 'text-red-400'}`}
+                    animate={{ 
+                      filter: ['brightness(1)', 'brightness(1.3)', 'brightness(1)'],
+                      scale: [1, 1.02, 1]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    {introducingPlayer?.username}
+                  </motion.span>
+                  
+                  {/* Floating sparkles around name */}
+                  <motion.div
+                    className="absolute -right-6 -top-2"
+                    animate={{ 
+                      y: [-2, 2, -2],
+                      rotate: [0, 360]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    <Sparkles className="w-4 h-4 text-yellow-400" />
+                  </motion.div>
+                  <motion.div
+                    className="absolute -left-6 -bottom-2"
+                    animate={{ 
+                      y: [2, -2, 2],
+                      rotate: [0, -360]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                  >
+                    <Star className="w-4 h-4 text-yellow-400" />
+                  </motion.div>
+                </motion.h2>
+                
+                {/* Animated introduction text */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-lg text-white/80 font-medium"
+                >
+                  <motion.span
+                    animate={{ 
+                      opacity: [0.5, 1, 0.5],
+                      scale: [0.98, 1.02, 0.98]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    kendini tanıtıyor
+                  </motion.span>
+                  <motion.span 
+                    className="inline-block ml-1"
+                    animate={{ opacity: [0, 1, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    {".".repeat(dotCount)}
+                  </motion.span>
                 </motion.div>
                 
                 <div 
