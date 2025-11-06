@@ -1,18 +1,18 @@
 # Ses Efektleri Listesi
 
 ## Oyun Akışı
-1. **Oyun Başlangıcı** -
-2. **Tur Değişimi** - 
-3. **İpucu Verildi** - 
-4. **Süre Azalıyor** - 
-5. **Tur Sonu**
+1. **Oyun Başlangıcı** - 3sn (bas darbe → crescendo → final)
+2. **Tur Değişimi** - 1sn (swoosh)
+3. **İpucu Verildi** - 2sn (kalem-yazı sesi)
+4. **Süre Azalıyor** - 1sn loop (tik-tak)
+5. **Tur Sonu** - 2sn (zil)
 
 ## Kart Sesleri
-6. **Kart Tıklama** - 
-7. **Doğru Kart** - 
-8. **Yanlış Kart** -
-9. **Nötr Kart** - 
-10. **Suikastçı** -
+6. **Kart Tıklama** - 0.2sn (click)
+7. **Doğru Kart** - 1.5sn (çevirme + başarı chime)
+8. **Yanlış Kart** - 1sn (çevirme + buzzer)
+9. **Nötr Kart** - 0.8sn (çevirme + pop)
+10. **Suikastçı** - 3sn (dramatik stinger + patlama)
 
 ## Oyun Sonu
 11. **Zafer** - 5sn (fanfar + tezahürat)

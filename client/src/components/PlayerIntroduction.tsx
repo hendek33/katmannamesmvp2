@@ -1,19 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import type { GameState, Player } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  color: string;
-  size: number;
-  velocity: { x: number; y: number };
-}
 
 interface PlayerIntroductionProps {
   gameState: GameState;
@@ -35,8 +26,6 @@ export function PlayerIntroduction({
   const [showTitle, setShowTitle] = useState(true);
   const [playerBubbles, setPlayerBubbles] = useState<Player[]>([]);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
-  const [dots, setDots] = useState(1);
-  const [particles, setParticles] = useState<Particle[]>([]);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team (light) spymaster controls
@@ -52,15 +41,6 @@ export function PlayerIntroduction({
     (introducingPlayer.introductionLikes && playerId in introducingPlayer.introductionLikes) ||
     (introducingPlayer.introductionDislikes && playerId in introducingPlayer.introductionDislikes)
   );
-  
-  useEffect(() => {
-    // Animate dots for "kendini tanıtıyor..."
-    const dotsInterval = setInterval(() => {
-      setDots(prev => (prev >= 3 ? 1 : prev + 1));
-    }, 500);
-    
-    return () => clearInterval(dotsInterval);
-  }, []);
   
   useEffect(() => {
     // Hide title after 3 seconds
@@ -80,25 +60,8 @@ export function PlayerIntroduction({
   }, [darkTeamPlayers.length, lightTeamPlayers.length]);
   
   const handlePlayerClick = (player: Player) => {
-    console.log('🔍 Player clicked:', {
-      playerName: player.username,
-      playerId: player.id,
-      isController,
-      playerIntroduced: player.introduced,
-      currentIntroducingPlayer,
-      currentPlayerTeam: currentPlayer?.team,
-      currentPlayerRole: currentPlayer?.role
-    });
-    
     if (isController && !player.introduced && !currentIntroducingPlayer) {
-      console.log('✅ Sending select_player_for_introduction for:', player.username);
       onSelectPlayer(player.id);
-    } else {
-      console.log('❌ Click ignored - conditions not met:', {
-        isController,
-        playerIntroduced: player.introduced,
-        hasCurrentIntroducingPlayer: !!currentIntroducingPlayer
-      });
     }
   };
   
@@ -108,39 +71,8 @@ export function PlayerIntroduction({
     }
   };
   
-  const createParticles = useCallback((isLike: boolean, event: React.MouseEvent) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const colors = isLike 
-      ? ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#86efac']
-      : ['#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fb923c'];
-    
-    const newParticles: Particle[] = [];
-    for (let i = 0; i < 30; i++) {
-      const angle = (Math.PI * 2 * i) / 30;
-      const velocity = 3 + Math.random() * 4;
-      newParticles.push({
-        id: Date.now() + i,
-        x: centerX,
-        y: centerY,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        size: 4 + Math.random() * 6,
-        velocity: {
-          x: Math.cos(angle) * velocity,
-          y: Math.sin(angle) * velocity - 2,
-        },
-      });
-    }
-    
-    setParticles(newParticles);
-    setTimeout(() => setParticles([]), 1000);
-  }, []);
-
-  const handleLikeDislike = (isLike: boolean, event: React.MouseEvent) => {
+  const handleLikeDislike = (isLike: boolean) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer && !hasVoted) {
-      createParticles(isLike, event);
       onLikeDislike(currentIntroducingPlayer, isLike);
     }
   };
@@ -165,32 +97,24 @@ export function PlayerIntroduction({
   const { likes, dislikes } = getLikesAndDislikes();
   
   return (
-    <Card className="relative w-full max-w-6xl mx-auto bg-slate-900/95 backdrop-blur-lg border-2 border-purple-500/30 shadow-2xl overflow-hidden">
-      {/* Particle System */}
-      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 9999 }}>
-        {particles.map((particle) => (
-          <motion.div
-            key={particle.id}
-            initial={{ x: particle.x, y: particle.y, opacity: 1, scale: 1 }}
-            animate={{ 
-              x: particle.x + particle.velocity.x * 100, 
-              y: particle.y + particle.velocity.y * 100 + 200,
-              opacity: 0,
-              scale: 0
-            }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            style={{
-              position: 'fixed',
-              width: particle.size,
-              height: particle.size,
-              backgroundColor: particle.color,
-              borderRadius: '50%',
-              boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
-            }}
-          />
-        ))}
-      </div>
-      <div className="relative flex flex-col p-4">
+    <div className="fixed inset-0 bg-slate-900 z-50" style={{ 
+      backgroundImage: 'url(/arkaplan.webp)', 
+      backgroundSize: 'cover', 
+      backgroundPosition: 'center' 
+    }}>
+      {/* Dark overlay for better contrast */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-900/95" />
+      
+      {/* Particles */}
+      {[...Array(12)].map((_, i) => (
+        <div key={i} className={`particle particle-${i + 1}`} />
+      ))}
+      
+      {/* Light effects */}
+      <div className="light-effect light-1" />
+      <div className="light-effect light-2" />
+      
+      <div className="relative h-full flex flex-col">
         {/* Title Animation */}
         <AnimatePresence>
           {showTitle && (
@@ -199,7 +123,7 @@ export function PlayerIntroduction({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.5 }}
-              className="flex items-center justify-center py-6"
+              className="absolute inset-0 flex items-center justify-center z-50"
             >
               <div className="relative">
                 <motion.div
@@ -207,13 +131,13 @@ export function PlayerIntroduction({
                   transition={{ repeat: 2, duration: 0.5 }}
                   className="text-center"
                 >
-                  <h1 className="text-4xl md:text-5xl font-black mb-2 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent drop-shadow-2xl">
+                  <h1 className="text-7xl font-black mb-4 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent drop-shadow-2xl">
                     TANIŞMA ZAMANI!
                   </h1>
-                  <p className="text-lg text-white/90 font-semibold">
+                  <p className="text-2xl text-white/90 font-semibold">
                     Oyuncular kendilerini tanıtacak
                   </p>
-                  <Sparkles className="w-8 h-8 text-yellow-400 mx-auto mt-2 animate-pulse" />
+                  <Sparkles className="w-12 h-12 text-yellow-400 mx-auto mt-4 animate-pulse" />
                 </motion.div>
               </div>
             </motion.div>
@@ -225,16 +149,15 @@ export function PlayerIntroduction({
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex justify-end mb-2"
+            className="absolute top-4 right-4 z-40"
           >
             <Button
               onClick={onSkipIntroduction}
               variant="outline"
-              size="sm"
               className="bg-slate-900/80 hover:bg-slate-900/90 border-white/20 text-white backdrop-blur-md"
               data-testid="skip-introduction-button"
             >
-              <SkipForward className="w-3 h-3 mr-2" />
+              <SkipForward className="w-4 h-4 mr-2" />
               Tanıtımı Atla ve Oyuna Başla
             </Button>
           </motion.div>
@@ -242,40 +165,40 @@ export function PlayerIntroduction({
         
         {/* Main Content Area */}
         {!showTitle && (
-          <div className="flex items-start justify-center">
+          <div className="flex-1 flex items-center justify-center p-8">
             {!currentIntroducingPlayer ? (
               /* Player Selection Grid */
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="w-full"
+                className="w-full max-w-7xl"
               >
                 {isController && (
                   <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-3"
+                    className="text-center mb-8"
                   >
-                    <Badge className="text-sm px-4 py-1.5 bg-red-600 text-white border-0">
-                      <Crown className="w-4 h-4 mr-2" />
+                    <Badge className="text-lg px-6 py-2 bg-red-600 text-white border-0">
+                      <Crown className="w-5 h-5 mr-2" />
                       Bir oyuncu seçerek tanıtımını başlat
                     </Badge>
                   </motion.div>
                 )}
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                <div className="grid grid-cols-2 gap-8">
                   {/* Dark Team (Blue) */}
                   <div>
-                    <div className="flex items-center justify-center mb-2">
-                      <div className="bg-blue-600/20 backdrop-blur-md rounded-lg px-3 py-1.5 border border-blue-500/30">
-                        <h2 className="text-lg font-bold text-blue-400 flex items-center">
-                          <Users className="w-4 h-4 mr-2" />
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="bg-blue-600/20 backdrop-blur-md rounded-xl px-6 py-3 border border-blue-500/30">
+                        <h2 className="text-2xl font-bold text-blue-400 flex items-center">
+                          <Users className="w-6 h-6 mr-2" />
                           {gameState.darkTeamName}
                         </h2>
                       </div>
                     </div>
                     
-                    <div className="space-y-1.5">
+                    <div className="space-y-3">
                       {darkTeamPlayers.map((player, index) => {
                         const isInBubbles = playerBubbles.some(p => p.id === player.id);
                         const hasBeenIntroduced = player.introduced;
@@ -289,7 +212,7 @@ export function PlayerIntroduction({
                           >
                             <Card
                               className={`
-                                relative p-2 cursor-pointer transition-all duration-300
+                                relative p-4 cursor-pointer transition-all duration-300
                                 ${hasBeenIntroduced 
                                   ? 'bg-blue-900/20 border-blue-800/30' 
                                   : 'bg-blue-900/40 hover:bg-blue-900/60 border-blue-600/50 hover:border-blue-500/70'
@@ -303,27 +226,25 @@ export function PlayerIntroduction({
                               onMouseLeave={() => setHoveredPlayer(null)}
                               data-testid={`player-card-${player.id}`}
                             >
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                                  <div className={`w-7 h-7 rounded-full bg-blue-600/50 flex items-center justify-center flex-shrink-0 ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
-                                    <UserCircle className="w-4 h-4 text-blue-300" />
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className={`w-10 h-10 rounded-full bg-blue-600/50 flex items-center justify-center ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
+                                    <UserCircle className="w-6 h-6 text-blue-300" />
                                   </div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-1 flex-wrap">
-                                      <span className={`text-sm font-bold truncate ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
-                                        {player.username}
-                                      </span>
-                                      {player.role === "spymaster" && (
-                                        <Badge variant="outline" className="text-[10px] border-blue-500/50 text-blue-400 flex-shrink-0 px-1 py-0">
-                                          <Crown className="w-2.5 h-2.5 mr-0.5" />
-                                          İstihbarat Şefi
-                                        </Badge>
-                                      )}
-                                    </div>
+                                  <div>
+                                    <span className={`text-lg font-bold ${hasBeenIntroduced ? 'text-blue-400/60' : 'text-blue-300'}`}>
+                                      {player.username}
+                                    </span>
+                                    {player.role === "spymaster" && (
+                                      <Badge variant="outline" className="ml-2 text-xs border-blue-500/50 text-blue-400">
+                                        <Crown className="w-3 h-3 mr-1" />
+                                        İstihbarat Şefi
+                                      </Badge>
+                                    )}
                                   </div>
                                 </div>
                                 {hasBeenIntroduced && (
-                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50 text-[10px] flex-shrink-0 px-1.5 py-0">
+                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50">
                                     Tanıtıldı
                                   </Badge>
                                 )}
@@ -337,16 +258,16 @@ export function PlayerIntroduction({
                   
                   {/* Light Team (Red) */}
                   <div>
-                    <div className="flex items-center justify-center mb-2">
-                      <div className="bg-red-600/20 backdrop-blur-md rounded-lg px-3 py-1.5 border border-red-500/30">
-                        <h2 className="text-lg font-bold text-red-400 flex items-center">
-                          <Users className="w-4 h-4 mr-2" />
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="bg-red-600/20 backdrop-blur-md rounded-xl px-6 py-3 border border-red-500/30">
+                        <h2 className="text-2xl font-bold text-red-400 flex items-center">
+                          <Users className="w-6 h-6 mr-2" />
                           {gameState.lightTeamName}
                         </h2>
                       </div>
                     </div>
                     
-                    <div className="space-y-1.5">
+                    <div className="space-y-3">
                       {lightTeamPlayers.map((player, index) => {
                         const isInBubbles = playerBubbles.some(p => p.id === player.id);
                         const hasBeenIntroduced = player.introduced;
@@ -360,7 +281,7 @@ export function PlayerIntroduction({
                           >
                             <Card
                               className={`
-                                relative p-2 cursor-pointer transition-all duration-300
+                                relative p-4 cursor-pointer transition-all duration-300
                                 ${hasBeenIntroduced 
                                   ? 'bg-red-900/20 border-red-800/30' 
                                   : 'bg-red-900/40 hover:bg-red-900/60 border-red-600/50 hover:border-red-500/70'
@@ -374,27 +295,25 @@ export function PlayerIntroduction({
                               onMouseLeave={() => setHoveredPlayer(null)}
                               data-testid={`player-card-${player.id}`}
                             >
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center space-x-2 min-w-0 flex-1">
-                                  <div className={`w-7 h-7 rounded-full bg-red-600/50 flex items-center justify-center flex-shrink-0 ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
-                                    <UserCircle className="w-4 h-4 text-red-300" />
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <div className={`w-10 h-10 rounded-full bg-red-600/50 flex items-center justify-center ${!hasBeenIntroduced ? 'animate-pulse' : ''}`}>
+                                    <UserCircle className="w-6 h-6 text-red-300" />
                                   </div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-1 flex-wrap">
-                                      <span className={`text-sm font-bold truncate ${hasBeenIntroduced ? 'text-red-400/60' : 'text-red-300'}`}>
-                                        {player.username}
-                                      </span>
-                                      {player.role === "spymaster" && (
-                                        <Badge variant="outline" className="text-[10px] border-red-500/50 text-red-400 flex-shrink-0 px-1 py-0">
-                                          <Crown className="w-2.5 h-2.5 mr-0.5" />
-                                          İstihbarat Şefi
-                                        </Badge>
-                                      )}
-                                    </div>
+                                  <div>
+                                    <span className={`text-lg font-bold ${hasBeenIntroduced ? 'text-red-400/60' : 'text-red-300'}`}>
+                                      {player.username}
+                                    </span>
+                                    {player.role === "spymaster" && (
+                                      <Badge variant="outline" className="ml-2 text-xs border-red-500/50 text-red-400">
+                                        <Crown className="w-3 h-3 mr-1" />
+                                        İstihbarat Şefi
+                                      </Badge>
+                                    )}
                                   </div>
                                 </div>
                                 {hasBeenIntroduced && (
-                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50 text-[10px] flex-shrink-0 px-1.5 py-0">
+                                  <Badge className="bg-green-600/30 text-green-400 border-green-500/50">
                                     Tanıtıldı
                                   </Badge>
                                 )}
@@ -410,202 +329,138 @@ export function PlayerIntroduction({
             ) : (
               /* Active Introduction View */
               <motion.div 
-                initial={{ scale: 0.8, opacity: 0, y: 50 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className="w-full"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="w-full max-w-4xl"
               >
                 <Card className="bg-slate-900/60 backdrop-blur-xl border-2 border-white/10 shadow-2xl">
-                  <div className="p-8">
+                  <div className="p-12">
                     {/* Introducing Player Info */}
-                    <div className="text-center mb-6">
+                    <div className="text-center mb-8">
                       <motion.div
-                        initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ repeat: Infinity, duration: 2 }}
+                        className="inline-block"
                       >
-                        <motion.div
-                          animate={{ scale: [1, 1.05, 1] }}
-                          transition={{ repeat: Infinity, duration: 2 }}
-                          className="inline-block"
-                        >
-                          <div className={`
-                            w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center
-                            ${introducingPlayer?.team === "dark" ? 'bg-blue-600/50' : 'bg-red-600/50'}
-                          `}>
-                            <UserCircle className="w-14 h-14 text-white/80" />
-                          </div>
-                        </motion.div>
+                        <div className={`
+                          w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center
+                          ${introducingPlayer?.team === "dark" ? 'bg-blue-600/50' : 'bg-red-600/50'}
+                        `}>
+                          <UserCircle className="w-16 h-16 text-white/80" />
+                        </div>
                       </motion.div>
                       
-                      <motion.h2 
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-4xl font-black mb-2"
-                      >
+                      <h2 className="text-5xl font-black mb-2">
                         <span className={`${introducingPlayer?.team === "dark" ? 'text-blue-400' : 'text-red-400'}`}>
                           {introducingPlayer?.username}
                         </span>
-                      </motion.h2>
+                      </h2>
                       
                       <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-lg text-white/70"
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="text-xl text-white/70"
                       >
-                        kendini tanıtıyor{'.'.repeat(dots)}
+                        kendini tanıtıyor...
                       </motion.div>
                       
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4 }}
-                      >
-                        <Badge className={`mt-3 text-base px-3 py-1.5 ${
-                          introducingPlayer?.team === "dark" 
-                            ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                            : 'bg-red-600/30 text-red-300 border-red-500/50'
-                        }`}>
-                          {introducingPlayer?.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                          {introducingPlayer?.role === "spymaster" && " - İstihbarat Şefi"}
-                        </Badge>
-                      </motion.div>
+                      <Badge className={`mt-4 text-lg px-4 py-2 ${
+                        introducingPlayer?.team === "dark" 
+                          ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                          : 'bg-red-600/30 text-red-300 border-red-500/50'
+                      }`}>
+                        {introducingPlayer?.team === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                        {introducingPlayer?.role === "spymaster" && " - İstihbarat Şefi"}
+                      </Badge>
                     </div>
                     
                     {/* Voting Stats */}
-                    <div className="grid grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-2 gap-8 mb-8">
                       {/* Likes */}
-                      <motion.div
-                        initial={{ x: -50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                      >
-                        <Card className="bg-green-600/10 border-green-500/30 backdrop-blur-sm p-4">
-                          <div className="flex items-center justify-center mb-3">
-                            <ThumbsUp className="w-8 h-8 text-green-400 mr-2" />
-                            <span className="text-3xl font-bold text-green-400">{likes.length}</span>
-                          </div>
-                          <div className="flex flex-wrap justify-center gap-1.5 min-h-[40px]">
-                            {likes.map((like, index) => (
-                              <motion.div
-                                key={`like-${like.username}-${index}`}
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                transition={{ 
-                                  type: "spring",
-                                  stiffness: 300,
-                                  damping: 15,
-                                  delay: index * 0.05
-                                }}
-                              >
-                                <Badge className={`text-xs ${
-                                  like.team === "dark" 
-                                    ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                                    : 'bg-red-600/30 text-red-300 border-red-500/50'
-                                }`}>
-                                  <Heart className="w-2.5 h-2.5 mr-1" />
-                                  {like.username}
-                                </Badge>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </Card>
-                      </motion.div>
+                      <Card className="bg-green-600/10 border-green-500/30 backdrop-blur-sm p-6">
+                        <div className="flex items-center justify-center mb-4">
+                          <ThumbsUp className="w-10 h-10 text-green-400 mr-3" />
+                          <span className="text-4xl font-bold text-green-400">{likes.length}</span>
+                        </div>
+                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                          {likes.map((like, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ x: -20, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="flex items-center justify-center"
+                            >
+                              <Badge className={`${
+                                like.team === "dark" 
+                                  ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                                  : 'bg-red-600/30 text-red-300 border-red-500/50'
+                              }`}>
+                                <Heart className="w-3 h-3 mr-1" />
+                                {like.username}
+                              </Badge>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </Card>
                       
                       {/* Dislikes */}
-                      <motion.div
-                        initial={{ x: 50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                      >
-                        <Card className="bg-red-600/10 border-red-500/30 backdrop-blur-sm p-4">
-                          <div className="flex items-center justify-center mb-3">
-                            <ThumbsDown className="w-8 h-8 text-red-400 mr-2" />
-                            <span className="text-3xl font-bold text-red-400">{dislikes.length}</span>
-                          </div>
-                          <div className="flex flex-wrap justify-center gap-1.5 min-h-[40px]">
-                            {dislikes.map((dislike, index) => (
-                              <motion.div
-                                key={`dislike-${dislike.username}-${index}`}
-                                initial={{ scale: 0, rotate: 180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                transition={{ 
-                                  type: "spring",
-                                  stiffness: 300,
-                                  damping: 15,
-                                  delay: index * 0.05
-                                }}
-                              >
-                                <Badge className={`text-xs ${
-                                  dislike.team === "dark" 
-                                    ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
-                                    : 'bg-red-600/30 text-red-300 border-red-500/50'
-                                }`}>
-                                  {dislike.username}
-                                </Badge>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </Card>
-                      </motion.div>
+                      <Card className="bg-red-600/10 border-red-500/30 backdrop-blur-sm p-6">
+                        <div className="flex items-center justify-center mb-4">
+                          <ThumbsDown className="w-10 h-10 text-red-400 mr-3" />
+                          <span className="text-4xl font-bold text-red-400">{dislikes.length}</span>
+                        </div>
+                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                          {dislikes.map((dislike, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ x: 20, opacity: 0 }}
+                              animate={{ x: 0, opacity: 1 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="flex items-center justify-center"
+                            >
+                              <Badge className={`${
+                                dislike.team === "dark" 
+                                  ? 'bg-blue-600/30 text-blue-300 border-blue-500/50' 
+                                  : 'bg-red-600/30 text-red-300 border-red-500/50'
+                              }`}>
+                                {dislike.username}
+                              </Badge>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </Card>
                     </div>
                     
                     {/* Action Buttons */}
-                    <motion.div 
-                      initial={{ y: 30, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.7 }}
-                      className="flex justify-center gap-4"
-                    >
+                    <div className="flex justify-center gap-4">
                       {/* Voting buttons for non-introducing players */}
                       {playerId !== currentIntroducingPlayer && !hasVoted && (
                         <>
-                          <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                          <Button
+                            onClick={() => handleLikeDislike(true)}
+                            size="lg"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            data-testid="like-button"
                           >
-                            <Button
-                              onClick={(e) => handleLikeDislike(true, e)}
-                              size="lg"
-                              className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-green-500/50 transition-all duration-200"
-                              data-testid="like-button"
-                            >
-                              <motion.div
-                                animate={{ rotate: [0, -10, 10, -10, 0] }}
-                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                              >
-                                <ThumbsUp className="w-5 h-5 mr-2" />
-                              </motion.div>
-                              Beğendim
-                            </Button>
-                          </motion.div>
-                          <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            <ThumbsUp className="w-5 h-5 mr-2" />
+                            Beğendim
+                          </Button>
+                          <Button
+                            onClick={() => handleLikeDislike(false)}
+                            size="lg"
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                            data-testid="dislike-button"
                           >
-                            <Button
-                              onClick={(e) => handleLikeDislike(false, e)}
-                              size="lg"
-                              className="bg-red-600 hover:bg-red-700 text-white shadow-lg hover:shadow-red-500/50 transition-all duration-200"
-                              data-testid="dislike-button"
-                            >
-                              <motion.div
-                                animate={{ rotate: [0, 10, -10, 10, 0] }}
-                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                              >
-                                <ThumbsDown className="w-5 h-5 mr-2" />
-                              </motion.div>
-                              Beğenmedim
-                            </Button>
-                          </motion.div>
+                            <ThumbsDown className="w-5 h-5 mr-2" />
+                            Beğenmedim
+                          </Button>
                         </>
                       )}
                       
                       {/* Already voted indicator */}
                       {hasVoted && playerId !== currentIntroducingPlayer && (
-                        <Badge className="text-base px-4 py-2 bg-slate-700/50 text-white/70">
+                        <Badge className="text-lg px-6 py-3 bg-slate-700/50 text-white/70">
                           Oyunu Kullandın ✓
                         </Badge>
                       )}
@@ -623,7 +478,7 @@ export function PlayerIntroduction({
                           <ChevronRight className="w-5 h-5 ml-2" />
                         </Button>
                       )}
-                    </motion.div>
+                    </div>
                   </div>
                 </Card>
               </motion.div>
@@ -631,6 +486,6 @@ export function PlayerIntroduction({
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 }
