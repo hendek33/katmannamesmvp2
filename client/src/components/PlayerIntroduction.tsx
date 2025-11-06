@@ -319,26 +319,76 @@ export function PlayerIntroduction({
         /* Player Selection View */
         <div className="space-y-3">
           {isController && (
-            <div className="text-center mb-3">
-              <div 
-                className="inline-flex items-center text-sm px-4 py-1 rounded-md font-semibold"
-                style={{ backgroundColor: '#dc2626', color: 'white' }}
+            <motion.div 
+              className="text-center mb-4"
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+            >
+              <motion.div 
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-red-600 to-red-700 shadow-xl border-2 border-red-500/50"
+                animate={{ 
+                  boxShadow: [
+                    "0 0 20px rgba(220, 38, 38, 0.3)",
+                    "0 0 30px rgba(220, 38, 38, 0.5)",
+                    "0 0 20px rgba(220, 38, 38, 0.3)"
+                  ]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
               >
-                <Crown className="w-4 h-4 mr-1" style={{ color: 'white' }} />
-                <span>Bir oyuncu seçerek tanıtımını başlat</span>
-              </div>
-            </div>
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Crown className="w-5 h-5 text-yellow-400" />
+                </motion.div>
+                <span className="text-white font-bold text-base">
+                  Bir Oyuncu Seç ve Tanıtımı Başlat
+                </span>
+                <Sparkles className="w-5 h-5 text-yellow-400" />
+              </motion.div>
+            </motion.div>
           )}
           
           <div className="grid grid-cols-2 gap-4">
             {/* Light Team (Red) - Left Side */}
             <div>
-              <div className="bg-red-600/20 backdrop-blur-sm rounded-lg px-3 py-1 mb-2 border border-red-500/30">
-                <h3 className="text-sm font-bold text-red-400 flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  {gameState.lightTeamName}
+              <motion.div 
+                className="relative bg-gradient-to-r from-red-900/60 to-red-800/60 backdrop-blur-sm rounded-xl px-4 py-3 mb-3 border-2 border-red-500/50 shadow-lg overflow-hidden"
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 150 }}
+              >
+                {/* Animated background gradient */}
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-red-600/20 via-transparent to-red-600/20"
+                  animate={{ 
+                    x: [-200, 200, -200]
+                  }}
+                  transition={{ 
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+                <h3 className="relative text-base font-black text-red-300 flex items-center justify-center gap-2">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    <Users className="w-5 h-5 text-red-400" />
+                  </motion.div>
+                  <span className="bg-gradient-to-r from-red-300 to-red-100 bg-clip-text text-transparent">
+                    {gameState.lightTeamName}
+                  </span>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Star className="w-4 h-4 text-red-400" />
+                  </motion.div>
                 </h3>
-              </div>
+              </motion.div>
               
               <div className="space-y-2">
                 {lightTeamPlayers.map((player) => {
@@ -438,12 +488,42 @@ export function PlayerIntroduction({
             
             {/* Dark Team (Blue) - Right Side */}
             <div>
-              <div className="bg-blue-600/20 backdrop-blur-sm rounded-lg px-3 py-1 mb-2 border border-blue-500/30">
-                <h3 className="text-sm font-bold text-blue-400 flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  {gameState.darkTeamName}
+              <motion.div 
+                className="relative bg-gradient-to-r from-blue-900/60 to-blue-800/60 backdrop-blur-sm rounded-xl px-4 py-3 mb-3 border-2 border-blue-500/50 shadow-lg overflow-hidden"
+                initial={{ x: 50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 150 }}
+              >
+                {/* Animated background gradient */}
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-transparent to-blue-600/20"
+                  animate={{ 
+                    x: [200, -200, 200]
+                  }}
+                  transition={{ 
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+                <h3 className="relative text-base font-black text-blue-300 flex items-center justify-center gap-2">
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                  >
+                    <Users className="w-5 h-5 text-blue-400" />
+                  </motion.div>
+                  <span className="bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">
+                    {gameState.darkTeamName}
+                  </span>
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Star className="w-4 h-4 text-blue-400" />
+                  </motion.div>
                 </h3>
-              </div>
+              </motion.div>
               
               <div className="space-y-2">
                 {darkTeamPlayers.map((player) => {
