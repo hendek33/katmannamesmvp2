@@ -118,26 +118,177 @@ export function PlayerIntroduction({
   // Show title animation first
   if (showTitle) {
     return (
-      <div className="grid-area px-4 py-8 flex items-center justify-center">
+      <div className="grid-area px-4 py-8 flex items-center justify-center relative overflow-hidden">
+        {/* Animated background particles */}
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-yellow-400 rounded-full opacity-60"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [-20, 20, -20],
+                x: [-10, 10, -10],
+                opacity: [0, 0.8, 0],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.5 }}
-          className="text-center"
+          initial={{ scale: 0, opacity: 0, rotateX: -90 }}
+          animate={{ 
+            scale: 1, 
+            opacity: 1, 
+            rotateX: 0,
+          }}
+          exit={{ opacity: 0, scale: 0.8, rotateX: 90 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            duration: 1
+          }}
+          className="text-center relative z-10"
         >
-          <motion.div
-            animate={{ rotate: [0, 5, -5, 0] }}
-            transition={{ repeat: 1, duration: 0.5 }}
-          >
-            <h1 className="text-5xl lg:text-6xl font-black mb-4 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent drop-shadow-2xl">
-              TANIŞMA ZAMANI!
+          {/* Main title with staggered letter animation */}
+          <motion.div className="mb-4 relative">
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 blur-3xl opacity-30"
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 180, 360]
+              }}
+              transition={{ 
+                duration: 10,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+            <h1 className="text-5xl lg:text-7xl font-black relative">
+              {"TANIŞMA ZAMANI!".split("").map((letter, index) => (
+                <motion.span
+                  key={index}
+                  className="inline-block bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent"
+                  initial={{ 
+                    y: -100, 
+                    opacity: 0,
+                    rotateZ: Math.random() * 360 - 180
+                  }}
+                  animate={{ 
+                    y: 0, 
+                    opacity: 1,
+                    rotateZ: 0
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20,
+                    delay: index * 0.05
+                  }}
+                  style={{
+                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.5))'
+                  }}
+                >
+                  {letter === " " ? "\u00A0" : letter}
+                </motion.span>
+              ))}
             </h1>
-            <p className="text-xl text-white/90 font-semibold">
-              Oyuncular kendilerini tanıtacak
-            </p>
-            <Sparkles className="w-10 h-10 text-yellow-400 mx-auto mt-4 animate-pulse" />
           </motion.div>
+
+          {/* Subtitle with slide-in animation */}
+          <motion.div className="mb-4">
+            {"Oyuncular kendilerini tanıtacak".split(" ").map((word, index) => (
+              <motion.span
+                key={index}
+                className="inline-block text-xl text-white/90 font-bold mr-2"
+                initial={{ 
+                  y: 50, 
+                  opacity: 0,
+                  scale: 0
+                }}
+                animate={{ 
+                  y: 0, 
+                  opacity: 1,
+                  scale: 1
+                }}
+                transition={{
+                  delay: 0.8 + index * 0.15,
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15
+                }}
+                whileHover={{ 
+                  scale: 1.1,
+                  color: "#fbbf24"
+                }}
+              >
+                {word}
+              </motion.span>
+            ))}
+          </motion.div>
+
+          {/* Central sparkle with rotation */}
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ 
+              scale: [1, 1.2, 1],
+              rotate: 360
+            }}
+            transition={{ 
+              scale: { 
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              },
+              rotate: {
+                delay: 1.2,
+                duration: 0.8,
+                type: "spring"
+              }
+            }}
+            className="inline-block"
+          >
+            <Sparkles className="w-12 h-12 text-yellow-400 drop-shadow-lg" />
+          </motion.div>
+
+          {/* Orbiting stars */}
+          <div className="absolute -inset-20 pointer-events-none">
+            {[...Array(3)].map((_, i) => (
+              <motion.div
+                key={`star-${i}`}
+                className="absolute top-1/2 left-1/2"
+                animate={{ 
+                  rotate: 360
+                }}
+                transition={{ 
+                  duration: 5 + i * 2,
+                  repeat: Infinity,
+                  ease: "linear",
+                  delay: i * 0.7
+                }}
+              >
+                <Star 
+                  className={`
+                    w-6 h-6 absolute
+                    ${i === 0 ? 'text-red-400' : i === 1 ? 'text-yellow-400' : 'text-blue-400'}
+                  `}
+                  style={{
+                    transform: `translateX(${80 + i * 25}px)`,
+                    filter: 'drop-shadow(0 0 8px currentColor)'
+                  }}
+                />
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     );
