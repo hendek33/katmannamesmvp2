@@ -43,10 +43,10 @@ export function PlayerIntroduction({
   );
   
   useEffect(() => {
-    // Hide title after 2.5 seconds
+    // Hide title after 3.5 seconds
     const timer = setTimeout(() => {
       setShowTitle(false);
-    }, 2500);
+    }, 3500);
     
     return () => clearTimeout(timer);
   }, []);
@@ -119,30 +119,6 @@ export function PlayerIntroduction({
   if (showTitle) {
     return (
       <div className="grid-area px-4 py-8 flex items-center justify-center relative overflow-hidden">
-        {/* Animated background particles */}
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-yellow-400 rounded-full opacity-60"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [-20, 20, -20],
-                x: [-10, 10, -10],
-                opacity: [0, 0.8, 0],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
-        </div>
-
         <motion.div
           initial={{ scale: 0, opacity: 0, rotateX: -90 }}
           animate={{ 
