@@ -84,7 +84,8 @@ const insultMessages = [
   "{target} ağlayacaksan peçete getireyim?",
   "{target} şinasi bile senden akıllı...",
   "{target} vay gerizekalı vay!",
-  "{target} haha ezik XD"
+  "{target} haha ezik XD",
+  "{target} kımıl zararlısı!"
 ];
 
 export class MemStorage implements IStorage {
