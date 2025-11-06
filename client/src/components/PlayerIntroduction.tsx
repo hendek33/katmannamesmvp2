@@ -36,11 +36,10 @@ export function PlayerIntroduction({
   const darkTeamPlayers = gameState.players.filter(p => p.team === "dark");
   const lightTeamPlayers = gameState.players.filter(p => p.team === "light");
   
-  // Check if current player already voted
-  const hasVoted = introducingPlayer && (
-    (introducingPlayer.introductionLikes && playerId in introducingPlayer.introductionLikes) ||
-    (introducingPlayer.introductionDislikes && playerId in introducingPlayer.introductionDislikes)
-  );
+  // Check if current player already voted and which option
+  const hasVotedLike = introducingPlayer?.introductionLikes && playerId in introducingPlayer.introductionLikes;
+  const hasVotedDislike = introducingPlayer?.introductionDislikes && playerId in introducingPlayer.introductionDislikes;
+  const hasVoted = hasVotedLike || hasVotedDislike;
   
   useEffect(() => {
     // Hide title after 3.5 seconds
@@ -76,7 +75,7 @@ export function PlayerIntroduction({
   };
   
   const handleLikeDislike = (isLike: boolean, event: React.MouseEvent) => {
-    if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer && !hasVoted) {
+    if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
       // Add particle effect
       const rect = event.currentTarget.getBoundingClientRect();
       const newParticle = {
@@ -749,28 +748,29 @@ export function PlayerIntroduction({
               <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
                 {/* Likes - Clickable Card */}
                 <motion.div
-                  className={`relative bg-green-900/30 border-2 border-green-500/50 rounded-lg p-4 
-                    ${!hasVoted && playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-green-900/40 hover:border-green-500/70' : ''}`}
+                  className={`relative bg-green-900/30 border-2 rounded-lg p-4 
+                    ${hasVotedLike ? 'border-green-400 bg-green-800/50' : 'border-green-500/50'}
+                    ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-green-900/40 hover:border-green-500/70' : ''}`}
                   onClick={(e) => {
-                    if (!hasVoted && playerId !== currentIntroducingPlayer) {
+                    if (playerId !== currentIntroducingPlayer) {
                       handleLikeDislike(true, e);
                     }
                   }}
-                  whileHover={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
-                  whileTap={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
+                  whileHover={playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
+                  whileTap={playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
                   data-testid="like-card"
                 >
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsUp className="w-6 h-6 text-green-400 mr-2" />
                     <span className="text-2xl font-bold text-green-400">{likes.length}</span>
                   </div>
-                  {!hasVoted && playerId !== currentIntroducingPlayer && (
+                  {playerId !== currentIntroducingPlayer && (
                     <motion.div 
                       className="text-center text-sm text-green-400 font-medium mb-2"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      Beğenmek için tıkla
+                      {hasVotedLike ? 'Seçildi ✓' : 'Beğenmek için tıkla'}
                     </motion.div>
                   )}
                   <div className="flex flex-wrap gap-1 max-h-20 overflow-hidden">
@@ -797,28 +797,29 @@ export function PlayerIntroduction({
                 
                 {/* Dislikes - Clickable Card */}
                 <motion.div
-                  className={`relative bg-red-900/30 border-2 border-red-500/50 rounded-lg p-4 
-                    ${!hasVoted && playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-red-900/40 hover:border-red-500/70' : ''}`}
+                  className={`relative bg-red-900/30 border-2 rounded-lg p-4 
+                    ${hasVotedDislike ? 'border-red-400 bg-red-800/50' : 'border-red-500/50'}
+                    ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-red-900/40 hover:border-red-500/70' : ''}`}
                   onClick={(e) => {
-                    if (!hasVoted && playerId !== currentIntroducingPlayer) {
+                    if (playerId !== currentIntroducingPlayer) {
                       handleLikeDislike(false, e);
                     }
                   }}
-                  whileHover={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
-                  whileTap={!hasVoted && playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
+                  whileHover={playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
+                  whileTap={playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
                   data-testid="dislike-card"
                 >
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsDown className="w-6 h-6 text-red-400 mr-2" />
                     <span className="text-2xl font-bold text-red-400">{dislikes.length}</span>
                   </div>
-                  {!hasVoted && playerId !== currentIntroducingPlayer && (
+                  {playerId !== currentIntroducingPlayer && (
                     <motion.div 
                       className="text-center text-sm text-red-400 font-medium mb-2"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      Beğenmemek için tıkla
+                      {hasVotedDislike ? 'Seçildi ✓' : 'Beğenmemek için tıkla'}
                     </motion.div>
                   )}
                   <div className="flex flex-wrap gap-1 max-h-20 overflow-hidden">
@@ -845,16 +846,6 @@ export function PlayerIntroduction({
               
               {/* Action Buttons */}
               <div className="flex justify-center gap-3">
-                {/* Already voted indicator */}
-                {hasVoted && playerId !== currentIntroducingPlayer && (
-                  <div 
-                    className="inline-flex items-center text-sm px-4 py-2 rounded-md font-semibold"
-                    style={{ backgroundColor: '#475569', color: 'white' }}
-                  >
-                    Oyunu Kullandın ✓
-                  </div>
-                )}
-                
                 {/* Finish button for controller */}
                 {isController && (
                   <Button
