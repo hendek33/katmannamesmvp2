@@ -174,10 +174,14 @@ export function PlayerIntroduction({
               }}
             />
             <h1 className="text-5xl lg:text-7xl font-black relative">
-              {"TANIŞMA ZAMANI!".split("").map((letter, index) => (
+              {"TANIŞMA ZAMANI!".split("").map((letter, index) => {
+                // Alternate colors between red and blue
+                const isEven = index % 2 === 0;
+                const colorClass = isEven ? 'text-red-500' : 'text-blue-500';
+                return (
                 <motion.span
                   key={index}
-                  className="inline-block bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 bg-clip-text text-transparent"
+                  className={`inline-block ${colorClass} font-black`}
                   initial={{ 
                     y: -100, 
                     opacity: 0,
@@ -200,7 +204,7 @@ export function PlayerIntroduction({
                 >
                   {letter === " " ? "\u00A0" : letter}
                 </motion.span>
-              ))}
+              );})}
             </h1>
           </motion.div>
 
@@ -591,34 +595,6 @@ export function PlayerIntroduction({
             <div className="p-6 h-full flex flex-col">
               {/* Introducing Player Info */}
               <div className="text-center mb-4 relative">
-                {/* Animated background rays */}
-                <motion.div
-                  className="absolute inset-0 -z-10"
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                >
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    {[...Array(8)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute w-32 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/20 to-transparent"
-                        style={{
-                          transform: `rotate(${i * 45}deg)`,
-                          transformOrigin: 'center',
-                        }}
-                        animate={{ 
-                          opacity: [0, 1, 0],
-                          width: ['8rem', '20rem', '8rem']
-                        }}
-                        transition={{ 
-                          duration: 3, 
-                          repeat: Infinity, 
-                          delay: i * 0.2 
-                        }}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
                 
                 {/* Player avatar with glow effect */}
                 <motion.div
@@ -674,28 +650,6 @@ export function PlayerIntroduction({
                   >
                     {introducingPlayer?.username}
                   </motion.span>
-                  
-                  {/* Floating sparkles around name */}
-                  <motion.div
-                    className="absolute -right-6 -top-2"
-                    animate={{ 
-                      y: [-2, 2, -2],
-                      rotate: [0, 360]
-                    }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    <Sparkles className="w-4 h-4 text-yellow-400" />
-                  </motion.div>
-                  <motion.div
-                    className="absolute -left-6 -bottom-2"
-                    animate={{ 
-                      y: [2, -2, 2],
-                      rotate: [0, -360]
-                    }}
-                    transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                  >
-                    <Star className="w-4 h-4 text-yellow-400" />
-                  </motion.div>
                 </motion.h2>
                 
                 {/* Animated introduction text */}
