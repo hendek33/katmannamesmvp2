@@ -1802,10 +1802,10 @@ export class MemStorage implements IStorage {
     if (room.phase !== "introduction") return null;
     if (!room.introductionPhase) return null;
     
-    // Only red team spymaster can control introductions
+    // Only red team (light) spymaster can control introductions
     const player = room.players.find(p => p.id === playerId);
     if (!player) return null;
-    if (player.team !== "dark" || player.role !== "spymaster") return null;
+    if (player.team !== "light" || player.role !== "spymaster") return null;
     
     // Target must exist and not be introduced yet
     const target = room.players.find(p => p.id === targetPlayerId);
@@ -1827,10 +1827,10 @@ export class MemStorage implements IStorage {
     if (room.phase !== "introduction") return null;
     if (!room.introductionPhase) return null;
     
-    // Only red team spymaster can control introductions
+    // Only red team (light) spymaster can control introductions
     const player = room.players.find(p => p.id === playerId);
     if (!player) return null;
-    if (player.team !== "dark" || player.role !== "spymaster") return null;
+    if (player.team !== "light" || player.role !== "spymaster") return null;
     
     // Must be introducing the specified player
     if (room.introductionPhase.currentIntroducingPlayer !== targetPlayerId) return null;
@@ -1908,10 +1908,10 @@ export class MemStorage implements IStorage {
     if (room.phase !== "introduction") return null;
     if (!room.introductionPhase) return null;
     
-    // Only red team spymaster can skip
+    // Only red team (light) spymaster can skip
     const player = room.players.find(p => p.id === playerId);
     if (!player) return null;
-    if (player.team !== "dark" || player.role !== "spymaster") return null;
+    if (player.team !== "light" || player.role !== "spymaster") return null;
     
     // Mark introduction as occurred and start the game
     room.introductionPhase.hasOccurred = true;
