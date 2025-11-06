@@ -231,15 +231,31 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1">
-                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
-                                   style={{ backgroundColor: '#16a34a' }}>
-                                <ThumbsUp className="w-3 h-3 mr-0.5" />
-                                {Object.keys(player.introductionLikes || {}).length}
+                              <div 
+                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                style={{ 
+                                  backgroundColor: 'rgb(22, 163, 74)',
+                                  color: 'rgb(255, 255, 255)',
+                                  opacity: '1 !important',
+                                  position: 'relative',
+                                  zIndex: 10
+                                }}
+                              >
+                                <ThumbsUp className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionLikes || {}).length}</span>
                               </div>
-                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
-                                   style={{ backgroundColor: '#dc2626' }}>
-                                <ThumbsDown className="w-3 h-3 mr-0.5" />
-                                {Object.keys(player.introductionDislikes || {}).length}
+                              <div 
+                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                style={{ 
+                                  backgroundColor: 'rgb(220, 38, 38)',
+                                  color: 'rgb(255, 255, 255)',
+                                  opacity: '1 !important',
+                                  position: 'relative',
+                                  zIndex: 10
+                                }}
+                              >
+                                <ThumbsDown className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionDislikes || {}).length}</span>
                               </div>
                             </div>
                           )}
@@ -306,15 +322,31 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1">
-                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
-                                   style={{ backgroundColor: '#16a34a' }}>
-                                <ThumbsUp className="w-3 h-3 mr-0.5" />
-                                {Object.keys(player.introductionLikes || {}).length}
+                              <div 
+                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                style={{ 
+                                  backgroundColor: 'rgb(22, 163, 74)',
+                                  color: 'rgb(255, 255, 255)',
+                                  opacity: '1 !important',
+                                  position: 'relative',
+                                  zIndex: 10
+                                }}
+                              >
+                                <ThumbsUp className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionLikes || {}).length}</span>
                               </div>
-                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
-                                   style={{ backgroundColor: '#dc2626' }}>
-                                <ThumbsDown className="w-3 h-3 mr-0.5" />
-                                {Object.keys(player.introductionDislikes || {}).length}
+                              <div 
+                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                style={{ 
+                                  backgroundColor: 'rgb(220, 38, 38)',
+                                  color: 'rgb(255, 255, 255)',
+                                  opacity: '1 !important',
+                                  position: 'relative',
+                                  zIndex: 10
+                                }}
+                              >
+                                <ThumbsDown className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionDislikes || {}).length}</span>
                               </div>
                             </div>
                           )}
@@ -422,75 +454,59 @@ export function PlayerIntroduction({
               {/* Voting Stats */}
               <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
                 {/* Likes */}
-                <Card className="bg-gray-800 border-green-500 p-4 overflow-hidden">
+                <div className="relative bg-green-900/30 border border-green-500/50 rounded-lg p-4">
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsUp className="w-6 h-6 text-green-400 mr-2" />
                     <span className="text-2xl font-bold text-green-400">{likes.length}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1 max-h-24 overflow-hidden">
-                    <AnimatePresence mode="popLayout">
-                      {likes.map((like, index) => (
-                        <motion.div
-                          key={`like-${like.username}`}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ 
-                            delay: index * 0.05,
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 25
+                  <div className="flex flex-wrap gap-1 max-h-24">
+                    {likes.map((like, index) => (
+                      <div
+                        key={`like-${like.username}`}
+                        className="inline-block"
+                      >
+                        <div 
+                          className="inline-flex items-center px-2 py-1 rounded text-xs font-bold"
+                          style={{ 
+                            backgroundColor: like.team === "dark" ? 'rgb(29, 78, 216)' : 'rgb(185, 28, 28)',
+                            color: 'rgb(255, 255, 255)',
+                            opacity: '1 !important'
                           }}
-                          className="flex"
                         >
-                          <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold text-white ${
-                            like.team === "dark" 
-                              ? 'bg-blue-700' 
-                              : 'bg-red-700'
-                          }`} style={{ backgroundColor: like.team === "dark" ? '#1d4ed8' : '#b91c1c' }}>
-                            <Heart className="w-3 h-3 mr-1 text-white" />
-                            <span className="text-white">{like.username}</span>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
+                          <Heart className="w-3 h-3 mr-1" style={{ color: 'rgb(255, 255, 255)' }} />
+                          <span style={{ color: 'rgb(255, 255, 255)' }}>{like.username}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </Card>
+                </div>
                 
                 {/* Dislikes */}
-                <Card className="bg-red-600/10 border-red-500/30 backdrop-blur-sm p-4 overflow-hidden">
+                <div className="relative bg-red-900/30 border border-red-500/50 rounded-lg p-4">
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsDown className="w-6 h-6 text-red-400 mr-2" />
                     <span className="text-2xl font-bold text-red-400">{dislikes.length}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1 max-h-24 overflow-hidden">
-                    <AnimatePresence mode="popLayout">
-                      {dislikes.map((dislike, index) => (
-                        <motion.div
-                          key={`dislike-${dislike.username}`}
-                          initial={{ scale: 0, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          exit={{ scale: 0, opacity: 0 }}
-                          transition={{ 
-                            delay: index * 0.05,
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 25
+                  <div className="flex flex-wrap gap-1 max-h-24">
+                    {dislikes.map((dislike, index) => (
+                      <div
+                        key={`dislike-${dislike.username}`}
+                        className="inline-block"
+                      >
+                        <div 
+                          className="inline-flex items-center px-2 py-1 rounded text-xs font-bold"
+                          style={{ 
+                            backgroundColor: dislike.team === "dark" ? 'rgb(29, 78, 216)' : 'rgb(185, 28, 28)',
+                            color: 'rgb(255, 255, 255)',
+                            opacity: '1 !important'
                           }}
-                          className="flex"
                         >
-                          <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold text-white ${
-                            dislike.team === "dark" 
-                              ? 'bg-blue-700' 
-                              : 'bg-red-700'
-                          }`} style={{ backgroundColor: dislike.team === "dark" ? '#1d4ed8' : '#b91c1c' }}>
-                            <span className="text-white">{dislike.username}</span>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
+                          <span style={{ color: 'rgb(255, 255, 255)' }}>{dislike.username}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </Card>
+                </div>
               </div>
               
               {/* Action Buttons */}
