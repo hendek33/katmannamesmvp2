@@ -419,12 +419,12 @@ export function PlayerIntroduction({
                           }}
                           className="flex"
                         >
-                          <Badge className={`text-xs text-white font-semibold ${
+                          <Badge className={`text-xs font-semibold ${
                             like.team === "dark" 
-                              ? 'bg-blue-700/90 border-blue-600' 
-                              : 'bg-red-700/90 border-red-600'
-                          }`}>
-                            <Heart className="w-3 h-3 mr-1 text-white" />
+                              ? 'bg-blue-700 border-blue-600' 
+                              : 'bg-red-700 border-red-600'
+                          }`} style={{ color: 'white' }}>
+                            <Heart className="w-3 h-3 mr-1" style={{ color: 'white' }} />
                             {like.username}
                           </Badge>
                         </motion.div>
@@ -455,11 +455,11 @@ export function PlayerIntroduction({
                           }}
                           className="flex"
                         >
-                          <Badge className={`text-xs text-white font-semibold ${
+                          <Badge className={`text-xs font-semibold ${
                             dislike.team === "dark" 
-                              ? 'bg-blue-700/90 border-blue-600' 
-                              : 'bg-red-700/90 border-red-600'
-                          }`}>
+                              ? 'bg-blue-700 border-blue-600' 
+                              : 'bg-red-700 border-red-600'
+                          }`} style={{ color: 'white' }}>
                             {dislike.username}
                           </Badge>
                         </motion.div>
