@@ -193,19 +193,19 @@ export function PlayerIntroduction({
                     <motion.div
                       key={player.id}
                       initial={{ x: -50, opacity: 0 }}
-                      animate={{ x: 0, opacity: hasBeenIntroduced ? 0.5 : 1 }}
+                      animate={{ x: 0, opacity: 1 }}
                       whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { scale: 1.05 } : {}}
                     >
                       <Card
                         className={`
                           p-3 cursor-pointer transition-all duration-200
                           ${hasBeenIntroduced 
-                            ? 'bg-red-900/20 border-red-800/30' 
+                            ? 'bg-gray-800 border-gray-700' 
                             : 'bg-red-900/40 hover:bg-red-900/60 border-red-600/50 hover:border-red-500/70'
                           }
                           ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-red-600/20' : ''}
                           ${hoveredPlayer === player.id ? 'ring-1 ring-red-400' : ''}
-                          backdrop-blur-sm
+                          ${hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
                         onClick={() => handlePlayerClick(player)}
                         onMouseEnter={() => setHoveredPlayer(player.id)}
@@ -268,19 +268,19 @@ export function PlayerIntroduction({
                     <motion.div
                       key={player.id}
                       initial={{ x: 50, opacity: 0 }}
-                      animate={{ x: 0, opacity: hasBeenIntroduced ? 0.5 : 1 }}
+                      animate={{ x: 0, opacity: 1 }}
                       whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { scale: 1.05 } : {}}
                     >
                       <Card
                         className={`
                           p-3 cursor-pointer transition-all duration-200
                           ${hasBeenIntroduced 
-                            ? 'bg-blue-900/20 border-blue-800/30' 
+                            ? 'bg-gray-800 border-gray-700' 
                             : 'bg-blue-900/40 hover:bg-blue-900/60 border-blue-600/50 hover:border-blue-500/70'
                           }
                           ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-blue-600/20' : ''}
                           ${hoveredPlayer === player.id ? 'ring-1 ring-blue-400' : ''}
-                          backdrop-blur-sm
+                          ${hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
                         onClick={() => handlePlayerClick(player)}
                         onMouseEnter={() => setHoveredPlayer(player.id)}
@@ -422,7 +422,7 @@ export function PlayerIntroduction({
               {/* Voting Stats */}
               <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
                 {/* Likes */}
-                <Card className="bg-green-600/10 border-green-500/30 backdrop-blur-sm p-4 overflow-hidden">
+                <Card className="bg-gray-800 border-green-500 p-4 overflow-hidden">
                   <div className="flex items-center justify-center mb-2">
                     <ThumbsUp className="w-6 h-6 text-green-400 mr-2" />
                     <span className="text-2xl font-bold text-green-400">{likes.length}</span>
