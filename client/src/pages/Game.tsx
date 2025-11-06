@@ -2091,10 +2091,8 @@ export default function Game() {
               </div>
             )}
           </div>
-        </div>
 
-
-      {/* Right Side - Dark Team (Blue) */}
+          {/* Right Side - Dark Team (Blue) */}
           <div className="hidden lg:flex lg:flex-col lg:gap-2 h-full min-h-0">
             {/* Score & Players Card Combined */}
             <Card 
@@ -2360,8 +2358,9 @@ export default function Game() {
         </div>
         </div>
       </div>
+    </div>
       
-      {/* Zoom Help Bubble Portal - renders outside zoom viewport */}
+    {/* Zoom Help Bubble Portal - renders outside zoom viewport */}
       {showZoomHelp && zoomButtonPosition && createPortal(
         <div 
           className="fixed zoom-help-bubble z-[10000] animate-zoom-help-enter"
