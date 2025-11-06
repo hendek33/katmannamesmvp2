@@ -228,14 +228,16 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1">
-                              <Badge className="text-xs bg-green-600/30 text-green-300 border-green-500/50">
+                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
+                                   style={{ backgroundColor: '#16a34a' }}>
                                 <ThumbsUp className="w-3 h-3 mr-0.5" />
                                 {Object.keys(player.introductionLikes || {}).length}
-                              </Badge>
-                              <Badge className="text-xs bg-red-600/30 text-red-300 border-red-500/50">
+                              </div>
+                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
+                                   style={{ backgroundColor: '#dc2626' }}>
                                 <ThumbsDown className="w-3 h-3 mr-0.5" />
                                 {Object.keys(player.introductionDislikes || {}).length}
-                              </Badge>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -300,14 +302,16 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1">
-                              <Badge className="text-xs bg-green-600/30 text-green-300 border-green-500/50">
+                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
+                                   style={{ backgroundColor: '#16a34a' }}>
                                 <ThumbsUp className="w-3 h-3 mr-0.5" />
                                 {Object.keys(player.introductionLikes || {}).length}
-                              </Badge>
-                              <Badge className="text-xs bg-red-600/30 text-red-300 border-red-500/50">
+                              </div>
+                              <div className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold text-white" 
+                                   style={{ backgroundColor: '#dc2626' }}>
                                 <ThumbsDown className="w-3 h-3 mr-0.5" />
                                 {Object.keys(player.introductionDislikes || {}).length}
-                              </Badge>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -433,14 +437,14 @@ export function PlayerIntroduction({
                           }}
                           className="flex"
                         >
-                          <Badge className={`text-xs font-semibold ${
+                          <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold text-white ${
                             like.team === "dark" 
-                              ? 'bg-blue-700 border-blue-600' 
-                              : 'bg-red-700 border-red-600'
-                          }`} style={{ color: 'white' }}>
-                            <Heart className="w-3 h-3 mr-1" style={{ color: 'white' }} />
-                            {like.username}
-                          </Badge>
+                              ? 'bg-blue-700' 
+                              : 'bg-red-700'
+                          }`} style={{ backgroundColor: like.team === "dark" ? '#1d4ed8' : '#b91c1c' }}>
+                            <Heart className="w-3 h-3 mr-1 text-white" />
+                            <span className="text-white">{like.username}</span>
+                          </div>
                         </motion.div>
                       ))}
                     </AnimatePresence>
@@ -469,13 +473,13 @@ export function PlayerIntroduction({
                           }}
                           className="flex"
                         >
-                          <Badge className={`text-xs font-semibold ${
+                          <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold text-white ${
                             dislike.team === "dark" 
-                              ? 'bg-blue-700 border-blue-600' 
-                              : 'bg-red-700 border-red-600'
-                          }`} style={{ color: 'white' }}>
-                            {dislike.username}
-                          </Badge>
+                              ? 'bg-blue-700' 
+                              : 'bg-red-700'
+                          }`} style={{ backgroundColor: dislike.team === "dark" ? '#1d4ed8' : '#b91c1c' }}>
+                            <span className="text-white">{dislike.username}</span>
+                          </div>
                         </motion.div>
                       ))}
                     </AnimatePresence>
