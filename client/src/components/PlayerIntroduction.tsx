@@ -24,7 +24,7 @@ export function PlayerIntroduction({
 }: PlayerIntroductionProps) {
   const [showTitle, setShowTitle] = useState(true);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
-  const [particles, setParticles] = useState<{id: number, x: number, y: number, type: 'like' | 'dislike'}[]>([]);
+  const [particles, setParticles] = useState<{id: number, x: number, y: number, type: 'like' | 'dislike', delay?: number}[]>([]);
   const [dotCount, setDotCount] = useState(1);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
@@ -76,20 +76,27 @@ export function PlayerIntroduction({
   
   const handleLikeDislike = (isLike: boolean, event: React.MouseEvent) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
-      // Add particle effect
+      // Add multiple particle effects for more impact
       const rect = event.currentTarget.getBoundingClientRect();
-      const newParticle = {
-        id: Date.now(),
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-        type: isLike ? 'like' as const : 'dislike' as const
-      };
-      setParticles(prev => [...prev, newParticle]);
+      const particleCount = 5;
+      const newParticles: Array<{ id: number; x: number; y: number; type: 'like' | 'dislike'; delay?: number }> = [];
       
-      // Remove particle after animation
+      for (let i = 0; i < particleCount; i++) {
+        newParticles.push({
+          id: Date.now() + i,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+          type: isLike ? 'like' : 'dislike',
+          delay: i * 50
+        });
+      }
+      
+      setParticles(prev => [...prev, ...newParticles]);
+      
+      // Remove particles after animation
       setTimeout(() => {
-        setParticles(prev => prev.filter(p => p.id !== newParticle.id));
-      }, 1000);
+        setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+      }, 1500);
       
       onLikeDislike(currentIntroducingPlayer, isLike);
     }
@@ -385,13 +392,12 @@ export function PlayerIntroduction({
                         }
                       }}
                       whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
-                        scale: [1, 1.12, 1.08],
-                        rotate: [0, -3, 3, -1, 1, 0],
-                        y: -5,
+                        scale: 1.02,
+                        y: -2,
                         transition: { 
-                          scale: { duration: 0.4, ease: "easeOut" },
-                          rotate: { duration: 0.6, ease: "easeInOut" },
-                          y: { duration: 0.2, ease: "easeOut" }
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 20
                         }
                       } : {}}
                     >
@@ -525,13 +531,12 @@ export function PlayerIntroduction({
                         }
                       }}
                       whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
-                        scale: [1, 1.12, 1.08],
-                        rotate: [0, 3, -3, 1, -1, 0],
-                        y: -5,
+                        scale: 1.02,
+                        y: -2,
                         transition: { 
-                          scale: { duration: 0.4, ease: "easeOut" },
-                          rotate: { duration: 0.6, ease: "easeInOut" },
-                          y: { duration: 0.2, ease: "easeOut" }
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 20
                         }
                       } : {}}
                     >
@@ -621,39 +626,91 @@ export function PlayerIntroduction({
         >
           {/* Particle Effects */}
           <AnimatePresence>
-            {particles.map((particle) => (
-              <motion.div
-                key={particle.id}
-                initial={{ 
-                  scale: 0,
-                  x: 0,
-                  y: 0
-                }}
-                animate={{ 
-                  scale: [1, 1.5, 0],
-                  x: particle.type === 'like' ? -50 : 50,
-                  y: -100
-                }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
-                className="fixed pointer-events-none z-50"
-                style={{ 
-                  left: particle.x, 
-                  top: particle.y,
-                }}
-              >
-                {particle.type === 'like' ? (
-                  <div className="flex items-center">
-                    <Heart className="w-8 h-8 text-green-500 fill-green-500" />
-                    <Sparkles className="w-6 h-6 text-yellow-400 ml-1 animate-pulse" />
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <ThumbsDown className="w-8 h-8 text-red-500 fill-red-500" />
-                  </div>
-                )}
-              </motion.div>
-            ))}
+            {particles.map((particle, index) => {
+              const angle = (index * 72) * (Math.PI / 180); // Spread particles in a circle
+              const distance = 120;
+              const finalX = Math.cos(angle) * distance + (Math.random() - 0.5) * 30;
+              const finalY = Math.sin(angle) * distance - 50;
+              
+              return (
+                <motion.div
+                  key={particle.id}
+                  initial={{ 
+                    scale: 0,
+                    x: 0,
+                    y: 0,
+                    opacity: 0,
+                    rotate: 0
+                  }}
+                  animate={{ 
+                    scale: [0, 1.2, 0.8, 0],
+                    x: [0, finalX * 0.5, finalX],
+                    y: [0, finalY * 0.3, finalY],
+                    opacity: [0, 1, 1, 0],
+                    rotate: particle.type === 'like' ? 360 : -360
+                  }}
+                  exit={{ opacity: 0 }}
+                  transition={{ 
+                    duration: 1.2,
+                    delay: particle.delay ? particle.delay / 1000 : 0,
+                    ease: [0.45, 0, 0.55, 1]
+                  }}
+                  className="fixed pointer-events-none z-50"
+                  style={{ 
+                    left: particle.x, 
+                    top: particle.y,
+                  }}
+                >
+                  {particle.type === 'like' ? (
+                    <div className="relative">
+                      <motion.div
+                        animate={{ 
+                          scale: [1, 1.3, 1],
+                          rotate: [0, 180, 360]
+                        }}
+                        transition={{ 
+                          duration: 0.8,
+                          repeat: 1
+                        }}
+                      >
+                        <Heart className="w-10 h-10 text-green-400 fill-green-400 drop-shadow-lg" />
+                      </motion.div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: [0, 2, 0] }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <div className="w-8 h-8 bg-green-400/30 rounded-full blur-xl" />
+                      </motion.div>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <motion.div
+                        animate={{ 
+                          scale: [1, 1.3, 1],
+                          rotate: [0, -180, -360]
+                        }}
+                        transition={{ 
+                          duration: 0.8,
+                          repeat: 1
+                        }}
+                      >
+                        <ThumbsDown className="w-10 h-10 text-red-400 fill-red-400 drop-shadow-lg" />
+                      </motion.div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: [0, 2, 0] }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <div className="w-8 h-8 bg-red-400/30 rounded-full blur-xl" />
+                      </motion.div>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
           
           <Card className="bg-slate-900/60 backdrop-blur-xl border-2 border-white/10 shadow-2xl flex-1">
@@ -758,16 +815,27 @@ export function PlayerIntroduction({
               <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
                 {/* Likes - Clickable Card */}
                 <motion.div
-                  className={`relative bg-green-900/30 border-2 rounded-lg p-4 
-                    ${hasVotedLike ? 'border-green-400 bg-green-800/50' : 'border-green-500/50'}
+                  className={`relative bg-green-900/30 border-2 rounded-lg p-4 overflow-hidden
+                    ${hasVotedLike ? 'border-green-400 bg-green-800/50 shadow-lg shadow-green-500/30' : 'border-green-500/50'}
                     ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-green-900/40 hover:border-green-500/70' : ''}`}
                   onClick={(e) => {
                     if (playerId !== currentIntroducingPlayer) {
                       handleLikeDislike(true, e);
                     }
                   }}
-                  whileHover={playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
-                  whileTap={playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
+                  whileHover={playerId !== currentIntroducingPlayer ? { 
+                    scale: 1.03,
+                    transition: { type: "spring", stiffness: 300 }
+                  } : {}}
+                  whileTap={playerId !== currentIntroducingPlayer ? { 
+                    scale: 0.95,
+                    rotate: hasVotedLike ? [0, -2, 2, 0] : 0,
+                    transition: { type: "spring", stiffness: 500, damping: 15 }
+                  } : {}}
+                  animate={hasVotedLike ? {
+                    scale: [1, 1.05, 1],
+                    transition: { duration: 0.5, ease: "easeOut" }
+                  } : {}}
                   data-testid="like-card"
                 >
                   <div className="flex items-center justify-center mb-2">
@@ -807,16 +875,27 @@ export function PlayerIntroduction({
                 
                 {/* Dislikes - Clickable Card */}
                 <motion.div
-                  className={`relative bg-red-900/30 border-2 rounded-lg p-4 
-                    ${hasVotedDislike ? 'border-red-400 bg-red-800/50' : 'border-red-500/50'}
+                  className={`relative bg-red-900/30 border-2 rounded-lg p-4 overflow-hidden
+                    ${hasVotedDislike ? 'border-red-400 bg-red-800/50 shadow-lg shadow-red-500/30' : 'border-red-500/50'}
                     ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-red-900/40 hover:border-red-500/70' : ''}`}
                   onClick={(e) => {
                     if (playerId !== currentIntroducingPlayer) {
                       handleLikeDislike(false, e);
                     }
                   }}
-                  whileHover={playerId !== currentIntroducingPlayer ? { scale: 1.02 } : {}}
-                  whileTap={playerId !== currentIntroducingPlayer ? { scale: 0.98 } : {}}
+                  whileHover={playerId !== currentIntroducingPlayer ? { 
+                    scale: 1.03,
+                    transition: { type: "spring", stiffness: 300 }
+                  } : {}}
+                  whileTap={playerId !== currentIntroducingPlayer ? { 
+                    scale: 0.95,
+                    rotate: hasVotedDislike ? [0, 2, -2, 0] : 0,
+                    transition: { type: "spring", stiffness: 500, damping: 15 }
+                  } : {}}
+                  animate={hasVotedDislike ? {
+                    scale: [1, 1.05, 1],
+                    transition: { duration: 0.5, ease: "easeOut" }
+                  } : {}}
                   data-testid="dislike-card"
                 >
                   <div className="flex items-center justify-center mb-2">
