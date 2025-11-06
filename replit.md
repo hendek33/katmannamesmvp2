@@ -31,6 +31,7 @@ Do not make changes to file `server/words.ts`.
 - **Improved Instructions**: Better visual hierarchy for spymaster instructions with glowing effects
 - **Cleaner Animations**: Removed distracting background particles from "Tanışma Zamanı" title
 - **Extended Display Time**: Introduction title now displays for 3.5 seconds (increased by 1 second)
+- **New Hover Animation**: Changed player name bubble hover effect to wiggle/bounce animation with team-colored shadow glow
 
 ### Video Performance Optimizations (November 5, 2025)
 - **Base64 Video Conversion**: Implemented VideoBase64Converter service to convert all videos to base64 format on app load

@@ -680,7 +680,7 @@ export default function Lobby() {
                   {chaosMode && (
                     <div className="mt-4">
                       <div className="p-2 rounded-lg text-[10px] leading-relaxed bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20">
-                        Her takıma gizli bir Kahin atanacak • Kahinler kendi takımlarının 3 kartını bilir
+                        Her takıma gizli bir Kahin atanacak • Kahinler oyundaki kartların yerlerini bilir.
                       </div>
                     </div>
                   )}
@@ -788,10 +788,9 @@ export default function Lobby() {
                       <h4 className="font-bold text-cyan-500">Kahin Rolü</h4>
                     </div>
                     <p className="text-xs">
-                      Her takımda 1 tane gizli Kahin bulunur. Oyun başında kendi takımının 3 kartının yerini bilir. 
-                      Bu kartlar ona mor ışıltı ile gösterilir. Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Oyun boyunca karşı takımın Kahin'ini tahmin edebilirsiniz - Doğru tahmin anında kazandırır!</span>
-                      <span className="text-red-400 font-bold"> DİKKAT: Yanlış tahmin anında kaybettirir!</span>
+                      Her takımda 1 tane gizli Kahin bulunur. Oyun başında bütün kartların yerini bilir. 
+                      Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
+                      <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Doğru tahmin kazandırır!</span>
                     </p>
                   </div>
                 </div>
@@ -800,11 +799,9 @@ export default function Lobby() {
                   <h4 className="font-semibold text-amber-400 mb-2">⚡ Oyun Kuralları</h4>
                   <ul className="text-xs space-y-1">
                     <li>• Her takıma oyun başında rastgele bir Kahin atanır (kimliği gizlidir)</li>
-                    <li>• Kahinler kendi takımlarının 3 kartını bilir (mor ışıltı ile gösterilir)</li>
-                    <li>• Oyun sırasında karşı takımın Kahinini tahmin etme hakkınız var</li>
-                    <li>• Doğru tahmin = Anında kazanırsınız ✅</li>
-                    <li>• Yanlış tahmin = Anında kaybedersiniz ❌</li>
-                    <li>• Oyun sonunda tahmin hakkı kalmaz, roller açığa çıkar</li>
+                    <li>• Kahinler oyundaki kartların yerlerini bilir</li>
+                    <li>• Oyun sonunda kaybeden takımının karşı takımın Kahinini tahmin etme hakkı bulunur</li>
+                    <li>• Kahinin karşı takıma kimliğini belli etmemesi gerekir</li>
                   </ul>
                 </div>
               </div>

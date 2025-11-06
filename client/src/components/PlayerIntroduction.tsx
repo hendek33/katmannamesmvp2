@@ -385,9 +385,14 @@ export function PlayerIntroduction({
                         }
                       }}
                       whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
-                        scale: 1.08, 
-                        rotate: 2,
-                        transition: { type: "spring", stiffness: 300 }
+                        scale: [1, 1.12, 1.08],
+                        rotate: [0, -3, 3, -1, 1, 0],
+                        y: -5,
+                        transition: { 
+                          scale: { duration: 0.4, ease: "easeOut" },
+                          rotate: { duration: 0.6, ease: "easeInOut" },
+                          y: { duration: 0.2, ease: "easeOut" }
+                        }
                       } : {}}
                     >
                       <Card
@@ -397,8 +402,8 @@ export function PlayerIntroduction({
                             ? 'bg-red-900/40 border-red-600/50' 
                             : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-gray-600'
                           }
-                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-gray-600/20' : ''}
-                          ${hoveredPlayer === player.id ? 'ring-1 ring-gray-400' : ''}
+                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-2xl hover:shadow-red-500/30' : ''}
+                          ${hoveredPlayer === player.id ? 'ring-2 ring-red-400/60' : ''}
                           ${!hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
                         onClick={() => handlePlayerClick(player)}
@@ -520,9 +525,14 @@ export function PlayerIntroduction({
                         }
                       }}
                       whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
-                        scale: 1.08, 
-                        rotate: -2,
-                        transition: { type: "spring", stiffness: 300 }
+                        scale: [1, 1.12, 1.08],
+                        rotate: [0, 3, -3, 1, -1, 0],
+                        y: -5,
+                        transition: { 
+                          scale: { duration: 0.4, ease: "easeOut" },
+                          rotate: { duration: 0.6, ease: "easeInOut" },
+                          y: { duration: 0.2, ease: "easeOut" }
+                        }
                       } : {}}
                     >
                       <Card
@@ -532,8 +542,8 @@ export function PlayerIntroduction({
                             ? 'bg-blue-900/40 border-blue-600/50' 
                             : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-gray-600'
                           }
-                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-lg hover:shadow-gray-600/20' : ''}
-                          ${hoveredPlayer === player.id ? 'ring-1 ring-gray-400' : ''}
+                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-2xl hover:shadow-blue-500/30' : ''}
+                          ${hoveredPlayer === player.id ? 'ring-2 ring-blue-400/60' : ''}
                           ${!hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
                         onClick={() => handlePlayerClick(player)}
