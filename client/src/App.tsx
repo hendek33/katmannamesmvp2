@@ -5,11 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
-import { videoCache } from "@/services/VideoCache";
-import { enhancedVideoCache } from "@/services/EnhancedVideoCache";
-import { videoOptimizer } from "@/services/SimpleVideoOptimizer";
 import { VideoBase64Converter } from "@/services/VideoBase64Converter";
-import { VideoPreloader } from "@/components/VideoPreloader";
 import { GameProtection } from "@/utils/protection";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
@@ -36,31 +32,21 @@ function App() {
     // Initialize game protection system
     GameProtection.initializeProtection();
     
-    // Preload all videos when app starts
-    videoCache.preloadAllVideos();
-    
-    // Convert videos to base64 for inline playback - this prevents stuttering
+    // SADECE TEK BİR VİDEO YÜKLEME SERVİSİ - ÇOKLU YÜKLEME SORUNU ÇÖZÜLDÜ
+    // VideoBase64Converter videolar bir kere yüklenir, base64'e çevrilir ve cache'lenir
     VideoBase64Converter.preloadAllAsBase64()
       .catch(err => {
         // Base64 conversion failed, falling back to normal loading
       });
     
-    // Also use simple optimizer for better playback
-    videoOptimizer.preloadAllVideos().catch(err => {
-      // Simple video optimizer preloading failed
-    });
-    
-    // TEMPORARILY DISABLED: Enhanced video cache is causing loading issues
-    // enhancedVideoCache.preloadAllVideos().catch(err => {
-    //   console.error('Enhanced video preloading failed:', err);
-    // });
+    // DİĞER VIDEO SERVİSLERİ KAPATILDI - ARTIK ÇOKLU YÜKLEME YOK
+    // videoCache.preloadAllVideos() - KALDIRILDI
+    // videoOptimizer.preloadAllVideos() - KALDIRILDI
+    // VideoPreloader komponenti - KALDIRILDI
     
     // Cleanup on unmount
     return () => {
-      videoCache.dispose();
-      videoOptimizer.dispose();
       VideoBase64Converter.clearCache();
-      // enhancedVideoCache.dispose();
     };
   }, []);
   
@@ -68,7 +54,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <WebSocketProvider>
         <TooltipProvider>
-          <VideoPreloader />
           <Toaster />
           <Router />
         </TooltipProvider>
