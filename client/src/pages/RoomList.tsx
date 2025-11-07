@@ -123,11 +123,13 @@ export default function RoomList() {
               </Button>
             </div>
 
+            {/* Hata mesajları kaldırıldı
             {error && (
               <div className="bg-red-500/20 border border-red-500 rounded p-3 mb-4">
                 <p className="text-red-500 text-sm font-medium">{error}</p>
               </div>
             )}
+            */}
 
             <div className="flex-1 space-y-2 overflow-y-auto pr-1 min-h-0">
               {roomsList.length === 0 ? (
