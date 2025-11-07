@@ -5,10 +5,10 @@ export class GameProtection {
     'repl.co',
     'localhost',
     '127.0.0.1',
-    // Buraya yeni domainlerinizi ekleyin:
-    // 'example.com',
-    // 'katmannames.com',
-    // 'yourdomain.net'
+    'katmannames.onrender.com',
+    '61cf5dfd-7ac6-4b14-af25-b09d11ba5d3e-00-uzpyghpu3it9.sisko.replit.dev',
+    'onrender.com',
+    'sisko.replit.dev'
   ];
 
   private static readonly COPYRIGHT = '© 2025 Katmannames - Tüm hakları saklıdır';
