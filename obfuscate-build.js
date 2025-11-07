@@ -8,29 +8,27 @@ const distDir = path.join(process.cwd(), 'dist/public');
 
 // Obfuscator configuration
 const obfuscatorOptions = {
-  // Code transformation
+  // Code transformation - PERFORMANS İÇİN OPTİMİZE EDİLDİ
   compact: true,
   controlFlowFlattening: true,
-  controlFlowFlatteningThreshold: 0.75,
-  deadCodeInjection: true,
-  deadCodeInjectionThreshold: 0.4,
+  controlFlowFlatteningThreshold: 0.3,  // Düşürüldü (0.75'ten)
+  deadCodeInjection: false,  // Kapatıldı (büyük dosyalar için yavaş)
   debugProtection: true,
-  debugProtectionInterval: 2000,
   disableConsoleOutput: true,
   
   // String encoding
   rotateStringArray: true,
   selfDefending: true,
   stringArray: true,
-  stringArrayEncoding: ['base64', 'rc4'],
-  stringArrayIndexShift: true,
-  stringArrayRotate: true,
+  stringArrayEncoding: ['base64'],  // Sadece base64 (hız için)
+  stringArrayIndexShift: false,
+  stringArrayRotate: false,
   stringArrayShuffle: true,
-  stringArrayWrappersCount: 2,
-  stringArrayWrappersChainedCalls: true,
-  stringArrayWrappersParametersMaxCount: 4,
+  stringArrayWrappersCount: 1,  // Düşürüldü
+  stringArrayWrappersChainedCalls: false,
+  stringArrayWrappersParametersMaxCount: 2,
   stringArrayWrappersType: 'function',
-  stringArrayThreshold: 0.75,
+  stringArrayThreshold: 0.5,  // Düşürüldü
   
   // Identifier renaming
   identifierNamesGenerator: 'hexadecimal',
@@ -48,7 +46,6 @@ const obfuscatorOptions = {
   
   // Other options
   seed: Date.now(),
-  sourceMapMode: 'off',
   target: 'browser',
   transformObjectKeys: true,
   unicodeEscapeSequence: false
