@@ -4,7 +4,11 @@ export class GameProtection {
     'replit.app',
     'repl.co',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1',
+    // Buraya yeni domainlerinizi ekleyin:
+    // 'example.com',
+    // 'katmannames.com',
+    // 'yourdomain.net'
   ];
 
   private static readonly COPYRIGHT = '© 2025 Katmannames - Tüm hakları saklıdır';
