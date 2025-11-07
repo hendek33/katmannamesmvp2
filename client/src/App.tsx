@@ -10,6 +10,7 @@ import { enhancedVideoCache } from "@/services/EnhancedVideoCache";
 import { videoOptimizer } from "@/services/SimpleVideoOptimizer";
 import { VideoBase64Converter } from "@/services/VideoBase64Converter";
 import { VideoPreloader } from "@/components/VideoPreloader";
+import { GameProtection } from "@/utils/protection";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
@@ -32,6 +33,9 @@ function Router() {
 
 function App() {
   useEffect(() => {
+    // Initialize game protection system
+    GameProtection.initializeProtection();
+    
     // Preload all videos when app starts
     videoCache.preloadAllVideos();
     
