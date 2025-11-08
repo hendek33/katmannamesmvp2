@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { GameState } from "@shared/schema";
-import { TurnVideoInline } from "./TurnVideoInline";
+import { NormalWinVideo } from "./NormalWinVideo";
 
 interface EndGameGuessSequenceProps {
   sequence: GameState["endGameGuessSequence"];
@@ -93,19 +93,17 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
   const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
   const isCorrect = sequence.success;
   
-  // Video gösteriliyorsa sadece video göster
+  // Video gösteriliyorsa sadece video göster - normal kazanma videosu kullan
   if (showVideo && isCorrect && sequence.finalWinner && sequence.finalWinnerName) {
     return (
-      <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center">
-        <TurnVideoInline 
-          team={sequence.finalWinner}
-          teamName={sequence.finalWinnerName}
-          onComplete={() => {
-            setIsComplete(true);
-            onComplete?.();
-          }}
-        />
-      </div>
+      <NormalWinVideo 
+        winnerTeam={sequence.finalWinner}
+        winnerTeamName={sequence.finalWinnerName}
+        onComplete={() => {
+          setIsComplete(true);
+          onComplete?.();
+        }}
+      />
     );
   }
   
