@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { GameState } from "@shared/schema";
 import { NormalWinVideo } from "./NormalWinVideo";
@@ -34,63 +34,77 @@ function AnimatedText({ text, className = "", delay = 0 }: { text: string; class
 }
 
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
-  const [currentSentence, setCurrentSentence] = useState(0);
+  const [currentSentence, setCurrentSentence] = useState(1);
   const [showVideo, setShowVideo] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const hasStartedRef = useRef(false);
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
   
   useEffect(() => {
-    if (!sequence) return;
+    // Eğer sekans yoksa veya zaten bitmiş/başlamışsa, hiçbir şey yapma
+    if (!sequence || isFinished || hasStartedRef.current) {
+      return;
+    }
     
-    const timers: NodeJS.Timeout[] = [];
+    // Sekansı başlat ve bir daha başlamasını engelle
+    hasStartedRef.current = true;
     
-    // Zamanlama açıklaması:
-    // Cümle 1: 0-1 saniye arası gösterilir (1 saniye)
-    // Cümle 2: 1-6 saniye arası gösterilir (5 saniye) 
-    // Cümle 3: 6-10 saniye arası gösterilir (4 saniye)
-    // Video/Bitiş: 10+ saniye
-    
-    // İlk cümle başlasın
-    setCurrentSentence(1);
+    // Zamanlama:
+    // 0-1 saniye: İlk cümle
+    // 1-6 saniye: İkinci cümle (5 saniye gösterim)
+    // 6-10 saniye: Üçüncü cümle (4 saniye gösterim)
+    // 10+ saniye: Video veya bitiş
     
     // 1 saniye sonra ikinci cümleye geç
-    timers.push(setTimeout(() => {
+    const timer1 = setTimeout(() => {
       setCurrentSentence(2);
-    }, 1000));
+    }, 1000);
     
     // 6 saniye sonra üçüncü cümleye geç
-    timers.push(setTimeout(() => {
+    const timer2 = setTimeout(() => {
       setCurrentSentence(3);
-    }, 6000));
+    }, 6000);
     
-    // 10 saniye sonra bitir veya video göster
-    timers.push(setTimeout(() => {
+    // 10 saniye sonra sekansı bitir
+    const timer3 = setTimeout(() => {
       if (sequence.success) {
         setShowVideo(true);
         setCurrentSentence(0); // Yazıları gizle
-        // NormalWinVideo kendi onComplete'ini çağıracak
       } else {
-        // Yanlış tahmin - direkt bitir
+        setIsFinished(true);
         onComplete?.();
       }
-    }, 10000));
+    }, 10000);
     
+    // Timer'ları kaydet
+    timersRef.current = [timer1, timer2, timer3];
+    
+    // Cleanup fonksiyonu
     return () => {
-      timers.forEach(timer => clearTimeout(timer));
+      timersRef.current.forEach(timer => clearTimeout(timer));
+      timersRef.current = [];
     };
-  }, [sequence, onComplete]);
+  }, []); // Boş dependency array - sadece mount'ta çalışacak
   
-  if (!sequence) return null;
+  // Video bittiğinde
+  const handleVideoComplete = () => {
+    setIsFinished(true);
+    onComplete?.();
+  };
+  
+  if (!sequence || isFinished) return null;
   
   const roleText = "Kahin";
   const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
   const isCorrect = sequence.success;
   
-  // Video gösteriliyorsa sadece video göster - normal kazanma videosu kullan
+  // Video gösteriliyorsa
   if (showVideo && isCorrect && sequence.finalWinner && sequence.finalWinnerName) {
     return (
       <NormalWinVideo 
         winnerTeam={sequence.finalWinner}
         winnerTeamName={sequence.finalWinnerName}
-        onComplete={onComplete}
+        onComplete={handleVideoComplete}
       />
     );
   }
@@ -104,7 +118,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           KAHİN TAHMİNİ
         </div>
         
-        {/* Cümle 1: Takım kararı */}
+        {/* Cümle 1: Takım kararı (0-1 saniye arası) */}
         {currentSentence === 1 && (
           <div className="text-3xl md:text-5xl font-bold">
             <div className="mb-2">
@@ -139,7 +153,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           </div>
         )}
         
-        {/* Cümle 2: Gerçek rol açıklaması */}
+        {/* Cümle 2: Gerçek rol açıklaması (1-6 saniye arası) */}
         {currentSentence === 2 && (
           <div className="text-3xl md:text-5xl font-bold">
             <div className="mb-4">
@@ -175,7 +189,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           </div>
         )}
         
-        {/* Cümle 3: Sonuç */}
+        {/* Cümle 3: Sonuç (6-10 saniye arası) */}
         {currentSentence === 3 && (
           <div className="space-y-8">
             <div 
