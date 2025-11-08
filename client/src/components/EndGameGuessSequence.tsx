@@ -36,55 +36,49 @@ function AnimatedText({ text, className = "", delay = 0 }: { text: string; class
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
   const [currentSentence, setCurrentSentence] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
   
   useEffect(() => {
-    if (!sequence || isComplete) return;
+    if (!sequence) return;
     
     const timers: NodeJS.Timeout[] = [];
     
-    // Cümle süreleri - ilk cümle kısaltıldı
-    // Cümle 1: 0-1 saniye arası (1 saniye - 2 SANİYE AZALTILDI)
-    // Cümle 2: 1-6 saniye arası (5 saniye - aynı süre korundu)
-    // Cümle 3: 6-10 saniye arası (4 saniye - aynı süre korundu)
-    // Video veya bitiş: 10+ saniye
+    // Zamanlama açıklaması:
+    // Cümle 1: 0-1 saniye arası gösterilir (1 saniye)
+    // Cümle 2: 1-6 saniye arası gösterilir (5 saniye) 
+    // Cümle 3: 6-10 saniye arası gösterilir (4 saniye)
+    // Video/Bitiş: 10+ saniye
     
-    // Başlangıç - ilk cümle hemen görünsün
+    // İlk cümle başlasın
     setCurrentSentence(1);
     
-    // 1 saniye sonra ilk cümle kaybolsun, ikinci cümle gelsin (3s'den 1s'ye düşürüldü)
+    // 1 saniye sonra ikinci cümleye geç
     timers.push(setTimeout(() => {
       setCurrentSentence(2);
     }, 1000));
     
-    // 6 saniye sonra ikinci cümle kaybolsun, üçüncü cümle gelsin (5 saniye gösterim süresi korundu)
+    // 6 saniye sonra üçüncü cümleye geç
     timers.push(setTimeout(() => {
       setCurrentSentence(3);
     }, 6000));
     
-    // 10 saniye sonra - doğru tahminde video göster, yanlışta kapat (12s'den 10s'ye)
-    if (sequence.success) {
-      timers.push(setTimeout(() => {
+    // 10 saniye sonra bitir veya video göster
+    timers.push(setTimeout(() => {
+      if (sequence.success) {
         setShowVideo(true);
         setCurrentSentence(0); // Yazıları gizle
-      }, 10000));
-      
-      // Video kendi süresini tamamlayınca onComplete çağrılacak
-      // NormalWinVideo komponenti kendi zamanlamasını yönetiyor
-    } else {
-      // Yanlış tahminde 11 saniye sonra kapat
-      timers.push(setTimeout(() => {
-        setIsComplete(true);
+        // NormalWinVideo kendi onComplete'ini çağıracak
+      } else {
+        // Yanlış tahmin - direkt bitir
         onComplete?.();
-      }, 11000));
-    }
+      }
+    }, 10000));
     
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [sequence, onComplete, isComplete]);
+  }, [sequence, onComplete]);
   
-  if (!sequence || isComplete) return null;
+  if (!sequence) return null;
   
   const roleText = "Kahin";
   const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
@@ -96,10 +90,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       <NormalWinVideo 
         winnerTeam={sequence.finalWinner}
         winnerTeamName={sequence.finalWinnerName}
-        onComplete={() => {
-          setIsComplete(true);
-          onComplete?.();
-        }}
+        onComplete={onComplete}
       />
     );
   }
