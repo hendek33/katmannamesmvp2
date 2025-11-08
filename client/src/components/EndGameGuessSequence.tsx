@@ -14,23 +14,23 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
   useEffect(() => {
     if (!sequence) return;
     
-    // Progress through steps with delays
+    // Progress through steps with delays - HIZLANDIRILDI
     const timers: NodeJS.Timeout[] = [];
     
-    // Step 1: Show team decision (1.5s delay)
-    timers.push(setTimeout(() => setStep(1), 1500));
+    // Step 1: Show team decision (1s delay)
+    timers.push(setTimeout(() => setStep(1), 1000));
     
-    // Step 2: Show actual role reveal (3.5s delay)
-    timers.push(setTimeout(() => setStep(2), 3500));
+    // Step 2: Show actual role reveal (2s delay) - KISALTILDI
+    timers.push(setTimeout(() => setStep(2), 2000));
     
-    // Step 3: Show final result (5.5s delay)  
-    timers.push(setTimeout(() => setStep(3), 5500));
+    // Step 3: Show final result (3.5s delay)  
+    timers.push(setTimeout(() => setStep(3), 3500));
     
-    // Hide and complete (8s delay)
+    // Hide and complete (5.5s delay)
     timers.push(setTimeout(() => {
       setShow(false);
       onComplete?.();
-    }, 8000));
+    }, 5500));
     
     return () => {
       timers.forEach(timer => clearTimeout(timer));
@@ -101,9 +101,9 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
                 sequence.actualRole === "prophet" ? "text-purple-500" : "text-slate-500"
               )}
               style={{
-                animation: 'zoomInRotate 0.8s ease-out forwards',
+                animation: 'zoomInRotate 0.6s ease-out forwards',
                 opacity: 0,
-                animationDelay: '1s',
+                animationDelay: '0.3s',  // 1s'den 0.3s'ye düşürüldü
               }}
             >
               {actualRoleText} İDİ!
