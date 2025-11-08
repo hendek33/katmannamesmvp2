@@ -28,7 +28,9 @@ export function PlayerIntroduction({
   const [dotCount, setDotCount] = useState(1);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
-  const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team (light) spymaster controls
+  // Allow all players to select who introduces (voting system)
+  const canSelectPlayer = true; // All players can vote/select
+  const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team spymaster controls skip/finish
   const currentIntroducingPlayer = gameState.introductionPhase?.currentIntroducingPlayer;
   const introducingPlayer = gameState.players.find(p => p.id === currentIntroducingPlayer);
   
@@ -61,7 +63,7 @@ export function PlayerIntroduction({
   }, [currentIntroducingPlayer]);
   
   const handlePlayerClick = (player: Player) => {
-    if (isController && !player.introduced && !currentIntroducingPlayer) {
+    if (canSelectPlayer && !player.introduced && !currentIntroducingPlayer) {
       onSelectPlayer(player.id);
     }
   };
@@ -292,7 +294,7 @@ export function PlayerIntroduction({
       {!currentIntroducingPlayer ? (
         /* Player Selection View */
         <div className="space-y-3">
-          {isController && (
+          {canSelectPlayer && (
             <motion.div 
               className="text-center mb-4"
               initial={{ y: -20, opacity: 0 }}
@@ -300,12 +302,12 @@ export function PlayerIntroduction({
               transition={{ type: "spring", stiffness: 200 }}
             >
               <motion.div 
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-red-600 to-red-700 shadow-xl border-2 border-red-500/50"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 shadow-xl border-2 border-purple-500/50"
                 animate={{ 
                   boxShadow: [
-                    "0 0 20px rgba(220, 38, 38, 0.3)",
-                    "0 0 30px rgba(220, 38, 38, 0.5)",
-                    "0 0 20px rgba(220, 38, 38, 0.3)"
+                    "0 0 20px rgba(147, 51, 234, 0.3)",
+                    "0 0 30px rgba(147, 51, 234, 0.5)",
+                    "0 0 20px rgba(147, 51, 234, 0.3)"
                   ]
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -314,10 +316,10 @@ export function PlayerIntroduction({
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <Crown className="w-5 h-5 text-yellow-400" />
+                  <Users className="w-5 h-5 text-yellow-400" />
                 </motion.div>
                 <span className="text-white font-bold text-base">
-                  Bir Oyuncu Seç ve Tanıtımı Başlat
+                  Bu Oyuncuyu Seç
                 </span>
                 <Sparkles className="w-5 h-5 text-yellow-400" />
               </motion.div>
@@ -383,7 +385,7 @@ export function PlayerIntroduction({
                           delay: lightTeamPlayers.indexOf(player) * 0.1
                         }
                       }}
-                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
+                      whileHover={canSelectPlayer && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
                         scale: 1.02,
                         y: -2,
                         transition: { 
@@ -400,7 +402,7 @@ export function PlayerIntroduction({
                             ? 'bg-red-900/40 border-red-600/50' 
                             : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-gray-600'
                           }
-                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-2xl hover:shadow-red-500/30' : ''}
+                          ${canSelectPlayer && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-2xl hover:shadow-red-500/30' : ''}
                           ${hoveredPlayer === player.id ? 'ring-2 ring-red-400/60' : ''}
                           ${!hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
@@ -522,7 +524,7 @@ export function PlayerIntroduction({
                           delay: darkTeamPlayers.indexOf(player) * 0.1
                         }
                       }}
-                      whileHover={isController && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
+                      whileHover={canSelectPlayer && !hasBeenIntroduced && !currentIntroducingPlayer ? { 
                         scale: 1.02,
                         y: -2,
                         transition: { 
@@ -539,7 +541,7 @@ export function PlayerIntroduction({
                             ? 'bg-blue-900/40 border-blue-600/50' 
                             : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-gray-600'
                           }
-                          ${isController && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-2xl hover:shadow-blue-500/30' : ''}
+                          ${canSelectPlayer && !hasBeenIntroduced && !currentIntroducingPlayer ? 'hover:shadow-2xl hover:shadow-blue-500/30' : ''}
                           ${hoveredPlayer === player.id ? 'ring-2 ring-blue-400/60' : ''}
                           ${!hasBeenIntroduced ? '' : 'backdrop-blur-sm'}
                         `}
