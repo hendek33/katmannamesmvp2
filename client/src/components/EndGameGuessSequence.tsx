@@ -69,11 +69,8 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         setCurrentSentence(0); // Yazıları gizle
       }, 12000));
       
-      // Video bitince (16 saniye sonra) kapat
-      timers.push(setTimeout(() => {
-        setIsComplete(true);
-        onComplete?.();
-      }, 16000));
+      // Video kendi süresini tamamlayınca onComplete çağrılacak
+      // NormalWinVideo komponenti kendi zamanlamasını yönetiyor
     } else {
       // Yanlış tahminde 13 saniye sonra kapat
       timers.push(setTimeout(() => {
