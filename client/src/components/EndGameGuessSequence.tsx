@@ -43,40 +43,40 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     
     const timers: NodeJS.Timeout[] = [];
     
-    // Cümle süreleri güncellendi - rol açıklaması daha uzun
-    // Cümle 1: 0-3 saniye arası (3 saniye)
-    // Cümle 2: 3-8 saniye arası (5 saniye - UZATILDI)
-    // Cümle 3: 8-12 saniye arası (4 saniye)
-    // Video veya bitiş: 12+ saniye
+    // Cümle süreleri güncellendi - ilk cümle daha kısa
+    // Cümle 1: 0-1 saniye arası (1 saniye - KISALTILDI)
+    // Cümle 2: 1-6 saniye arası (5 saniye)
+    // Cümle 3: 6-10 saniye arası (4 saniye)
+    // Video veya bitiş: 10+ saniye
     
     // Başlangıç - ilk cümle hemen görünsün
     setCurrentSentence(1);
     
-    // 3 saniye sonra ilk cümle kaybolsun, ikinci cümle gelsin
+    // 1 saniye sonra ilk cümle kaybolsun, ikinci cümle gelsin (2 saniye azaltıldı)
     timers.push(setTimeout(() => {
       setCurrentSentence(2);
-    }, 3000));
+    }, 1000));
     
-    // 8 saniye sonra ikinci cümle kaybolsun, üçüncü cümle gelsin (5 saniye gösterim)
+    // 6 saniye sonra ikinci cümle kaybolsun, üçüncü cümle gelsin (5 saniye gösterim)
     timers.push(setTimeout(() => {
       setCurrentSentence(3);
-    }, 8000));
+    }, 6000));
     
-    // 12 saniye sonra - doğru tahminde video göster, yanlışta kapat
+    // 10 saniye sonra - doğru tahminde video göster, yanlışta kapat
     if (sequence.success) {
       timers.push(setTimeout(() => {
         setShowVideo(true);
         setCurrentSentence(0); // Yazıları gizle
-      }, 12000));
+      }, 10000));
       
       // Video kendi süresini tamamlayınca onComplete çağrılacak
       // NormalWinVideo komponenti kendi zamanlamasını yönetiyor
     } else {
-      // Yanlış tahminde 13 saniye sonra kapat
+      // Yanlış tahminde 11 saniye sonra kapat (10 saniye + 1 saniye bekleme)
       timers.push(setTimeout(() => {
         setIsComplete(true);
         onComplete?.();
-      }, 13000));
+      }, 11000));
     }
     
     return () => {
