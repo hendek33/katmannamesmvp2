@@ -8,6 +8,29 @@ interface EndGameGuessSequenceProps {
   onComplete?: () => void;
 }
 
+// Kelime kelime animasyon için yardımcı component
+function AnimatedText({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
+  const words = text.split(' ');
+  
+  return (
+    <>
+      {words.map((word, index) => (
+        <span
+          key={index}
+          className={cn("inline-block", className)}
+          style={{
+            animation: 'wordFadeIn 0.4s ease-out forwards',
+            animationDelay: `${delay + (index * 0.15)}s`,
+            opacity: 0,
+          }}
+        >
+          {word}{' '}
+        </span>
+      ))}
+    </>
+  );
+}
+
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
   const [currentSentence, setCurrentSentence] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
@@ -89,51 +112,73 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       <div className="max-w-5xl w-full text-center space-y-12">
         
         {/* Başlık - her zaman görünsün */}
-        <div className="text-5xl md:text-7xl font-black text-purple-400">
+        <div className="text-5xl md:text-7xl font-black text-purple-400 drop-shadow-[0_0_40px_rgba(168,85,247,0.6)]">
           KAHİN TAHMİNİ
         </div>
         
         {/* Cümle 1: Takım kararı */}
         {currentSentence === 1 && (
-          <div 
-            className="text-3xl md:text-5xl font-bold"
-            style={{
-              animation: 'fadeIn 0.5s ease-out forwards',
-            }}
-          >
-            <span className="text-slate-300">{sequence.guessingTeamName} Takımı</span>
-            <br />
-            <span className="text-yellow-400 text-4xl md:text-6xl">{sequence.targetPlayer}</span>
-            <span className="text-slate-300"> oyuncusunun</span>
-            <br />
-            <span className="text-purple-400 text-4xl md:text-6xl">{roleText}</span>
-            <span className="text-slate-300"> olduğuna karar verdi!</span>
+          <div className="text-3xl md:text-5xl font-bold">
+            <div className="mb-2">
+              <AnimatedText text={sequence.guessingTeamName + " Takımı"} className="text-slate-300" />
+            </div>
+            <div className="mb-2">
+              <span 
+                className="text-yellow-400 text-4xl md:text-6xl inline-block font-black"
+                style={{
+                  animation: 'namePop 0.6s ease-out forwards',
+                  animationDelay: '0.5s',
+                  opacity: 0,
+                }}
+              >
+                {sequence.targetPlayer}
+              </span>
+              <AnimatedText text=" oyuncusunun" className="text-slate-300" delay={0.8} />
+            </div>
+            <div>
+              <span 
+                className="text-purple-400 text-4xl md:text-6xl inline-block font-black"
+                style={{
+                  animation: 'rolePop 0.6s ease-out forwards',
+                  animationDelay: '1.2s',
+                  opacity: 0,
+                }}
+              >
+                {roleText}
+              </span>
+              <AnimatedText text=" olduğuna karar verdi!" className="text-slate-300" delay={1.5} />
+            </div>
           </div>
         )}
         
         {/* Cümle 2: Gerçek rol açıklaması */}
         {currentSentence === 2 && (
-          <div 
-            className="text-3xl md:text-5xl font-bold"
-            style={{
-              animation: 'fadeIn 0.5s ease-out forwards',
-            }}
-          >
-            <span className="text-yellow-400 text-4xl md:text-6xl">{sequence.targetPlayer}</span>
-            <span className="text-slate-300"> oyuncusunun</span>
-            <br />
-            <span className="text-slate-300">gerçek rolü aslında...</span>
-            <br />
+          <div className="text-3xl md:text-5xl font-bold">
+            <div className="mb-4">
+              <span 
+                className="text-yellow-400 text-4xl md:text-6xl inline-block font-black"
+                style={{
+                  animation: 'namePop 0.6s ease-out forwards',
+                  opacity: 0,
+                }}
+              >
+                {sequence.targetPlayer}
+              </span>
+              <AnimatedText text=" oyuncusunun" className="text-slate-300" delay={0.4} />
+            </div>
+            <div className="mb-6">
+              <AnimatedText text="gerçek rolü aslında..." className="text-slate-300 text-4xl" delay={0.8} />
+            </div>
             <div 
               className={cn(
-                "text-6xl md:text-8xl font-black mt-6",
+                "text-6xl md:text-8xl font-black",
                 sequence.actualRole === "prophet" 
-                  ? "text-purple-500 drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]" 
-                  : "text-slate-400"
+                  ? "text-purple-500 drop-shadow-[0_0_50px_rgba(168,85,247,0.8)]" 
+                  : "text-slate-400 drop-shadow-[0_0_30px_rgba(148,163,184,0.5)]"
               )}
               style={{
-                animation: 'zoomIn 0.5s ease-out forwards',
-                animationDelay: '0.5s',
+                animation: 'roleReveal 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
+                animationDelay: '1.8s',
                 opacity: 0,
               }}
             >
@@ -144,71 +189,157 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         
         {/* Cümle 3: Sonuç */}
         {currentSentence === 3 && (
-          <div 
-            className="space-y-6"
-            style={{
-              animation: 'fadeIn 0.5s ease-out forwards',
-            }}
-          >
-            <div className="text-5xl md:text-7xl font-black">
+          <div className="space-y-8">
+            <div 
+              className="text-5xl md:text-7xl font-black"
+              style={{
+                animation: 'resultSlam 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
+                opacity: 0,
+              }}
+            >
               {isCorrect ? (
-                <span className="text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.6)]">
+                <span className="text-green-400 drop-shadow-[0_0_40px_rgba(74,222,128,0.8)]">
                   ✓ DOĞRU TAHMİN!
                 </span>
               ) : (
-                <span className="text-red-400 drop-shadow-[0_0_20px_rgba(248,113,113,0.6)]">
+                <span className="text-red-400 drop-shadow-[0_0_40px_rgba(248,113,113,0.8)]">
                   ✗ YANLIŞ TAHMİN!
                 </span>
               )}
             </div>
             
-            <div 
-              className={cn(
-                "text-6xl md:text-8xl font-black",
-                sequence.finalWinner === "dark" ? "text-blue-400" : "text-red-400"
-              )}
-              style={{
-                textShadow: sequence.finalWinner === "dark"
-                  ? '0 0 40px rgba(59,130,246,0.9), 0 0 80px rgba(59,130,246,0.5)'
-                  : '0 0 40px rgba(239,68,68,0.9), 0 0 80px rgba(239,68,68,0.5)',
-                animation: 'pulse 1.5s ease-in-out infinite',
-              }}
-            >
-              {sequence.finalWinnerName} TAKIMI KAZANDI!
+            <div className="text-5xl md:text-7xl font-black">
+              <div
+                className={cn(
+                  sequence.finalWinner === "dark" 
+                    ? "text-blue-400 drop-shadow-[0_0_60px_rgba(59,130,246,1)]" 
+                    : "text-red-400 drop-shadow-[0_0_60px_rgba(239,68,68,1)]"
+                )}
+                style={{
+                  animation: 'winnerPulse 2s ease-in-out infinite',
+                  animationDelay: '0.8s',
+                  opacity: 0,
+                }}
+              >
+                {sequence.finalWinnerName}
+              </div>
+              <AnimatedText 
+                text="TAKIMI KAZANDI!" 
+                className={cn(
+                  "text-6xl md:text-8xl",
+                  sequence.finalWinner === "dark" ? "text-blue-300" : "text-red-300"
+                )}
+                delay={1.2} 
+              />
             </div>
           </div>
         )}
       </div>
       
       <style>{`
-        @keyframes fadeIn {
-          from {
+        @keyframes wordFadeIn {
+          0% {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(20px) scale(0.8);
+            filter: blur(10px);
           }
-          to {
+          50% {
+            opacity: 0.5;
+            filter: blur(5px);
+          }
+          100% {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+            filter: blur(0);
           }
         }
         
-        @keyframes zoomIn {
-          from {
+        @keyframes namePop {
+          0% {
             opacity: 0;
-            transform: scale(0.3);
+            transform: scale(0) rotate(-180deg);
           }
-          to {
+          50% {
+            transform: scale(1.2) rotate(10deg);
+          }
+          100% {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) rotate(0);
           }
         }
         
-        @keyframes pulse {
-          0%, 100% {
+        @keyframes rolePop {
+          0% {
+            opacity: 0;
+            transform: translateX(-100px) scale(0.5);
+          }
+          70% {
+            transform: translateX(20px) scale(1.1);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+          }
+        }
+        
+        @keyframes roleReveal {
+          0% {
+            opacity: 0;
+            transform: scale(3) rotate(720deg);
+            filter: blur(20px);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.5) rotate(360deg);
+            filter: blur(5px);
+          }
+          80% {
+            transform: scale(0.9) rotate(0);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0);
+            filter: blur(0);
+          }
+        }
+        
+        @keyframes resultSlam {
+          0% {
+            opacity: 0;
+            transform: translateY(-100px) scale(2);
+          }
+          60% {
+            opacity: 1;
+            transform: translateY(10px) scale(0.95);
+          }
+          80% {
+            transform: translateY(-5px) scale(1.02);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        @keyframes winnerPulse {
+          0% {
+            opacity: 0;
+            transform: scale(0.5);
+          }
+          25% {
+            opacity: 1;
             transform: scale(1);
           }
           50% {
+            transform: scale(1.1);
+          }
+          75% {
             transform: scale(1.05);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
           }
         }
       `}</style>
