@@ -735,9 +735,6 @@ export default function Game() {
       {showEndGameGuessSequence && gameState?.endGameGuessSequence && (
         <EndGameGuessSequence
           sequence={gameState.endGameGuessSequence}
-          currentPlayerId={playerId}
-          players={gameState.players}
-          endGameGuessVotes={endGameGuessVotes}
           onComplete={() => setShowEndGameGuessSequence(false)}
         />
       )}
