@@ -18,26 +18,26 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     
     const timers: NodeJS.Timeout[] = [];
     
-    // Cümle 1: "X Takımı Y oyuncusunun Kahin olduğuna karar verdi!" (0s başla, 3s göster)
-    // Cümle 2: "Y oyuncusunun gerçek rolü aslında... Z İDİ!" (3s başla, 3s göster)  
-    // Cümle 3: "DOĞRU/YANLIŞ TAHMİN! X TAKIMI KAZANDI!" (6s başla, 3s göster)
-    // Sonuç ve video (eğer doğruysa): (9s başla, 4s göster)
-    // Toplam: 13s (doğru tahmin) veya 10s (yanlış tahmin)
+    // Her cümle 3 saniye gösterilip kaybolacak
+    // Cümle 1: 0-3 saniye arası
+    // Cümle 2: 3-6 saniye arası  
+    // Cümle 3: 6-9 saniye arası
+    // Video veya bitiş: 9+ saniye
     
     // Başlangıç - ilk cümle hemen görünsün
     setCurrentSentence(1);
     
-    // 3 saniye sonra ikinci cümle
+    // 3 saniye sonra ilk cümle kaybolsun, ikinci cümle gelsin
     timers.push(setTimeout(() => {
       setCurrentSentence(2);
     }, 3000));
     
-    // 6 saniye sonra üçüncü cümle (sonuç)
+    // 6 saniye sonra ikinci cümle kaybolsun, üçüncü cümle gelsin
     timers.push(setTimeout(() => {
       setCurrentSentence(3);
     }, 6000));
     
-    // 9 saniye sonra - doğru tahminde video göster
+    // 9 saniye sonra - doğru tahminde video göster, yanlışta kapat
     if (sequence.success) {
       timers.push(setTimeout(() => {
         setShowVideo(true);
@@ -50,7 +50,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         onComplete?.();
       }, 13000));
     } else {
-      // Yanlış tahminde 10 saniye sonra (9+1 saniye bekleme) kapat
+      // Yanlış tahminde 10 saniye sonra kapat
       timers.push(setTimeout(() => {
         setIsComplete(true);
         onComplete?.();
@@ -94,7 +94,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         </div>
         
         {/* Cümle 1: Takım kararı */}
-        {currentSentence >= 1 && (
+        {currentSentence === 1 && (
           <div 
             className="text-3xl md:text-5xl font-bold"
             style={{
@@ -112,7 +112,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         )}
         
         {/* Cümle 2: Gerçek rol açıklaması */}
-        {currentSentence >= 2 && (
+        {currentSentence === 2 && (
           <div 
             className="text-3xl md:text-5xl font-bold"
             style={{
@@ -143,7 +143,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         )}
         
         {/* Cümle 3: Sonuç */}
-        {currentSentence >= 3 && (
+        {currentSentence === 3 && (
           <div 
             className="space-y-6"
             style={{
