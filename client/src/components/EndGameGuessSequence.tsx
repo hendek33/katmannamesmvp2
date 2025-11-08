@@ -15,16 +15,18 @@ function AnimatedText({ text, className = "", delay = 0 }: { text: string; class
   return (
     <>
       {words.map((word, index) => (
-        <span
-          key={index}
-          className={cn("inline-block", className)}
-          style={{
-            animation: 'wordFadeIn 0.4s ease-out forwards',
-            animationDelay: `${delay + (index * 0.15)}s`,
-            opacity: 0,
-          }}
-        >
-          {word}{' '}
+        <span key={index}>
+          <span
+            className={cn("inline-block", className)}
+            style={{
+              animation: 'wordFadeIn 0.4s ease-out forwards',
+              animationDelay: `${delay + (index * 0.15)}s`,
+              opacity: 0,
+            }}
+          >
+            {word}
+          </span>
+          {index < words.length - 1 && '\u00A0'}
         </span>
       ))}
     </>
@@ -41,11 +43,11 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     
     const timers: NodeJS.Timeout[] = [];
     
-    // Her cümle 3 saniye gösterilip kaybolacak
-    // Cümle 1: 0-3 saniye arası
-    // Cümle 2: 3-6 saniye arası  
-    // Cümle 3: 6-9 saniye arası
-    // Video veya bitiş: 9+ saniye
+    // Cümle süreleri güncellendi - rol açıklaması daha uzun
+    // Cümle 1: 0-3 saniye arası (3 saniye)
+    // Cümle 2: 3-8 saniye arası (5 saniye - UZATILDI)
+    // Cümle 3: 8-12 saniye arası (4 saniye)
+    // Video veya bitiş: 12+ saniye
     
     // Başlangıç - ilk cümle hemen görünsün
     setCurrentSentence(1);
@@ -55,29 +57,29 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       setCurrentSentence(2);
     }, 3000));
     
-    // 6 saniye sonra ikinci cümle kaybolsun, üçüncü cümle gelsin
+    // 8 saniye sonra ikinci cümle kaybolsun, üçüncü cümle gelsin (5 saniye gösterim)
     timers.push(setTimeout(() => {
       setCurrentSentence(3);
-    }, 6000));
+    }, 8000));
     
-    // 9 saniye sonra - doğru tahminde video göster, yanlışta kapat
+    // 12 saniye sonra - doğru tahminde video göster, yanlışta kapat
     if (sequence.success) {
       timers.push(setTimeout(() => {
         setShowVideo(true);
         setCurrentSentence(0); // Yazıları gizle
-      }, 9000));
+      }, 12000));
       
-      // Video bitince (13 saniye sonra) kapat
+      // Video bitince (16 saniye sonra) kapat
+      timers.push(setTimeout(() => {
+        setIsComplete(true);
+        onComplete?.();
+      }, 16000));
+    } else {
+      // Yanlış tahminde 13 saniye sonra kapat
       timers.push(setTimeout(() => {
         setIsComplete(true);
         onComplete?.();
       }, 13000));
-    } else {
-      // Yanlış tahminde 10 saniye sonra kapat
-      timers.push(setTimeout(() => {
-        setIsComplete(true);
-        onComplete?.();
-      }, 10000));
     }
     
     return () => {
