@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import type { GameState } from "@shared/schema";
+import { TurnVideoInline } from "./TurnVideoInline";
 
 interface EndGameGuessSequenceProps {
   sequence: GameState["endGameGuessSequence"];
@@ -8,102 +9,132 @@ interface EndGameGuessSequenceProps {
 }
 
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
-  const [step, setStep] = useState(0);
-  const [show, setShow] = useState(true);
+  const [currentSentence, setCurrentSentence] = useState(0);
+  const [showVideo, setShowVideo] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
   
   useEffect(() => {
-    if (!sequence) return;
+    if (!sequence || isComplete) return;
     
-    // Progress through steps with delays - HIZLANDIRILDI
     const timers: NodeJS.Timeout[] = [];
     
-    // Step 1: Show team decision (1s delay)
-    timers.push(setTimeout(() => setStep(1), 1000));
+    // Cümle 1: "X Takımı Y oyuncusunun Kahin olduğuna karar verdi!" (0s başla, 3s göster)
+    // Cümle 2: "Y oyuncusunun gerçek rolü aslında... Z İDİ!" (3s başla, 3s göster)  
+    // Cümle 3: "DOĞRU/YANLIŞ TAHMİN! X TAKIMI KAZANDI!" (6s başla, 3s göster)
+    // Sonuç ve video (eğer doğruysa): (9s başla, 4s göster)
+    // Toplam: 13s (doğru tahmin) veya 10s (yanlış tahmin)
     
-    // Step 2: Show actual role reveal (2s delay) - KISALTILDI
-    timers.push(setTimeout(() => setStep(2), 2000));
+    // Başlangıç - ilk cümle hemen görünsün
+    setCurrentSentence(1);
     
-    // Step 3: Show final result (3.5s delay)  
-    timers.push(setTimeout(() => setStep(3), 3500));
-    
-    // Hide and complete (5.5s delay)
+    // 3 saniye sonra ikinci cümle
     timers.push(setTimeout(() => {
-      setShow(false);
-      onComplete?.();
-    }, 5500));
+      setCurrentSentence(2);
+    }, 3000));
+    
+    // 6 saniye sonra üçüncü cümle (sonuç)
+    timers.push(setTimeout(() => {
+      setCurrentSentence(3);
+    }, 6000));
+    
+    // 9 saniye sonra - doğru tahminde video göster
+    if (sequence.success) {
+      timers.push(setTimeout(() => {
+        setShowVideo(true);
+        setCurrentSentence(0); // Yazıları gizle
+      }, 9000));
+      
+      // Video bitince (13 saniye sonra) kapat
+      timers.push(setTimeout(() => {
+        setIsComplete(true);
+        onComplete?.();
+      }, 13000));
+    } else {
+      // Yanlış tahminde 10 saniye sonra (9+1 saniye bekleme) kapat
+      timers.push(setTimeout(() => {
+        setIsComplete(true);
+        onComplete?.();
+      }, 10000));
+    }
     
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
-  }, [sequence, onComplete]);
+  }, [sequence, onComplete, isComplete]);
   
-  if (!sequence || !show) return null;
+  if (!sequence || isComplete) return null;
   
   const roleText = "Kahin";
-  const actualRoleText = sequence.actualRole === "prophet" 
-    ? "KAHİN" 
-    : "NORMAL AJAN";
-  
+  const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
   const isCorrect = sequence.success;
+  
+  // Video gösteriliyorsa sadece video göster
+  if (showVideo && isCorrect && sequence.finalWinner && sequence.finalWinnerName) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center">
+        <TurnVideoInline 
+          team={sequence.finalWinner}
+          teamName={sequence.finalWinnerName}
+          onComplete={() => {
+            setIsComplete(true);
+            onComplete?.();
+          }}
+        />
+      </div>
+    );
+  }
   
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full text-center space-y-8">
+      <div className="max-w-5xl w-full text-center space-y-12">
         
-        {/* Step 0: Initial fade in */}
-        {step >= 0 && (
+        {/* Başlık - her zaman görünsün */}
+        <div className="text-5xl md:text-7xl font-black text-purple-400">
+          KAHİN TAHMİNİ
+        </div>
+        
+        {/* Cümle 1: Takım kararı */}
+        {currentSentence >= 1 && (
           <div 
-            className="text-4xl md:text-6xl font-black"
+            className="text-3xl md:text-5xl font-bold"
             style={{
-              animation: 'fadeInScale 1s ease-out forwards',
-              opacity: 0,
+              animation: 'fadeIn 0.5s ease-out forwards',
             }}
           >
-            <span className="text-purple-400">KAHİN TAHMİNİ</span>
+            <span className="text-slate-300">{sequence.guessingTeamName} Takımı</span>
+            <br />
+            <span className="text-yellow-400 text-4xl md:text-6xl">{sequence.targetPlayer}</span>
+            <span className="text-slate-300"> oyuncusunun</span>
+            <br />
+            <span className="text-purple-400 text-4xl md:text-6xl">{roleText}</span>
+            <span className="text-slate-300"> olduğuna karar verdi!</span>
           </div>
         )}
         
-        {/* Step 1: Team decision */}
-        {step >= 1 && (
+        {/* Cümle 2: Gerçek rol açıklaması */}
+        {currentSentence >= 2 && (
           <div 
-            className="text-2xl md:text-4xl font-bold"
+            className="text-3xl md:text-5xl font-bold"
             style={{
-              animation: 'slideInFromLeft 1s ease-out forwards',
-              opacity: 0,
-              animationDelay: '0.2s',
+              animation: 'fadeIn 0.5s ease-out forwards',
             }}
           >
-            <span className="text-slate-400">{sequence.guessingTeamName} Takımı</span>
+            <span className="text-yellow-400 text-4xl md:text-6xl">{sequence.targetPlayer}</span>
+            <span className="text-slate-300"> oyuncusunun</span>
             <br />
-            <span className="text-yellow-400">{sequence.targetPlayer}</span>
-            <span className="text-slate-400"> oyuncusunun</span>
-            <br />
-            <span className="text-purple-300">{roleText} olduğuna karar verdi!</span>
-          </div>
-        )}
-        
-        {/* Step 2: Actual role reveal */}
-        {step >= 2 && (
-          <div 
-            className="text-2xl md:text-4xl font-bold"
-            style={{
-              animation: 'slideInFromRight 1s ease-out forwards',
-              opacity: 0,
-              animationDelay: '0.2s',
-            }}
-          >
-            <span className="text-yellow-400">{sequence.targetPlayer}</span>
-            <span className="text-slate-400"> oyuncusunun gerçek rolü aslında...</span>
+            <span className="text-slate-300">gerçek rolü aslında...</span>
             <br />
             <div 
               className={cn(
-                "text-5xl md:text-7xl font-black mt-4",
-                sequence.actualRole === "prophet" ? "text-purple-500" : "text-slate-500"
+                "text-6xl md:text-8xl font-black mt-6",
+                sequence.actualRole === "prophet" 
+                  ? "text-purple-500 drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]" 
+                  : "text-slate-400"
               )}
               style={{
-                animation: 'zoomInRotate 0.6s ease-out forwards',
+                animation: 'zoomIn 0.5s ease-out forwards',
+                animationDelay: '0.5s',
                 opacity: 0,
-                animationDelay: '0.3s',  // 1s'den 0.3s'ye düşürüldü
               }}
             >
               {actualRoleText} İDİ!
@@ -111,32 +142,36 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           </div>
         )}
         
-        {/* Step 3: Final result */}
-        {step >= 3 && (
+        {/* Cümle 3: Sonuç */}
+        {currentSentence >= 3 && (
           <div 
-            className="text-4xl md:text-6xl font-black"
+            className="space-y-6"
             style={{
-              animation: 'bounceIn 1s ease-out forwards',
-              opacity: 0,
-              animationDelay: '0.3s',
+              animation: 'fadeIn 0.5s ease-out forwards',
             }}
           >
-            <div className="mb-4">
+            <div className="text-5xl md:text-7xl font-black">
               {isCorrect ? (
-                <span className="text-green-400">✓ DOĞRU TAHMİN!</span>
+                <span className="text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.6)]">
+                  ✓ DOĞRU TAHMİN!
+                </span>
               ) : (
-                <span className="text-red-400">✗ YANLIŞ TAHMİN!</span>
+                <span className="text-red-400 drop-shadow-[0_0_20px_rgba(248,113,113,0.6)]">
+                  ✗ YANLIŞ TAHMİN!
+                </span>
               )}
             </div>
+            
             <div 
               className={cn(
-                "text-5xl md:text-7xl",
+                "text-6xl md:text-8xl font-black",
                 sequence.finalWinner === "dark" ? "text-blue-400" : "text-red-400"
               )}
               style={{
                 textShadow: sequence.finalWinner === "dark"
-                  ? '0 0 30px rgba(59,130,246,0.8)'
-                  : '0 0 30px rgba(239,68,68,0.8)',
+                  ? '0 0 40px rgba(59,130,246,0.9), 0 0 80px rgba(59,130,246,0.5)'
+                  : '0 0 40px rgba(239,68,68,0.9), 0 0 80px rgba(239,68,68,0.5)',
+                animation: 'pulse 1.5s ease-in-out infinite',
               }}
             >
               {sequence.finalWinnerName} TAKIMI KAZANDI!
@@ -146,65 +181,34 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       </div>
       
       <style>{`
-        @keyframes fadeInScale {
+        @keyframes fadeIn {
           from {
             opacity: 0;
-            transform: scale(0.5);
+            transform: translateY(20px);
           }
           to {
             opacity: 1;
-            transform: scale(1);
+            transform: translateY(0);
           }
         }
         
-        @keyframes slideInFromLeft {
+        @keyframes zoomIn {
           from {
-            opacity: 0;
-            transform: translateX(-100px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes slideInFromRight {
-          from {
-            opacity: 0;
-            transform: translateX(100px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        @keyframes zoomInRotate {
-          from {
-            opacity: 0;
-            transform: scale(0) rotate(-180deg);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-          }
-        }
-        
-        @keyframes bounceIn {
-          0% {
             opacity: 0;
             transform: scale(0.3);
           }
-          50% {
-            opacity: 1;
-            transform: scale(1.05);
-          }
-          70% {
-            transform: scale(0.9);
-          }
-          100% {
+          to {
             opacity: 1;
             transform: scale(1);
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
           }
         }
       `}</style>
