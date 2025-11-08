@@ -50,22 +50,22 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     hasStartedRef.current = true;
     
     // Zamanlama:
-    // 0-1 saniye: İlk cümle
-    // 1-6 saniye: İkinci cümle (5 saniye gösterim)
-    // 6-10 saniye: Üçüncü cümle (4 saniye gösterim)
-    // 10+ saniye: Video veya bitiş
+    // 0-3 saniye: İlk cümle (3 SANİYE)
+    // 3-8 saniye: İkinci cümle (5 saniye gösterim)
+    // 8-12 saniye: Üçüncü cümle (4 saniye gösterim)
+    // 12+ saniye: Video veya bitiş
     
-    // 1 saniye sonra ikinci cümleye geç
+    // 3 saniye sonra ikinci cümleye geç
     const timer1 = setTimeout(() => {
       setCurrentSentence(2);
-    }, 1000);
+    }, 3000);
     
-    // 6 saniye sonra üçüncü cümleye geç
+    // 8 saniye sonra üçüncü cümleye geç
     const timer2 = setTimeout(() => {
       setCurrentSentence(3);
-    }, 6000);
+    }, 8000);
     
-    // 10 saniye sonra sekansı bitir
+    // 12 saniye sonra sekansı bitir
     const timer3 = setTimeout(() => {
       if (sequence.success) {
         setShowVideo(true);
@@ -74,7 +74,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         setIsFinished(true);
         onComplete?.();
       }
-    }, 10000);
+    }, 12000);
     
     // Timer'ları kaydet
     timersRef.current = [timer1, timer2, timer3];
@@ -118,7 +118,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           KAHİN TAHMİNİ
         </div>
         
-        {/* Cümle 1: Takım kararı (0-1 saniye arası) */}
+        {/* Cümle 1: Takım kararı (0-3 saniye arası) */}
         {currentSentence === 1 && (
           <div className="text-3xl md:text-5xl font-bold">
             <div className="mb-2">
@@ -153,7 +153,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           </div>
         )}
         
-        {/* Cümle 2: Gerçek rol açıklaması (1-6 saniye arası) */}
+        {/* Cümle 2: Gerçek rol açıklaması (3-8 saniye arası) */}
         {currentSentence === 2 && (
           <div className="text-3xl md:text-5xl font-bold">
             <div className="mb-4">
@@ -189,7 +189,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           </div>
         )}
         
-        {/* Cümle 3: Sonuç (6-10 saniye arası) */}
+        {/* Cümle 3: Sonuç (8-12 saniye arası) */}
         {currentSentence === 3 && (
           <div className="space-y-8">
             <div 
