@@ -1,10 +1,15 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
-import type { GameState } from "@shared/schema";
+import type { GameState, Player } from "@shared/schema";
 import { NormalWinVideo } from "./NormalWinVideo";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface EndGameGuessSequenceProps {
   sequence: GameState["endGameGuessSequence"];
+  currentPlayerId?: string;
+  players?: Player[];
+  endGameGuessVotes?: Record<string, string[]>;
   onComplete?: () => void;
 }
 
@@ -33,12 +38,37 @@ function AnimatedText({ text, className = "", delay = 0 }: { text: string; class
   );
 }
 
-export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
+export function EndGameGuessSequence({ 
+  sequence, 
+  currentPlayerId,
+  players,
+  endGameGuessVotes,
+  onComplete 
+}: EndGameGuessSequenceProps) {
   const [currentSentence, setCurrentSentence] = useState(1);
   const [showVideo, setShowVideo] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const hasStartedRef = useRef(false);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
+  
+  // Check if current player participated in the voting
+  const hasParticipatedInVoting = () => {
+    if (!currentPlayerId || !endGameGuessVotes) return false;
+    // Check if player is in any of the vote arrays
+    return Object.values(endGameGuessVotes).some(voters => 
+      voters.includes(currentPlayerId)
+    );
+  };
+  
+  // Check if the current player is on the losing team (who did the voting)
+  const isOnLosingTeam = () => {
+    if (!currentPlayerId || !players || !sequence?.guessingTeam) return false;
+    const currentPlayer = players.find(p => p.id === currentPlayerId);
+    return currentPlayer?.team === sequence.guessingTeam;
+  };
+  
+  // Allow close if player participated in voting OR is on the losing team that voted
+  const canClose = hasParticipatedInVoting() || isOnLosingTeam();
   
   useEffect(() => {
     // Eğer sekans yoksa veya zaten bitmiş/başlamışsa, hiçbir şey yapma
@@ -111,6 +141,22 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
   
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
+      {/* Close Button - Only for those who participated in voting */}
+      {canClose && currentSentence >= 3 && (
+        <Button
+          onClick={() => {
+            setIsFinished(true);
+            onComplete?.();
+          }}
+          className="fixed top-8 right-8 z-[110] bg-purple-600 hover:bg-purple-700 text-white"
+          size="lg"
+          data-testid="button-close-prophet-guess"
+        >
+          <X className="w-5 h-5 mr-2" />
+          Kapat
+        </Button>
+      )}
+      
       <div className="max-w-5xl w-full text-center space-y-12">
         
         {/* Başlık - her zaman görünsün */}
