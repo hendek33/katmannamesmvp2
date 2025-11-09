@@ -480,24 +480,23 @@ export default function Game() {
   const handleNormalWinVideoComplete = useCallback(() => {
     setShowNormalWinVideo(false);
     
-    // Check if assassin was revealed or opponent's last card was revealed
+    // Check if assassin was revealed
     const lastRevealedCard = gameState?.revealHistory.length ? 
       gameState.revealHistory[gameState.revealHistory.length - 1] : null;
     const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
     
-    // Check if opponent's last card was revealed
-    const currentPlayer = gameState?.players.find(p => p.id === playerId);
-    const losingTeam = currentPlayer?.team !== gameState?.winner ? currentPlayer?.team : 
-      (gameState?.winner === "dark" ? "light" : "dark");
-    const opponentTeam = losingTeam === "dark" ? "light" : "dark";
-    const wasOpponentLastCard = lastRevealedCard?.type === opponentTeam && 
-      ((opponentTeam === "dark" && gameState?.darkCardsRemaining === 0) ||
-       (opponentTeam === "light" && gameState?.lightCardsRemaining === 0));
+    // Check if losing team revealed winning team's last card (causing themselves to lose)
+    // This happens when losing team accidentally reveals the winning team's last card
+    const winningTeam = gameState?.winner;
+    const wasWinningTeamLastCardRevealed = lastRevealedCard?.type === winningTeam && 
+      ((winningTeam === "dark" && gameState?.darkCardsRemaining === 0) ||
+       (winningTeam === "light" && gameState?.lightCardsRemaining === 0));
     
-    // Show end game voting if chaos mode is enabled BUT NOT if assassin or opponent's last card
+    // Show end game voting if chaos mode is enabled
+    // BUT NOT if assassin was revealed or losing team revealed winning team's last card
     if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
         gameState.winner && !gameState.endGameGuessUsed &&
-        !wasAssassinRevealed && !wasOpponentLastCard) {
+        !wasAssassinRevealed && !wasWinningTeamLastCardRevealed) {
       
       // Show voting UI for all players (losing team can vote, winning team can watch)
       setShowEndGameVoting(true);
