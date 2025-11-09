@@ -1124,12 +1124,24 @@ export class MemStorage implements IStorage {
     room.doubleAgentGuessResult = undefined;
     room.endGameGuessUsed = undefined;
     
+    // Reset two-phase voting states
+    room.endGameVotingPhase = undefined;
+    room.endGameGuesses = undefined;
+    room.endGameGuessSequence = undefined;
+    (room as any).endGameGuessSequences = undefined;
+    room.endGameFinalResult = undefined;
+    room.bothCorrectOutcome = undefined;
+    
+    // Clear end game voting map
+    if (roomData.endGameGuessVotes) {
+      roomData.endGameGuessVotes.clear();
+    }
+    
     // Reset consecutive passes tracking
     room.consecutivePasses = { dark: 0, light: 0 };
     if (roomData.turnRevealMap) {
       roomData.turnRevealMap = { dark: false, light: false };
     }
-    room.endGameGuessSequence = undefined;
 
     return room;
   }
@@ -1160,6 +1172,18 @@ export class MemStorage implements IStorage {
     // Clear end game guess tracking
     room.endGameGuessUsed = undefined;
     room.endGameGuessSequence = undefined;
+    
+    // Reset two-phase voting states
+    room.endGameVotingPhase = undefined;
+    room.endGameGuesses = undefined;
+    (room as any).endGameGuessSequences = undefined;
+    room.endGameFinalResult = undefined;
+    room.bothCorrectOutcome = undefined;
+    
+    // Clear end game voting map
+    if (roomData.endGameGuessVotes) {
+      roomData.endGameGuessVotes.clear();
+    }
     
     // Reset consecutive passes tracking
     room.consecutivePasses = { dark: 0, light: 0 };
