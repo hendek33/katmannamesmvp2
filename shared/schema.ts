@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export type Team = "dark" | "light" | null;
+export type Team = "dark" | "light";
+export type TeamOrNull = Team | null;
+export type GameOutcome = "dark" | "light" | "draw" | null;
 export type Role = "spymaster" | "guesser";
 export type CardType = "dark" | "light" | "neutral" | "assassin";
 export type GamePhase = "lobby" | "introduction" | "playing" | "ended";
@@ -9,7 +11,7 @@ export type SecretRole = "prophet" | "double_agent" | null;
 export interface Player {
   id: string;
   username: string;
-  team: Team;
+  team: TeamOrNull;
   role: Role;
   isRoomOwner: boolean;
   isBot: boolean;
@@ -47,11 +49,11 @@ export interface GameState {
   phase: GamePhase;
   players: Player[];
   cards: Card[];
-  currentTeam: Team;
+  currentTeam: TeamOrNull;
   darkCardsRemaining: number;
   lightCardsRemaining: number;
   currentClue: Clue | null;
-  winner: Team | null;
+  winner: GameOutcome;
   revealHistory: RevealHistoryEntry[];
   darkTeamName: string;
   lightTeamName: string;
@@ -68,19 +70,30 @@ export interface GameState {
   prophetGuessResult?: { team: Team; success: boolean; targetId?: string }; // Result of prophet guess
   doubleAgentGuessUsed?: boolean; // Track if losing team used double agent guess
   doubleAgentGuessResult?: { success: boolean; targetId?: string }; // Result of double agent guess
-  endGameGuessUsed?: boolean; // Track if end game guess has been used (for both modes)
-  endGameGuessSequence?: { // Dramatic sequence for end game guess
-    guessingTeam: Team;
-    guessingTeamName?: string;
-    targetPlayer: string;
-    targetTeam: Team;
-    targetTeamName?: string;
-    guessType: "prophet" | "double_agent";
-    actualRole?: "prophet" | "double_agent" | null;
-    success?: boolean;
-    finalWinner?: Team;
+  endGameVotingPhase?: "loser_voting" | "winner_voting" | "completed"; // Current voting phase
+  endGameGuesses?: { // Track each team's end game guess
+    dark?: {
+      targetPlayerId: string;
+      targetTeam: Team;
+      guessType: "prophet" | "double_agent";
+      success?: boolean;
+      timestamp?: number;
+    };
+    light?: {
+      targetPlayerId: string;
+      targetTeam: Team;
+      guessType: "prophet" | "double_agent";
+      success?: boolean;
+      timestamp?: number;
+    };
+  };
+  endGameFinalResult?: { // Final result after both teams guess
+    darkSuccess: boolean;
+    lightSuccess: boolean;
+    finalWinner: GameOutcome;
     finalWinnerName?: string;
   };
+  bothCorrectOutcome?: "winner_wins" | "draw"; // What happens when both teams guess correctly
   introductionPhase?: { // Introduction phase state
     hasOccurred: boolean; // Whether introduction has happened this session
     currentIntroducingPlayer?: string; // ID of currently introducing player
