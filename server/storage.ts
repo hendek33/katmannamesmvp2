@@ -1418,14 +1418,18 @@ export class MemStorage implements IStorage {
     // Check if there's a winner already (a team won normally)
     if (!room.winner) return null;
     
-    // Check if end game guess hasn't been used yet
+    // Initialize voting phase if not set
+    if (!room.endGameVotingPhase) {
+      room.endGameVotingPhase = "loser_voting";
+      room.endGameGuesses = {};
+    }
+    
+    // Handle legacy single-phase support 
     if (room.endGameGuessUsed) return null;
     
-    // Check if player is on the losing team
+    // Get player and validate
     const player = room.players.find(p => p.id === playerId);
-    if (!player || player.team === room.winner) {
-      return null; // Only losing team can guess
-    }
+    if (!player) return null;
     
     // Get the target player
     const targetPlayer = room.players.find(p => p.id === targetPlayerId);
@@ -1434,8 +1438,26 @@ export class MemStorage implements IStorage {
     // Ensure both players have teams (required for end game guessing)
     if (!player.team || !targetPlayer.team) return null;
     
-    // Mark that end game guess has been used
-    room.endGameGuessUsed = true;
+    // Determine which phase we're in and validate
+    const loserTeam = room.winner === "dark" ? "light" : "dark";
+    const winnerTeam = room.winner;
+    
+    if (room.endGameVotingPhase === "loser_voting") {
+      // Only losing team can vote in this phase
+      if (player.team !== loserTeam) return null;
+      
+      // Check if loser team hasn't already voted
+      if (room.endGameGuesses && room.endGameGuesses[loserTeam]) return null;
+    } else if (room.endGameVotingPhase === "winner_voting") {
+      // Only winning team can vote in this phase
+      if (player.team !== winnerTeam) return null;
+      
+      // Check if winner team hasn't already voted
+      if (room.endGameGuesses && room.endGameGuesses[winnerTeam]) return null;
+    } else {
+      // Voting is completed
+      return null;
+    }
     
     // Clear votes after guess is made
     if (roomData.endGameGuessVotes) {
@@ -1446,47 +1468,109 @@ export class MemStorage implements IStorage {
     const guessingTeamName = player.team === "dark" ? room.darkTeamName : room.lightTeamName;
     const targetTeamName = targetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName;
     
-    // Initialize the dramatic sequence
-    room.endGameGuessSequence = {
-      guessingTeam: player.team,
-      guessingTeamName: guessingTeamName,
-      targetPlayer: targetPlayer.username,
-      targetTeam: targetPlayer.team,
-      targetTeamName: targetTeamName,
-      guessType: room.chaosModeType,
-      actualRole: targetPlayer.secretRole,
-      success: false,
-      finalWinner: room.winner,
-      finalWinnerName: room.winner === "dark" ? room.darkTeamName : room.lightTeamName
-    };
-    
+    // Check if the guess is correct
     let guessCorrect = false;
     
     if (room.chaosModeType === "prophet") {
-      // In Prophet mode: Losing team guesses the prophet on the OPPOSING team
+      // Teams guess the prophet on the OPPOSING team
       if (targetPlayer.team !== player.team && targetPlayer.secretRole === "prophet") {
         guessCorrect = true;
       }
     } else if (room.chaosModeType === "double_agent") {
-      // In Double Agent mode: Losing team guesses the double agent on THEIR OWN team
+      // Teams guess the double agent on THEIR OWN team
       if (targetPlayer.team === player.team && targetPlayer.secretRole === "double_agent") {
         guessCorrect = true;
       }
     }
     
-    // Update the sequence with results
-    room.endGameGuessSequence.success = guessCorrect;
+    // Store the guess for the current team
+    if (!room.endGameGuesses) room.endGameGuesses = {};
+    room.endGameGuesses[player.team] = {
+      targetPlayerId: targetPlayerId,
+      targetTeam: targetPlayer.team,
+      guessType: room.chaosModeType,
+      success: guessCorrect,
+      timestamp: Date.now()
+    };
     
-    if (guessCorrect) {
-      // If guess is correct, the losing team wins!
-      room.winner = player.team;
-      room.endGameGuessSequence.finalWinner = player.team;
-      room.endGameGuessSequence.finalWinnerName = guessingTeamName;
-      console.log(`END GAME GUESS CORRECT! ${player.team} team wins by guessing ${targetPlayer.username}`);
-    } else {
-      // If guess is wrong, the original winner remains
-      room.endGameGuessSequence.finalWinnerName = room.winner === "dark" ? room.darkTeamName : room.lightTeamName;
-      console.log(`END GAME GUESS WRONG! ${room.winner} team still wins. ${targetPlayer.username} was ${targetPlayer.secretRole || "normal player"}`);
+    // Handle phase transitions
+    if (room.endGameVotingPhase === "loser_voting") {
+      // Transition to winner voting phase
+      room.endGameVotingPhase = "winner_voting";
+      
+      // Initialize sequence for loser's guess (for backward compatibility)
+      room.endGameGuessSequence = {
+        guessingTeam: player.team,
+        guessingTeamName: guessingTeamName,
+        targetPlayer: targetPlayer.username,
+        targetTeam: targetPlayer.team,
+        targetTeamName: targetTeamName,
+        guessType: room.chaosModeType,
+        actualRole: targetPlayer.secretRole,
+        success: guessCorrect,
+        finalWinner: room.winner, // Will be updated if both teams vote
+        finalWinnerName: room.winner === "dark" ? room.darkTeamName : room.lightTeamName
+      };
+      
+      // Mark for legacy compatibility
+      room.endGameGuessUsed = true;
+      
+      console.log(`PHASE 1 COMPLETE: ${player.team} team guessed ${targetPlayer.username} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
+    } else if (room.endGameVotingPhase === "winner_voting") {
+      // Both teams have now voted - calculate final outcome
+      room.endGameVotingPhase = "completed";
+      
+      const loserTeam = room.winner === "dark" ? "light" : "dark";
+      const winnerTeam = room.winner;
+      
+      const loserGuess = room.endGameGuesses[loserTeam];
+      const winnerGuess = room.endGameGuesses[winnerTeam];
+      
+      let finalWinner: "dark" | "light" | "draw" = room.winner;
+      
+      if (loserGuess?.success && winnerGuess?.success) {
+        // Both teams guessed correctly
+        finalWinner = room.bothCorrectOutcome === "draw" ? "draw" : room.winner;
+      } else if (loserGuess?.success) {
+        // Only loser guessed correctly - they win
+        finalWinner = loserTeam;
+      } else if (winnerGuess?.success) {
+        // Only winner guessed correctly - they keep winning
+        finalWinner = winnerTeam;
+      }
+      // else neither guessed correctly - original winner remains
+      
+      // Store final result
+      room.endGameFinalResult = {
+        darkSuccess: room.endGameGuesses.dark?.success || false,
+        lightSuccess: room.endGameGuesses.light?.success || false,
+        finalWinner: finalWinner,
+        finalWinnerName: finalWinner === "draw" ? undefined : 
+                        (finalWinner === "dark" ? room.darkTeamName : room.lightTeamName)
+      };
+      
+      // Update the sequence for backward compatibility (show winner's guess)
+      room.endGameGuessSequence = {
+        guessingTeam: player.team,
+        guessingTeamName: guessingTeamName,
+        targetPlayer: targetPlayer.username,
+        targetTeam: targetPlayer.team,
+        targetTeamName: targetTeamName,
+        guessType: room.chaosModeType,
+        actualRole: targetPlayer.secretRole,
+        success: guessCorrect,
+        finalWinner: finalWinner === "draw" ? room.winner : finalWinner,
+        finalWinnerName: finalWinner === "draw" ? "Berabere!" : 
+                        (finalWinner === "dark" ? room.darkTeamName : room.lightTeamName)
+      };
+      
+      // Update the actual winner
+      if (finalWinner !== "draw") {
+        room.winner = finalWinner;
+      }
+      
+      console.log(`PHASE 2 COMPLETE: ${player.team} team guessed ${targetPlayer.username} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
+      console.log(`FINAL RESULT: ${finalWinner === "draw" ? "DRAW" : `${finalWinner} wins`}`);
     }
     
     return room;
