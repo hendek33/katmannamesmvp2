@@ -139,11 +139,11 @@ export function EndGameVoting({
           stiffness: 200,
           damping: 20
         }}
-        className="relative max-w-4xl w-full"
+        className="relative max-w-2xl w-full"
       >
         {/* Glow effect behind card */}
         <div 
-          className="absolute -inset-8 blur-3xl opacity-20"
+          className="absolute -inset-4 blur-2xl opacity-20"
           style={{
             background: `radial-gradient(circle, ${
               winningTeam === "dark" 
@@ -153,7 +153,7 @@ export function EndGameVoting({
           }}
         />
         
-        <div className="relative bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 rounded-2xl border border-purple-500/30 backdrop-blur-xl shadow-2xl overflow-hidden">
+        <div className="relative bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 rounded-xl border border-purple-500/30 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[80vh] overflow-y-auto">
           {/* Top gradient strip */}
           <div 
             className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r"
@@ -181,15 +181,15 @@ export function EndGameVoting({
             Küçült
           </Button>
           
-          <div className="p-8 space-y-6">
+          <div className="p-4 sm:p-6 space-y-4">
             {/* Title Section with Team Colors */}
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-3">
               <motion.div
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-purple-500 to-purple-400 bg-clip-text text-transparent">
+                <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-400 via-purple-500 to-purple-400 bg-clip-text text-transparent">
                   ⚡ Kahin Tahmini ⚡
                 </h2>
               </motion.div>
@@ -295,19 +295,19 @@ export function EndGameVoting({
           </div>
           
           {/* Players Grid Section */}
-          <div className="px-8 pb-8">
+          <div className="px-4 pb-4">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="space-y-4"
+              className="space-y-3"
             >
-              <h3 className="text-xl font-semibold text-center">
+              <h3 className="text-lg font-semibold text-center">
                 <span className="text-purple-400">Kahini Seçin</span>
               </h3>
               
               {/* Players Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             {winningTeamPlayers.map((player, index) => {
               const playerVotes = votes[player.id] || [];
               const isSelected = currentPlayerVote === player.id;
@@ -332,16 +332,16 @@ export function EndGameVoting({
                   <div
                     onClick={isOnLosingTeam ? () => handlePlayerClick(player.id) : undefined}
                     className={cn(
-                      "flex-1 p-4 text-center",
+                      "flex-1 p-3 text-center",
                       isOnLosingTeam && "cursor-pointer",
                       !isOnLosingTeam && "cursor-default"
                     )}
                   >
                     {/* Player Avatar with gradient */}
-                    <div className="relative mb-3">
+                    <div className="relative mb-2">
                       <div className={cn(
-                        "w-20 h-20 mx-auto rounded-full flex items-center justify-center text-2xl font-bold shadow-lg",
-                        "bg-gradient-to-br border-2",
+                        "w-12 h-12 mx-auto rounded-full flex items-center justify-center text-lg font-bold shadow-md",
+                        "bg-gradient-to-br border",
                         winningTeam === "dark" 
                           ? "from-blue-500/30 to-blue-700/30 border-blue-400/50 text-blue-200" 
                           : "from-red-500/30 to-red-700/30 border-red-400/50 text-red-200"
@@ -351,25 +351,24 @@ export function EndGameVoting({
                       {/* Glow effect for most voted */}
                       {isMostVoted && (
                         <div className="absolute inset-0 rounded-full animate-pulse">
-                          <div className="w-20 h-20 mx-auto rounded-full bg-amber-400/20 blur-md" />
+                          <div className="w-12 h-12 mx-auto rounded-full bg-amber-400/20 blur-sm" />
                         </div>
                       )}
                     </div>
                     
-                    {/* Player Name with gradient text */}
-                    <p className="text-white font-bold text-lg tracking-wide">
+                    {/* Player Name */}
+                    <p className="text-white font-semibold text-sm">
                       {player.username}
                     </p>
                     
                     {/* Role Badge with better styling */}
                     <div className={cn(
-                      "mt-2 px-3 py-1 rounded-lg text-xs font-semibold inline-block",
-                      "bg-gradient-to-r shadow-md",
+                      "mt-1 px-2 py-0.5 rounded text-xs font-medium inline-block",
                       player.role === "spymaster" 
-                        ? "from-purple-600/40 to-purple-500/40 text-purple-200 border border-purple-400/30"
-                        : "from-slate-600/40 to-slate-500/40 text-slate-200 border border-slate-400/30"
+                        ? "bg-purple-600/30 text-purple-200"
+                        : "bg-slate-600/30 text-slate-200"
                     )}>
-                      {player.role === "spymaster" ? "👑 İSTİHBARAT ŞEFİ" : "🎯 AJAN"}
+                      {player.role === "spymaster" ? "İpucu" : "Ajan"}
                     </div>
                     
                     {/* Voters List */}
@@ -395,7 +394,7 @@ export function EndGameVoting({
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                      className="absolute -top-3 -right-3 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold shadow-lg border-2 border-purple-400"
+                      className="absolute -top-2 -right-2 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold shadow-md border border-purple-400"
                     >
                       {playerVotes.length}
                     </motion.div>
@@ -416,24 +415,24 @@ export function EndGameVoting({
                   {/* Most Voted Crown */}
                   {isMostVoted && (
                     <motion.div
-                      initial={{ y: -20, opacity: 0 }}
+                      initial={{ y: -10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className="absolute -top-8 left-1/2 transform -translate-x-1/2"
+                      className="absolute -top-5 left-1/2 transform -translate-x-1/2"
                     >
-                      <div className="text-3xl animate-bounce">👑</div>
+                      <div className="text-xl animate-bounce">👑</div>
                     </motion.div>
                   )}
                   
                   {/* Select Button for all losing team members - Improved */}
                   {isOnLosingTeam && !isProphetVotingDisabled && (
-                    <div className="px-3 pb-3">
+                    <div className="px-2 pb-2">
                       <Button
                         onClick={() => handleSelectPlayer(player.id)}
-                        className="w-full h-9 text-sm bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold shadow-lg transition-all duration-200"
+                        className="w-full h-7 text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium shadow-md transition-all duration-200"
                         data-testid={`button-select-${player.id}`}
                       >
-                        Bu Oyuncuyu Seç
+                        Seç
                       </Button>
                     </div>
                   )}

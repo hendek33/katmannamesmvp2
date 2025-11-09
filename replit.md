@@ -14,6 +14,13 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
+### Prophet Voting Window Size Optimization (November 9, 2025)
+- **Compact Design**: Reduced overall window size from max-w-4xl to max-w-2xl for better screen fit
+- **Smaller Player Cards**: Avatar size reduced to 48px, text sizes optimized for readability
+- **Responsive Grid**: Cards adjust from 2 to 4 columns based on screen size
+- **Simplified UI**: Removed unnecessary emojis from role badges, shortened button text
+- **Maintained Aesthetics**: All glassmorphism effects, animations, and team colors preserved
+
 ### Word Tracking System (November 9, 2025)
 - **No Word Repetition**: Once a word appears in a game, it won't appear again in subsequent games in the same room
 - **Automatic Reset**: When all available words are used, the system automatically resets and starts fresh
