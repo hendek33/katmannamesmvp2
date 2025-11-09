@@ -396,6 +396,13 @@ export default function Game() {
       return;
     }
     
+    // CRITICAL: Only show sequence if chaos mode with prophet is enabled
+    if (!gameState?.chaosMode || gameState?.chaosModeType !== "prophet") {
+      endGameGuessRef.current = null;
+      setShowEndGameGuessSequence(false);
+      return;
+    }
+    
     // Check for either single sequence or multiple sequences
     const hasSequences = (gameState as any)?.endGameGuessSequences || gameState?.endGameGuessSequence;
     if (!hasSequences) {
@@ -437,7 +444,7 @@ export default function Game() {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [gameState?.endGameGuessSequence, (gameState as any)?.endGameGuessSequences, gameState?.phase, gameState?.endGameVotingPhase]);
+  }, [gameState?.endGameGuessSequence, (gameState as any)?.endGameGuessSequences, gameState?.phase, gameState?.endGameVotingPhase, gameState?.chaosMode, gameState?.chaosModeType]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
