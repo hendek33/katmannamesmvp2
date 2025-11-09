@@ -132,6 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? card.type 
             : ("neutral" as any),
         })),
+        consecutivePasses: gameState.consecutivePasses,
       };
     }
 
@@ -142,6 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...card,
         type: card.revealed ? card.type : ("neutral" as any),
       })),
+      consecutivePasses: gameState.consecutivePasses,
     };
   }
 

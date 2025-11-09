@@ -17,6 +17,7 @@ interface EndGameVotingProps {
   onVote: (targetPlayerId: string) => void;
   onConfirm: (targetPlayerId: string) => void;
   chaosType: "prophet" | "double_agent";
+  consecutivePasses?: { dark: number; light: number };
 }
 
 export function EndGameVoting({
@@ -29,7 +30,8 @@ export function EndGameVoting({
   votes,
   onVote,
   onConfirm,
-  chaosType
+  chaosType,
+  consecutivePasses
 }: EndGameVotingProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -47,6 +49,9 @@ export function EndGameVoting({
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const isOnLosingTeam = currentPlayer?.team === losingTeam;
   const isRoomOwner = currentPlayer?.isRoomOwner || false;
+  
+  // Check if prophet voting is disabled due to consecutive passes
+  const isProphetVotingDisabled = consecutivePasses && consecutivePasses[losingTeam] >= 2;
   
   // Get winning team players to vote on
   const winningTeamPlayers = players.filter(p => p.team === winningTeam);
@@ -74,6 +79,7 @@ export function EndGameVoting({
   
   const handlePlayerClick = (playerId: string) => {
     if (!isOnLosingTeam) return;
+    if (isProphetVotingDisabled) return; // Prophet voting disabled due to consecutive passes
     if (currentPlayerVote === playerId) return; // Already voted for this player
     
     onVote(playerId);
@@ -82,6 +88,7 @@ export function EndGameVoting({
   
   const handleSelectPlayer = (playerId: string) => {
     if (!isOnLosingTeam) return;
+    if (isProphetVotingDisabled) return; // Prophet voting disabled due to consecutive passes
     onConfirm(playerId);
   };
   
@@ -162,7 +169,19 @@ export function EndGameVoting({
               </div>
             </div>
             
-            {!isOnLosingTeam && (
+            {/* Show when prophet voting is disabled */}
+            {isProphetVotingDisabled && (
+              <div className="mt-4 p-4 bg-red-900/20 rounded-lg border-2 border-red-500/50">
+                <p className="text-red-400 text-lg font-bold">
+                  ⚠️ Kahin Tahmini Devre Dışı
+                </p>
+                <p className="text-red-300 text-sm mt-2">
+                  {losingTeamName} takımı art arda 2 tur pas geçtiği için kahin tahmini hakkını kaybetti!
+                </p>
+              </div>
+            )}
+            
+            {!isOnLosingTeam && !isProphetVotingDisabled && (
               <div className="mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
                 <p className="text-amber-400 text-lg font-semibold">
                   👁️ İzleyici Modu

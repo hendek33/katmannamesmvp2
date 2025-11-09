@@ -749,6 +749,7 @@ export default function Game() {
           onVote={handleVoteEndGameGuess}
           onConfirm={handleConfirmEndGameGuess}
           chaosType={gameState.chaosModeType || "prophet"}
+          consecutivePasses={gameState.consecutivePasses}
         />
       )}
 
