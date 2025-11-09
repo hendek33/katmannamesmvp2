@@ -28,9 +28,9 @@ export function PlayerIntroduction({
   const [dotCount, setDotCount] = useState(1);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
-  // Allow all players to select who introduces (voting system)
-  const canSelectPlayer = true; // All players can vote/select
-  const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team spymaster controls skip/finish
+  const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team spymaster controls
+  // Only the controller can select players for introduction (since there's no losing team yet in introduction phase)
+  const canSelectPlayer = isController;
   const currentIntroducingPlayer = gameState.introductionPhase?.currentIntroducingPlayer;
   const introducingPlayer = gameState.players.find(p => p.id === currentIntroducingPlayer);
   
@@ -302,12 +302,12 @@ export function PlayerIntroduction({
               transition={{ type: "spring", stiffness: 200 }}
             >
               <motion.div 
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 shadow-xl border-2 border-purple-500/50"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-red-600 to-red-700 shadow-xl border-2 border-red-500/50"
                 animate={{ 
                   boxShadow: [
-                    "0 0 20px rgba(147, 51, 234, 0.3)",
-                    "0 0 30px rgba(147, 51, 234, 0.5)",
-                    "0 0 20px rgba(147, 51, 234, 0.3)"
+                    "0 0 20px rgba(220, 38, 38, 0.3)",
+                    "0 0 30px rgba(220, 38, 38, 0.5)",
+                    "0 0 20px rgba(220, 38, 38, 0.3)"
                   ]
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -316,10 +316,10 @@ export function PlayerIntroduction({
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <Users className="w-5 h-5 text-yellow-400" />
+                  <Crown className="w-5 h-5 text-yellow-400" />
                 </motion.div>
                 <span className="text-white font-bold text-base">
-                  Bu Oyuncuyu Seç
+                  Bir Oyuncu Seç ve Tanıtımı Başlat
                 </span>
                 <Sparkles className="w-5 h-5 text-yellow-400" />
               </motion.div>
