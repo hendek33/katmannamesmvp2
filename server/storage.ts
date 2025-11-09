@@ -668,22 +668,8 @@ export class MemStorage implements IStorage {
 
     room.prophetVisibility = visibility;
 
-    // If we're in a game and there are prophets, update their knownCards
-    if (room.phase === "playing" && room.chaosMode && room.chaosModeType === "prophet") {
-      const prophets = room.players.filter(p => p.secretRole === "prophet");
-      prophets.forEach(prophet => {
-        if (visibility === "own_team") {
-          // Only their team's cards
-          prophet.knownCards = room.cards.filter(c => c.type === prophet.team).map(c => c.id);
-        } else if (visibility === "both_teams") {
-          // Both teams' cards, but not neutral or assassin
-          prophet.knownCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
-        } else if (visibility === "all_cards") {
-          // All cards including neutral and assassin
-          prophet.knownCards = room.cards.map(c => c.id);
-        }
-      });
-    }
+    // Note: Prophet knownCards are assigned when the game starts in assignSecretRoles
+    // This setting will be used when the game begins, not updated mid-game
 
     return room;
   }
