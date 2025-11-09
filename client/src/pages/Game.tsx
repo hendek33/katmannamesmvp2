@@ -501,11 +501,16 @@ export default function Game() {
     // Show end game voting if chaos mode is enabled
     // BUT NOT if assassin was revealed or losing team revealed winning team's last card
     if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
-        gameState.winner && !gameState.endGameGuessUsed &&
+        gameState.winner && 
+        (!gameState.endGameGuessUsed || // Legacy support
+         (gameState.endGameVotingPhase && gameState.endGameVotingPhase !== "completed")) &&
         !wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
       
-      // Show voting UI for all players (losing team can vote, winning team can watch)
+      // Show voting UI during both phases
       setShowEndGameVoting(true);
+    } else if (gameState?.endGameVotingPhase === "completed") {
+      // Hide voting UI when both phases complete
+      setShowEndGameVoting(false);
     }
   }, [gameState, playerId]);
 
@@ -739,8 +744,8 @@ export default function Game() {
         />
       )}
 
-      {/* End Game Prophet Voting - Only show if no guess has been made yet */}
-      {showEndGameVoting && gameState && gameState.winner && !gameState.endGameGuessUsed && (
+      {/* End Game Prophet Voting - Show during voting phases */}
+      {showEndGameVoting && gameState && gameState.winner && (
         <EndGameVoting
           winningTeam={gameState.winner as "dark" | "light"}
           losingTeam={gameState.winner === "dark" ? "light" : "dark"}
@@ -753,6 +758,10 @@ export default function Game() {
           onConfirm={handleConfirmEndGameGuess}
           chaosType={gameState.chaosModeType || "prophet"}
           consecutivePasses={gameState.consecutivePasses}
+          votingPhase={gameState.endGameVotingPhase || "loser_voting"}
+          endGameGuesses={gameState.endGameGuesses}
+          endGameFinalResult={gameState.endGameFinalResult}
+          bothCorrectOutcome={gameState.bothCorrectOutcome}
         />
       )}
 

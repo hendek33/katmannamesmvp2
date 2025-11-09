@@ -18,6 +18,10 @@ interface EndGameVotingProps {
   onConfirm: (targetPlayerId: string) => void;
   chaosType: "prophet" | "double_agent";
   consecutivePasses?: { dark: number; light: number };
+  votingPhase?: "loser_voting" | "winner_voting" | "completed";
+  endGameGuesses?: any; // Track each team's guess
+  endGameFinalResult?: any; // Final result after both teams vote
+  bothCorrectOutcome?: "winner_wins" | "draw";
 }
 
 export function EndGameVoting({
@@ -31,7 +35,11 @@ export function EndGameVoting({
   onVote,
   onConfirm,
   chaosType,
-  consecutivePasses
+  consecutivePasses,
+  votingPhase = "loser_voting",
+  endGameGuesses,
+  endGameFinalResult,
+  bothCorrectOutcome
 }: EndGameVotingProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -47,8 +55,12 @@ export function EndGameVoting({
   
   // Get current player
   const currentPlayer = players.find(p => p.id === currentPlayerId);
-  const isOnLosingTeam = currentPlayer?.team === losingTeam;
   const isRoomOwner = currentPlayer?.isRoomOwner || false;
+  
+  // Determine which team can vote based on phase
+  const currentVotingTeam = votingPhase === "loser_voting" ? losingTeam : 
+                            votingPhase === "winner_voting" ? winningTeam : null;
+  const isOnVotingTeam = currentPlayer?.team === currentVotingTeam;
   
   // Check if prophet voting is disabled due to consecutive passes
   const isProphetVotingDisabled = consecutivePasses && consecutivePasses[losingTeam] >= 2;
@@ -78,8 +90,8 @@ export function EndGameVoting({
   )?.[0];
   
   const handlePlayerClick = (playerId: string) => {
-    if (!isOnLosingTeam) return;
-    if (isProphetVotingDisabled) return; // Prophet voting disabled due to consecutive passes
+    if (!isOnVotingTeam) return;
+    if (isProphetVotingDisabled && votingPhase === "loser_voting") return; // Prophet voting disabled for loser team
     if (currentPlayerVote === playerId) return; // Already voted for this player
     
     onVote(playerId);
@@ -87,8 +99,8 @@ export function EndGameVoting({
   };
   
   const handleSelectPlayer = (playerId: string) => {
-    if (!isOnLosingTeam) return;
-    if (isProphetVotingDisabled) return; // Prophet voting disabled due to consecutive passes
+    if (!isOnVotingTeam) return;
+    if (isProphetVotingDisabled && votingPhase === "loser_voting") return; // Prophet voting disabled for loser team
     onConfirm(playerId);
   };
   
