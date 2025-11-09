@@ -1430,8 +1430,11 @@ export class MemStorage implements IStorage {
       room.endGameGuesses = {};
     }
     
-    // Handle legacy single-phase support 
-    if (room.endGameGuessUsed) return null;
+    // Handle legacy single-phase support - only block if we're in completed phase
+    // Allow voting during active phases even if endGameGuessUsed is set
+    if (room.endGameGuessUsed && room.endGameVotingPhase === "completed") {
+      return null;
+    }
     
     // Get player and validate
     const player = room.players.find(p => p.id === playerId);
