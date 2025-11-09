@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { GameState } from "@shared/schema";
 import { NormalWinVideo } from "./NormalWinVideo";
+import { Zap, Sparkles, Star } from "lucide-react";
 
 interface EndGameGuessSequenceProps {
   sequence: GameState["endGameGuessSequence"];
@@ -33,73 +34,129 @@ function AnimatedText({ text, className = "", delay = 0 }: { text: string; class
   );
 }
 
+// Dramatik sayaç component
+function DramaticCounter({ onComplete }: { onComplete: () => void }) {
+  const [count, setCount] = useState(3);
+  
+  useEffect(() => {
+    if (count > 0) {
+      const timer = setTimeout(() => {
+        setCount(count - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      onComplete();
+    }
+  }, [count, onComplete]);
+  
+  if (count === 0) return null;
+  
+  return (
+    <div 
+      className="absolute inset-0 flex items-center justify-center z-[110]"
+      style={{
+        animation: `countPulse 1s ease-out`,
+        animationIterationCount: 1,
+      }}
+    >
+      <div 
+        className="text-[200px] md:text-[300px] font-black text-purple-500"
+        style={{
+          textShadow: '0 0 100px rgba(168,85,247,0.8), 0 0 200px rgba(168,85,247,0.5)',
+          animation: 'countBounce 1s ease-out',
+        }}
+      >
+        {count}
+      </div>
+    </div>
+  );
+}
+
+// Parçacık efekti component
+function ParticleEffect({ type }: { type: 'success' | 'fail' }) {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {[...Array(30)].map((_, i) => (
+        <div
+          key={i}
+          className={cn(
+            "absolute w-2 h-2 rounded-full",
+            type === 'success' ? "bg-green-400" : "bg-red-400"
+          )}
+          style={{
+            left: '50%',
+            top: '50%',
+            animation: `particle${i % 4} 2s ease-out forwards`,
+            animationDelay: `${i * 0.05}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
-  const [currentSentence, setCurrentSentence] = useState(1);
-  const [showVideo, setShowVideo] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
+  const [phase, setPhase] = useState<'countdown' | 'reveal' | 'decision' | 'result' | 'video' | 'finished'>('countdown');
+  const [showDrumRoll, setShowDrumRoll] = useState(false);
+  const [showParticles, setShowParticles] = useState(false);
+  const [shake, setShake] = useState(false);
   const hasStartedRef = useRef(false);
   const timersRef = useRef<NodeJS.Timeout[]>([]);
   
   useEffect(() => {
-    // Eğer sekans yoksa veya zaten bitmiş/başlamışsa, hiçbir şey yapma
-    if (!sequence || isFinished || hasStartedRef.current) {
+    if (!sequence || hasStartedRef.current) {
       return;
     }
     
-    // Sekansı başlat ve bir daha başlamasını engelle
     hasStartedRef.current = true;
     
-    // Zamanlama:
-    // 0-3 saniye: İlk cümle (3 SANİYE)
-    // 3-8 saniye: İkinci cümle (5 saniye gösterim)
-    // 8-12 saniye: Üçüncü cümle (4 saniye gösterim)
-    // 12+ saniye: Video veya bitiş
-    
-    // 3 saniye sonra ikinci cümleye geç
-    const timer1 = setTimeout(() => {
-      setCurrentSentence(2);
-    }, 3000);
-    
-    // 8 saniye sonra üçüncü cümleye geç
-    const timer2 = setTimeout(() => {
-      setCurrentSentence(3);
-    }, 8000);
-    
-    // 12 saniye sonra sekansı bitir
+    // Zamanlama
+    const timer1 = setTimeout(() => setPhase('reveal'), 4000);  // 3s sayaç + 1s bekleme
+    const timer2 = setTimeout(() => setPhase('decision'), 8000); // 4s reveal gösterimi
     const timer3 = setTimeout(() => {
+      setShowDrumRoll(true);
+    }, 10000); // Decision'dan 2s sonra drum roll
+    const timer4 = setTimeout(() => {
+      setPhase('result');
+      setShowDrumRoll(false);
+      setShake(true);
+      setShowParticles(true);
+      setTimeout(() => setShake(false), 500);
+    }, 14000); // 6s decision gösterimi
+    const timer5 = setTimeout(() => {
       if (sequence.success) {
-        setShowVideo(true);
-        setCurrentSentence(0); // Yazıları gizle
+        setPhase('video');
       } else {
-        setIsFinished(true);
+        setPhase('finished');
         onComplete?.();
       }
-    }, 12000);
+    }, 20000); // 6s result gösterimi
     
-    // Timer'ları kaydet
-    timersRef.current = [timer1, timer2, timer3];
+    timersRef.current = [timer1, timer2, timer3, timer4, timer5];
     
-    // Cleanup fonksiyonu
     return () => {
       timersRef.current.forEach(timer => clearTimeout(timer));
       timersRef.current = [];
     };
-  }, []); // Boş dependency array - sadece mount'ta çalışacak
+  }, []);
   
-  // Video bittiğinde
   const handleVideoComplete = () => {
-    setIsFinished(true);
+    setPhase('finished');
     onComplete?.();
   };
   
-  if (!sequence || isFinished) return null;
+  const handleCountdownComplete = () => {
+    // Countdown bitince hiçbir şey yapma, timer'lar halledecek
+  };
+  
+  if (!sequence || phase === 'finished') return null;
   
   const roleText = "Kahin";
   const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
   const isCorrect = sequence.success;
   
   // Video gösteriliyorsa
-  if (showVideo && isCorrect && sequence.finalWinner && sequence.finalWinnerName) {
+  if (phase === 'video' && isCorrect && sequence.finalWinner && sequence.finalWinnerName) {
     return (
       <NormalWinVideo 
         winnerTeam={sequence.finalWinner}
@@ -110,27 +167,81 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
   }
   
   return (
-    <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
-      <div className="max-w-5xl w-full text-center space-y-12">
+    <div 
+      className={cn(
+        "fixed inset-0 z-[100] bg-black flex items-center justify-center p-4",
+        shake && "animate-shake"
+      )}
+    >
+      {/* Arka plan efektleri */}
+      <div className="absolute inset-0">
+        {/* Radial gradient background */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: phase === 'result' 
+              ? isCorrect 
+                ? 'radial-gradient(circle at center, rgba(74,222,128,0.1) 0%, transparent 50%)'
+                : 'radial-gradient(circle at center, rgba(248,113,113,0.1) 0%, transparent 50%)'
+              : 'radial-gradient(circle at center, rgba(168,85,247,0.05) 0%, transparent 50%)',
+          }}
+        />
         
-        {/* Başlık - her zaman görünsün */}
-        <div className="text-5xl md:text-7xl font-black text-purple-400 drop-shadow-[0_0_40px_rgba(168,85,247,0.6)]">
-          KAHİN TAHMİNİ
-        </div>
+        {/* Dönen ışınlar */}
+        {(phase === 'decision' || showDrumRoll) && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div 
+              className="w-[200%] h-[200%]"
+              style={{
+                background: 'conic-gradient(from 0deg, transparent, rgba(168,85,247,0.1), transparent, rgba(168,85,247,0.1), transparent)',
+                animation: 'spin 2s linear infinite',
+              }}
+            />
+          </div>
+        )}
+      </div>
+      
+      {/* Parçacık efektleri */}
+      {showParticles && <ParticleEffect type={isCorrect ? 'success' : 'fail'} />}
+      
+      {/* Sayaç */}
+      {phase === 'countdown' && (
+        <DramaticCounter onComplete={handleCountdownComplete} />
+      )}
+      
+      {/* Ana içerik */}
+      <div className="max-w-5xl w-full text-center space-y-12 relative z-10">
         
-        {/* Cümle 1: Takım kararı (0-3 saniye arası) */}
-        {currentSentence === 1 && (
+        {/* Başlık - her zaman görünsün (countdown hariç) */}
+        {phase !== 'countdown' && (
+          <div 
+            className="text-5xl md:text-7xl font-black text-purple-400 drop-shadow-[0_0_40px_rgba(168,85,247,0.6)]"
+            style={{
+              animation: phase === 'reveal' ? 'titleSlam 0.8s ease-out' : undefined,
+            }}
+          >
+            <div className="flex items-center justify-center gap-4">
+              <Sparkles className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
+              <span>KAHİN TAHMİNİ</span>
+              <Sparkles className="w-12 h-12 md:w-16 md:h-16 animate-pulse" />
+            </div>
+          </div>
+        )}
+        
+        {/* Reveal aşaması: Takım kararı */}
+        {phase === 'reveal' && (
           <div className="text-3xl md:text-5xl font-bold">
-            <div className="mb-2">
+            <div className="mb-4">
               <AnimatedText text={sequence.guessingTeamName + " Takımı"} className="text-slate-300" />
             </div>
-            <div className="mb-2">
+            <div className="mb-4">
               <span 
-                className="text-yellow-400 text-4xl md:text-6xl inline-block font-black"
+                className="text-yellow-400 text-5xl md:text-7xl inline-block font-black"
                 style={{
-                  animation: 'namePop 0.6s ease-out forwards',
+                  animation: 'namePop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
                   animationDelay: '0.5s',
                   opacity: 0,
+                  textShadow: '0 0 30px rgba(251,191,36,0.8)',
                 }}
               >
                 {sequence.targetPlayer}
@@ -139,11 +250,12 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
             </div>
             <div>
               <span 
-                className="text-purple-400 text-4xl md:text-6xl inline-block font-black"
+                className="text-purple-400 text-5xl md:text-7xl inline-block font-black"
                 style={{
-                  animation: 'rolePop 0.6s ease-out forwards',
+                  animation: 'rolePop 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
                   animationDelay: '1.2s',
                   opacity: 0,
+                  textShadow: '0 0 40px rgba(168,85,247,0.8)',
                 }}
               >
                 {roleText}
@@ -153,85 +265,130 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           </div>
         )}
         
-        {/* Cümle 2: Gerçek rol açıklaması (3-8 saniye arası) */}
-        {currentSentence === 2 && (
+        {/* Decision aşaması: Gerçek rol açıklaması */}
+        {phase === 'decision' && (
           <div className="text-3xl md:text-5xl font-bold">
-            <div className="mb-4">
+            <div className="mb-6">
               <span 
-                className="text-yellow-400 text-4xl md:text-6xl inline-block font-black"
+                className="text-yellow-400 text-5xl md:text-7xl inline-block font-black"
                 style={{
                   animation: 'namePop 0.6s ease-out forwards',
                   opacity: 0,
+                  textShadow: '0 0 30px rgba(251,191,36,0.8)',
                 }}
               >
                 {sequence.targetPlayer}
               </span>
-              <AnimatedText text=" oyuncusunun" className="text-slate-300" delay={0.4} />
             </div>
-            <div className="mb-6">
-              <AnimatedText text="gerçek rolü aslında..." className="text-slate-300 text-4xl" delay={0.8} />
-            </div>
-            <div 
-              className={cn(
-                "text-6xl md:text-8xl font-black",
-                sequence.actualRole === "prophet" 
-                  ? "text-purple-500 drop-shadow-[0_0_50px_rgba(168,85,247,0.8)]" 
-                  : "text-slate-400 drop-shadow-[0_0_30px_rgba(148,163,184,0.5)]"
-              )}
-              style={{
-                animation: 'roleReveal 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
-                animationDelay: '1.8s',
-                opacity: 0,
-              }}
-            >
-              {actualRoleText} İDİ!
-            </div>
+            
+            {!showDrumRoll ? (
+              <div className="space-y-4">
+                <AnimatedText text="oyuncusunun gerçek rolü" className="text-slate-300 text-3xl md:text-4xl" delay={0.4} />
+                <AnimatedText text="aslında..." className="text-white text-4xl md:text-5xl font-black" delay={1} />
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="text-white text-3xl md:text-4xl">gerçek rolü...</div>
+                <div className="flex justify-center items-center gap-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-3 h-3 md:w-4 md:h-4 bg-purple-400 rounded-full"
+                      style={{
+                        animation: `dotPulse 1s ease-in-out infinite`,
+                        animationDelay: `${i * 0.2}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="text-5xl md:text-7xl font-black text-purple-500 animate-pulse">
+                  AÇIKLANIYOR...
+                </div>
+              </div>
+            )}
           </div>
         )}
         
-        {/* Cümle 3: Sonuç (8-12 saniye arası) */}
-        {currentSentence === 3 && (
-          <div className="space-y-8">
+        {/* Result aşaması: Sonuç */}
+        {phase === 'result' && (
+          <div className="space-y-12">
+            {/* Rol açıklaması */}
+            <div 
+              className={cn(
+                "text-7xl md:text-9xl font-black",
+                sequence.actualRole === "prophet" 
+                  ? "text-purple-500" 
+                  : "text-slate-400"
+              )}
+              style={{
+                animation: 'roleRevealExplosion 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
+                textShadow: sequence.actualRole === "prophet"
+                  ? '0 0 80px rgba(168,85,247,1), 0 0 160px rgba(168,85,247,0.5)'
+                  : '0 0 40px rgba(148,163,184,0.8)',
+              }}
+            >
+              {actualRoleText}!
+            </div>
+            
+            {/* Doğru/Yanlış */}
             <div 
               className="text-5xl md:text-7xl font-black"
               style={{
                 animation: 'resultSlam 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
+                animationDelay: '0.6s',
                 opacity: 0,
               }}
             >
               {isCorrect ? (
-                <span className="text-green-400 drop-shadow-[0_0_40px_rgba(74,222,128,0.8)]">
-                  ✓ DOĞRU TAHMİN!
-                </span>
+                <div className="text-green-400">
+                  <div className="flex items-center justify-center gap-4">
+                    <Star className="w-16 h-16 fill-current animate-spin" />
+                    <span style={{ textShadow: '0 0 60px rgba(74,222,128,1)' }}>
+                      DOĞRU TAHMİN!
+                    </span>
+                    <Star className="w-16 h-16 fill-current animate-spin" />
+                  </div>
+                </div>
               ) : (
-                <span className="text-red-400 drop-shadow-[0_0_40px_rgba(248,113,113,0.8)]">
-                  ✗ YANLIŞ TAHMİN!
-                </span>
+                <div className="text-red-400">
+                  <div className="flex items-center justify-center gap-4">
+                    <Zap className="w-16 h-16 animate-pulse" />
+                    <span style={{ textShadow: '0 0 60px rgba(248,113,113,1)' }}>
+                      YANLIŞ TAHMİN!
+                    </span>
+                    <Zap className="w-16 h-16 animate-pulse" />
+                  </div>
+                </div>
               )}
             </div>
             
-            <div className="text-5xl md:text-7xl font-black">
+            {/* Kazanan takım */}
+            <div className="text-6xl md:text-8xl font-black">
               <div
                 className={cn(
+                  "mb-4",
                   sequence.finalWinner === "dark" 
-                    ? "text-blue-400 drop-shadow-[0_0_60px_rgba(59,130,246,1)]" 
-                    : "text-red-400 drop-shadow-[0_0_60px_rgba(239,68,68,1)]"
+                    ? "text-blue-400" 
+                    : "text-red-400"
                 )}
                 style={{
-                  animation: 'winnerPulse 2s ease-in-out infinite',
-                  animationDelay: '0.8s',
+                  animation: 'winnerReveal 1.5s ease-out forwards',
+                  animationDelay: '1.2s',
                   opacity: 0,
+                  textShadow: sequence.finalWinner === "dark"
+                    ? '0 0 80px rgba(59,130,246,1), 0 0 160px rgba(59,130,246,0.5)'
+                    : '0 0 80px rgba(239,68,68,1), 0 0 160px rgba(239,68,68,0.5)',
                 }}
               >
-                {sequence.finalWinnerName}
+                🏆 {sequence.finalWinnerName} 🏆
               </div>
               <AnimatedText 
                 text="TAKIMI KAZANDI!" 
                 className={cn(
-                  "text-6xl md:text-8xl",
+                  "text-5xl md:text-6xl",
                   sequence.finalWinner === "dark" ? "text-blue-300" : "text-red-300"
                 )}
-                delay={1.2} 
+                delay={1.8} 
               />
             </div>
           </div>
@@ -239,6 +396,44 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       </div>
       
       <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes countBounce {
+          0% {
+            opacity: 0;
+            transform: scale(0.1);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes countPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.8; }
+        }
+        
+        @keyframes titleSlam {
+          0% {
+            opacity: 0;
+            transform: translateY(-100px) scale(0.5);
+          }
+          60% {
+            opacity: 1;
+            transform: translateY(10px) scale(1.05);
+          }
+          100% {
+            transform: translateY(0) scale(1);
+          }
+        }
+        
         @keyframes wordFadeIn {
           0% {
             opacity: 0;
@@ -284,20 +479,24 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           }
         }
         
-        @keyframes roleReveal {
+        @keyframes roleRevealExplosion {
           0% {
             opacity: 0;
-            transform: scale(3) rotate(720deg);
-            filter: blur(20px);
+            transform: scale(5) rotate(720deg);
+            filter: blur(30px);
           }
-          50% {
-            opacity: 0.8;
-            transform: scale(1.5) rotate(360deg);
-            filter: blur(5px);
+          40% {
+            opacity: 0.5;
+            transform: scale(2) rotate(360deg);
+            filter: blur(10px);
           }
-          80% {
-            transform: scale(0.9) rotate(0);
+          70% {
+            opacity: 1;
+            transform: scale(0.8) rotate(0);
             filter: blur(0);
+          }
+          85% {
+            transform: scale(1.1) rotate(-5deg);
           }
           100% {
             opacity: 1;
@@ -309,14 +508,15 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
         @keyframes resultSlam {
           0% {
             opacity: 0;
-            transform: translateY(-100px) scale(2);
+            transform: translateY(-150px) scale(3);
           }
-          60% {
+          50% {
+            opacity: 0.8;
+            transform: translateY(20px) scale(0.9);
+          }
+          75% {
             opacity: 1;
-            transform: translateY(10px) scale(0.95);
-          }
-          80% {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-10px) scale(1.05);
           }
           100% {
             opacity: 1;
@@ -324,25 +524,72 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
           }
         }
         
-        @keyframes winnerPulse {
+        @keyframes winnerReveal {
           0% {
             opacity: 0;
-            transform: scale(0.5);
-          }
-          25% {
-            opacity: 1;
-            transform: scale(1);
+            transform: scale(0.1) rotateY(720deg);
           }
           50% {
-            transform: scale(1.1);
+            opacity: 0.5;
+            transform: scale(1.3) rotateY(360deg);
           }
           75% {
-            transform: scale(1.05);
+            opacity: 1;
+            transform: scale(0.95) rotateY(0);
           }
           100% {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) rotateY(0);
           }
+        }
+        
+        @keyframes dotPulse {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 0.3;
+          }
+          50% {
+            transform: scale(1.5);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes particle0 {
+          to {
+            transform: translate(-200px, -300px);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes particle1 {
+          to {
+            transform: translate(250px, -250px);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes particle2 {
+          to {
+            transform: translate(-180px, 280px);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes particle3 {
+          to {
+            transform: translate(200px, 300px);
+            opacity: 0;
+          }
+        }
+        
+        .animate-shake {
+          animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+          20%, 40%, 60%, 80% { transform: translateX(10px); }
         }
       `}</style>
     </div>
