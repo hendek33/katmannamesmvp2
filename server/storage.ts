@@ -1415,8 +1415,14 @@ export class MemStorage implements IStorage {
     // End game guessing only works after the game ends, in chaos mode
     if (room.phase !== "ended" || !room.chaosMode || !room.chaosModeType) return null;
     
-    // Check if there's a winner already (a team won normally)
-    if (!room.winner) return null;
+    // Check if there's a valid winner (a team won normally, not draw or null)
+    if (!room.winner || room.winner === "draw") return null;
+    
+    // Ensure room.winner is a valid team for voting
+    if (room.winner !== "dark" && room.winner !== "light") {
+      console.error("Invalid winner state for end game voting:", room.winner);
+      return null;
+    }
     
     // Initialize voting phase if not set
     if (!room.endGameVotingPhase) {
@@ -1498,6 +1504,11 @@ export class MemStorage implements IStorage {
       // Transition to winner voting phase
       room.endGameVotingPhase = "winner_voting";
       
+      // Clear voting map for the winning team's voting phase
+      if (roomData.endGameGuessVotes) {
+        roomData.endGameGuessVotes.clear();
+      }
+      
       // DO NOT set endGameGuessSequence here - wait until both teams have voted
       // This prevents the reveal sequence from starting after just the first team votes
       
@@ -1505,18 +1516,13 @@ export class MemStorage implements IStorage {
       room.endGameGuessUsed = true;
       
       console.log(`PHASE 1 COMPLETE: ${player.team} team guessed ${targetPlayer.username} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
+      console.log(`TRANSITIONING TO WINNER VOTING PHASE`);
     } else if (room.endGameVotingPhase === "winner_voting") {
       // Both teams have now voted - calculate final outcome
       room.endGameVotingPhase = "completed";
       
-      // Ensure room.winner is a valid team (not "draw" or null)
-      if (room.winner !== "dark" && room.winner !== "light") {
-        console.error("Invalid winner state for end game voting:", room.winner);
-        return null;
-      }
-      
       const loserTeam: Team = room.winner === "dark" ? "light" : "dark";
-      const winnerTeam: Team = room.winner;
+      const winnerTeam: Team = room.winner as Team;
       
       const loserGuess = room.endGameGuesses[loserTeam];
       const winnerGuess = room.endGameGuesses[winnerTeam];
