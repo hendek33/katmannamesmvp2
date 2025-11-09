@@ -14,6 +14,22 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
+### Glassmorphism Prophet Voting Window (November 9, 2025)
+- **Modern Glassmorphism Theme**: Applied full glassmorphism design with backdrop blur, semi-transparent backgrounds, and gradient overlays
+- **Smooth Entrance Animation**: Added zoom-in and fade-in animation when window appears (0.5s duration)
+- **Enhanced Visual Effects**:
+  - Multi-layered glass panels with blur effects
+  - Gradient borders with purple/amber glow
+  - Semi-transparent cards with backdrop blur
+  - Animated shadow effects with team colors
+  - Pulsing crown emoji for winning team
+- **Improved Card Styling**: 
+  - Glass-like player cards with gradient backgrounds
+  - Hover effects with purple glow and scale transformation
+  - Semi-transparent vote badges with blur effect
+  - Glassmorphic buttons with gradient backgrounds
+- **Staggered Card Animation**: Player cards slide in with sequential delays for smooth appearance
+
 ### Enhanced Prophet Reveal Sequence (November 9, 2025)
 - **Dramatic Countdown**: Added 3-second countdown with large animated numbers before reveal starts
 - **Multi-Phase Sequence**: Structured reveal into distinct phases: countdown → reveal → decision → result
@@ -40,22 +56,6 @@ Do not make changes to file `server/words.ts`.
 - **Improved Text**: Larger font sizes and better hierarchy
 - **Role Icons**: Added emoji icons for spymaster (🎯) and agent (🕵️) roles
 - **No Scrolling**: Still fits entirely on screen without requiring scroll
-
-### Ultra-Simplified Prophet Voting Window (November 9, 2025)
-- **No-Scroll Design**: Created EndGameVotingSimple.tsx that fits entirely on screen without scrolling
-- **Single-Line Header**: Combined title, vote count, and winning team into one compact header
-- **Minimal Player Cards**: 2-column grid with ultra-compact player rows (8px avatar, name, vote button)
-- **Inline Alerts**: Converted large alert boxes to small inline badges in the header
-- **Removed Decorations**: Eliminated gradients, animations, crowns, and other visual embellishments
-- **Fixed Height**: Removed max-h and overflow-y-auto, allowing natural height within viewport
-- **Simplified Interactions**: Direct click on player row to vote, simple "Seç" button to confirm
-
-### Prophet Voting Window Size Optimization (November 9, 2025) 
-- **Compact Design**: Reduced overall window size from max-w-4xl to max-w-2xl for better screen fit
-- **Smaller Player Cards**: Avatar size reduced to 48px, text sizes optimized for readability
-- **Responsive Grid**: Cards adjust from 2 to 4 columns based on screen size
-- **Simplified UI**: Removed unnecessary emojis from role badges, shortened button text
-- **Maintained Aesthetics**: All glassmorphism effects, animations, and team colors preserved
 
 ### Word Tracking System (November 9, 2025)
 - **No Word Repetition**: Once a word appears in a game, it won't appear again in subsequent games in the same room
