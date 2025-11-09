@@ -34,7 +34,6 @@ export interface IStorage {
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
   updateChaosModeType(roomCode: string, type: "prophet" | "double_agent"): GameState | null;
   updateProphetVisibility(roomCode: string, visibility: "own_team" | "both_teams" | "all_cards"): GameState | null;
-  updateBothCorrectOutcome(roomCode: string, outcome: "winner_wins" | "draw"): GameState | null;
   updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -303,7 +302,6 @@ export class MemStorage implements IStorage {
       prophetVisibility: "own_team", // Default visibility for prophets
       prophetGuessUsed: { dark: false, light: false },
       consecutivePasses: { dark: 0, light: 0 }, // Track consecutive passes
-      bothCorrectOutcome: "winner_wins", // Default: winner wins when both teams guess correctly
     };
 
     this.rooms.set(roomCode, { 
@@ -639,13 +637,8 @@ export class MemStorage implements IStorage {
     if (room.phase !== "lobby") return null;
 
     room.chaosMode = chaosMode;
-    if (chaosMode) {
-      // Set defaults when enabling chaos mode
-      if (!room.chaosModeType) room.chaosModeType = "prophet";
-      if (!room.prophetVisibility) room.prophetVisibility = "own_team";
-      if (!room.bothCorrectOutcome) room.bothCorrectOutcome = "winner_wins";
-    } else {
-      // Reset when disabling
+    // Reset type when disabling
+    if (!chaosMode) {
       room.chaosModeType = null;
     }
 
@@ -691,22 +684,6 @@ export class MemStorage implements IStorage {
         }
       });
     }
-
-    return room;
-  }
-
-  updateBothCorrectOutcome(roomCode: string, outcome: "winner_wins" | "draw"): GameState | null {
-    const roomData = this.rooms.get(roomCode);
-    if (!roomData) return null;
-    const room = roomData.gameState;
-    
-    // Only allow outcome to be changed in lobby
-    if (room.phase !== "lobby") return null;
-    
-    // Only works when chaos mode is enabled
-    if (!room.chaosMode) return null;
-
-    room.bothCorrectOutcome = outcome;
 
     return room;
   }
@@ -934,9 +911,6 @@ export class MemStorage implements IStorage {
       return null;
     }
 
-    // Ensure currentTeam is not null before creating clue
-    if (!room.currentTeam) return null;
-
     room.currentClue = {
       word: word.toUpperCase(),
       count,
@@ -1124,24 +1098,12 @@ export class MemStorage implements IStorage {
     room.doubleAgentGuessResult = undefined;
     room.endGameGuessUsed = undefined;
     
-    // Reset two-phase voting states
-    room.endGameVotingPhase = undefined;
-    room.endGameGuesses = undefined;
-    room.endGameGuessSequence = undefined;
-    (room as any).endGameGuessSequences = undefined;
-    room.endGameFinalResult = undefined;
-    room.bothCorrectOutcome = undefined;
-    
-    // Clear end game voting map
-    if (roomData.endGameGuessVotes) {
-      roomData.endGameGuessVotes.clear();
-    }
-    
     // Reset consecutive passes tracking
     room.consecutivePasses = { dark: 0, light: 0 };
     if (roomData.turnRevealMap) {
       roomData.turnRevealMap = { dark: false, light: false };
     }
+    room.endGameGuessSequence = undefined;
 
     return room;
   }
@@ -1172,18 +1134,6 @@ export class MemStorage implements IStorage {
     // Clear end game guess tracking
     room.endGameGuessUsed = undefined;
     room.endGameGuessSequence = undefined;
-    
-    // Reset two-phase voting states
-    room.endGameVotingPhase = undefined;
-    room.endGameGuesses = undefined;
-    (room as any).endGameGuessSequences = undefined;
-    room.endGameFinalResult = undefined;
-    room.bothCorrectOutcome = undefined;
-    
-    // Clear end game voting map
-    if (roomData.endGameGuessVotes) {
-      roomData.endGameGuessVotes.clear();
-    }
     
     // Reset consecutive passes tracking
     room.consecutivePasses = { dark: 0, light: 0 };
@@ -1301,17 +1251,14 @@ export class MemStorage implements IStorage {
       return null;
     }
     
-    // Ensure we have an active team (required for prophet guessing)
-    if (!room.currentTeam) return null;
-    
     // Check if team has lost prophet voting rights due to consecutive passes
-    if (room.consecutivePasses && room.consecutivePasses[room.currentTeam] >= 2) {
+    if (room.consecutivePasses && room.currentTeam && room.consecutivePasses[room.currentTeam] >= 2) {
       console.log(`[PROPHET VOTE BLOCKED] ${room.currentTeam} team cannot vote - 2 consecutive passes`);
       return null;
     }
     
     // Check if the team hasn't used their prophet guess yet
-    if (room.prophetGuessUsed && room.prophetGuessUsed[room.currentTeam] ) {
+    if (room.prophetGuessUsed && room.prophetGuessUsed[room.currentTeam as "dark" | "light"]) {
       return null;
     }
     
@@ -1325,7 +1272,7 @@ export class MemStorage implements IStorage {
     if (!room.prophetGuessUsed) {
       room.prophetGuessUsed = { dark: false, light: false };
     }
-    room.prophetGuessUsed[room.currentTeam] = true;
+    room.prophetGuessUsed[room.currentTeam as "dark" | "light"] = true;
     
     // Check if the guess is correct
     const isCorrect = targetPlayer.secretRole === "prophet";
@@ -1362,66 +1309,19 @@ export class MemStorage implements IStorage {
     // Check if there's a winner already (a team won normally)
     if (!room.winner) return null;
     
-    // Check if end game guess hasn't been used yet (for legacy single-phase)
-    // But allow voting if we're in an active phase
-    if (room.endGameGuessUsed && room.endGameVotingPhase === "completed") {
-      return null;
-    }
+    // Check if end game guess hasn't been used yet
+    if (room.endGameGuessUsed) return null;
     
-    // Check if assassin was revealed (no prophet voting if assassin ends the game)
-    const lastReveal = room.revealHistory.length > 0 
-      ? room.revealHistory[room.revealHistory.length - 1] as any
-      : null;
-    if (lastReveal && lastReveal.type === "assassin") {
-      return null; // No prophet voting after assassin
-    }
-    
-    // Check if losing team revealed winning team's last card
-    const losingTeam = room.winner === "dark" ? "light" : "dark";
-    if (lastReveal && 
-        lastReveal.team === losingTeam && 
-        lastReveal.type === room.winner &&
-        ((room.winner === "dark" && room.darkCardsRemaining === 0) ||
-         (room.winner === "light" && room.lightCardsRemaining === 0))) {
-      return null; // No prophet voting if losing team revealed winner's last card
-    }
-    
-    // Initialize voting phase if not set
-    if (!room.endGameVotingPhase) {
-      room.endGameVotingPhase = "loser_voting";
-      room.endGameGuesses = {};
-    }
-    
-    // Get the player
+    // Check if player is on the losing team
     const player = room.players.find(p => p.id === playerId);
-    if (!player) return null;
+    if (!player || player.team === room.winner) {
+      return null; // Only losing team can vote
+    }
     
-    // Check voting phase and team permissions
-    // losingTeam already declared above
-    
-    if (room.endGameVotingPhase === "loser_voting") {
-      // During loser voting phase, only losing team can vote
-      if (player.team !== losingTeam) {
-        return null; // Only losing team can vote in this phase
-      }
-      // Get the target player and verify they're on the winning team
-      const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-      if (!targetPlayer || targetPlayer.team !== room.winner) {
-        return null; // Can only vote for players on the winning team
-      }
-    } else if (room.endGameVotingPhase === "winner_voting") {
-      // During winner voting phase, only winning team can vote
-      if (player.team !== room.winner) {
-        return null; // Only winning team can vote in this phase
-      }
-      // Get the target player and verify they're on the losing team
-      const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-      if (!targetPlayer || targetPlayer.team !== losingTeam) {
-        return null; // Can only vote for players on the losing team
-      }
-    } else {
-      // No voting allowed if phase is not set or completed
-      return null;
+    // Get the target player and verify they're on the winning team
+    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+    if (!targetPlayer || targetPlayer.team !== room.winner) {
+      return null; // Can only vote for players on the winning team
     }
     
     // Initialize votes map if not exists
@@ -1486,272 +1386,75 @@ export class MemStorage implements IStorage {
     // End game guessing only works after the game ends, in chaos mode
     if (room.phase !== "ended" || !room.chaosMode || !room.chaosModeType) return null;
     
-    // Check if there's a valid winner (a team won normally, not draw or null)
-    if (!room.winner || room.winner === "draw") return null;
+    // Check if there's a winner already (a team won normally)
+    if (!room.winner) return null;
     
-    // Ensure room.winner is a valid team for voting
-    if (room.winner !== "dark" && room.winner !== "light") {
-      console.error("Invalid winner state for end game voting:", room.winner);
-      return null;
-    }
+    // Check if end game guess hasn't been used yet
+    if (room.endGameGuessUsed) return null;
     
-    // Check if assassin was revealed (no prophet voting if assassin ends the game)
-    const lastReveal = room.revealHistory.length > 0 
-      ? room.revealHistory[room.revealHistory.length - 1] as any
-      : null;
-    if (lastReveal && lastReveal.type === "assassin") {
-      return null; // No prophet voting after assassin
-    }
-    
-    // Check if losing team revealed winning team's last card
-    const loserTeam = room.winner === "dark" ? "light" : "dark";
-    if (lastReveal && 
-        lastReveal.team === loserTeam && 
-        lastReveal.type === room.winner &&
-        ((room.winner === "dark" && room.darkCardsRemaining === 0) ||
-         (room.winner === "light" && room.lightCardsRemaining === 0))) {
-      return null; // No prophet voting if losing team revealed winner's last card
-    }
-    
-    // Initialize voting phase if not set
-    if (!room.endGameVotingPhase) {
-      room.endGameVotingPhase = "loser_voting";
-      room.endGameGuesses = {};
-    }
-    
-    // Handle legacy single-phase support - only block if we're in completed phase
-    // Allow voting during active phases even if endGameGuessUsed is set
-    if (room.endGameGuessUsed && room.endGameVotingPhase === "completed") {
-      return null;
-    }
-    
-    // Get player and validate
+    // Check if player is on the losing team
     const player = room.players.find(p => p.id === playerId);
-    if (!player) return null;
-    
-    // In prophet mode, targetPlayerId is actually a card ID
-    // We need to validate it differently
-    if (room.chaosModeType === "prophet") {
-      const targetCard = room.cards.find(c => c.id === Number(targetPlayerId));
-      if (!targetCard) {
-        console.error("Invalid card ID for prophet voting:", targetPlayerId);
-        return null;
-      }
-      
-      // Check if player has this card in their known cards
-      const prophet = room.players.find(p => p.team === player.team && p.secretRole === "prophet");
-      if (!prophet || !prophet.knownCards?.includes(targetCard.id)) {
-        console.error("Card not in prophet's known cards:", targetCard.id);
-        return null;
-      }
-    } else {
-      // For double agent mode (if we ever bring it back), validate as player ID
-      const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-      if (!targetPlayer) return null;
-      
-      // Ensure both players have teams (required for end game guessing)
-      if (!player.team || !targetPlayer.team) return null;
+    if (!player || player.team === room.winner) {
+      return null; // Only losing team can guess
     }
     
-    // Determine which phase we're in and validate
-    // loserTeam already declared above
-    const winnerTeam = room.winner;
+    // Get the target player
+    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+    if (!targetPlayer) return null;
     
-    if (room.endGameVotingPhase === "loser_voting") {
-      // Only losing team can vote in this phase
-      if (player.team !== loserTeam) return null;
-      
-      // Check if loser team hasn't already voted
-      if (room.endGameGuesses && room.endGameGuesses[loserTeam]) return null;
-    } else if (room.endGameVotingPhase === "winner_voting") {
-      // Only winning team can vote in this phase
-      if (player.team !== winnerTeam) return null;
-      
-      // Check if winner team hasn't already voted
-      if (room.endGameGuesses && room.endGameGuesses[winnerTeam]) return null;
-    } else {
-      // Voting is completed
-      return null;
-    }
+    // Mark that end game guess has been used
+    room.endGameGuessUsed = true;
     
     // Clear votes after guess is made
     if (roomData.endGameGuessVotes) {
       roomData.endGameGuessVotes.clear();
     }
-    // Check if the guess is correct
+    
+    // Get team names
+    const guessingTeamName = player.team === "dark" ? room.darkTeamName : room.lightTeamName;
+    const targetTeamName = targetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName;
+    
+    // Initialize the dramatic sequence
+    room.endGameGuessSequence = {
+      guessingTeam: player.team,
+      guessingTeamName: guessingTeamName,
+      targetPlayer: targetPlayer.username,
+      targetTeam: targetPlayer.team,
+      targetTeamName: targetTeamName,
+      guessType: room.chaosModeType,
+      actualRole: targetPlayer.secretRole,
+      success: false,
+      finalWinner: room.winner,
+      finalWinnerName: room.winner === "dark" ? room.darkTeamName : room.lightTeamName
+    };
+    
     let guessCorrect = false;
     
     if (room.chaosModeType === "prophet") {
-      // In prophet mode, check if the selected card ID matches one of the prophet's actual cards
-      const targetCard = room.cards.find(c => c.id === Number(targetPlayerId));
-      if (!targetCard) return null;
-      
-      // Find the opposing team's prophet
-      const opposingTeam = player.team === "dark" ? "light" : "dark";
-      const opposingProphet = room.players.find(p => p.team === opposingTeam && p.secretRole === "prophet");
-      
-      if (opposingProphet && opposingProphet.knownCards) {
-        // Check if the guessed card is one of the opposing prophet's cards
-        guessCorrect = opposingProphet.knownCards.includes(targetCard.id);
+      // In Prophet mode: Losing team guesses the prophet on the OPPOSING team
+      if (targetPlayer.team !== player.team && targetPlayer.secretRole === "prophet") {
+        guessCorrect = true;
+      }
+    } else if (room.chaosModeType === "double_agent") {
+      // In Double Agent mode: Losing team guesses the double agent on THEIR OWN team
+      if (targetPlayer.team === player.team && targetPlayer.secretRole === "double_agent") {
+        guessCorrect = true;
       }
     }
     
-    // Store the guess for the current team
-    if (!room.endGameGuesses) room.endGameGuesses = {};
-    room.endGameGuesses[player.team] = {
-      targetPlayerId: targetPlayerId, // Actually a card ID in prophet mode
-      targetTeam: player.team === "dark" ? "light" : "dark", // Guessing opposing team
-      guessType: room.chaosModeType,
-      success: guessCorrect,
-      timestamp: Date.now()
-    };
+    // Update the sequence with results
+    room.endGameGuessSequence.success = guessCorrect;
     
-    // Handle phase transitions
-    if (room.endGameVotingPhase === "loser_voting") {
-      // Transition to winner voting phase
-      room.endGameVotingPhase = "winner_voting";
-      
-      // Clear voting map for the winning team's voting phase
-      if (roomData.endGameGuessVotes) {
-        roomData.endGameGuessVotes.clear();
-      }
-      
-      // DO NOT set endGameGuessSequence here - wait until both teams have voted
-      // This prevents the reveal sequence from starting after just the first team votes
-      
-      // Mark for legacy compatibility
-      room.endGameGuessUsed = true;
-      
-      console.log(`PHASE 1 COMPLETE: ${player.team} team guessed card ID ${targetPlayerId} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
-      console.log(`TRANSITIONING TO WINNER VOTING PHASE`);
-    } else if (room.endGameVotingPhase === "winner_voting") {
-      // Both teams have now voted - calculate final outcome
-      room.endGameVotingPhase = "completed";
-      
-      const loserTeam: Team = room.winner === "dark" ? "light" : "dark";
-      const winnerTeam: Team = room.winner as Team;
-      
-      const loserGuess = room.endGameGuesses[loserTeam];
-      const winnerGuess = room.endGameGuesses[winnerTeam];
-      
-      let finalWinner: "dark" | "light" | "draw" = room.winner;
-      
-      if (loserGuess?.success && winnerGuess?.success) {
-        // Both teams guessed correctly
-        finalWinner = room.bothCorrectOutcome === "draw" ? "draw" : room.winner;
-      } else if (loserGuess?.success) {
-        // Only loser guessed correctly - they win
-        finalWinner = loserTeam;
-      } else if (winnerGuess?.success) {
-        // Only winner guessed correctly - they keep winning
-        finalWinner = winnerTeam;
-      }
-      // else neither guessed correctly - original winner remains
-      
-      // Store final result
-      room.endGameFinalResult = {
-        darkSuccess: room.endGameGuesses.dark?.success || false,
-        lightSuccess: room.endGameGuesses.light?.success || false,
-        finalWinner: finalWinner,
-        finalWinnerName: finalWinner === "draw" ? undefined : 
-                        (finalWinner === "dark" ? room.darkTeamName : room.lightTeamName)
-      };
-      
-      // Create array to hold both teams' guess sequences for the reveal animation
-      const guessSequences: any[] = [];
-      
-      // First add loser's guess sequence
-      if (loserGuess) {
-        // In prophet mode, targetPlayerId is actually a card ID
-        const loserTargetCard = room.cards.find(c => c.id === Number(loserGuess.targetPlayerId));
-        const loserProphet = room.players.find(p => p.team === loserTeam && p.secretRole === "prophet");
-        
-        if (loserTargetCard && loserProphet) {
-          // Get the card that prophet voted on (what they guessed)
-          const votedCard = room.cards.find(c => c.id === Number(loserGuess.targetPlayerId));
-          
-          // Get one of the prophet's actual cards for the reveal
-          const prophetCards = room.cards.filter(c => loserProphet.knownCards?.includes(c.id));
-          const targetCard = prophetCards.length > 0 ? prophetCards[0] : loserTargetCard;
-          
-          guessSequences.push({
-            votingTeam: loserTeam,
-            votingTeamName: loserTeam === "dark" ? room.darkTeamName : room.lightTeamName,
-            prophetName: loserProphet.username,
-            guessedCard: votedCard ? {
-              word: votedCard.word,
-              type: votedCard.type,
-              id: votedCard.id
-            } : null,
-            targetCard: targetCard ? {
-              word: targetCard.word,
-              type: targetCard.type,
-              id: targetCard.id
-            } : null,
-            success: loserGuess.success,
-            isFirstGuess: true
-          });
-        }
-      }
-      
-      // Then add winner's guess sequence
-      if (winnerGuess) {
-        // In prophet mode, targetPlayerId is actually a card ID
-        const winnerTargetCard = room.cards.find(c => c.id === Number(winnerGuess.targetPlayerId));
-        const winnerProphet = room.players.find(p => p.team === winnerTeam && p.secretRole === "prophet");
-        
-        if (winnerTargetCard && winnerProphet) {
-          // Get the card that prophet voted on (what they guessed)
-          const votedCard = room.cards.find(c => c.id === Number(winnerGuess.targetPlayerId));
-          
-          // Get one of the prophet's actual cards for the reveal
-          const prophetCards = room.cards.filter(c => winnerProphet.knownCards?.includes(c.id));
-          const targetCard = prophetCards.length > 0 ? prophetCards[0] : winnerTargetCard;
-          
-          guessSequences.push({
-            votingTeam: winnerTeam,
-            votingTeamName: winnerTeam === "dark" ? room.darkTeamName : room.lightTeamName,
-            prophetName: winnerProphet.username,
-            guessedCard: votedCard ? {
-              word: votedCard.word,
-              type: votedCard.type,
-              id: votedCard.id
-            } : null,
-            targetCard: targetCard ? {
-              word: targetCard.word,
-              type: targetCard.type,
-              id: targetCard.id
-            } : null,
-            success: winnerGuess.success,
-            finalWinner: finalWinner === "draw" ? room.winner : finalWinner,
-            finalWinnerName: finalWinner === "draw" ? "Berabere!" : 
-                            (finalWinner === "dark" ? room.darkTeamName : room.lightTeamName),
-            isLastGuess: true
-          });
-        }
-      }
-      
-      // Store the sequences in the existing endGameGuessSequence field
-      // We'll pass ALL sequences through this single field
-      if (guessSequences.length > 0) {
-        // Create a wrapper object that contains all sequences
-        room.endGameGuessSequence = {
-          // Mark this as a multi-sequence object
-          isMultiSequence: true,
-          sequences: guessSequences,
-          // Also include backwards compatibility fields from the last sequence
-          ...guessSequences[guessSequences.length - 1]
-        } as any;
-        console.log(`PROPHET SEQUENCE CREATED:`, JSON.stringify(room.endGameGuessSequence));
-      }
-      
-      // Update the actual winner
-      if (finalWinner !== "draw") {
-        room.winner = finalWinner;
-      }
-      
-      console.log(`PHASE 2 COMPLETE: ${player.team} team guessed CARD ID ${targetPlayerId} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
-      console.log(`FINAL RESULT: ${finalWinner === "draw" ? "DRAW" : `${finalWinner} wins`}`);
+    if (guessCorrect) {
+      // If guess is correct, the losing team wins!
+      room.winner = player.team;
+      room.endGameGuessSequence.finalWinner = player.team;
+      room.endGameGuessSequence.finalWinnerName = guessingTeamName;
+      console.log(`END GAME GUESS CORRECT! ${player.team} team wins by guessing ${targetPlayer.username}`);
+    } else {
+      // If guess is wrong, the original winner remains
+      room.endGameGuessSequence.finalWinnerName = room.winner === "dark" ? room.darkTeamName : room.lightTeamName;
+      console.log(`END GAME GUESS WRONG! ${room.winner} team still wins. ${targetPlayer.username} was ${targetPlayer.secretRole || "normal player"}`);
     }
     
     return room;
@@ -2322,13 +2025,11 @@ export class MemStorage implements IStorage {
     delete target.introductionLikes[playerId];
     delete target.introductionDislikes[playerId];
     
-    // Add new vote (only if player has a team)
-    if (player.team) {
-      if (isLike) {
-        target.introductionLikes[playerId] = player.team;
-      } else {
-        target.introductionDislikes[playerId] = player.team;
-      }
+    // Add new vote
+    if (isLike) {
+      target.introductionLikes[playerId] = player.team;
+    } else {
+      target.introductionDislikes[playerId] = player.team;
     }
     
     return room;

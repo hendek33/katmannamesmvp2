@@ -15,7 +15,6 @@ import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
 import { EndGameVoting } from "@/components/EndGameVoting";
 import { EndGameGuessSequence } from "@/components/EndGameGuessSequence";
-import { EndGameGuessSequences } from "@/components/EndGameGuessSequences";
 import { PlayerIntroduction } from "@/components/PlayerIntroduction";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,9 +26,6 @@ import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb,
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
-
-// Type guard to check if GameOutcome is a Team
-const isTeam = (value: any): value is "dark" | "light" => value === "dark" || value === "light";
 
 export default function Game() {
   const [, setLocation] = useLocation();
@@ -259,7 +255,6 @@ export default function Game() {
       // Game was restarted, reset refs
       previousTurnRef.current = null;
       assassinShownRef.current = false;
-      normalWinShownRef.current = false;  // Reset normal win ref for new game
     }
     
     // Also reset assassin ref when going to lobby (for all players)
@@ -352,56 +347,9 @@ export default function Game() {
     }
   }, [gameState?.phase, gameState?.winner]);
 
-  // Monitor voting phase changes to keep voting UI visible for observers
-  useEffect(() => {
-    if (!gameState || gameState.phase !== "ended" || !gameState.winner) return;
-    
-    // Initialize or show voting UI for prophet mode
-    if (gameState.chaosMode && gameState.chaosModeType === "prophet") {
-      // Check if voting phase is active or needs to be initialized
-      if (!gameState.endGameVotingPhase || 
-          gameState.endGameVotingPhase === "loser_voting" || 
-          gameState.endGameVotingPhase === "winner_voting") {
-        
-        // Check if assassin was revealed
-        const lastRevealedCard = gameState.revealHistory.length ? 
-          gameState.revealHistory[gameState.revealHistory.length - 1] : null;
-        const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
-        
-        // Check if losing team revealed winning team's last card
-        const winningTeam = gameState.winner;
-        const losingTeam = winningTeam === "dark" ? "light" : "dark";
-        const wasLosingTeamRevealedWinningCard = 
-          lastRevealedCard?.team === losingTeam &&
-          lastRevealedCard?.type === winningTeam &&
-          ((winningTeam === "dark" && gameState.darkCardsRemaining === 0) ||
-           (winningTeam === "light" && gameState.lightCardsRemaining === 0));
-        
-        // Show voting UI for ALL players during both phases
-        if (!wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
-          setShowEndGameVoting(true);
-        }
-      } else if (gameState.endGameVotingPhase === "completed") {
-        // Hide voting UI only when voting is completed
-        setShowEndGameVoting(false);
-      }
-    } else if (gameState.endGameVotingPhase === "completed") {
-      // Hide voting UI only when voting is completed
-      setShowEndGameVoting(false);
-    }
-  }, [gameState?.endGameVotingPhase, gameState?.chaosMode, gameState?.chaosModeType, gameState?.phase, gameState?.winner, gameState?.revealHistory, gameState?.darkCardsRemaining, gameState?.lightCardsRemaining]);
-
   // Handle end game guess sequence animation
   const endGameGuessRef = useRef<any>(null);
   useEffect(() => {
-    console.log("Prophet sequence useEffect running", {
-      phase: gameState?.phase,
-      chaosMode: gameState?.chaosMode,
-      chaosModeType: gameState?.chaosModeType,
-      endGameGuessSequence: gameState?.endGameGuessSequence,
-      endGameVotingPhase: gameState?.endGameVotingPhase,
-    });
-    
     // Reset when game restarts or goes back to lobby
     if (gameState?.phase === "lobby" || gameState?.phase === "playing") {
       endGameGuessRef.current = null;
@@ -410,43 +358,17 @@ export default function Game() {
       return;
     }
     
-    // CRITICAL: Only show sequence if chaos mode with prophet is enabled
-    if (!gameState?.chaosMode || gameState?.chaosModeType !== "prophet") {
-      console.log("No chaos mode or not prophet mode");
-      endGameGuessRef.current = null;
-      setShowEndGameGuessSequence(false);
-      return;
-    }
-    
-    // Check for sequences
-    const hasSequences = gameState?.endGameGuessSequence;
-    if (!hasSequences) {
-      console.log("No endGameGuessSequence found");
+    if (!gameState?.endGameGuessSequence) {
       endGameGuessRef.current = null;
       return;
     }
     
-    // CRITICAL: Only show sequence after BOTH teams have voted (voting phase completed)
-    if (gameState.endGameVotingPhase !== "completed") {
-      console.log("Voting phase not completed yet:", gameState.endGameVotingPhase);
-      return; // Wait for both teams to vote
-    }
-    
-    // Check if this is a multi-sequence object
-    const isMultiSequence = (gameState.endGameGuessSequence as any)?.isMultiSequence;
-    console.log("Sequence check:", { isMultiSequence, sequence: gameState.endGameGuessSequence });
-    
-    // Generate unique key for the sequences
-    const sequenceKey = isMultiSequence 
-      ? `multi-${JSON.stringify((gameState.endGameGuessSequence as any).sequences?.map((s: any) => s.votingTeam))}`
-      : `single-${gameState.endGameGuessSequence?.targetPlayer}-${gameState.endGameGuessSequence?.guessType}`;
-    
+    // Only trigger if it's a new sequence (not the same one from before)
+    const sequenceKey = `${gameState.endGameGuessSequence.targetPlayer}-${gameState.endGameGuessSequence.guessType}`;
     if (endGameGuessRef.current === sequenceKey) {
-      console.log("Already shown this sequence:", sequenceKey);
       return; // Already shown this sequence
     }
     
-    console.log("Starting prophet sequence animation!");
     // Mark this sequence as shown
     endGameGuessRef.current = sequenceKey;
     
@@ -454,10 +376,10 @@ export default function Game() {
     setShowEndGameGuessSequence(true);
     setSequenceStep(0);
     
-    // Also hide the voting dialog since both teams have voted
+    // Also hide the voting dialog since a guess has been made
     setShowEndGameVoting(false);
     
-    // Progress through steps with delays (not used with new sequences wrapper)
+    // Progress through steps with delays
     const timer1 = setTimeout(() => setSequenceStep(1), 1500); // Show guess
     const timer2 = setTimeout(() => setSequenceStep(2), 3500); // Show role reveal
     const timer3 = setTimeout(() => setSequenceStep(3), 5500); // Show result
@@ -467,7 +389,7 @@ export default function Game() {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [gameState?.endGameGuessSequence, gameState?.phase, gameState?.endGameVotingPhase, gameState?.chaosMode, gameState?.chaosModeType]);
+  }, [gameState?.endGameGuessSequence, gameState?.phase]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -576,16 +498,11 @@ export default function Game() {
     // Show end game voting if chaos mode is enabled
     // BUT NOT if assassin was revealed or losing team revealed winning team's last card
     if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
-        gameState.winner && 
-        (!gameState.endGameGuessUsed || // Legacy support
-         (gameState.endGameVotingPhase && gameState.endGameVotingPhase !== "completed")) &&
+        gameState.winner && !gameState.endGameGuessUsed &&
         !wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
       
-      // Show voting UI during both phases for ALL players (including observers)
+      // Show voting UI for all players (losing team can vote, winning team can watch)
       setShowEndGameVoting(true);
-    } else if (gameState?.endGameVotingPhase === "completed") {
-      // Hide voting UI when both phases complete
-      setShowEndGameVoting(false);
     }
   }, [gameState, playerId]);
 
@@ -766,7 +683,7 @@ export default function Game() {
       )}
 
       {/* Assassin Video for black card */}
-      {showAssassinVideo.show && gameState && isTeam(gameState.winner) && (
+      {showAssassinVideo.show && gameState && gameState.winner && (
         <AssassinVideo
           winnerTeam={gameState.winner}
           winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
@@ -811,7 +728,7 @@ export default function Game() {
 
 
       {/* Normal Win Video */}
-      {showNormalWinVideo && gameState && isTeam(gameState.winner) && (
+      {showNormalWinVideo && gameState && gameState.winner && (
         <NormalWinVideo
           winnerTeam={gameState.winner}
           winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
@@ -819,8 +736,8 @@ export default function Game() {
         />
       )}
 
-      {/* End Game Prophet Voting - Show during voting phases */}
-      {showEndGameVoting && gameState && gameState.winner && (
+      {/* End Game Prophet Voting - Only show if no guess has been made yet */}
+      {showEndGameVoting && gameState && gameState.winner && !gameState.endGameGuessUsed && (
         <EndGameVoting
           winningTeam={gameState.winner as "dark" | "light"}
           losingTeam={gameState.winner === "dark" ? "light" : "dark"}
@@ -833,24 +750,13 @@ export default function Game() {
           onConfirm={handleConfirmEndGameGuess}
           chaosType={gameState.chaosModeType || "prophet"}
           consecutivePasses={gameState.consecutivePasses}
-          votingPhase={gameState.endGameVotingPhase || "loser_voting"}
-          endGameGuesses={gameState.endGameGuesses}
-          endGameFinalResult={gameState.endGameFinalResult}
-          bothCorrectOutcome={gameState.bothCorrectOutcome}
         />
       )}
 
-      {/* End Game Guess Dramatic Sequence - Support both single and multiple sequences */}
+      {/* End Game Guess Dramatic Sequence */}
       {showEndGameGuessSequence && gameState?.endGameGuessSequence && (
-        <EndGameGuessSequences
-          sequences={(gameState.endGameGuessSequence as any)?.isMultiSequence 
-            ? (gameState.endGameGuessSequence as any)?.sequences 
-            : null}
-          singleSequence={!(gameState.endGameGuessSequence as any)?.isMultiSequence 
-            ? gameState?.endGameGuessSequence 
-            : null}
-          darkTeamName={gameState.darkTeamName}
-          lightTeamName={gameState.lightTeamName}
+        <EndGameGuessSequence
+          sequence={gameState.endGameGuessSequence}
           onComplete={() => setShowEndGameGuessSequence(false)}
         />
       )}
