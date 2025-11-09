@@ -1716,12 +1716,17 @@ export class MemStorage implements IStorage {
         }
       }
       
-      // Store the first sequence for backward compatibility
-      // But also store both sequences in a new field (will be handled in frontend)
+      // Store the sequences in the existing endGameGuessSequence field
+      // We'll pass ALL sequences through this single field
       if (guessSequences.length > 0) {
-        room.endGameGuessSequence = guessSequences[guessSequences.length - 1];
-        // Store all sequences as a JSON string in a temporary field for passing to frontend
-        (room as any).endGameGuessSequences = guessSequences;
+        // Create a wrapper object that contains all sequences
+        room.endGameGuessSequence = {
+          // Mark this as a multi-sequence object
+          isMultiSequence: true,
+          sequences: guessSequences,
+          // Also include backwards compatibility fields from the last sequence
+          ...guessSequences[guessSequences.length - 1]
+        } as any;
       }
       
       // Update the actual winner

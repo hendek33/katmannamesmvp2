@@ -409,8 +409,8 @@ export default function Game() {
       return;
     }
     
-    // Check for either single sequence or multiple sequences
-    const hasSequences = (gameState as any)?.endGameGuessSequences || gameState?.endGameGuessSequence;
+    // Check for sequences
+    const hasSequences = gameState?.endGameGuessSequence;
     if (!hasSequences) {
       endGameGuessRef.current = null;
       return;
@@ -421,9 +421,12 @@ export default function Game() {
       return; // Wait for both teams to vote
     }
     
+    // Check if this is a multi-sequence object
+    const isMultiSequence = (gameState.endGameGuessSequence as any)?.isMultiSequence;
+    
     // Generate unique key for the sequences
-    const sequenceKey = (gameState as any)?.endGameGuessSequences 
-      ? `multi-${JSON.stringify((gameState as any).endGameGuessSequences.map((s: any) => s.targetPlayer))}`
+    const sequenceKey = isMultiSequence 
+      ? `multi-${JSON.stringify((gameState.endGameGuessSequence as any).sequences?.map((s: any) => s.votingTeam))}`
       : `single-${gameState.endGameGuessSequence?.targetPlayer}-${gameState.endGameGuessSequence?.guessType}`;
     
     if (endGameGuessRef.current === sequenceKey) {
@@ -450,7 +453,7 @@ export default function Game() {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [gameState?.endGameGuessSequence, (gameState as any)?.endGameGuessSequences, gameState?.phase, gameState?.endGameVotingPhase, gameState?.chaosMode, gameState?.chaosModeType]);
+  }, [gameState?.endGameGuessSequence, gameState?.phase, gameState?.endGameVotingPhase, gameState?.chaosMode, gameState?.chaosModeType]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -824,10 +827,14 @@ export default function Game() {
       )}
 
       {/* End Game Guess Dramatic Sequence - Support both single and multiple sequences */}
-      {showEndGameGuessSequence && (gameState?.endGameGuessSequence || (gameState as any)?.endGameGuessSequences) && (
+      {showEndGameGuessSequence && gameState?.endGameGuessSequence && (
         <EndGameGuessSequences
-          sequences={(gameState as any)?.endGameGuessSequences}
-          singleSequence={gameState?.endGameGuessSequence}
+          sequences={(gameState.endGameGuessSequence as any)?.isMultiSequence 
+            ? (gameState.endGameGuessSequence as any)?.sequences 
+            : null}
+          singleSequence={!(gameState.endGameGuessSequence as any)?.isMultiSequence 
+            ? gameState?.endGameGuessSequence 
+            : null}
           darkTeamName={gameState.darkTeamName}
           lightTeamName={gameState.lightTeamName}
           onComplete={() => setShowEndGameGuessSequence(false)}
