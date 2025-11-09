@@ -394,6 +394,14 @@ export default function Game() {
   // Handle end game guess sequence animation
   const endGameGuessRef = useRef<any>(null);
   useEffect(() => {
+    console.log("Prophet sequence useEffect running", {
+      phase: gameState?.phase,
+      chaosMode: gameState?.chaosMode,
+      chaosModeType: gameState?.chaosModeType,
+      endGameGuessSequence: gameState?.endGameGuessSequence,
+      endGameVotingPhase: gameState?.endGameVotingPhase,
+    });
+    
     // Reset when game restarts or goes back to lobby
     if (gameState?.phase === "lobby" || gameState?.phase === "playing") {
       endGameGuessRef.current = null;
@@ -404,6 +412,7 @@ export default function Game() {
     
     // CRITICAL: Only show sequence if chaos mode with prophet is enabled
     if (!gameState?.chaosMode || gameState?.chaosModeType !== "prophet") {
+      console.log("No chaos mode or not prophet mode");
       endGameGuessRef.current = null;
       setShowEndGameGuessSequence(false);
       return;
@@ -412,17 +421,20 @@ export default function Game() {
     // Check for sequences
     const hasSequences = gameState?.endGameGuessSequence;
     if (!hasSequences) {
+      console.log("No endGameGuessSequence found");
       endGameGuessRef.current = null;
       return;
     }
     
     // CRITICAL: Only show sequence after BOTH teams have voted (voting phase completed)
     if (gameState.endGameVotingPhase !== "completed") {
+      console.log("Voting phase not completed yet:", gameState.endGameVotingPhase);
       return; // Wait for both teams to vote
     }
     
     // Check if this is a multi-sequence object
     const isMultiSequence = (gameState.endGameGuessSequence as any)?.isMultiSequence;
+    console.log("Sequence check:", { isMultiSequence, sequence: gameState.endGameGuessSequence });
     
     // Generate unique key for the sequences
     const sequenceKey = isMultiSequence 
@@ -430,9 +442,11 @@ export default function Game() {
       : `single-${gameState.endGameGuessSequence?.targetPlayer}-${gameState.endGameGuessSequence?.guessType}`;
     
     if (endGameGuessRef.current === sequenceKey) {
+      console.log("Already shown this sequence:", sequenceKey);
       return; // Already shown this sequence
     }
     
+    console.log("Starting prophet sequence animation!");
     // Mark this sequence as shown
     endGameGuessRef.current = sequenceKey;
     
