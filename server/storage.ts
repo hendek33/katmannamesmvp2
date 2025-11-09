@@ -1341,16 +1341,54 @@ export class MemStorage implements IStorage {
     // Check if end game guess hasn't been used yet
     if (room.endGameGuessUsed) return null;
     
-    // Check if player is on the losing team
-    const player = room.players.find(p => p.id === playerId);
-    if (!player || player.team === room.winner) {
-      return null; // Only losing team can vote
+    // Check if assassin was revealed (no prophet voting if assassin ends the game)
+    const lastReveal = room.revealHistory.length > 0 
+      ? room.revealHistory[room.revealHistory.length - 1] as any
+      : null;
+    if (lastReveal && lastReveal.type === "assassin") {
+      return null; // No prophet voting after assassin
     }
     
-    // Get the target player and verify they're on the winning team
-    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-    if (!targetPlayer || targetPlayer.team !== room.winner) {
-      return null; // Can only vote for players on the winning team
+    // Check if losing team revealed winning team's last card
+    const losingTeam = room.winner === "dark" ? "light" : "dark";
+    if (lastReveal && 
+        lastReveal.team === losingTeam && 
+        lastReveal.type === room.winner &&
+        ((room.winner === "dark" && room.darkCardsRemaining === 0) ||
+         (room.winner === "light" && room.lightCardsRemaining === 0))) {
+      return null; // No prophet voting if losing team revealed winner's last card
+    }
+    
+    // Get the player
+    const player = room.players.find(p => p.id === playerId);
+    if (!player) return null;
+    
+    // Check voting phase and team permissions
+    // losingTeam already declared above
+    
+    if (room.endGameVotingPhase === "loser_voting") {
+      // During loser voting phase, only losing team can vote
+      if (player.team !== losingTeam) {
+        return null; // Only losing team can vote in this phase
+      }
+      // Get the target player and verify they're on the winning team
+      const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+      if (!targetPlayer || targetPlayer.team !== room.winner) {
+        return null; // Can only vote for players on the winning team
+      }
+    } else if (room.endGameVotingPhase === "winner_voting") {
+      // During winner voting phase, only winning team can vote
+      if (player.team !== room.winner) {
+        return null; // Only winning team can vote in this phase
+      }
+      // Get the target player and verify they're on the losing team
+      const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+      if (!targetPlayer || targetPlayer.team !== losingTeam) {
+        return null; // Can only vote for players on the losing team
+      }
+    } else {
+      // No voting allowed if phase is not set or completed
+      return null;
     }
     
     // Initialize votes map if not exists
@@ -1424,6 +1462,24 @@ export class MemStorage implements IStorage {
       return null;
     }
     
+    // Check if assassin was revealed (no prophet voting if assassin ends the game)
+    const lastReveal = room.revealHistory.length > 0 
+      ? room.revealHistory[room.revealHistory.length - 1] as any
+      : null;
+    if (lastReveal && lastReveal.type === "assassin") {
+      return null; // No prophet voting after assassin
+    }
+    
+    // Check if losing team revealed winning team's last card
+    const loserTeam = room.winner === "dark" ? "light" : "dark";
+    if (lastReveal && 
+        lastReveal.team === loserTeam && 
+        lastReveal.type === room.winner &&
+        ((room.winner === "dark" && room.darkCardsRemaining === 0) ||
+         (room.winner === "light" && room.lightCardsRemaining === 0))) {
+      return null; // No prophet voting if losing team revealed winner's last card
+    }
+    
     // Initialize voting phase if not set
     if (!room.endGameVotingPhase) {
       room.endGameVotingPhase = "loser_voting";
@@ -1448,7 +1504,7 @@ export class MemStorage implements IStorage {
     if (!player.team || !targetPlayer.team) return null;
     
     // Determine which phase we're in and validate
-    const loserTeam = room.winner === "dark" ? "light" : "dark";
+    // loserTeam already declared above
     const winnerTeam = room.winner;
     
     if (room.endGameVotingPhase === "loser_voting") {
