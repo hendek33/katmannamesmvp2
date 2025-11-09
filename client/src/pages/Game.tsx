@@ -1882,7 +1882,7 @@ export default function Game() {
                     isLastCard={card.id === lastCardId && gameState.phase === "ended"}
                     isAssassinCard={card.type === "assassin" && card.revealed && gameState.phase === "ended"}
                     gameEnded={gameState.phase === "ended"}
-                    isKnownCard={currentPlayer?.secretRole === "prophet"} // Prophets see all cards
+                    isKnownCard={currentPlayer?.secretRole === "prophet" && card.type === currentPlayer?.team} // Prophets see only their team's cards
                   />
                 </div>
               ))}
