@@ -87,6 +87,10 @@ export interface GameState {
     introductionStarted?: boolean; // Whether introduction phase has started
     playersIntroduced?: string[]; // IDs of players who have been introduced
   };
+  consecutivePasses?: { // Track consecutive passes per team
+    dark: number;
+    light: number;
+  };
 }
 
 export interface RoomListItem {

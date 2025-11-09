@@ -15,6 +15,7 @@ interface RoomData {
   teamInsultCooldown?: { dark?: number; light?: number }; // Team-specific insult cooldown timestamps
   endGameGuessVotes?: Map<string, Set<string>>; // targetPlayerId -> Set of playerIds who voted
   usedWords?: Set<string>; // Track used words to prevent repetition across games in the same room
+  turnRevealMap?: { dark: boolean; light: boolean }; // Track if team revealed cards during their turn
 }
 
 export interface IStorage {
@@ -300,6 +301,7 @@ export class MemStorage implements IStorage {
       chaosMode: false,
       prophetVisibility: "own_team", // Default visibility for prophets
       prophetGuessUsed: { dark: false, light: false },
+      consecutivePasses: { dark: 0, light: 0 }, // Track consecutive passes
     };
 
     this.rooms.set(roomCode, { 
@@ -310,7 +312,8 @@ export class MemStorage implements IStorage {
       cardVotes: new Map(), // Map of cardId to Set of playerIds who voted
       tauntEnabled: true, // Enable taunt by default
       insultEnabled: true, // Enable insult by default
-      usedWords: new Set<string>() // Track used words across games in this room
+      usedWords: new Set<string>(), // Track used words across games in this room
+      turnRevealMap: { dark: false, light: false } // Track if teams revealed cards
     });
     this.playerToRoom.set(playerId, roomCode);
 
@@ -857,6 +860,12 @@ export class MemStorage implements IStorage {
     roomData.guessesRemaining = 0;
     roomData.maxGuesses = 0;
     
+    // Reset consecutive passes tracking
+    room.consecutivePasses = { dark: 0, light: 0 };
+    if (roomData.turnRevealMap) {
+      roomData.turnRevealMap = { dark: false, light: false };
+    }
+    
     // Start timer if timed mode is enabled
     if (room.timedMode) {
       room.currentTurnStartTime = Date.now();
@@ -939,6 +948,14 @@ export class MemStorage implements IStorage {
 
     card.revealed = true;
     
+    // Track that this team revealed a card and reset consecutive passes
+    if (roomData.turnRevealMap && room.currentTeam) {
+      roomData.turnRevealMap[room.currentTeam] = true;
+    }
+    if (room.consecutivePasses && room.currentTeam) {
+      room.consecutivePasses[room.currentTeam] = 0;
+    }
+    
     // Add player info to history (runtime extension)
     const historyEntry: any = {
       cardId: card.id,
@@ -1002,6 +1019,12 @@ export class MemStorage implements IStorage {
     
     // End turn if needed
     if (shouldEndTurn && room.phase !== "ended") {
+      // Clear the turn reveal flag for the team whose turn is ending
+      const endingTeam = room.currentTeam;
+      if (roomData.turnRevealMap && endingTeam) {
+        roomData.turnRevealMap[endingTeam] = false;
+      }
+      
       room.currentTeam = room.currentTeam === "dark" ? "light" : "dark";
       room.currentClue = null;
       roomData.guessesRemaining = 0;
@@ -1074,6 +1097,12 @@ export class MemStorage implements IStorage {
     room.doubleAgentGuessUsed = undefined;
     room.doubleAgentGuessResult = undefined;
     room.endGameGuessUsed = undefined;
+    
+    // Reset consecutive passes tracking
+    room.consecutivePasses = { dark: 0, light: 0 };
+    if (roomData.turnRevealMap) {
+      roomData.turnRevealMap = { dark: false, light: false };
+    }
     room.endGameGuessSequence = undefined;
 
     return room;
@@ -1105,6 +1134,12 @@ export class MemStorage implements IStorage {
     // Clear end game guess tracking
     room.endGameGuessUsed = undefined;
     room.endGameGuessSequence = undefined;
+    
+    // Reset consecutive passes tracking
+    room.consecutivePasses = { dark: 0, light: 0 };
+    if (roomData.turnRevealMap) {
+      roomData.turnRevealMap = { dark: false, light: false };
+    }
 
     return room;
   }
@@ -1123,6 +1158,25 @@ export class MemStorage implements IStorage {
     // Check if game is in guessing phase
     if (room.phase !== "playing" || !room.currentClue) {
       return null;
+    }
+    
+    // Track consecutive passes
+    if (room.consecutivePasses && roomData.turnRevealMap && room.currentTeam) {
+      const currentTeam = room.currentTeam;
+      const hasRevealedCard = roomData.turnRevealMap[currentTeam];
+      
+      if (!hasRevealedCard) {
+        // Team didn't reveal any cards - increment consecutive passes
+        room.consecutivePasses[currentTeam] = Math.min(room.consecutivePasses[currentTeam] + 1, 2);
+        
+        // Log if team loses prophet voting rights
+        if (room.consecutivePasses[currentTeam] === 2) {
+          console.log(`[CONSECUTIVE PASSES] ${currentTeam} team has passed 2 times consecutively - prophet voting disabled`);
+        }
+      }
+      
+      // Reset the turn reveal flag for the current team
+      roomData.turnRevealMap[currentTeam] = false;
     }
     
     // Add end turn log entry (runtime extension)
@@ -1194,6 +1248,12 @@ export class MemStorage implements IStorage {
     // Check if player is a guesser on the current team
     const player = room.players.find(p => p.id === playerId);
     if (!player || player.team !== room.currentTeam || player.role !== "guesser") {
+      return null;
+    }
+    
+    // Check if team has lost prophet voting rights due to consecutive passes
+    if (room.consecutivePasses && room.currentTeam && room.consecutivePasses[room.currentTeam] >= 2) {
+      console.log(`[PROPHET VOTE BLOCKED] ${room.currentTeam} team cannot vote - 2 consecutive passes`);
       return null;
     }
     
