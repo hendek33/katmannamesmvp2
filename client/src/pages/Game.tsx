@@ -259,6 +259,7 @@ export default function Game() {
       // Game was restarted, reset refs
       previousTurnRef.current = null;
       assassinShownRef.current = false;
+      normalWinShownRef.current = false;  // Reset normal win ref for new game
     }
     
     // Also reset assassin ref when going to lobby (for all players)
@@ -355,29 +356,34 @@ export default function Game() {
   useEffect(() => {
     if (!gameState || gameState.phase !== "ended" || !gameState.winner) return;
     
-    // Show voting UI during both voting phases
-    if (gameState.chaosMode && gameState.chaosModeType === "prophet" && 
-        gameState.endGameVotingPhase && 
-        (gameState.endGameVotingPhase === "loser_voting" || 
-         gameState.endGameVotingPhase === "winner_voting")) {
-      
-      // Check if assassin was revealed
-      const lastRevealedCard = gameState.revealHistory.length ? 
-        gameState.revealHistory[gameState.revealHistory.length - 1] : null;
-      const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
-      
-      // Check if losing team revealed winning team's last card
-      const winningTeam = gameState.winner;
-      const losingTeam = winningTeam === "dark" ? "light" : "dark";
-      const wasLosingTeamRevealedWinningCard = 
-        lastRevealedCard?.team === losingTeam &&
-        lastRevealedCard?.type === winningTeam &&
-        ((winningTeam === "dark" && gameState.darkCardsRemaining === 0) ||
-         (winningTeam === "light" && gameState.lightCardsRemaining === 0));
-      
-      // Show voting UI for ALL players during both phases
-      if (!wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
-        setShowEndGameVoting(true);
+    // Initialize or show voting UI for prophet mode
+    if (gameState.chaosMode && gameState.chaosModeType === "prophet") {
+      // Check if voting phase is active or needs to be initialized
+      if (!gameState.endGameVotingPhase || 
+          gameState.endGameVotingPhase === "loser_voting" || 
+          gameState.endGameVotingPhase === "winner_voting") {
+        
+        // Check if assassin was revealed
+        const lastRevealedCard = gameState.revealHistory.length ? 
+          gameState.revealHistory[gameState.revealHistory.length - 1] : null;
+        const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
+        
+        // Check if losing team revealed winning team's last card
+        const winningTeam = gameState.winner;
+        const losingTeam = winningTeam === "dark" ? "light" : "dark";
+        const wasLosingTeamRevealedWinningCard = 
+          lastRevealedCard?.team === losingTeam &&
+          lastRevealedCard?.type === winningTeam &&
+          ((winningTeam === "dark" && gameState.darkCardsRemaining === 0) ||
+           (winningTeam === "light" && gameState.lightCardsRemaining === 0));
+        
+        // Show voting UI for ALL players during both phases
+        if (!wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
+          setShowEndGameVoting(true);
+        }
+      } else if (gameState.endGameVotingPhase === "completed") {
+        // Hide voting UI only when voting is completed
+        setShowEndGameVoting(false);
       }
     } else if (gameState.endGameVotingPhase === "completed") {
       // Hide voting UI only when voting is completed
