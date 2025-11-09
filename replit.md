@@ -14,6 +14,33 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
+### Enhanced Prophet Reveal Sequence (November 9, 2025)
+- **Dramatic Countdown**: Added 3-second countdown with large animated numbers before reveal starts
+- **Multi-Phase Sequence**: Structured reveal into distinct phases: countdown → reveal → decision → result
+- **Suspenseful Timing**: Extended total sequence from 12s to 20s for maximum drama
+- **Drum Roll Effect**: Added animated dots and "AÇIKLANIYOR..." text during the suspenseful moment
+- **Particle Effects**: Exploding particles on success/failure announcement
+- **Screen Shake**: Camera shake effect when revealing the final result
+- **Visual Enhancements**: 
+  - Rotating light rays during decision phase
+  - Radial gradient backgrounds that change based on success/failure
+  - Icons (stars, lightning, sparkles) for visual interest
+  - More dramatic animations with better timing curves
+- **Improved Typography**: Larger text sizes and better shadow effects for impact
+
+### Balanced Prophet Voting Window (November 9, 2025)
+- **Optimal Size**: Adjusted to max-w-2xl (672px) - not too small, not too large
+- **Larger Avatars**: Increased from 32px to 48px with gradient backgrounds
+- **Better Spacing**: Increased padding and gaps between elements
+- **Enhanced Visual Effects**:
+  - Gradient backgrounds on avatars and buttons
+  - Shadow effects on selected players
+  - Ring highlight on most-voted player
+  - Smooth hover scaling animations
+- **Improved Text**: Larger font sizes and better hierarchy
+- **Role Icons**: Added emoji icons for spymaster (🎯) and agent (🕵️) roles
+- **No Scrolling**: Still fits entirely on screen without requiring scroll
+
 ### Ultra-Simplified Prophet Voting Window (November 9, 2025)
 - **No-Scroll Design**: Created EndGameVotingSimple.tsx that fits entirely on screen without scrolling
 - **Single-Line Header**: Combined title, vote count, and winning team into one compact header
