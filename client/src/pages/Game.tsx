@@ -485,10 +485,13 @@ export default function Game() {
       gameState.revealHistory[gameState.revealHistory.length - 1] : null;
     const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
     
-    // Check if losing team revealed winning team's last card (causing themselves to lose)
-    // This happens when losing team accidentally reveals the winning team's last card
+    // Check if LOSING team revealed WINNING team's last card
+    // The 'team' field in revealHistory shows WHO revealed the card
     const winningTeam = gameState?.winner;
-    const wasWinningTeamLastCardRevealed = lastRevealedCard?.type === winningTeam && 
+    const losingTeam = winningTeam === "dark" ? "light" : "dark";
+    const wasLosingTeamRevealedWinningCard = 
+      lastRevealedCard?.team === losingTeam && // Losing team made the reveal
+      lastRevealedCard?.type === winningTeam && // They revealed winning team's card
       ((winningTeam === "dark" && gameState?.darkCardsRemaining === 0) ||
        (winningTeam === "light" && gameState?.lightCardsRemaining === 0));
     
@@ -496,7 +499,7 @@ export default function Game() {
     // BUT NOT if assassin was revealed or losing team revealed winning team's last card
     if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
         gameState.winner && !gameState.endGameGuessUsed &&
-        !wasAssassinRevealed && !wasWinningTeamLastCardRevealed) {
+        !wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
       
       // Show voting UI for all players (losing team can vote, winning team can watch)
       setShowEndGameVoting(true);
