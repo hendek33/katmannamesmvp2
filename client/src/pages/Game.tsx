@@ -13,7 +13,7 @@ import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
-import { EndGameVoting } from "@/components/EndGameVotingSimple";
+import { EndGameVoting } from "@/components/EndGameVotingMedium";
 import { EndGameGuessSequence } from "@/components/EndGameGuessSequence";
 import { PlayerIntroduction } from "@/components/PlayerIntroduction";
 import { Button } from "@/components/ui/button";
