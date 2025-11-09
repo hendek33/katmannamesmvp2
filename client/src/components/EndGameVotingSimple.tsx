@@ -95,34 +95,34 @@ export function EndGameVoting({
     );
   }
 
-  // Full View - Ultra Compact
+  // Full View - Balanced Size
   return (
     <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900/95 rounded-lg border border-purple-500/30 shadow-2xl w-full max-w-xl">
-        {/* Single Line Header */}
-        <div className="bg-slate-800/50 px-4 py-2 border-b border-slate-700/50 flex items-center justify-between">
+      <div className="bg-slate-900/95 rounded-lg border border-purple-500/30 shadow-2xl w-full max-w-2xl">
+        {/* Header with better spacing */}
+        <div className="bg-slate-800/50 px-5 py-3 border-b border-slate-700/50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-purple-400 font-bold">Kahin Tahmini</span>
+            <span className="text-purple-400 font-bold text-lg">Son Şans: Kahin Tahmini</span>
             {isProphetVotingDisabled ? (
-              <span className="text-xs bg-red-900/30 text-red-400 px-2 py-0.5 rounded">
+              <span className="text-sm bg-red-900/30 text-red-400 px-2.5 py-1 rounded-md">
                 ⛔ Devre Dışı
               </span>
             ) : !isOnLosingTeam ? (
-              <span className="text-xs bg-amber-900/30 text-amber-400 px-2 py-0.5 rounded">
-                👁️ İzleyici
+              <span className="text-sm bg-amber-900/30 text-amber-400 px-2.5 py-1 rounded-md">
+                👁️ İzleyici Modu
               </span>
             ) : (
-              <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-0.5 rounded">
-                {totalVotes}/{totalLosingPlayers} oy
+              <span className="text-sm bg-purple-600/20 text-purple-300 px-2.5 py-1 rounded-md font-medium">
+                Oy: {totalVotes}/{totalLosingPlayers}
               </span>
             )}
             <div className={cn(
-              "px-2 py-0.5 rounded text-xs font-medium",
+              "px-3 py-1 rounded-md text-sm font-semibold",
               winningTeam === "dark" 
-                ? "bg-blue-600/30 text-blue-300" 
-                : "bg-red-600/30 text-red-300"
+                ? "bg-blue-600/30 text-blue-300 border border-blue-500/30" 
+                : "bg-red-600/30 text-red-300 border border-red-500/30"
             )}>
-              👑 {winningTeamName}
+              👑 {winningTeamName} Kazandı
             </div>
           </div>
           <Button
@@ -135,9 +135,9 @@ export function EndGameVoting({
           </Button>
         </div>
         
-        {/* Ultra Compact Player Grid */}
-        <div className="p-3">
-          <div className="grid grid-cols-2 gap-2">
+        {/* Balanced Player Grid */}
+        <div className="p-4">
+          <div className="grid grid-cols-2 gap-3">
             {winningTeamPlayers.map(player => {
               const playerVotes = votes[player.id] || [];
               const isSelected = currentPlayerVote === player.id;
@@ -148,36 +148,36 @@ export function EndGameVoting({
                   key={player.id}
                   onClick={() => handlePlayerClick(player.id)}
                   className={cn(
-                    "flex items-center gap-2 p-2 rounded-lg border transition-all",
-                    isOnLosingTeam && !isProphetVotingDisabled && "cursor-pointer hover:bg-slate-800/50",
-                    isSelected ? "border-purple-400 bg-purple-900/30" : "border-slate-700 bg-slate-800/30",
-                    isMostVoted && "border-amber-400/50 bg-amber-900/20"
+                    "flex items-center gap-3 p-3 rounded-lg border transition-all",
+                    isOnLosingTeam && !isProphetVotingDisabled && "cursor-pointer hover:bg-slate-800/50 hover:scale-[1.02]",
+                    isSelected ? "border-purple-400 bg-purple-900/30 shadow-lg shadow-purple-500/20" : "border-slate-700 bg-slate-800/30",
+                    isMostVoted && "border-amber-400/50 bg-amber-900/20 ring-2 ring-amber-500/30"
                   )}
                 >
-                  {/* Mini Avatar */}
+                  {/* Larger Avatar */}
                   <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold",
+                    "w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold shadow-md",
                     winningTeam === "dark" 
-                      ? "bg-blue-600/40 text-blue-300" 
-                      : "bg-red-600/40 text-red-300"
+                      ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white" 
+                      : "bg-gradient-to-br from-red-600 to-red-700 text-white"
                   )}>
                     {player.username.charAt(0).toUpperCase()}
                   </div>
                   
                   {/* Name and Role */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">
+                    <p className="text-white text-base font-semibold truncate flex items-center gap-1">
                       {player.username}
-                      {isMostVoted && " 👑"}
+                      {isMostVoted && <span className="text-amber-400">👑</span>}
                     </p>
-                    <p className="text-xs text-slate-400">
-                      {player.role === "spymaster" ? "İpucu" : "Ajan"}
+                    <p className="text-sm text-slate-400">
+                      {player.role === "spymaster" ? "🎯 İpucu Veren" : "🕵️ Ajan"}
                     </p>
                   </div>
                   
-                  {/* Vote Count or Button */}
+                  {/* Vote Count Badge */}
                   {playerVotes.length > 0 && (
-                    <div className="bg-purple-600 text-white text-xs rounded px-2 py-1 font-bold">
+                    <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm rounded-full px-3 py-1.5 font-bold shadow-lg">
                       {playerVotes.length}
                     </div>
                   )}
@@ -189,10 +189,10 @@ export function EndGameVoting({
                         handleSelectPlayer(player.id);
                       }}
                       size="sm"
-                      className="h-6 px-2 text-xs bg-purple-600 hover:bg-purple-700"
+                      className="h-8 px-3 text-sm bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium"
                       disabled={isSelected}
                     >
-                      {isSelected ? "✓" : "Seç"}
+                      {isSelected ? "Seçildi ✓" : "Seç"}
                     </Button>
                   )}
                 </div>
