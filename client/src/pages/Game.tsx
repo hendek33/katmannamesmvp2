@@ -85,11 +85,11 @@ export default function Game() {
   const [newUsername, setNewUsername] = useState("");
   const [isChangingName, setIsChangingName] = useState(false);
   
-  // Handle username change response
+  // Kullanıcı adı değişikliği yanıtını işle
   useEffect(() => {
     if (usernameChangeStatus) {
       if (usernameChangeStatus.success) {
-        // Success - close dialog and reset
+        // Başarılı - diyalogu kapat ve sıfırla
         setShowChangeNameDialog(false);
         setNewUsername("");
         setIsChangingName(false);
@@ -99,7 +99,7 @@ export default function Game() {
           duration: 3000,
         });
       } else {
-        // Error - show message and keep dialog open
+        // Hata - mesajı göster ve diyalogu açık tut
         setIsChangingName(false);
         toast({
           title: "Hata",
@@ -108,12 +108,12 @@ export default function Game() {
           duration: 4000,
         });
       }
-      // Clear the status after handling
+      // İşlendikten sonra durumu temizle
       clearUsernameChangeStatus();
     }
   }, [usernameChangeStatus, clearUsernameChangeStatus, toast]);
   
-  // Handle zoom help button click
+  // Yakınlaştırma yardım butonuna tıklamayı işle
   const handleZoomHelpClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     const button = e.currentTarget;
@@ -125,7 +125,7 @@ export default function Game() {
     setShowZoomHelp(!showZoomHelp);
   };
   
-  // Close dropdowns when clicking outside
+  // Dışarı tıklandığında açılır menüleri kapat
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;

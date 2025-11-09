@@ -7,15 +7,15 @@ interface RoomData {
   password?: string;
   guessesRemaining: number;
   maxGuesses: number;
-  cardVotes: Map<number, Set<string>>; // cardId -> Set of playerIds who voted
-  cardImages?: Map<number, string>; // cardId -> image path for revealed cards
+  cardVotes: Map<number, Set<string>>; // kartId -> Oy veren oyuncu ID'lerinin seti
+  cardImages?: Map<number, string>; // kartId -> Açılan kartlar için resim yolu
   tauntEnabled?: boolean;
   insultEnabled?: boolean;
-  teamTauntCooldown?: { dark?: number; light?: number }; // Team-specific taunt cooldown timestamps
-  teamInsultCooldown?: { dark?: number; light?: number }; // Team-specific insult cooldown timestamps
-  endGameGuessVotes?: Map<string, Set<string>>; // targetPlayerId -> Set of playerIds who voted
-  usedWords?: Set<string>; // Track used words to prevent repetition across games in the same room
-  turnRevealMap?: { dark: boolean; light: boolean }; // Track if team revealed cards during their turn
+  teamTauntCooldown?: { dark?: number; light?: number }; // Takım özel alay bekleme süresi timestamp'leri
+  teamInsultCooldown?: { dark?: number; light?: number }; // Takım özel hakaret bekleme süresi timestamp'leri
+  endGameGuessVotes?: Map<string, Set<string>>; // hedefOyuncuId -> Oy veren oyuncu ID'lerinin seti
+  usedWords?: Set<string>; // Aynı odadaki oyunlarda tekrarı önlemek için kullanılan kelimeleri takip et
+  turnRevealMap?: { dark: boolean; light: boolean }; // Takımın kendi turunda kart açıp açmadığını takip et
 }
 
 export interface IStorage {
@@ -53,7 +53,7 @@ export interface IStorage {
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number } | null;
-  // Introduction phase methods
+  // Tanıtım aşaması metodları
   startIntroduction(roomCode: string): GameState | null;
   selectPlayerForIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   finishPlayerIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -61,7 +61,7 @@ export interface IStorage {
   skipIntroduction(roomCode: string, playerId: string): GameState | null;
 }
 
-// Insult templates
+// Hakaret şablonları
 const insultMessages = [
   "{target} acayip hayvanlara benziyirsen!",
   "{target} sütünü iç de uyu!",
@@ -94,33 +94,33 @@ const insultMessages = [
 export class MemStorage implements IStorage {
   private rooms: Map<string, RoomData>;
   private playerToRoom: Map<string, string>;
-  private lastInsultTime: Map<string, number>; // roomCode -> timestamp
-  private playerInsultCooldown: Map<string, number>; // playerId -> timestamp
-  private insultCooldowns: Map<string, number>; // For V2 system
-  private tauntCooldowns: Map<string, number>; // For taunt system
-  private activeUsernames: Map<string, string>; // username -> playerId, tracks active usernames globally
-  private playerIdToUsername: Map<string, string>; // playerId -> username for cleanup
-  private disconnectedPlayers: Map<string, { player: Player; roomCode: string; disconnectedAt: number }>; // Track disconnected players with timestamp
+  private lastInsultTime: Map<string, number>; // odaKodu -> zaman damgası
+  private playerInsultCooldown: Map<string, number>; // oyuncuId -> zaman damgası
+  private insultCooldowns: Map<string, number>; // V2 sistemi için
+  private tauntCooldowns: Map<string, number>; // Alay sistemi için
+  private activeUsernames: Map<string, string>; // kullanıcıAdı -> oyuncuId, global olarak aktif kullanıcı adlarını takip eder
+  private playerIdToUsername: Map<string, string>; // oyuncuId -> kullanıcıAdı temizlik için
+  private disconnectedPlayers: Map<string, { player: Player; roomCode: string; disconnectedAt: number }>; // Zaman damgası ile bağlantısı kopan oyuncuları takip et
 
   constructor() {
     this.rooms = new Map();
     this.playerToRoom = new Map();
     this.lastInsultTime = new Map();
     this.playerInsultCooldown = new Map();
-    this.insultCooldowns = new Map(); // Initialize V2 cooldowns
-    this.tauntCooldowns = new Map(); // Initialize taunt cooldowns
-    this.activeUsernames = new Map(); // Track active usernames globally
-    this.playerIdToUsername = new Map(); // Track playerId to username mapping
-    this.disconnectedPlayers = new Map(); // Track disconnected players for reconnection
+    this.insultCooldowns = new Map(); // V2 bekleme sürelerini başlat
+    this.tauntCooldowns = new Map(); // Alay bekleme sürelerini başlat
+    this.activeUsernames = new Map(); // Global olarak aktif kullanıcı adlarını takip et
+    this.playerIdToUsername = new Map(); // oyuncuId'den kullanıcı adı eşleşmesini takip et
+    this.disconnectedPlayers = new Map(); // Yeniden bağlanma için bağlantısı kopan oyuncuları takip et
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
-    setInterval(() => this.cleanupDisconnectedPlayers(), 30000); // Clean up old disconnected players every 30 seconds
+    setInterval(() => this.cleanupDisconnectedPlayers(), 30000); // Eski bağlantısı kopmuş oyuncuları her 30 saniyede temizle
   }
 
   private cleanupDisconnectedPlayers(): void {
-    // Don't automatically clean up disconnected players
-    // They can reconnect anytime as long as the room exists
-    // Only clean up when the room itself is deleted
+    // Bağlantısı kopmuş oyuncuları otomatik olarak temizleme
+    // Oda var olduğu sürece istedikleri zaman yeniden bağlanabilirler
+    // Sadece oda silindiğinde temizle
   }
 
   private generateRoomCode(): string {
@@ -133,7 +133,7 @@ export class MemStorage implements IStorage {
   }
 
   private assignCardImages(roomData: RoomData): void {
-    // Image pools for each card type - using ALL available images from both folders
+    // Her kart tipi için resim havuzları - her iki klasördeki TÜM mevcut resimleri kullanarak
     const imagePools = {
       dark: [
         '/acilmiskartgorsel/ali mavi.webp',
@@ -679,7 +679,7 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     
-    // Update the password and hasPassword flag
+    // Şifre ve hasPassword bayrağını güncelle
     if (password) {
       roomData.password = password;
       room.hasPassword = true;
@@ -692,18 +692,18 @@ export class MemStorage implements IStorage {
   }
 
   private assignSecretRoles(room: GameState): void {
-    // Clear any existing secret roles
+    // Mevcut gizli rolleri temizle
     room.players.forEach(p => {
       p.secretRole = null;
       p.knownCards = undefined;
     });
 
-    // Only assign roles if chaos mode is enabled and a type is selected
+    // Sadece kaos modu etkin ve bir tür seçilmişse roller ata
     if (!room.chaosMode || !room.chaosModeType) {
       return;
     }
 
-    // Fisher-Yates shuffle for truly random array shuffling
+    // Gerçekten rastgele dizi karıştırma için Fisher-Yates algoritması
     const shuffleArray = <T>(array: T[]): T[] => {
       const shuffled = [...array];
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -713,7 +713,7 @@ export class MemStorage implements IStorage {
       return shuffled;
     };
 
-    // Get all guessers and shuffle them properly
+    // Tüm ajanları al ve düzgünce karıştır
     const darkGuessers = shuffleArray(
       room.players.filter(p => p.team === "dark" && p.role === "guesser")
     );
@@ -722,69 +722,69 @@ export class MemStorage implements IStorage {
     );
     
     if (room.chaosModeType === "prophet") {
-      // Prophet mode: Assign Prophet to one player from each team (if there are guessers)
+      // Kahin modu: Her takımdan bir oyuncuya Kahin ata (eğer ajan varsa)
       if (darkGuessers.length > 0) {
-        // Simply pick the first player from the shuffled array (truly random)
+        // Karıştırılmış diziden ilk oyuncuyu seç (gerçekten rastgele)
         const darkProphet = darkGuessers[0];
         darkProphet.secretRole = "prophet";
-        console.log(`Dark team prophet assigned to: ${darkProphet.username} (from ${darkGuessers.length} guessers)`);
+        console.log(`Koyu takım kahini atandı: ${darkProphet.username} (${darkGuessers.length} ajandan)`);
         
-        // Assign cards based on prophetVisibility setting
+        // prophetVisibility ayarına göre kartları ata
         const visibility = room.prophetVisibility || "own_team";
         if (visibility === "own_team") {
-          // Give prophet all cards from their team
+          // Kahine sadece kendi takımının kartlarını ver
           const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
           darkProphet.knownCards = darkCards;
         } else if (visibility === "both_teams") {
-          // Give prophet all cards from both teams (not neutral/assassin)
+          // Kahine her iki takımın kartlarını ver (nötr/suikastçı hariç)
           const teamCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
           darkProphet.knownCards = teamCards;
         } else if (visibility === "all_cards") {
-          // Give prophet all cards
+          // Kahine tüm kartları ver
           const allCards = room.cards.map(c => c.id);
           darkProphet.knownCards = allCards;
         }
       }
       
       if (lightGuessers.length > 0) {
-        // Simply pick the first player from the shuffled array (truly random)
+        // Karıştırılmış diziden ilk oyuncuyu seç (gerçekten rastgele)
         const lightProphet = lightGuessers[0];
         lightProphet.secretRole = "prophet";
-        console.log(`Light team prophet assigned to: ${lightProphet.username} (from ${lightGuessers.length} guessers)`);
+        console.log(`Açık takım kahini atandı: ${lightProphet.username} (${lightGuessers.length} ajandan)`);
         
-        // Assign cards based on prophetVisibility setting
+        // prophetVisibility ayarına göre kartları ata
         const visibility = room.prophetVisibility || "own_team";
         if (visibility === "own_team") {
-          // Give prophet all cards from their team
+          // Kahine sadece kendi takımının kartlarını ver
           const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
           lightProphet.knownCards = lightCards;
         } else if (visibility === "both_teams") {
-          // Give prophet all cards from both teams (not neutral/assassin)
+          // Kahine her iki takımın kartlarını ver (nötr/suikastçı hariç)
           const teamCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
           lightProphet.knownCards = teamCards;
         } else if (visibility === "all_cards") {
-          // Give prophet all cards
+          // Kahine tüm kartları ver
           const allCards = room.cards.map(c => c.id);
           lightProphet.knownCards = allCards;
         }
       }
     } else if (room.chaosModeType === "double_agent") {
-      // Double Agent mode: Assign Double Agent to one player from each team
+      // Çift Ajan modu: Her takımdan bir oyuncuya Çift Ajan ata
       
-      // Assign Double Agent to one player from Dark team
+      // Koyu takımdan bir oyuncuya Çift Ajan ata
       if (darkGuessers.length > 0) {
-        // Simply pick the first player from the shuffled array (truly random)
+        // Karıştırılmış diziden ilk oyuncuyu seç (gerçekten rastgele)
         const darkDoubleAgent = darkGuessers[0];
         darkDoubleAgent.secretRole = "double_agent";
-        console.log(`Dark team double agent assigned to: ${darkDoubleAgent.username} (from ${darkGuessers.length} guessers)`);
+        console.log(`Koyu takım çift ajanı atandı: ${darkDoubleAgent.username} (${darkGuessers.length} ajandan)`);
       }
       
-      // Assign Double Agent to one player from Light team  
+      // Açık takımdan bir oyuncuya Çift Ajan ata  
       if (lightGuessers.length > 0) {
-        // Simply pick the first player from the shuffled array (truly random)
+        // Karıştırılmış diziden ilk oyuncuyu seç (gerçekten rastgele)
         const lightDoubleAgent = lightGuessers[0];
         lightDoubleAgent.secretRole = "double_agent";
-        console.log(`Light team double agent assigned to: ${lightDoubleAgent.username} (from ${lightGuessers.length} guessers)`);
+        console.log(`Açık takım çift ajanı atandı: ${lightDoubleAgent.username} (${lightGuessers.length} ajandan)`);
       }
     }
   }

@@ -9,8 +9,6 @@ Katmannames, Codenames'den ilham alan ancak resmi Codenames oyunu olmayan, benze
 Detaylı açıklamaları tercih ediyorum.
 Tekrarlı geliştirme istiyorum.
 Büyük değişiklikler yapmadan önce sor.
-`shared/` klasöründe değişiklik yapma.
-`server/words.ts` dosyasında değişiklik yapma.
 
 ## Son Güncellemeler
 
@@ -65,9 +63,9 @@ Büyük değişiklikler yapmadan önce sor.
 ### Oyuncu Atma ve Kahin Güncellemeleri (9 Kasım 2025)
 - **Oyun Ekranı Atma**: Oda sahipleri artık aktif oyunlar sırasında oyuncuları atabilir (sadece lobide değil)
 - **Kahin Görünürlük Ayarları**: Oda sahipleri kahinlerin hangi kartları görebileceğini yapılandırabilir:
-  - **"Sadece Kendi Takımı" (own_team)**: Kahinler sadece kendi takımlarından rastgele 3 kart görür (varsayılan)
-  - **"Her İki Takım" (both_teams)**: Kahinler her iki takımdan rastgele 3 kart görür (nötr/suikastçı hariç)
-  - **"Tüm Kartlar" (all_cards)**: Kahinler nötr ve suikastçı dahil tüm kartlardan rastgele 3 kart görür
+  - **"Sadece Kendi Takımı" (own_team)**: Kahinler sadece kendi takımlarının kartlarını görür
+  - **"Her İki Takım" (both_teams)**: Kahinler her iki takımın da kartlarını görür
+  - **"Tüm Kartlar" (all_cards)**: Kahinler nötr ve suikastçı dahil tüm kartları görür
   - **Lobi Kontrolü**: Kaos Modu ayarları altında açılır seçici (sadece oda sahipleri)
   - **Sunucu Filtreleme**: Sunucu, kahinin knownCards dizisinde olmayan kartları düzgün maskeler
 - **Suikastçı Seçim Engeli**: Suikastçı (siyah kart) seçildiyse kahin oylaması devre dışı bırakılır
