@@ -95,7 +95,7 @@ export function EndGameVoting({
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed bottom-4 right-4 z-[90]"
+        className="fixed bottom-4 left-4 z-[90]"
       >
         <Card 
           className="p-4 bg-slate-900/95 border-2 border-purple-500/50 cursor-pointer hover:border-purple-400 transition-all"
