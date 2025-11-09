@@ -14,6 +14,11 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
+### Word Tracking System (November 9, 2025)
+- **No Word Repetition**: Once a word appears in a game, it won't appear again in subsequent games in the same room
+- **Automatic Reset**: When all available words are used, the system automatically resets and starts fresh
+- **Persistent Across Games**: Word tracking persists for the entire room session until all players leave
+
 ### Player Kick and Prophet Updates (November 9, 2025)
 - **Game Screen Kick**: Room owners can now kick players during active games (not just in lobby)
 - **Prophet Vision Limited**: Prophets now only see their own team's cards (not neutral or assassin)

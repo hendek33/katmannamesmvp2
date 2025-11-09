@@ -14,6 +14,7 @@ interface RoomData {
   teamTauntCooldown?: { dark?: number; light?: number }; // Team-specific taunt cooldown timestamps
   teamInsultCooldown?: { dark?: number; light?: number }; // Team-specific insult cooldown timestamps
   endGameGuessVotes?: Map<string, Set<string>>; // targetPlayerId -> Set of playerIds who voted
+  usedWords?: Set<string>; // Track used words to prevent repetition across games in the same room
 }
 
 export interface IStorage {
@@ -209,9 +210,10 @@ export class MemStorage implements IStorage {
     return arr;
   }
 
-  private createGameCards(): Card[] {
+  private createGameCards(usedWords?: Set<string>): Card[] {
     // Kelimeleri al ve tekrar karıştır (getRandomWords'ün üstüne ekstra karıştırma)
-    let words = getRandomWords(25);
+    // Pass the usedWords set to prevent repetition
+    let words = getRandomWords(25, usedWords);
     // Kelimeleri Fisher-Yates ile tekrar karıştır
     words = this.fisherYatesShuffle(words);
     
@@ -305,7 +307,8 @@ export class MemStorage implements IStorage {
       maxGuesses: 0,
       cardVotes: new Map(), // Map of cardId to Set of playerIds who voted
       tauntEnabled: true, // Enable taunt by default
-      insultEnabled: true // Enable insult by default
+      insultEnabled: true, // Enable insult by default
+      usedWords: new Set<string>() // Track used words across games in this room
     });
     this.playerToRoom.set(playerId, roomCode);
 
@@ -774,7 +777,20 @@ export class MemStorage implements IStorage {
       return this.startIntroduction(roomCode);
     }
 
-    room.cards = this.createGameCards();
+    // Create game cards with excluded words
+    room.cards = this.createGameCards(roomData.usedWords);
+    
+    // Track the newly used words
+    if (!roomData.usedWords) {
+      roomData.usedWords = new Set<string>();
+    }
+    room.cards.forEach(card => {
+      roomData.usedWords!.add(card.word);
+    });
+    
+    // Log used words count
+    console.log(`Room ${roomCode} has used ${roomData.usedWords!.size} words total`);
+    
     room.phase = "playing";
     room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
@@ -964,7 +980,20 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player || !player.isRoomOwner) return null;
 
-    room.cards = this.createGameCards();
+    // Create game cards with excluded words
+    room.cards = this.createGameCards(roomData.usedWords);
+    
+    // Track the newly used words
+    if (!roomData.usedWords) {
+      roomData.usedWords = new Set<string>();
+    }
+    room.cards.forEach(card => {
+      roomData.usedWords!.add(card.word);
+    });
+    
+    // Log used words count
+    console.log(`Room ${roomCode} has used ${roomData.usedWords!.size} words total`);
+    
     room.phase = "playing";
     room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;
@@ -1918,7 +1947,20 @@ export class MemStorage implements IStorage {
     room.introductionPhase.hasOccurred = true;
     
     // Transition to playing phase
-    room.cards = this.createGameCards();
+    // Create game cards with excluded words
+    room.cards = this.createGameCards(roomData.usedWords);
+    
+    // Track the newly used words
+    if (!roomData.usedWords) {
+      roomData.usedWords = new Set<string>();
+    }
+    room.cards.forEach(card => {
+      roomData.usedWords!.add(card.word);
+    });
+    
+    // Log used words count
+    console.log(`Room ${roomCode} has used ${roomData.usedWords!.size} words total`);
+    
     room.phase = "playing";
     room.darkCardsRemaining = room.cards.filter(c => c.type === "dark").length;
     room.lightCardsRemaining = room.cards.filter(c => c.type === "light").length;

@@ -41,7 +41,22 @@ export const turkishWords = [
   "Yay", "Yaz", "Yeşil", "Yıldız", "Yunanistan", "Yürek", "Yüz", "Zaman", "Zar", "Zehir"
 ];
 
-export function getRandomWords(count: number): string[] {
-  const shuffled = [...turkishWords].sort(() => Math.random() - 0.5);
+export function getRandomWords(count: number, excludedWords?: Set<string>): string[] {
+  // Filter out excluded words if provided
+  let availableWords = excludedWords 
+    ? turkishWords.filter(word => !excludedWords.has(word))
+    : [...turkishWords];
+  
+  // If we don't have enough words, reset and use all words
+  if (availableWords.length < count) {
+    console.log(`Not enough words available (${availableWords.length} < ${count}). Resetting used words.`);
+    availableWords = [...turkishWords];
+    // Clear the excluded words set if provided
+    if (excludedWords) {
+      excludedWords.clear();
+    }
+  }
+  
+  const shuffled = availableWords.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 }
