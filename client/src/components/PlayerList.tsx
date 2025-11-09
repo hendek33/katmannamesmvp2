@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, Crown, Eye, Target, Edit2, Check, X, WifiOff } from "lucide-react";
+import { Users, Crown, Eye, Target, Edit2, Check, X, WifiOff, UserX } from "lucide-react";
 import { useState } from "react";
 
 interface PlayerListProps {
@@ -16,6 +16,7 @@ interface PlayerListProps {
   lightTeamName?: string;
   onTeamNameChange?: (team: Team, name: string) => void;
   onRemoveBot?: (botId: string) => void;
+  onKickPlayer?: (playerId: string) => void;
 }
 
 export function PlayerList({ 
@@ -27,7 +28,8 @@ export function PlayerList({
   darkTeamName = "Mavi Takım",
   lightTeamName = "Kırmızı Takım",
   onTeamNameChange,
-  onRemoveBot
+  onRemoveBot,
+  onKickPlayer
 }: PlayerListProps) {
   const darkTeam = players.filter(p => p.team === "dark");
   const lightTeam = players.filter(p => p.team === "light");
@@ -201,6 +203,17 @@ export function PlayerList({
                     kaldır
                   </button>
                 )}
+                {isLobby && !spymaster.isBot && currentPlayer?.isRoomOwner && spymaster.id !== currentPlayerId && onKickPlayer && (
+                  <button 
+                    onClick={() => onKickPlayer(spymaster.id)}
+                    className="text-[9px] text-red-400 hover:text-red-300 mt-0.5 flex items-center gap-0.5"
+                    data-testid={`button-kick-${spymaster.id}`}
+                    title="Oyuncuyu at"
+                  >
+                    <UserX className="w-3 h-3" />
+                    at
+                  </button>
+                )}
               </div>
             );
           } else {
@@ -263,6 +276,17 @@ export function PlayerList({
                     data-testid={`button-remove-bot-${agent.id}`}
                   >
                     kaldır
+                  </button>
+                )}
+                {isLobby && !agent.isBot && currentPlayer?.isRoomOwner && agent.id !== currentPlayerId && onKickPlayer && (
+                  <button 
+                    onClick={() => onKickPlayer(agent.id)}
+                    className="text-[9px] text-red-400 hover:text-red-300 mt-0.5 flex items-center gap-0.5"
+                    data-testid={`button-kick-${agent.id}`}
+                    title="Oyuncuyu at"
+                  >
+                    <UserX className="w-3 h-3" />
+                    at
                   </button>
                 )}
               </div>

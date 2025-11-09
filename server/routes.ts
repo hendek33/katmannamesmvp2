@@ -1122,6 +1122,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "kick_player": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const targetPlayerId = payload.targetPlayerId as string;
+            if (!targetPlayerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Hedef oyuncu belirtilmedi" } });
+              return;
+            }
+
+            // Check if player is room owner
+            const room = storage.getRoom(ws.roomCode);
+            if (!room) {
+              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              return;
+            }
+
+            const currentPlayer = room.players.find(p => p.id === ws.playerId);
+            if (!currentPlayer || !currentPlayer.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda kurucusu oyuncu atabilir" } });
+              return;
+            }
+
+            // Cannot kick yourself
+            if (targetPlayerId === ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Kendinizi atamazsınız" } });
+              return;
+            }
+            
+            // Cannot kick during active game phases
+            if (room.phase !== "lobby") {
+              sendToClient(ws, { type: "error", payload: { message: "Oyun sırasında oyuncu atamazsınız" } });
+              return;
+            }
+
+            // Remove the player
+            storage.removePlayer(ws.roomCode, targetPlayerId);
+            
+            // Find and disconnect the kicked player's WebSocket
+            const clients = roomClients.get(ws.roomCode);
+            if (clients) {
+              const kickedClient = Array.from(clients).find(client => client.playerId === targetPlayerId);
+              if (kickedClient) {
+                // Notify the kicked player
+                sendToClient(kickedClient, { 
+                  type: "kicked",
+                  payload: { message: "Oda kurucusu tarafından oyundan atıldınız" }
+                });
+                
+                // Clean up their connection
+                kickedClient.roomCode = undefined;
+                kickedClient.playerId = undefined;
+                clients.delete(kickedClient);
+              }
+            }
+
+            // Get updated room state
+            const updatedRoom = storage.getRoom(ws.roomCode);
+            if (updatedRoom) {
+              broadcastToRoom(ws.roomCode, {
+                type: "player_kicked",
+                payload: { 
+                  gameState: updatedRoom,
+                  kickedPlayerId: targetPlayerId
+                },
+              });
+            }
+
+            break;
+          }
+
           case "return_to_lobby": {
             if (!ws.roomCode) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });

@@ -440,6 +440,9 @@ export default function Lobby() {
                   lightTeamName={gameState.lightTeamName}
                   onTeamNameChange={handleTeamNameChange}
                   onRemoveBot={handleRemoveBot}
+                  onKickPlayer={(targetPlayerId) => {
+                    send("kick_player", { targetPlayerId });
+                  }}
                 />
               </div>
             </div>

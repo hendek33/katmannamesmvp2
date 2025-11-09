@@ -159,6 +159,23 @@ export function useWebSocket() {
                 localStorage.removeItem("katmannames_room_code");
                 localStorage.removeItem("katmannames_player_id");
                 break;
+                
+              case "kicked":
+                // Player was kicked from the room
+                setGameState(null);
+                setRoomCode("");
+                setPlayerId("");
+                localStorage.removeItem("katmannames_room_code");
+                localStorage.removeItem("katmannames_player_id");
+                setError(message.payload.message || "Oyundan atıldınız");
+                // Redirect to rooms page
+                window.location.href = "/rooms";
+                break;
+                
+              case "player_kicked":
+                // Another player was kicked from the room
+                setGameState(message.payload.gameState);
+                break;
 
               case "votes_updated":
                 setCardVotes(message.payload.votes || {});
