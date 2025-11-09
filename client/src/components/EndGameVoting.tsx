@@ -193,7 +193,7 @@ export function EndGameVoting({
               </div>
             )}
             
-            {!isOnLosingTeam && !isProphetVotingDisabled && (
+            {!isOnVotingTeam && !isProphetVotingDisabled && (
               <div className="mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
                 <p className="text-amber-400 text-lg font-semibold">
                   👁️ İzleyici Modu
@@ -225,11 +225,11 @@ export function EndGameVoting({
                 >
                   {/* Clickable Card Content - Only for losing team */}
                   <div
-                    onClick={isOnLosingTeam ? () => handlePlayerClick(player.id) : undefined}
+                    onClick={isOnVotingTeam ? () => handlePlayerClick(player.id) : undefined}
                     className={cn(
                       "flex-1 p-4 text-center",
-                      isOnLosingTeam && "cursor-pointer",
-                      !isOnLosingTeam && "cursor-default"
+                      isOnVotingTeam && "cursor-pointer",
+                      !isOnVotingTeam && "cursor-default"
                     )}
                   >
                     {/* Player Avatar */}
@@ -284,8 +284,8 @@ export function EndGameVoting({
                     <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-pulse pointer-events-none" />
                   )}
                   
-                  {/* Select Button for all losing team members */}
-                  {isOnLosingTeam && (
+                  {/* Select Button for all voting team members */}
+                  {isOnVotingTeam && (
                     <div className="px-2 pb-2">
                       <Button
                         onClick={() => handleSelectPlayer(player.id)}
