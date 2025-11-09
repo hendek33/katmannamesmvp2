@@ -15,6 +15,7 @@ import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
 import { EndGameVoting } from "@/components/EndGameVoting";
 import { EndGameGuessSequence } from "@/components/EndGameGuessSequence";
+import { EndGameGuessSequences } from "@/components/EndGameGuessSequences";
 import { PlayerIntroduction } from "@/components/PlayerIntroduction";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -361,7 +362,9 @@ export default function Game() {
       return;
     }
     
-    if (!gameState?.endGameGuessSequence) {
+    // Check for either single sequence or multiple sequences
+    const hasSequences = (gameState as any)?.endGameGuessSequences || gameState?.endGameGuessSequence;
+    if (!hasSequences) {
       endGameGuessRef.current = null;
       return;
     }
@@ -371,8 +374,11 @@ export default function Game() {
       return; // Wait for both teams to vote
     }
     
-    // Only trigger if it's a new sequence (not the same one from before)
-    const sequenceKey = `${gameState.endGameGuessSequence.targetPlayer}-${gameState.endGameGuessSequence.guessType}`;
+    // Generate unique key for the sequences
+    const sequenceKey = (gameState as any)?.endGameGuessSequences 
+      ? `multi-${JSON.stringify((gameState as any).endGameGuessSequences.map((s: any) => s.targetPlayer))}`
+      : `single-${gameState.endGameGuessSequence?.targetPlayer}-${gameState.endGameGuessSequence?.guessType}`;
+    
     if (endGameGuessRef.current === sequenceKey) {
       return; // Already shown this sequence
     }
@@ -387,7 +393,7 @@ export default function Game() {
     // Also hide the voting dialog since both teams have voted
     setShowEndGameVoting(false);
     
-    // Progress through steps with delays
+    // Progress through steps with delays (not used with new sequences wrapper)
     const timer1 = setTimeout(() => setSequenceStep(1), 1500); // Show guess
     const timer2 = setTimeout(() => setSequenceStep(2), 3500); // Show role reveal
     const timer3 = setTimeout(() => setSequenceStep(3), 5500); // Show result
@@ -397,7 +403,7 @@ export default function Game() {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [gameState?.endGameGuessSequence, gameState?.phase, gameState?.endGameVotingPhase]);
+  }, [gameState?.endGameGuessSequence, (gameState as any)?.endGameGuessSequences, gameState?.phase, gameState?.endGameVotingPhase]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {
@@ -770,10 +776,11 @@ export default function Game() {
         />
       )}
 
-      {/* End Game Guess Dramatic Sequence */}
-      {showEndGameGuessSequence && gameState?.endGameGuessSequence && (
-        <EndGameGuessSequence
-          sequence={gameState.endGameGuessSequence}
+      {/* End Game Guess Dramatic Sequence - Support both single and multiple sequences */}
+      {showEndGameGuessSequence && (gameState?.endGameGuessSequence || (gameState as any)?.endGameGuessSequences) && (
+        <EndGameGuessSequences
+          sequences={(gameState as any)?.endGameGuessSequences}
+          singleSequence={gameState?.endGameGuessSequence}
           onComplete={() => setShowEndGameGuessSequence(false)}
         />
       )}
