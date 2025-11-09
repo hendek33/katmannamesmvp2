@@ -1338,8 +1338,11 @@ export class MemStorage implements IStorage {
     // Check if there's a winner already (a team won normally)
     if (!room.winner) return null;
     
-    // Check if end game guess hasn't been used yet
-    if (room.endGameGuessUsed) return null;
+    // Check if end game guess hasn't been used yet (for legacy single-phase)
+    // But allow voting if we're in an active phase
+    if (room.endGameGuessUsed && room.endGameVotingPhase === "completed") {
+      return null;
+    }
     
     // Check if assassin was revealed (no prophet voting if assassin ends the game)
     const lastReveal = room.revealHistory.length > 0 
@@ -1357,6 +1360,12 @@ export class MemStorage implements IStorage {
         ((room.winner === "dark" && room.darkCardsRemaining === 0) ||
          (room.winner === "light" && room.lightCardsRemaining === 0))) {
       return null; // No prophet voting if losing team revealed winner's last card
+    }
+    
+    // Initialize voting phase if not set
+    if (!room.endGameVotingPhase) {
+      room.endGameVotingPhase = "loser_voting";
+      room.endGameGuesses = {};
     }
     
     // Get the player
