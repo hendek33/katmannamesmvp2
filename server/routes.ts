@@ -938,8 +938,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            // Use confirmEndGameGuess for the two-phase voting system
-            const gameState = storage.confirmEndGameGuess(ws.roomCode, ws.playerId, validation.data.targetPlayerId);
+            const gameState = storage.endGameGuess(ws.roomCode, ws.playerId, validation.data.targetPlayerId);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Oyun sonu tahmini yapılamadı" } });
               return;
