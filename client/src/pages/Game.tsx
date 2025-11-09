@@ -500,13 +500,12 @@ export default function Game() {
       ((winningTeam === "dark" && gameState?.darkCardsRemaining === 0) ||
        (winningTeam === "light" && gameState?.lightCardsRemaining === 0));
     
-    // Show end game voting if chaos mode is enabled
-    // BUT NOT if assassin was revealed or losing team revealed winning team's last card
+    // Always show end game voting if chaos mode is enabled (but may be disabled)
     if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
-        gameState.winner && !gameState.endGameGuessUsed &&
-        !wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
+        gameState.winner && !gameState.endGameGuessUsed) {
       
       // Show voting UI for all players (losing team can vote, winning team can watch)
+      // It will show as disabled with reason if conditions are met
       setShowEndGameVoting(true);
     }
   }, [gameState, playerId]);
@@ -742,21 +741,49 @@ export default function Game() {
       )}
 
       {/* End Game Prophet Voting - Only show if no guess has been made yet */}
-      {showEndGameVoting && gameState && gameState.winner && !gameState.endGameGuessUsed && (
-        <EndGameVoting
-          winningTeam={gameState.winner as "dark" | "light"}
-          losingTeam={gameState.winner === "dark" ? "light" : "dark"}
-          winningTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-          losingTeamName={gameState.winner === "dark" ? gameState.lightTeamName : gameState.darkTeamName}
-          players={gameState.players}
-          currentPlayerId={playerId}
-          votes={endGameGuessVotes}
-          onVote={handleVoteEndGameGuess}
-          onConfirm={handleConfirmEndGameGuess}
-          chaosType={gameState.chaosModeType || "prophet"}
-          consecutivePasses={gameState.consecutivePasses}
-        />
-      )}
+      {showEndGameVoting && gameState && gameState.winner && !gameState.endGameGuessUsed && (() => {
+        // Calculate disable reason
+        const lastRevealedCard = gameState.revealHistory.length ? 
+          gameState.revealHistory[gameState.revealHistory.length - 1] : null;
+        const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
+        
+        const winningTeam = gameState.winner;
+        const losingTeam = winningTeam === "dark" ? "light" : "dark";
+        const wasLosingTeamRevealedWinningCard = 
+          lastRevealedCard?.team === losingTeam && 
+          lastRevealedCard?.type === winningTeam && 
+          ((winningTeam === "dark" && gameState.darkCardsRemaining === 0) ||
+           (winningTeam === "light" && gameState.lightCardsRemaining === 0));
+        
+        const hasConsecutivePasses = gameState.consecutivePasses && 
+          gameState.consecutivePasses[losingTeam] >= 2;
+        
+        let disableReason: "assassin" | "opponent_last_card" | "consecutive_passes" | null = null;
+        if (wasAssassinRevealed) {
+          disableReason = "assassin";
+        } else if (wasLosingTeamRevealedWinningCard) {
+          disableReason = "opponent_last_card";
+        } else if (hasConsecutivePasses) {
+          disableReason = "consecutive_passes";
+        }
+        
+        return (
+          <EndGameVoting
+            winningTeam={gameState.winner as "dark" | "light"}
+            losingTeam={losingTeam}
+            winningTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+            losingTeamName={gameState.winner === "dark" ? gameState.lightTeamName : gameState.darkTeamName}
+            players={gameState.players}
+            currentPlayerId={playerId}
+            votes={endGameGuessVotes}
+            onVote={handleVoteEndGameGuess}
+            onConfirm={handleConfirmEndGameGuess}
+            chaosType={gameState.chaosModeType || "prophet"}
+            consecutivePasses={gameState.consecutivePasses}
+            disableReason={disableReason}
+          />
+        );
+      })()}
 
       {/* End Game Guess Dramatic Sequence */}
       {showEndGameGuessSequence && gameState?.endGameGuessSequence && (

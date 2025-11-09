@@ -835,9 +835,9 @@ export default function Lobby() {
                       <h4 className="font-bold text-cyan-500">Kahin Rolü</h4>
                     </div>
                     <p className="text-xs">
-                      Her takımda 1 tane gizli Kahin bulunur. Oyun başında bütün kartların yerini bilir. 
+                      Her takımda 1 tane gizli Kahin bulunur. Oyun başında moderatörün ayarlayacağı kurallardaki kartların yerini bilir. 
                       Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Doğru tahmin kazandırır!</span>
+                      <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Ama tahmin yapabilmenin bazı koşulları vardır.</span>
                     </p>
                   </div>
                 </div>
@@ -845,10 +845,11 @@ export default function Lobby() {
                 <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                   <h4 className="font-semibold text-amber-400 mb-2">⚡ Oyun Kuralları</h4>
                   <ul className="text-xs space-y-1">
-                    <li>• Her takıma oyun başında rastgele bir Kahin atanır (kimliği gizlidir)</li>
-                    <li>• Kahinler oyundaki kartların yerlerini bilir</li>
-                    <li>• Oyun sonunda kaybeden takımının karşı takımın Kahinini tahmin etme hakkı bulunur</li>
-                    <li>• Kahinin karşı takıma kimliğini belli etmemesi gerekir</li>
+                    <li>• Kahinler lobide oyun ayarında ayarlanmış kartların yerlerini bilir</li>
+                    <li>• Oyun sonunda kaybeden takımının karşı takımın Kahinini tahmin etme hakkı bulunur, ama bu hak bazı kurallara tabiidir</li>
+                    <li>• Siyah kelime bulunursa kahin tahmininde bulunulamaz, hükmen kaybedilir</li>
+                    <li>• Karşı takımın son kalan kelimesi bulunursa kahin tahmininde bulunulamaz, hükmen kaybedilir</li>
+                    <li>• Üst üste iki tur kelime açmadan tahmini bitiren takım oyun sonunda kahin tahmininde bulunamaz</li>
                   </ul>
                 </div>
               </div>

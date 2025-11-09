@@ -16,6 +16,7 @@ interface EndGameVotingProps {
   onConfirm: (targetPlayerId: string) => void;
   chaosType: "prophet" | "double_agent";
   consecutivePasses?: { dark: number; light: number };
+  disableReason?: "assassin" | "opponent_last_card" | "consecutive_passes" | null;
 }
 
 export function EndGameVoting({
@@ -29,7 +30,8 @@ export function EndGameVoting({
   onVote,
   onConfirm,
   chaosType,
-  consecutivePasses
+  consecutivePasses,
+  disableReason
 }: EndGameVotingProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -46,7 +48,22 @@ export function EndGameVoting({
   
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const isOnLosingTeam = currentPlayer?.team === losingTeam;
-  const isProphetVotingDisabled = consecutivePasses && consecutivePasses[losingTeam] >= 2;
+  
+  // Check if prophet voting is disabled (either by explicit disable reason or consecutive passes)
+  const hasConsecutivePasses = consecutivePasses && consecutivePasses[losingTeam] >= 2;
+  const isProphetVotingDisabled = (disableReason !== null && disableReason !== undefined) || hasConsecutivePasses;
+  
+  // Get the disable reason text - check both explicit reason and consecutive passes
+  const getDisableReasonText = () => {
+    if (disableReason === "assassin") {
+      return "Suikastçı kartı bulunduğu için kahin tahmini devre dışı!";
+    } else if (disableReason === "opponent_last_card") {
+      return "Karşı takımın son kartı bulunduğu için kahin tahmini devre dışı!";
+    } else if (disableReason === "consecutive_passes" || hasConsecutivePasses) {
+      return "2 kez üst üste pas geçildiği için kahin tahmini devre dışı!";
+    }
+    return null;
+  };
   
   const winningTeamPlayers = players.filter(p => p.team === winningTeam);
   const losingTeamPlayers = players.filter(p => p.team === losingTeam);
@@ -145,6 +162,15 @@ export function EndGameVoting({
             <Minimize2 className="w-3 h-3" />
           </Button>
         </div>
+        
+        {/* Disable Reason Display */}
+        {isProphetVotingDisabled && getDisableReasonText() && (
+          <div className="px-5 py-3 bg-red-900/20 border-b border-red-500/20">
+            <p className="text-red-300 text-sm font-medium text-center">
+              {getDisableReasonText()}
+            </p>
+          </div>
+        )}
         
         {/* Glassmorphic Player Grid */}
         <div className="relative p-4">
