@@ -347,6 +347,41 @@ export default function Game() {
     }
   }, [gameState?.phase, gameState?.winner]);
 
+  // Centralized prophet voting window management
+  useEffect(() => {
+    // Determine if prophet voting should be shown
+    const shouldShowVoting = 
+      gameState?.phase === "ended" &&
+      gameState?.chaosMode &&
+      gameState?.chaosModeType === "prophet" &&
+      gameState?.winner &&
+      !gameState?.endGameGuessUsed &&
+      !showAssassinVideo.show &&
+      !showNormalWinVideo &&
+      !showEndGameGuessSequence;
+    
+    if (shouldShowVoting) {
+      // Add a small delay to ensure videos have finished
+      const timer = setTimeout(() => {
+        setShowEndGameVoting(true);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    } else {
+      // Hide voting window if conditions are not met
+      setShowEndGameVoting(false);
+    }
+  }, [
+    gameState?.phase,
+    gameState?.chaosMode,
+    gameState?.chaosModeType,
+    gameState?.winner,
+    gameState?.endGameGuessUsed,
+    showAssassinVideo.show,
+    showNormalWinVideo,
+    showEndGameGuessSequence
+  ]);
+
   // Handle end game guess sequence animation
   const endGameGuessRef = useRef<any>(null);
   useEffect(() => {
@@ -477,38 +512,13 @@ export default function Game() {
 
   const handleAssassinVideoComplete = useCallback(() => {
     setShowAssassinVideo({ show: false });
-    
-    // Don't show end game voting if assassin was revealed (losing team selected black card)
-    // Voting is disabled when assassin is revealed
-  }, [gameState]);
+    // Prophet voting will be handled by the centralized useEffect
+  }, []);
 
   const handleNormalWinVideoComplete = useCallback(() => {
     setShowNormalWinVideo(false);
-    
-    // Check if assassin was revealed
-    const lastRevealedCard = gameState?.revealHistory.length ? 
-      gameState.revealHistory[gameState.revealHistory.length - 1] : null;
-    const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
-    
-    // Check if LOSING team revealed WINNING team's last card
-    // The 'team' field in revealHistory shows WHO revealed the card
-    const winningTeam = gameState?.winner;
-    const losingTeam = winningTeam === "dark" ? "light" : "dark";
-    const wasLosingTeamRevealedWinningCard = 
-      lastRevealedCard?.team === losingTeam && // Losing team made the reveal
-      lastRevealedCard?.type === winningTeam && // They revealed winning team's card
-      ((winningTeam === "dark" && gameState?.darkCardsRemaining === 0) ||
-       (winningTeam === "light" && gameState?.lightCardsRemaining === 0));
-    
-    // Always show end game voting if chaos mode is enabled (but may be disabled)
-    if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
-        gameState.winner && !gameState.endGameGuessUsed) {
-      
-      // Show voting UI for all players (losing team can vote, winning team can watch)
-      // It will show as disabled with reason if conditions are met
-      setShowEndGameVoting(true);
-    }
-  }, [gameState, playerId]);
+    // Prophet voting will be handled by the centralized useEffect
+  }, []);
 
   const handleProphetVideoComplete = useCallback(() => {
     setShowProphetVideo(false);
