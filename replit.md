@@ -14,6 +14,12 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
+### Prophet Voting Restrictions (November 9, 2025)
+- **Assassin Selection Block**: Prophet voting is now disabled if the assassin (black card) was selected
+- **Opponent Last Card Block**: Prophet voting is disabled if losing team revealed opponent's last card
+- **Minimized UI Position**: Minimized Prophet voting UI moved to bottom-left corner for better visibility
+- **Removed Legacy UI**: Cleaned up old "Son Şans: Kahin Tahmini" button from header
+
 ### Chaos Mode Simplification (November 6, 2025)
 - **Prophet Mode Only**: Simplified chaos mode to only include Prophet (Kahin) mode
 - **Removed Double Agent**: Temporarily removed Double Agent (Çift Ajan) option for simpler gameplay

@@ -473,21 +473,31 @@ export default function Game() {
   const handleAssassinVideoComplete = useCallback(() => {
     setShowAssassinVideo({ show: false });
     
-    // Show end game voting if chaos mode is enabled and assassin revealed
-    if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
-        gameState.winner && !gameState.endGameGuessUsed) {
-      setShowEndGameVoting(true);
-    }
+    // Don't show end game voting if assassin was revealed (losing team selected black card)
+    // Voting is disabled when assassin is revealed
   }, [gameState]);
 
   const handleNormalWinVideoComplete = useCallback(() => {
     setShowNormalWinVideo(false);
     
-    // Show end game voting if chaos mode is enabled, there's a winner, and no guess has been made yet
+    // Check if assassin was revealed or opponent's last card was revealed
+    const lastRevealedCard = gameState?.revealHistory.length ? 
+      gameState.revealHistory[gameState.revealHistory.length - 1] : null;
+    const wasAssassinRevealed = lastRevealedCard?.type === "assassin";
+    
+    // Check if opponent's last card was revealed
+    const currentPlayer = gameState?.players.find(p => p.id === playerId);
+    const losingTeam = currentPlayer?.team !== gameState?.winner ? currentPlayer?.team : 
+      (gameState?.winner === "dark" ? "light" : "dark");
+    const opponentTeam = losingTeam === "dark" ? "light" : "dark";
+    const wasOpponentLastCard = lastRevealedCard?.type === opponentTeam && 
+      ((opponentTeam === "dark" && gameState?.darkCardsRemaining === 0) ||
+       (opponentTeam === "light" && gameState?.lightCardsRemaining === 0));
+    
+    // Show end game voting if chaos mode is enabled BUT NOT if assassin or opponent's last card
     if (gameState?.chaosMode && gameState.chaosModeType === "prophet" && 
-        gameState.winner && !gameState.endGameGuessUsed) {
-      const currentPlayer = gameState.players.find(p => p.id === playerId);
-      const isOnLosingTeam = currentPlayer?.team !== gameState.winner;
+        gameState.winner && !gameState.endGameGuessUsed &&
+        !wasAssassinRevealed && !wasOpponentLastCard) {
       
       // Show voting UI for all players (losing team can vote, winning team can watch)
       setShowEndGameVoting(true);
