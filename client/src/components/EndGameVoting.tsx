@@ -65,12 +65,16 @@ export function EndGameVoting({
   // Check if prophet voting is disabled due to consecutive passes
   const isProphetVotingDisabled = consecutivePasses && consecutivePasses[losingTeam] >= 2;
   
-  // Get winning team players to vote on
+  // Get team players
   const winningTeamPlayers = players.filter(p => p.team === winningTeam);
-  
-  // Get losing team players to see who has voted
   const losingTeamPlayers = players.filter(p => p.team === losingTeam);
   const totalLosingPlayers = losingTeamPlayers.length;
+  const totalWinningPlayers = winningTeamPlayers.length;
+  
+  // Determine which team's players to show for voting based on phase
+  const targetTeamPlayers = votingPhase === "loser_voting" ? winningTeamPlayers : 
+                            votingPhase === "winner_voting" ? losingTeamPlayers : 
+                            [];
   
   // Get most voted player and vote counts
   let mostVotedPlayer: string | null = null;
@@ -170,16 +174,34 @@ export function EndGameVoting({
               <h2 className="text-3xl font-bold text-purple-400">
                 Kahin Tahmini
               </h2>
-              <p className="text-xl text-slate-300">
-                {losingTeamName} takımı, {winningTeamName} takımındaki kahini tahmin ediyor!
-              </p>
+              
+              {/* Phase-specific subtitle */}
+              {votingPhase === "loser_voting" && (
+                <p className="text-xl text-slate-300">
+                  {losingTeamName} takımı, {winningTeamName} takımındaki kahini tahmin ediyor!
+                </p>
+              )}
+              
+              {votingPhase === "winner_voting" && (
+                <p className="text-xl text-slate-300">
+                  {winningTeamName} takımı, {losingTeamName} takımındaki kahini tahmin ediyor!
+                </p>
+              )}
+              
+              {votingPhase === "completed" && (
+                <p className="text-xl text-slate-300">
+                  Tahmin sonuçları açıklanıyor...
+                </p>
+              )}
             
-            {/* Voting Status */}
-            <div className="flex justify-center items-center gap-4">
-              <div className="text-lg text-amber-400">
-                {totalVotes}/{totalLosingPlayers} oyuncu oy kullandı
+            {/* Voting Status - only show during active voting */}
+            {(votingPhase === "loser_voting" || votingPhase === "winner_voting") && (
+              <div className="flex justify-center items-center gap-4">
+                <div className="text-lg text-amber-400">
+                  {totalVotes}/{votingPhase === "loser_voting" ? totalLosingPlayers : totalWinningPlayers} oyuncu oy kullandı
+                </div>
               </div>
-            </div>
+            )}
             
             {/* Show when prophet voting is disabled */}
             {isProphetVotingDisabled && (
@@ -193,21 +215,46 @@ export function EndGameVoting({
               </div>
             )}
             
-            {!isOnVotingTeam && !isProphetVotingDisabled && (
+            {!isOnVotingTeam && !isProphetVotingDisabled && votingPhase !== "completed" && (
               <div className="mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
                 <p className="text-amber-400 text-lg font-semibold">
                   👁️ İzleyici Modu
                 </p>
                 <p className="text-slate-400 text-sm mt-1">
-                  Kazanan takım olarak sadece izleyebilirsiniz
+                  {votingPhase === "loser_voting" && currentPlayer?.team === winningTeam && 
+                    "Kazanan takım olarak kaybeden takımın tahminini bekliyorsunuz"}
+                  {votingPhase === "winner_voting" && currentPlayer?.team === losingTeam && 
+                    "Kaybeden takım olarak kazanan takımın tahminini bekliyorsunuz"}
                 </p>
               </div>
             )}
           </div>
           
-          {/* Players Grid */}
+          {/* Show results for completed phase */}
+          {votingPhase === "completed" && endGameFinalResult && (
+            <div className="mt-4 p-4 bg-slate-800/50 rounded-lg border-2 border-purple-500/50">
+              <h3 className="text-2xl font-bold text-center mb-4">
+                {endGameFinalResult.finalOutcome === "draw" ? 
+                  "🤝 Berabere!" : 
+                  `🏆 ${endGameFinalResult.finalOutcome === winningTeam ? winningTeamName : losingTeamName} Kazandı!`}
+              </h3>
+              <div className="space-y-2">
+                <p className="text-lg">
+                  {losingTeamName} takımının tahmini: {endGameGuesses?.loser?.correct ? "✅ Doğru" : "❌ Yanlış"}
+                  {endGameGuesses?.loser?.targetPlayerId && ` (${players.find(p => p.id === endGameGuesses.loser.targetPlayerId)?.username})`}
+                </p>
+                <p className="text-lg">
+                  {winningTeamName} takımının tahmini: {endGameGuesses?.winner?.correct ? "✅ Doğru" : "❌ Yanlış"}
+                  {endGameGuesses?.winner?.targetPlayerId && ` (${players.find(p => p.id === endGameGuesses.winner.targetPlayerId)?.username})`}
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {/* Players Grid - Only show during voting phases */}
+          {(votingPhase === "loser_voting" || votingPhase === "winner_voting") && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {winningTeamPlayers.map(player => {
+            {targetTeamPlayers.map(player => {
               const playerVotes = votes[player.id] || [];
               const isSelected = currentPlayerVote === player.id;
               const isMostVoted = player.id === mostVotedPlayer;
@@ -223,7 +270,7 @@ export function EndGameVoting({
                     !isSelected && !isMostVoted && "border-slate-600 bg-slate-800/50"
                   )}
                 >
-                  {/* Clickable Card Content - Only for losing team */}
+                  {/* Clickable Card Content - Only for voting team */}
                   <div
                     onClick={isOnVotingTeam ? () => handlePlayerClick(player.id) : undefined}
                     className={cn(
@@ -235,7 +282,7 @@ export function EndGameVoting({
                     {/* Player Avatar */}
                     <div className={cn(
                       "w-16 h-16 mx-auto mb-3 rounded-full flex items-center justify-center text-2xl font-bold",
-                      winningTeam === "dark" ? "bg-blue-600" : "bg-red-600"
+                      player.team === "dark" ? "bg-blue-600" : "bg-red-600"
                     )}>
                       {player.username.substring(0, 2).toUpperCase()}
                     </div>
@@ -300,6 +347,7 @@ export function EndGameVoting({
               );
             })}
           </div>
+          )}
           
           {/* Vote Status */}
           <div className="space-y-2">
