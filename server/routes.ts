@@ -115,11 +115,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   function getFilteredGameState(gameState: GameState, playerId: string): GameState {
     const player = gameState.players.find(p => p.id === playerId);
     const isSpymaster = player?.role === "spymaster";
-    const isProphet = player?.secretRole === "prophet"; // Prophets can see all cards
-
-    if (isSpymaster || isProphet || gameState.phase !== "playing") {
+    const isProphet = player?.secretRole === "prophet";
+    
+    // Spymasters always see all cards
+    if (isSpymaster || gameState.phase !== "playing") {
       return gameState;
     }
+    
+    // Prophets see cards based on visibility setting - they should not see all cards automatically
+    // The server shouldn't filter for prophets; the client handles visibility based on knownCards
 
     return {
       ...gameState,

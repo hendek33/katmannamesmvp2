@@ -13,6 +13,7 @@ import { type Team } from "@shared/schema";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   AlertDialog, 
   AlertDialogContent, 
@@ -33,6 +34,7 @@ export default function Lobby() {
   const [spymasterTime, setSpymasterTime] = useState(120);
   const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
+  const [prophetVisibility, setProphetVisibility] = useState<"own_team" | "both_teams" | "all_cards">("own_team");
   const [showChaosDetails, setShowChaosDetails] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
@@ -87,6 +89,7 @@ export default function Lobby() {
       setSpymasterTime(gameState.spymasterTime);
       setGuesserTime(gameState.guesserTime);
       setChaosMode(gameState.chaosMode || false);
+      setProphetVisibility(gameState.prophetVisibility || "own_team");
     }
   }, [gameState]);
 
@@ -197,6 +200,10 @@ export default function Lobby() {
     if (enabled) {
       send("update_chaos_mode_type", { type: "prophet" });
     }
+  };
+
+  const handleProphetVisibilityUpdate = (visibility: "own_team" | "both_teams" | "all_cards") => {
+    send("update_prophet_visibility", { visibility });
   };
 
   if (!isConnected) {
@@ -562,9 +569,46 @@ export default function Lobby() {
                   </div>
                   {/* Chaos Mode Info when enabled */}
                   {chaosMode && (
-                    <div className="mt-4">
+                    <div className="mt-4 space-y-3">
                       <div className="p-2 rounded-lg text-[10px] leading-relaxed bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20">
                         Her takıma gizli bir Kahin atanacak • Kahinler oyundaki kartların yerlerini bilir.
+                      </div>
+                      
+                      {/* Prophet Visibility Settings */}
+                      <div className="space-y-2">
+                        <Label htmlFor="prophet-visibility" className="text-xs text-violet-300">
+                          Kahin Görüş Ayarı
+                        </Label>
+                        <Select
+                          value={prophetVisibility}
+                          disabled={!currentPlayer?.isRoomOwner}
+                          onValueChange={(value: "own_team" | "both_teams" | "all_cards") => {
+                            if (currentPlayer?.isRoomOwner) {
+                              setProphetVisibility(value);
+                              handleProphetVisibilityUpdate(value);
+                            }
+                          }}
+                        >
+                          <SelectTrigger id="prophet-visibility" className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="own_team">
+                              Sadece Kendi Takımı (3 kart)
+                            </SelectItem>
+                            <SelectItem value="both_teams">
+                              Her İki Takım (3 kart)
+                            </SelectItem>
+                            <SelectItem value="all_cards">
+                              Tüm Kartlar (3 kart, beyaz ve siyah dahil)
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[9px] text-violet-400/70">
+                          {prophetVisibility === "own_team" && "Kahinler sadece kendi takımlarının kartlarından 3 tanesini görebilir"}
+                          {prophetVisibility === "both_teams" && "Kahinler her iki takımın kartlarından rastgele 3 tanesini görebilir"}
+                          {prophetVisibility === "all_cards" && "Kahinler beyaz ve siyah kartlar dahil tüm kartlardan rastgele 3 tanesini görebilir"}
+                        </p>
                       </div>
                     </div>
                   )}
