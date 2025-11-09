@@ -1647,16 +1647,32 @@ export class MemStorage implements IStorage {
       
       // First add loser's guess sequence
       if (loserGuess) {
-        const loserTargetPlayer = room.players.find(p => p.id === loserGuess.targetPlayerId);
-        if (loserTargetPlayer) {
+        // In prophet mode, targetPlayerId is actually a card ID
+        const loserTargetCard = room.cards.find(c => c.id === Number(loserGuess.targetPlayerId));
+        const loserProphet = room.players.find(p => p.team === loserTeam && p.secretRole === "prophet");
+        
+        if (loserTargetCard && loserProphet) {
+          // Get the card that prophet voted on (what they guessed)
+          const votedCard = room.cards.find(c => c.id === Number(loserGuess.targetPlayerId));
+          
+          // Get one of the prophet's actual cards for the reveal
+          const prophetCards = room.cards.filter(c => loserProphet.knownCards?.includes(c.id));
+          const targetCard = prophetCards.length > 0 ? prophetCards[0] : loserTargetCard;
+          
           guessSequences.push({
-            guessingTeam: loserTeam,
-            guessingTeamName: loserTeam === "dark" ? room.darkTeamName : room.lightTeamName,
-            targetPlayer: loserTargetPlayer.username,
-            targetTeam: loserTargetPlayer.team,
-            targetTeamName: loserTargetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName,
-            guessType: room.chaosModeType,
-            actualRole: loserTargetPlayer.secretRole,
+            votingTeam: loserTeam,
+            votingTeamName: loserTeam === "dark" ? room.darkTeamName : room.lightTeamName,
+            prophetName: loserProphet.username,
+            guessedCard: votedCard ? {
+              word: votedCard.word,
+              type: votedCard.type,
+              id: votedCard.id
+            } : null,
+            targetCard: targetCard ? {
+              word: targetCard.word,
+              type: targetCard.type,
+              id: targetCard.id
+            } : null,
             success: loserGuess.success,
             isFirstGuess: true
           });
@@ -1665,16 +1681,32 @@ export class MemStorage implements IStorage {
       
       // Then add winner's guess sequence
       if (winnerGuess) {
-        const winnerTargetPlayer = room.players.find(p => p.id === winnerGuess.targetPlayerId);
-        if (winnerTargetPlayer) {
+        // In prophet mode, targetPlayerId is actually a card ID
+        const winnerTargetCard = room.cards.find(c => c.id === Number(winnerGuess.targetPlayerId));
+        const winnerProphet = room.players.find(p => p.team === winnerTeam && p.secretRole === "prophet");
+        
+        if (winnerTargetCard && winnerProphet) {
+          // Get the card that prophet voted on (what they guessed)
+          const votedCard = room.cards.find(c => c.id === Number(winnerGuess.targetPlayerId));
+          
+          // Get one of the prophet's actual cards for the reveal
+          const prophetCards = room.cards.filter(c => winnerProphet.knownCards?.includes(c.id));
+          const targetCard = prophetCards.length > 0 ? prophetCards[0] : winnerTargetCard;
+          
           guessSequences.push({
-            guessingTeam: winnerTeam,
-            guessingTeamName: winnerTeam === "dark" ? room.darkTeamName : room.lightTeamName,
-            targetPlayer: winnerTargetPlayer.username,
-            targetTeam: winnerTargetPlayer.team,
-            targetTeamName: winnerTargetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName,
-            guessType: room.chaosModeType,
-            actualRole: winnerTargetPlayer.secretRole,
+            votingTeam: winnerTeam,
+            votingTeamName: winnerTeam === "dark" ? room.darkTeamName : room.lightTeamName,
+            prophetName: winnerProphet.username,
+            guessedCard: votedCard ? {
+              word: votedCard.word,
+              type: votedCard.type,
+              id: votedCard.id
+            } : null,
+            targetCard: targetCard ? {
+              word: targetCard.word,
+              type: targetCard.type,
+              id: targetCard.id
+            } : null,
             success: winnerGuess.success,
             finalWinner: finalWinner === "draw" ? room.winner : finalWinner,
             finalWinnerName: finalWinner === "draw" ? "Berabere!" : 
