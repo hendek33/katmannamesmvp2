@@ -511,7 +511,7 @@ export default function Game() {
          (gameState.endGameVotingPhase && gameState.endGameVotingPhase !== "completed")) &&
         !wasAssassinRevealed && !wasLosingTeamRevealedWinningCard) {
       
-      // Show voting UI during both phases
+      // Show voting UI during both phases for ALL players (including observers)
       setShowEndGameVoting(true);
     } else if (gameState?.endGameVotingPhase === "completed") {
       // Hide voting UI when both phases complete
