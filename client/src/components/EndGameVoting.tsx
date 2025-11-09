@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { Player, Team } from "@shared/schema";
 import { motion } from "framer-motion";
+import { Minimize2, Maximize2 } from "lucide-react";
 
 interface EndGameVotingProps {
   winningTeam: "dark" | "light";
@@ -32,6 +33,7 @@ export function EndGameVoting({
 }: EndGameVotingProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   
   // Show with delay
   useEffect(() => {
@@ -85,12 +87,41 @@ export function EndGameVoting({
   
   if (!isVisible) return null;
 
+  // Minimized View - Small bar at bottom
+  if (isMinimized) {
+    return (
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 100, opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed bottom-4 right-4 z-[90]"
+      >
+        <Card 
+          className="p-4 bg-slate-900/95 border-2 border-purple-500/50 cursor-pointer hover:border-purple-400 transition-all"
+          onClick={() => setIsMinimized(false)}
+        >
+          <div className="flex items-center gap-3">
+            <Maximize2 className="w-5 h-5 text-purple-400" />
+            <div className="flex flex-col">
+              <span className="text-purple-400 font-bold">Kahin Tahmini</span>
+              <span className="text-xs text-slate-400">
+                {totalVotes}/{totalLosingPlayers} oy - Büyütmek için tıkla
+              </span>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  // Full View
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="fixed inset-0 z-[90] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     >
       <motion.div
         initial={{ scale: 0.8, opacity: 0, y: 50 }}
@@ -102,16 +133,27 @@ export function EndGameVoting({
           damping: 20
         }}
       >
-        <Card className="max-w-4xl w-full p-6 bg-slate-900/95 border-2 border-purple-500/50">
-        <div className="space-y-6">
-          {/* Title */}
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold text-purple-400">
-              Kahin Tahmini
-            </h2>
-            <p className="text-xl text-slate-300">
-              {losingTeamName} takımı, {winningTeamName} takımındaki kahini tahmin ediyor!
-            </p>
+        <Card className="max-w-4xl w-full p-6 bg-slate-900/95 border-2 border-purple-500/50 relative">
+          {/* Minimize Button */}
+          <Button
+            onClick={() => setIsMinimized(true)}
+            size="icon"
+            variant="ghost"
+            className="absolute top-2 right-2 hover:bg-purple-500/20"
+            data-testid="button-minimize-voting"
+          >
+            <Minimize2 className="w-5 h-5 text-purple-400" />
+          </Button>
+          
+          <div className="space-y-6">
+            {/* Title */}
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-bold text-purple-400">
+                Kahin Tahmini
+              </h2>
+              <p className="text-xl text-slate-300">
+                {losingTeamName} takımı, {winningTeamName} takımındaki kahini tahmin ediyor!
+              </p>
             
             {/* Voting Status */}
             <div className="flex justify-center items-center gap-4">
