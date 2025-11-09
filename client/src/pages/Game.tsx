@@ -355,6 +355,11 @@ export default function Game() {
       endGameGuessRef.current = null;
       setShowEndGameGuessSequence(false);
       setSequenceStep(0);
+      // IMPORTANT: Reset the win video refs when starting a new game
+      normalWinShownRef.current = false;
+      assassinShownRef.current = false;
+      setShowNormalWinVideo(false);
+      setShowEndGameVoting(false);
       return;
     }
     
