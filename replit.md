@@ -14,7 +14,9 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
-### Prophet Voting Restrictions (November 9, 2025)
+### Player Kick and Prophet Updates (November 9, 2025)
+- **Game Screen Kick**: Room owners can now kick players during active games (not just in lobby)
+- **Prophet Vision Limited**: Prophets now only see their own team's cards (not neutral or assassin)
 - **Assassin Selection Block**: Prophet voting is now disabled if the assassin (black card) was selected
 - **Opponent Last Card Block**: Prophet voting is disabled if losing team revealed opponent's last card
 - **Minimized UI Position**: Minimized Prophet voting UI moved to bottom-left corner for better visibility

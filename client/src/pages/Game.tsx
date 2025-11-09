@@ -22,7 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command, Edit2 } from "lucide-react";
+import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command, Edit2, UserX } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
@@ -1063,7 +1063,20 @@ export default function Game() {
                         {darkPlayers.map(player => (
                           <div key={player.id} className="flex items-center justify-between p-2 rounded bg-blue-950/50 border border-blue-800/30">
                             <span className="text-sm text-blue-100">{player.username}</span>
-                            <span className="text-xs text-blue-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-blue-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
+                              {currentPlayer?.isRoomOwner && player.id !== playerId && !player.isBot && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-5 w-5 hover:bg-red-500/20"
+                                  onClick={() => send("kick_player", { targetPlayerId: player.id })}
+                                  data-testid={`button-kick-${player.id}`}
+                                >
+                                  <UserX className="h-3 w-3 text-red-400" />
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1076,7 +1089,20 @@ export default function Game() {
                         {lightPlayers.map(player => (
                           <div key={player.id} className="flex items-center justify-between p-2 rounded bg-red-950/50 border border-red-800/30">
                             <span className="text-sm text-red-100">{player.username}</span>
-                            <span className="text-xs text-red-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-red-300">{player.role === "spymaster" ? "İstihbarat Şefi" : "Ajan"}</span>
+                              {currentPlayer?.isRoomOwner && player.id !== playerId && !player.isBot && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-5 w-5 hover:bg-red-500/20"
+                                  onClick={() => send("kick_player", { targetPlayerId: player.id })}
+                                  data-testid={`button-kick-${player.id}`}
+                                >
+                                  <UserX className="h-3 w-3 text-red-400" />
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1088,8 +1114,19 @@ export default function Game() {
                         <h3 className="text-sm font-bold text-gray-400 mb-2">İzleyiciler</h3>
                         <div className="space-y-1">
                           {gameState.players.filter(p => !p.team).map(player => (
-                            <div key={player.id} className="flex items-center p-2 rounded bg-slate-800/50 border border-slate-700/30">
+                            <div key={player.id} className="flex items-center justify-between p-2 rounded bg-slate-800/50 border border-slate-700/30">
                               <span className="text-sm text-gray-300">{player.username}</span>
+                              {currentPlayer?.isRoomOwner && player.id !== playerId && !player.isBot && (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="h-5 w-5 hover:bg-red-500/20"
+                                  onClick={() => send("kick_player", { targetPlayerId: player.id })}
+                                  data-testid={`button-kick-${player.id}`}
+                                >
+                                  <UserX className="h-3 w-3 text-red-400" />
+                                </Button>
+                              )}
                             </div>
                           ))}
                         </div>

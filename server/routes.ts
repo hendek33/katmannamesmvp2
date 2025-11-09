@@ -1152,12 +1152,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
               sendToClient(ws, { type: "error", payload: { message: "Kendinizi atamazsınız" } });
               return;
             }
-            
-            // Cannot kick during active game phases
-            if (room.phase !== "lobby") {
-              sendToClient(ws, { type: "error", payload: { message: "Oyun sırasında oyuncu atamazsınız" } });
-              return;
-            }
 
             // Remove the player
             storage.removePlayer(ws.roomCode, targetPlayerId);
