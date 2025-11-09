@@ -144,12 +144,12 @@ export function EndGameVoting({
           {/* Minimize Button */}
           <Button
             onClick={() => setIsMinimized(true)}
-            size="icon"
-            variant="ghost"
-            className="absolute top-2 right-2 hover:bg-purple-500/20"
+            variant="outline"
+            className="absolute top-2 right-2 bg-purple-600/20 hover:bg-purple-500/30 border-purple-500/50 text-purple-300 hover:text-purple-200 font-semibold"
             data-testid="button-minimize-voting"
           >
-            <Minimize2 className="w-5 h-5 text-purple-400" />
+            <Minimize2 className="w-4 h-4 mr-2" />
+            Küçült
           </Button>
           
           <div className="space-y-6">
