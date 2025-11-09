@@ -1529,12 +1529,29 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player) return null;
     
-    // Get the target player
-    const targetPlayer = room.players.find(p => p.id === targetPlayerId);
-    if (!targetPlayer) return null;
-    
-    // Ensure both players have teams (required for end game guessing)
-    if (!player.team || !targetPlayer.team) return null;
+    // In prophet mode, targetPlayerId is actually a card ID
+    // We need to validate it differently
+    if (room.chaosModeType === "prophet") {
+      const targetCard = room.cards.find(c => c.id === Number(targetPlayerId));
+      if (!targetCard) {
+        console.error("Invalid card ID for prophet voting:", targetPlayerId);
+        return null;
+      }
+      
+      // Check if player has this card in their known cards
+      const prophet = room.players.find(p => p.team === player.team && p.secretRole === "prophet");
+      if (!prophet || !prophet.knownCards?.includes(targetCard.id)) {
+        console.error("Card not in prophet's known cards:", targetCard.id);
+        return null;
+      }
+    } else {
+      // For double agent mode (if we ever bring it back), validate as player ID
+      const targetPlayer = room.players.find(p => p.id === targetPlayerId);
+      if (!targetPlayer) return null;
+      
+      // Ensure both players have teams (required for end game guessing)
+      if (!player.team || !targetPlayer.team) return null;
+    }
     
     // Determine which phase we're in and validate
     // loserTeam already declared above
@@ -1561,31 +1578,29 @@ export class MemStorage implements IStorage {
     if (roomData.endGameGuessVotes) {
       roomData.endGameGuessVotes.clear();
     }
-    
-    // Get team names
-    const guessingTeamName = player.team === "dark" ? room.darkTeamName : room.lightTeamName;
-    const targetTeamName = targetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName;
-    
     // Check if the guess is correct
     let guessCorrect = false;
     
     if (room.chaosModeType === "prophet") {
-      // Teams guess the prophet on the OPPOSING team
-      if (targetPlayer.team !== player.team && targetPlayer.secretRole === "prophet") {
-        guessCorrect = true;
-      }
-    } else if (room.chaosModeType === "double_agent") {
-      // Teams guess the double agent on THEIR OWN team
-      if (targetPlayer.team === player.team && targetPlayer.secretRole === "double_agent") {
-        guessCorrect = true;
+      // In prophet mode, check if the selected card ID matches one of the prophet's actual cards
+      const targetCard = room.cards.find(c => c.id === Number(targetPlayerId));
+      if (!targetCard) return null;
+      
+      // Find the opposing team's prophet
+      const opposingTeam = player.team === "dark" ? "light" : "dark";
+      const opposingProphet = room.players.find(p => p.team === opposingTeam && p.secretRole === "prophet");
+      
+      if (opposingProphet && opposingProphet.knownCards) {
+        // Check if the guessed card is one of the opposing prophet's cards
+        guessCorrect = opposingProphet.knownCards.includes(targetCard.id);
       }
     }
     
     // Store the guess for the current team
     if (!room.endGameGuesses) room.endGameGuesses = {};
     room.endGameGuesses[player.team] = {
-      targetPlayerId: targetPlayerId,
-      targetTeam: targetPlayer.team,
+      targetPlayerId: targetPlayerId, // Actually a card ID in prophet mode
+      targetTeam: player.team === "dark" ? "light" : "dark", // Guessing opposing team
       guessType: room.chaosModeType,
       success: guessCorrect,
       timestamp: Date.now()
@@ -1607,7 +1622,7 @@ export class MemStorage implements IStorage {
       // Mark for legacy compatibility
       room.endGameGuessUsed = true;
       
-      console.log(`PHASE 1 COMPLETE: ${player.team} team guessed ${targetPlayer.username} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
+      console.log(`PHASE 1 COMPLETE: ${player.team} team guessed card ID ${targetPlayerId} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
       console.log(`TRANSITIONING TO WINNER VOTING PHASE`);
     } else if (room.endGameVotingPhase === "winner_voting") {
       // Both teams have now voted - calculate final outcome
@@ -1727,6 +1742,7 @@ export class MemStorage implements IStorage {
           // Also include backwards compatibility fields from the last sequence
           ...guessSequences[guessSequences.length - 1]
         } as any;
+        console.log(`PROPHET SEQUENCE CREATED:`, JSON.stringify(room.endGameGuessSequence));
       }
       
       // Update the actual winner
@@ -1734,7 +1750,7 @@ export class MemStorage implements IStorage {
         room.winner = finalWinner;
       }
       
-      console.log(`PHASE 2 COMPLETE: ${player.team} team guessed ${targetPlayer.username} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
+      console.log(`PHASE 2 COMPLETE: ${player.team} team guessed CARD ID ${targetPlayerId} - ${guessCorrect ? "CORRECT" : "WRONG"}`);
       console.log(`FINAL RESULT: ${finalWinner === "draw" ? "DRAW" : `${finalWinner} wins`}`);
     }
     
