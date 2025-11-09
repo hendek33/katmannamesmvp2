@@ -32,6 +32,7 @@ export interface IStorage {
   updateTimerSettings(roomCode: string, timedMode: boolean, spymasterTime: number, guesserTime: number): GameState | null;
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
   updateChaosModeType(roomCode: string, type: "prophet" | "double_agent"): GameState | null;
+  updateProphetVisibility(roomCode: string, visibility: "own_team" | "both_teams" | "all_cards"): GameState | null;
   updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -297,6 +298,7 @@ export class MemStorage implements IStorage {
       guesserTime: 180, // Default 3 minutes for Agents
       currentTurnStartTime: null,
       chaosMode: false,
+      prophetVisibility: "own_team", // Default visibility for prophets
       prophetGuessUsed: { dark: false, light: false },
     };
 
@@ -653,6 +655,36 @@ export class MemStorage implements IStorage {
     return room;
   }
 
+  updateProphetVisibility(roomCode: string, visibility: "own_team" | "both_teams" | "all_cards"): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow prophet visibility to be changed in lobby
+    if (room.phase !== "lobby") return null;
+
+    room.prophetVisibility = visibility;
+
+    // If we're in a game and there are prophets, update their knownCards
+    if (room.phase === "playing" && room.chaosMode && room.chaosModeType === "prophet") {
+      const prophets = room.players.filter(p => p.secretRole === "prophet");
+      prophets.forEach(prophet => {
+        if (visibility === "own_team") {
+          // Only their team's cards
+          prophet.knownCards = room.cards.filter(c => c.type === prophet.team).map(c => c.id);
+        } else if (visibility === "both_teams") {
+          // Both teams' cards, but not neutral or assassin
+          prophet.knownCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
+        } else if (visibility === "all_cards") {
+          // All cards including neutral and assassin
+          prophet.knownCards = room.cards.map(c => c.id);
+        }
+      });
+    }
+
+    return room;
+  }
+
   updatePassword(roomCode: string, password: string | null): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
@@ -706,14 +738,36 @@ export class MemStorage implements IStorage {
         darkProphet.secretRole = "prophet";
         console.log(`Dark team prophet assigned to: ${darkProphet.username} (index ${randomIndex} of ${darkGuessers.length})`);
         
-        // Give prophet 3 random cards from their team
-        const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
-        // Fisher-Yates shuffle for better randomization
-        for (let i = darkCards.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [darkCards[i], darkCards[j]] = [darkCards[j], darkCards[i]];
+        // Assign cards based on prophetVisibility setting
+        const visibility = room.prophetVisibility || "own_team";
+        if (visibility === "own_team") {
+          // Give prophet 3 random cards from their team
+          const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
+          // Fisher-Yates shuffle for better randomization
+          for (let i = darkCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [darkCards[i], darkCards[j]] = [darkCards[j], darkCards[i]];
+          }
+          darkProphet.knownCards = darkCards.slice(0, Math.min(3, darkCards.length));
+        } else if (visibility === "both_teams") {
+          // Give prophet 3 random cards from both teams (not neutral/assassin)
+          const teamCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
+          // Fisher-Yates shuffle for better randomization
+          for (let i = teamCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [teamCards[i], teamCards[j]] = [teamCards[j], teamCards[i]];
+          }
+          darkProphet.knownCards = teamCards.slice(0, Math.min(3, teamCards.length));
+        } else if (visibility === "all_cards") {
+          // Give prophet 3 random cards from all types
+          const allCards = room.cards.map(c => c.id);
+          // Fisher-Yates shuffle for better randomization
+          for (let i = allCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allCards[i], allCards[j]] = [allCards[j], allCards[i]];
+          }
+          darkProphet.knownCards = allCards.slice(0, Math.min(3, allCards.length));
         }
-        darkProphet.knownCards = darkCards.slice(0, Math.min(3, darkCards.length));
       }
       
       if (lightGuessers.length > 0) {
@@ -722,14 +776,36 @@ export class MemStorage implements IStorage {
         lightProphet.secretRole = "prophet";
         console.log(`Light team prophet assigned to: ${lightProphet.username} (index ${randomIndex} of ${lightGuessers.length})`);
         
-        // Give prophet 3 random cards from their team
-        const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
-        // Fisher-Yates shuffle for better randomization
-        for (let i = lightCards.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [lightCards[i], lightCards[j]] = [lightCards[j], lightCards[i]];
+        // Assign cards based on prophetVisibility setting
+        const visibility = room.prophetVisibility || "own_team";
+        if (visibility === "own_team") {
+          // Give prophet 3 random cards from their team
+          const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
+          // Fisher-Yates shuffle for better randomization
+          for (let i = lightCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [lightCards[i], lightCards[j]] = [lightCards[j], lightCards[i]];
+          }
+          lightProphet.knownCards = lightCards.slice(0, Math.min(3, lightCards.length));
+        } else if (visibility === "both_teams") {
+          // Give prophet 3 random cards from both teams (not neutral/assassin)
+          const teamCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
+          // Fisher-Yates shuffle for better randomization
+          for (let i = teamCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [teamCards[i], teamCards[j]] = [teamCards[j], teamCards[i]];
+          }
+          lightProphet.knownCards = teamCards.slice(0, Math.min(3, teamCards.length));
+        } else if (visibility === "all_cards") {
+          // Give prophet 3 random cards from all types
+          const allCards = room.cards.map(c => c.id);
+          // Fisher-Yates shuffle for better randomization
+          for (let i = allCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allCards[i], allCards[j]] = [allCards[j], allCards[i]];
+          }
+          lightProphet.knownCards = allCards.slice(0, Math.min(3, allCards.length));
         }
-        lightProphet.knownCards = lightCards.slice(0, Math.min(3, lightCards.length));
       }
     } else if (room.chaosModeType === "double_agent") {
       // Double Agent mode: Assign Double Agent to one player from each team
