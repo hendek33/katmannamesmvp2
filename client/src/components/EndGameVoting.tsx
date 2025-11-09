@@ -181,75 +181,24 @@ export function EndGameVoting({
             Küçült
           </Button>
           
-          <div className="p-4 sm:p-6 space-y-4">
-            {/* Title Section with Team Colors */}
-            <div className="text-center space-y-3">
-              <motion.div
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-400 via-purple-500 to-purple-400 bg-clip-text text-transparent">
-                  ⚡ Kahin Tahmini ⚡
-                </h2>
-              </motion.div>
-              
-              {/* Team Battle Visual */}
-              <motion.div 
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="flex items-center justify-center gap-4 py-2"
-              >
-                <div className="flex items-center gap-2">
-                  <div className={cn(
-                    "px-4 py-2 rounded-lg font-bold text-lg shadow-lg",
-                    losingTeam === "dark" 
-                      ? "bg-gradient-to-r from-blue-600/80 to-blue-500/80 text-blue-100 border border-blue-400/50" 
-                      : "bg-gradient-to-r from-red-600/80 to-red-500/80 text-red-100 border border-red-400/50"
-                  )}>
-                    {losingTeamName}
-                  </div>
-                  <span className="text-2xl animate-pulse">⚔️</span>
-                </div>
-                <span className="text-slate-400 text-xl">vs</span>
-                <div className={cn(
-                  "px-4 py-2 rounded-lg font-bold text-lg shadow-lg",
-                  winningTeam === "dark" 
-                    ? "bg-gradient-to-r from-blue-600/80 to-blue-500/80 text-blue-100 border border-blue-400/50" 
-                    : "bg-gradient-to-r from-red-600/80 to-red-500/80 text-red-100 border border-red-400/50"
-                )}>
-                  {winningTeamName} 👑
-                </div>
-              </motion.div>
-              
-              <p className="text-lg text-slate-300">
-                {losingTeamName} takımı, {winningTeamName} takımındaki <span className="text-purple-400 font-semibold">Kahini</span> tahmin ediyor!
-              </p>
-            </div>
-            
-            {/* Voting Progress Bar */}
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: "100%" }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="relative"
-            >
-              <div className="bg-slate-700/50 rounded-full h-3 overflow-hidden">
-                <motion.div 
-                  className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(totalVotes / totalLosingPlayers) * 100}%` }}
-                  transition={{ delay: 0.6, duration: 0.8 }}
-                />
-              </div>
-              <div className="flex justify-between mt-2 text-sm">
-                <span className="text-slate-400">Oy Durumu</span>
-                <span className="text-purple-400 font-semibold">
-                  {totalVotes}/{totalLosingPlayers} Oyuncu
+          <div className="p-3 space-y-2">
+            {/* Compact Header with all info in one line */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-purple-400 font-bold">Kahin Tahmini</span>
+                <span className="text-xs bg-purple-600/20 text-purple-300 px-2 py-0.5 rounded">
+                  {totalVotes}/{totalLosingPlayers} oy
                 </span>
               </div>
-            </motion.div>
+              <div className={cn(
+                "px-2 py-0.5 rounded text-xs font-medium",
+                winningTeam === "dark" 
+                  ? "bg-blue-600/30 text-blue-300" 
+                  : "bg-red-600/30 text-red-300"
+              )}>
+                👑 {winningTeamName}
+              </div>
+            </div>
             
             {/* Show when prophet voting is disabled */}
             {isProphetVotingDisabled && (

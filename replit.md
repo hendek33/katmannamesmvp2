@@ -14,7 +14,16 @@ Do not make changes to file `server/words.ts`.
 
 ## Recent Updates
 
-### Prophet Voting Window Size Optimization (November 9, 2025)
+### Ultra-Simplified Prophet Voting Window (November 9, 2025)
+- **No-Scroll Design**: Created EndGameVotingSimple.tsx that fits entirely on screen without scrolling
+- **Single-Line Header**: Combined title, vote count, and winning team into one compact header
+- **Minimal Player Cards**: 2-column grid with ultra-compact player rows (8px avatar, name, vote button)
+- **Inline Alerts**: Converted large alert boxes to small inline badges in the header
+- **Removed Decorations**: Eliminated gradients, animations, crowns, and other visual embellishments
+- **Fixed Height**: Removed max-h and overflow-y-auto, allowing natural height within viewport
+- **Simplified Interactions**: Direct click on player row to vote, simple "Seç" button to confirm
+
+### Prophet Voting Window Size Optimization (November 9, 2025) 
 - **Compact Design**: Reduced overall window size from max-w-4xl to max-w-2xl for better screen fit
 - **Smaller Player Cards**: Avatar size reduced to 48px, text sizes optimized for readability
 - **Responsive Grid**: Cards adjust from 2 to 4 columns based on screen size
