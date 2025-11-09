@@ -211,8 +211,8 @@ export function EndGameVoting({
                     <div className="absolute inset-0 rounded-lg border-4 border-purple-400 animate-pulse pointer-events-none" />
                   )}
                   
-                  {/* Select Button for Room Owner - Only if on losing team */}
-                  {isRoomOwner && isOnLosingTeam && (
+                  {/* Select Button for all losing team members */}
+                  {isOnLosingTeam && (
                     <div className="px-2 pb-2">
                       <Button
                         onClick={() => handleSelectPlayer(player.id)}

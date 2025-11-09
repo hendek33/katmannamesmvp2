@@ -370,6 +370,9 @@ export default function Game() {
     setShowEndGameGuessSequence(true);
     setSequenceStep(0);
     
+    // Also hide the voting dialog since a guess has been made
+    setShowEndGameVoting(false);
+    
     // Progress through steps with delays
     const timer1 = setTimeout(() => setSequenceStep(1), 1500); // Show guess
     const timer2 = setTimeout(() => setSequenceStep(2), 3500); // Show role reveal
@@ -715,8 +718,8 @@ export default function Game() {
         />
       )}
 
-      {/* End Game Prophet Voting */}
-      {showEndGameVoting && gameState && gameState.winner && (
+      {/* End Game Prophet Voting - Only show if no guess has been made yet */}
+      {showEndGameVoting && gameState && gameState.winner && !gameState.endGameGuessUsed && (
         <EndGameVoting
           winningTeam={gameState.winner as "dark" | "light"}
           losingTeam={gameState.winner === "dark" ? "light" : "dark"}
