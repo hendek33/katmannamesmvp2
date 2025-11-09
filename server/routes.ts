@@ -17,6 +17,7 @@ import {
   updateTimerSettingsSchema,
   updateChaosModeSchema,
   updateChaosModeTypeSchema,
+  updateProphetVisibilitySchema,
   guessProphetSchema,
   guessDoubleAgentSchema,
   endGameGuessSchema,
@@ -738,6 +739,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const gameState = storage.updateChaosModeType(ws.roomCode, validation.data.type);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Kaos Modu tipi güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
+          case "update_prophet_visibility": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi Kahin görünürlüğünü değiştirebilir" } });
+              return;
+            }
+
+            const validation = updateProphetVisibilitySchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz görünürlük ayarı" } });
+              return;
+            }
+
+            const gameState = storage.updateProphetVisibility(ws.roomCode, validation.data.visibility);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Kahin görünürlük ayarı güncellenemedi" } });
               return;
             }
 
