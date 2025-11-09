@@ -256,6 +256,12 @@ export default function Game() {
       previousTurnRef.current = null;
       assassinShownRef.current = false;
     }
+    
+    // Also reset assassin ref when going to lobby (for all players)
+    if (gameState.phase === "lobby") {
+      assassinShownRef.current = false;
+      normalWinShownRef.current = false;
+    }
 
     // Show turn video when game starts or restarts
     if (gameState.phase === "playing" && !previousTurnRef.current) {
