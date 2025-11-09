@@ -34,11 +34,13 @@ export function EndGameVoting({
   const [hasVoted, setHasVoted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 1000);
+      setIsAnimating(true);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
   
@@ -79,15 +81,15 @@ export function EndGameVoting({
   
   if (!isVisible) return null;
 
-  // Minimized View
+  // Minimized View with glassmorphism
   if (isMinimized) {
     return (
-      <div className="fixed bottom-4 left-4 z-[90] bg-slate-900/95 border border-purple-500/50 rounded-lg p-3 cursor-pointer hover:border-purple-400 transition-all"
+      <div className="fixed bottom-4 left-4 z-[90] bg-slate-900/60 backdrop-blur-lg border border-purple-500/30 rounded-lg p-3 cursor-pointer hover:border-purple-400 transition-all shadow-lg shadow-purple-500/20"
            onClick={() => setIsMinimized(false)}>
         <div className="flex items-center gap-3">
-          <Maximize2 className="w-4 h-4 text-purple-400" />
+          <Maximize2 className="w-4 h-4 text-purple-400 animate-pulse" />
           <span className="text-purple-400 font-bold text-sm">Kahin Tahmini</span>
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-purple-300/80">
             {totalVotes}/{totalLosingPlayers} oy
           </span>
         </div>
@@ -95,34 +97,43 @@ export function EndGameVoting({
     );
   }
 
-  // Full View - Balanced Size
+  // Full View with Glassmorphism and Animation
   return (
-    <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900/95 rounded-lg border border-purple-500/30 shadow-2xl w-full max-w-2xl">
-        {/* Header with better spacing */}
-        <div className="bg-slate-800/50 px-5 py-3 border-b border-slate-700/50 flex items-center justify-between">
+    <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+      <div 
+        className={cn(
+          "bg-gradient-to-br from-slate-900/40 via-purple-900/20 to-slate-900/40 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-2xl",
+          "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-purple-500/20 before:via-transparent before:to-purple-500/20 before:opacity-50",
+          isAnimating && "animate-in fade-in-0 zoom-in-95 duration-500"
+        )}
+        style={{
+          boxShadow: '0 20px 70px -10px rgba(168,85,247,0.4), 0 10px 40px -10px rgba(168,85,247,0.3)',
+        }}
+      >
+        {/* Glassmorphic Header */}
+        <div className="relative bg-gradient-to-r from-purple-900/30 via-purple-800/20 to-purple-900/30 backdrop-blur-md px-5 py-3 border-b border-purple-500/20 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-purple-400 font-bold text-lg">Son Şans: Kahin Tahmini</span>
             {isProphetVotingDisabled ? (
-              <span className="text-sm bg-red-900/30 text-red-400 px-2.5 py-1 rounded-md">
+              <span className="text-sm bg-red-900/40 backdrop-blur-sm text-red-300 px-2.5 py-1 rounded-lg border border-red-500/30">
                 ⛔ Devre Dışı
               </span>
             ) : !isOnLosingTeam ? (
-              <span className="text-sm bg-amber-900/30 text-amber-400 px-2.5 py-1 rounded-md">
+              <span className="text-sm bg-amber-900/40 backdrop-blur-sm text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/30">
                 👁️ İzleyici Modu
               </span>
             ) : (
-              <span className="text-sm bg-purple-600/20 text-purple-300 px-2.5 py-1 rounded-md font-medium">
+              <span className="text-sm bg-purple-600/30 backdrop-blur-sm text-purple-300 px-2.5 py-1 rounded-lg font-medium border border-purple-500/30">
                 Oy: {totalVotes}/{totalLosingPlayers}
               </span>
             )}
             <div className={cn(
-              "px-3 py-1 rounded-md text-sm font-semibold",
+              "px-3 py-1 rounded-lg text-sm font-semibold backdrop-blur-sm",
               winningTeam === "dark" 
-                ? "bg-blue-600/30 text-blue-300 border border-blue-500/30" 
-                : "bg-red-600/30 text-red-300 border border-red-500/30"
+                ? "bg-gradient-to-r from-blue-600/30 to-blue-500/20 text-blue-300 border border-blue-400/30" 
+                : "bg-gradient-to-r from-red-600/30 to-red-500/20 text-red-300 border border-red-400/30"
             )}>
-              👑 {winningTeamName} Kazandı
+              <span className="animate-pulse">👑</span> {winningTeamName} Kazandı
             </div>
           </div>
           <Button
@@ -135,10 +146,10 @@ export function EndGameVoting({
           </Button>
         </div>
         
-        {/* Balanced Player Grid */}
-        <div className="p-4">
+        {/* Glassmorphic Player Grid */}
+        <div className="relative p-4">
           <div className="grid grid-cols-2 gap-3">
-            {winningTeamPlayers.map(player => {
+            {winningTeamPlayers.map((player, index) => {
               const playerVotes = votes[player.id] || [];
               const isSelected = currentPlayerVote === player.id;
               const isMostVoted = player.id === mostVotedPlayer;
@@ -148,11 +159,15 @@ export function EndGameVoting({
                   key={player.id}
                   onClick={() => handlePlayerClick(player.id)}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg border transition-all",
-                    isOnLosingTeam && !isProphetVotingDisabled && "cursor-pointer hover:bg-slate-800/50 hover:scale-[1.02]",
-                    isSelected ? "border-purple-400 bg-purple-900/30 shadow-lg shadow-purple-500/20" : "border-slate-700 bg-slate-800/30",
-                    isMostVoted && "border-amber-400/50 bg-amber-900/20 ring-2 ring-amber-500/30"
+                    "relative flex items-center gap-3 p-3 rounded-xl border backdrop-blur-sm transition-all duration-300",
+                    "bg-gradient-to-br from-slate-800/30 via-slate-900/20 to-slate-800/30",
+                    isOnLosingTeam && !isProphetVotingDisabled && "cursor-pointer hover:from-purple-800/30 hover:via-purple-900/20 hover:to-purple-800/30 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/20",
+                    isSelected ? "border-purple-400/60 from-purple-900/40 via-purple-800/30 to-purple-900/40 shadow-lg shadow-purple-500/30" : "border-slate-600/30",
+                    isMostVoted && "border-amber-400/60 from-amber-900/30 via-amber-800/20 to-amber-900/30 ring-2 ring-amber-500/40 shadow-lg shadow-amber-500/20"
                   )}
+                  style={{
+                    animation: isAnimating ? `slideIn ${0.3 + index * 0.05}s ease-out` : undefined,
+                  }}
                 >
                   {/* Larger Avatar */}
                   <div className={cn(
@@ -175,9 +190,9 @@ export function EndGameVoting({
                     </p>
                   </div>
                   
-                  {/* Vote Count Badge */}
+                  {/* Glassmorphic Vote Count Badge */}
                   {playerVotes.length > 0 && (
-                    <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white text-sm rounded-full px-3 py-1.5 font-bold shadow-lg">
+                    <div className="bg-gradient-to-r from-purple-600/60 to-purple-700/60 backdrop-blur-md text-white text-sm rounded-full px-3 py-1.5 font-bold shadow-lg shadow-purple-500/30 border border-purple-400/30">
                       {playerVotes.length}
                     </div>
                   )}
@@ -189,7 +204,7 @@ export function EndGameVoting({
                         handleSelectPlayer(player.id);
                       }}
                       size="sm"
-                      className="h-8 px-3 text-sm bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium"
+                      className="h-8 px-3 text-sm bg-gradient-to-r from-purple-600/70 to-purple-700/70 backdrop-blur-sm hover:from-purple-500/80 hover:to-purple-600/80 text-white font-medium border border-purple-400/30 shadow-md shadow-purple-500/20 transition-all duration-300"
                       disabled={isSelected}
                     >
                       {isSelected ? "Seçildi ✓" : "Seç"}
@@ -201,6 +216,50 @@ export function EndGameVoting({
           </div>
         </div>
       </div>
+      
+      <style>{`
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
+        .animate-in {
+          animation-fill-mode: both;
+        }
+        
+        .fade-in-0 {
+          opacity: 0;
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .zoom-in-95 {
+          transform: scale(0.95);
+          animation: zoomIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+          to {
+            opacity: 1;
+          }
+        }
+        
+        @keyframes zoomIn {
+          from {
+            opacity: 0;
+            transform: scale(0.85) translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
