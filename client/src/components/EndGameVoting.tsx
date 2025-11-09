@@ -222,9 +222,9 @@ export function EndGameVoting({
                 </p>
                 <p className="text-slate-400 text-sm mt-1">
                   {votingPhase === "loser_voting" && currentPlayer?.team === winningTeam && 
-                    "Kazanan takım olarak kaybeden takımın tahminini bekliyorsunuz"}
+                    "Kaybeden takım sizin takımınızdaki kahini tahmin ediyor"}
                   {votingPhase === "winner_voting" && currentPlayer?.team === losingTeam && 
-                    "Kaybeden takım olarak kazanan takımın tahminini bekliyorsunuz"}
+                    "Kazanan takım sizin takımınızdaki kahini tahmin ediyor"}
                 </p>
               </div>
             )}

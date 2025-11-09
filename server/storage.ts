@@ -1509,8 +1509,14 @@ export class MemStorage implements IStorage {
       // Both teams have now voted - calculate final outcome
       room.endGameVotingPhase = "completed";
       
-      const loserTeam = room.winner === "dark" ? "light" : "dark";
-      const winnerTeam = room.winner;
+      // Ensure room.winner is a valid team (not "draw" or null)
+      if (room.winner !== "dark" && room.winner !== "light") {
+        console.error("Invalid winner state for end game voting:", room.winner);
+        return null;
+      }
+      
+      const loserTeam: Team = room.winner === "dark" ? "light" : "dark";
+      const winnerTeam: Team = room.winner;
       
       const loserGuess = room.endGameGuesses[loserTeam];
       const winnerGuess = room.endGameGuesses[winnerTeam];
