@@ -1553,20 +1553,55 @@ export class MemStorage implements IStorage {
                         (finalWinner === "dark" ? room.darkTeamName : room.lightTeamName)
       };
       
-      // Update the sequence for backward compatibility (show winner's guess)
-      room.endGameGuessSequence = {
-        guessingTeam: player.team,
-        guessingTeamName: guessingTeamName,
-        targetPlayer: targetPlayer.username,
-        targetTeam: targetPlayer.team,
-        targetTeamName: targetTeamName,
-        guessType: room.chaosModeType,
-        actualRole: targetPlayer.secretRole,
-        success: guessCorrect,
-        finalWinner: finalWinner === "draw" ? room.winner : finalWinner,
-        finalWinnerName: finalWinner === "draw" ? "Berabere!" : 
-                        (finalWinner === "dark" ? room.darkTeamName : room.lightTeamName)
-      };
+      // Create array to hold both teams' guess sequences for the reveal animation
+      const guessSequences: any[] = [];
+      
+      // First add loser's guess sequence
+      if (loserGuess) {
+        const loserTargetPlayer = room.players.find(p => p.id === loserGuess.targetPlayerId);
+        if (loserTargetPlayer) {
+          guessSequences.push({
+            guessingTeam: loserTeam,
+            guessingTeamName: loserTeam === "dark" ? room.darkTeamName : room.lightTeamName,
+            targetPlayer: loserTargetPlayer.username,
+            targetTeam: loserTargetPlayer.team,
+            targetTeamName: loserTargetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName,
+            guessType: room.chaosModeType,
+            actualRole: loserTargetPlayer.secretRole,
+            success: loserGuess.success,
+            isFirstGuess: true
+          });
+        }
+      }
+      
+      // Then add winner's guess sequence
+      if (winnerGuess) {
+        const winnerTargetPlayer = room.players.find(p => p.id === winnerGuess.targetPlayerId);
+        if (winnerTargetPlayer) {
+          guessSequences.push({
+            guessingTeam: winnerTeam,
+            guessingTeamName: winnerTeam === "dark" ? room.darkTeamName : room.lightTeamName,
+            targetPlayer: winnerTargetPlayer.username,
+            targetTeam: winnerTargetPlayer.team,
+            targetTeamName: winnerTargetPlayer.team === "dark" ? room.darkTeamName : room.lightTeamName,
+            guessType: room.chaosModeType,
+            actualRole: winnerTargetPlayer.secretRole,
+            success: winnerGuess.success,
+            finalWinner: finalWinner === "draw" ? room.winner : finalWinner,
+            finalWinnerName: finalWinner === "draw" ? "Berabere!" : 
+                            (finalWinner === "dark" ? room.darkTeamName : room.lightTeamName),
+            isLastGuess: true
+          });
+        }
+      }
+      
+      // Store the first sequence for backward compatibility
+      // But also store both sequences in a new field (will be handled in frontend)
+      if (guessSequences.length > 0) {
+        room.endGameGuessSequence = guessSequences[guessSequences.length - 1];
+        // Store all sequences as a JSON string in a temporary field for passing to frontend
+        (room as any).endGameGuessSequences = guessSequences;
+      }
       
       // Update the actual winner
       if (finalWinner !== "draw") {
