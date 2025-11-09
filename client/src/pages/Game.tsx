@@ -27,6 +27,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
 
+// Type guard to check if GameOutcome is a Team
+const isTeam = (value: any): value is "dark" | "light" => value === "dark" || value === "light";
+
 export default function Game() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -683,7 +686,7 @@ export default function Game() {
       )}
 
       {/* Assassin Video for black card */}
-      {showAssassinVideo.show && gameState && gameState.winner && (
+      {showAssassinVideo.show && gameState && isTeam(gameState.winner) && (
         <AssassinVideo
           winnerTeam={gameState.winner}
           winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
@@ -728,7 +731,7 @@ export default function Game() {
 
 
       {/* Normal Win Video */}
-      {showNormalWinVideo && gameState && gameState.winner && (
+      {showNormalWinVideo && gameState && isTeam(gameState.winner) && (
         <NormalWinVideo
           winnerTeam={gameState.winner}
           winnerTeamName={gameState.winner === "dark" ? gameState.darkTeamName : gameState.lightTeamName}

@@ -302,6 +302,7 @@ export class MemStorage implements IStorage {
       prophetVisibility: "own_team", // Default visibility for prophets
       prophetGuessUsed: { dark: false, light: false },
       consecutivePasses: { dark: 0, light: 0 }, // Track consecutive passes
+      bothCorrectOutcome: "winner_wins", // Default: winner wins when both teams guess correctly
     };
 
     this.rooms.set(roomCode, { 
@@ -911,6 +912,9 @@ export class MemStorage implements IStorage {
       return null;
     }
 
+    // Ensure currentTeam is not null before creating clue
+    if (!room.currentTeam) return null;
+
     room.currentClue = {
       word: word.toUpperCase(),
       count,
@@ -1251,14 +1255,17 @@ export class MemStorage implements IStorage {
       return null;
     }
     
+    // Ensure we have an active team (required for prophet guessing)
+    if (!room.currentTeam) return null;
+    
     // Check if team has lost prophet voting rights due to consecutive passes
-    if (room.consecutivePasses && room.currentTeam && room.consecutivePasses[room.currentTeam] >= 2) {
+    if (room.consecutivePasses && room.consecutivePasses[room.currentTeam] >= 2) {
       console.log(`[PROPHET VOTE BLOCKED] ${room.currentTeam} team cannot vote - 2 consecutive passes`);
       return null;
     }
     
     // Check if the team hasn't used their prophet guess yet
-    if (room.prophetGuessUsed && room.prophetGuessUsed[room.currentTeam as "dark" | "light"]) {
+    if (room.prophetGuessUsed && room.prophetGuessUsed[room.currentTeam] ) {
       return null;
     }
     
@@ -1272,7 +1279,7 @@ export class MemStorage implements IStorage {
     if (!room.prophetGuessUsed) {
       room.prophetGuessUsed = { dark: false, light: false };
     }
-    room.prophetGuessUsed[room.currentTeam as "dark" | "light"] = true;
+    room.prophetGuessUsed[room.currentTeam] = true;
     
     // Check if the guess is correct
     const isCorrect = targetPlayer.secretRole === "prophet";
@@ -1401,6 +1408,9 @@ export class MemStorage implements IStorage {
     // Get the target player
     const targetPlayer = room.players.find(p => p.id === targetPlayerId);
     if (!targetPlayer) return null;
+    
+    // Ensure both players have teams (required for end game guessing)
+    if (!player.team || !targetPlayer.team) return null;
     
     // Mark that end game guess has been used
     room.endGameGuessUsed = true;
@@ -2025,11 +2035,13 @@ export class MemStorage implements IStorage {
     delete target.introductionLikes[playerId];
     delete target.introductionDislikes[playerId];
     
-    // Add new vote
-    if (isLike) {
-      target.introductionLikes[playerId] = player.team;
-    } else {
-      target.introductionDislikes[playerId] = player.team;
+    // Add new vote (only if player has a team)
+    if (player.team) {
+      if (isLike) {
+        target.introductionLikes[playerId] = player.team;
+      } else {
+        target.introductionDislikes[playerId] = player.team;
+      }
     }
     
     return room;

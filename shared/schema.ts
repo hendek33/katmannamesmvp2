@@ -70,6 +70,21 @@ export interface GameState {
   prophetGuessResult?: { team: Team; success: boolean; targetId?: string }; // Result of prophet guess
   doubleAgentGuessUsed?: boolean; // Track if losing team used double agent guess
   doubleAgentGuessResult?: { success: boolean; targetId?: string }; // Result of double agent guess
+  // Legacy fields - maintained for backward compatibility
+  endGameGuessUsed?: boolean; // DEPRECATED: Use endGameVotingPhase instead
+  endGameGuessSequence?: { // DEPRECATED: Use endGameGuesses instead
+    guessingTeam: Team;
+    guessingTeamName?: string;
+    targetPlayer: string;
+    targetTeam: Team;
+    targetTeamName?: string;
+    guessType: "prophet" | "double_agent";
+    actualRole?: "prophet" | "double_agent" | null;
+    success?: boolean;
+    finalWinner?: GameOutcome;
+    finalWinnerName?: string;
+  };
+  // New two-phase voting fields
   endGameVotingPhase?: "loser_voting" | "winner_voting" | "completed"; // Current voting phase
   endGameGuesses?: { // Track each team's end game guess
     dark?: {
