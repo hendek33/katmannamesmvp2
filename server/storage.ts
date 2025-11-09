@@ -717,29 +717,31 @@ export class MemStorage implements IStorage {
       return;
     }
 
-    // Helper function for truly random selection
-    const getRandomIndex = (max: number): number => {
-      // Use Date.now() to add more randomness
-      const seed = Date.now() % 1000;
-      return Math.floor((Math.random() * seed + Math.random() * (1000 - seed)) / 1000 * max);
+    // Fisher-Yates shuffle for truly random array shuffling
+    const shuffleArray = <T>(array: T[]): T[] => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
     };
 
-    // Assign roles to all players (including bots) who are guessers
-    // Shuffle the arrays first to ensure randomness
-    const darkGuessers = room.players
-      .filter(p => p.team === "dark" && p.role === "guesser")
-      .sort(() => Math.random() - 0.5);
-    const lightGuessers = room.players
-      .filter(p => p.team === "light" && p.role === "guesser")
-      .sort(() => Math.random() - 0.5);
+    // Get all guessers and shuffle them properly
+    const darkGuessers = shuffleArray(
+      room.players.filter(p => p.team === "dark" && p.role === "guesser")
+    );
+    const lightGuessers = shuffleArray(
+      room.players.filter(p => p.team === "light" && p.role === "guesser")
+    );
     
     if (room.chaosModeType === "prophet") {
       // Prophet mode: Assign Prophet to one player from each team (if there are guessers)
       if (darkGuessers.length > 0) {
-        const randomIndex = getRandomIndex(darkGuessers.length);
-        const darkProphet = darkGuessers[randomIndex];
+        // Simply pick the first player from the shuffled array (truly random)
+        const darkProphet = darkGuessers[0];
         darkProphet.secretRole = "prophet";
-        console.log(`Dark team prophet assigned to: ${darkProphet.username} (index ${randomIndex} of ${darkGuessers.length})`);
+        console.log(`Dark team prophet assigned to: ${darkProphet.username} (from ${darkGuessers.length} guessers)`);
         
         // Assign cards based on prophetVisibility setting
         const visibility = room.prophetVisibility || "own_team";
@@ -759,10 +761,10 @@ export class MemStorage implements IStorage {
       }
       
       if (lightGuessers.length > 0) {
-        const randomIndex = getRandomIndex(lightGuessers.length);
-        const lightProphet = lightGuessers[randomIndex];
+        // Simply pick the first player from the shuffled array (truly random)
+        const lightProphet = lightGuessers[0];
         lightProphet.secretRole = "prophet";
-        console.log(`Light team prophet assigned to: ${lightProphet.username} (index ${randomIndex} of ${lightGuessers.length})`);
+        console.log(`Light team prophet assigned to: ${lightProphet.username} (from ${lightGuessers.length} guessers)`);
         
         // Assign cards based on prophetVisibility setting
         const visibility = room.prophetVisibility || "own_team";
@@ -785,18 +787,18 @@ export class MemStorage implements IStorage {
       
       // Assign Double Agent to one player from Dark team
       if (darkGuessers.length > 0) {
-        const randomIndex = getRandomIndex(darkGuessers.length);
-        const darkDoubleAgent = darkGuessers[randomIndex];
+        // Simply pick the first player from the shuffled array (truly random)
+        const darkDoubleAgent = darkGuessers[0];
         darkDoubleAgent.secretRole = "double_agent";
-        console.log(`Dark team double agent assigned to: ${darkDoubleAgent.username} (index ${randomIndex} of ${darkGuessers.length})`);
+        console.log(`Dark team double agent assigned to: ${darkDoubleAgent.username} (from ${darkGuessers.length} guessers)`);
       }
       
       // Assign Double Agent to one player from Light team  
       if (lightGuessers.length > 0) {
-        const randomIndex = getRandomIndex(lightGuessers.length);
-        const lightDoubleAgent = lightGuessers[randomIndex];
+        // Simply pick the first player from the shuffled array (truly random)
+        const lightDoubleAgent = lightGuessers[0];
         lightDoubleAgent.secretRole = "double_agent";
-        console.log(`Light team double agent assigned to: ${lightDoubleAgent.username} (index ${randomIndex} of ${lightGuessers.length})`);
+        console.log(`Light team double agent assigned to: ${lightDoubleAgent.username} (from ${lightGuessers.length} guessers)`);
       }
     }
   }
