@@ -610,6 +610,39 @@ export default function Lobby() {
                           {prophetVisibility === "all_cards" && "Kahinler beyaz ve siyah kartlar dahil tüm kartları görebilir"}
                         </p>
                       </div>
+                      
+                      {/* Two-Team Correct Outcome Settings */}
+                      <div className="space-y-2">
+                        <Label htmlFor="both-correct-outcome" className="text-xs text-violet-300">
+                          Her İki Takım Doğru Tahmin Ederse
+                        </Label>
+                        <Select
+                          value={gameState.bothCorrectOutcome || "winner_wins"}
+                          disabled={!currentPlayer?.isRoomOwner}
+                          onValueChange={(value: "winner_wins" | "draw") => {
+                            if (currentPlayer?.isRoomOwner) {
+                              send("update_both_correct_outcome", { outcome: value });
+                            }
+                          }}
+                        >
+                          <SelectTrigger id="both-correct-outcome" className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="winner_wins">
+                              Kazanan Takım Kazanır
+                            </SelectItem>
+                            <SelectItem value="draw">
+                              Berabere
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[9px] text-violet-400/70">
+                          {(gameState.bothCorrectOutcome || "winner_wins") === "winner_wins" 
+                            ? "İki takım da kahinleri doğru tahmin ederse, normal kazanan takım kazanır" 
+                            : "İki takım da kahinleri doğru tahmin ederse, oyun berabere biter"}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>

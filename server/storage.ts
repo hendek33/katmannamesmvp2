@@ -34,6 +34,7 @@ export interface IStorage {
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
   updateChaosModeType(roomCode: string, type: "prophet" | "double_agent"): GameState | null;
   updateProphetVisibility(roomCode: string, visibility: "own_team" | "both_teams" | "all_cards"): GameState | null;
+  updateBothCorrectOutcome(roomCode: string, outcome: "winner_wins" | "draw"): GameState | null;
   updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -638,8 +639,13 @@ export class MemStorage implements IStorage {
     if (room.phase !== "lobby") return null;
 
     room.chaosMode = chaosMode;
-    // Reset type when disabling
-    if (!chaosMode) {
+    if (chaosMode) {
+      // Set defaults when enabling chaos mode
+      if (!room.chaosModeType) room.chaosModeType = "prophet";
+      if (!room.prophetVisibility) room.prophetVisibility = "own_team";
+      if (!room.bothCorrectOutcome) room.bothCorrectOutcome = "winner_wins";
+    } else {
+      // Reset when disabling
       room.chaosModeType = null;
     }
 
@@ -685,6 +691,22 @@ export class MemStorage implements IStorage {
         }
       });
     }
+
+    return room;
+  }
+
+  updateBothCorrectOutcome(roomCode: string, outcome: "winner_wins" | "draw"): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow outcome to be changed in lobby
+    if (room.phase !== "lobby") return null;
+    
+    // Only works when chaos mode is enabled
+    if (!room.chaosMode) return null;
+
+    room.bothCorrectOutcome = outcome;
 
     return room;
   }

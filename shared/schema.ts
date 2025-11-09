@@ -186,6 +186,10 @@ export const updateProphetVisibilitySchema = z.object({
   visibility: z.enum(["own_team", "both_teams", "all_cards"]),
 });
 
+export const updateBothCorrectOutcomeSchema = z.object({
+  outcome: z.enum(["winner_wins", "draw"]),
+});
+
 export const guessProphetSchema = z.object({
   targetPlayerId: z.string(),
 });
@@ -242,6 +246,7 @@ export type AddBotInput = z.infer<typeof addBotSchema>;
 export type UpdateTeamNameInput = z.infer<typeof updateTeamNameSchema>;
 export type UpdateTimerSettingsInput = z.infer<typeof updateTimerSettingsSchema>;
 export type UpdateChaosModeInput = z.infer<typeof updateChaosModeSchema>;
+export type UpdateBothCorrectOutcomeInput = z.infer<typeof updateBothCorrectOutcomeSchema>;
 export type GuessProphetInput = z.infer<typeof guessProphetSchema>;
 export type GuessDoubleAgentInput = z.infer<typeof guessDoubleAgentSchema>;
 export type TriggerTauntInput = z.infer<typeof triggerTauntSchema>;
