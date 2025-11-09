@@ -79,7 +79,7 @@ export function EndGameVoting({
   };
   
   const handleSelectPlayer = (playerId: string) => {
-    if (!isRoomOwner) return;
+    if (!isOnLosingTeam) return;
     onConfirm(playerId);
   };
   
