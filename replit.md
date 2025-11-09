@@ -21,7 +21,12 @@ Do not make changes to file `server/words.ts`.
 
 ### Player Kick and Prophet Updates (November 9, 2025)
 - **Game Screen Kick**: Room owners can now kick players during active games (not just in lobby)
-- **Prophet Vision Limited**: Prophets now only see their own team's cards (not neutral or assassin)
+- **Prophet Visibility Settings**: Room owners can configure what cards prophets can see:
+  - **"Sadece Kendi Takımı" (own_team)**: Prophets see 3 random cards from their own team only (default)
+  - **"Her İki Takım" (both_teams)**: Prophets see 3 random cards from both teams (not neutral/assassin)
+  - **"Tüm Kartlar" (all_cards)**: Prophets see 3 random cards from all cards including neutral and assassin
+  - **Lobby Control**: Dropdown selector under Chaos Mode settings (room owners only)
+  - **Server Filtering**: Server properly masks cards not in prophet's knownCards array
 - **Assassin Selection Block**: Prophet voting is now disabled if the assassin (black card) was selected
 - **Opponent Last Card Block**: Prophet voting is disabled if losing team revealed opponent's last card
 - **Minimized UI Position**: Minimized Prophet voting UI moved to bottom-left corner for better visibility

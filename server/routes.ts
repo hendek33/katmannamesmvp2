@@ -122,9 +122,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return gameState;
     }
     
-    // Prophets see cards based on visibility setting - they should not see all cards automatically
-    // The server shouldn't filter for prophets; the client handles visibility based on knownCards
+    // For prophets, show true card types only for cards in their knownCards array
+    if (isProphet && player?.knownCards) {
+      return {
+        ...gameState,
+        cards: gameState.cards.map(card => ({
+          ...card,
+          type: card.revealed || player.knownCards?.includes(card.id) 
+            ? card.type 
+            : ("neutral" as any),
+        })),
+      };
+    }
 
+    // For regular guessers, mask all unrevealed cards
     return {
       ...gameState,
       cards: gameState.cards.map(card => ({
