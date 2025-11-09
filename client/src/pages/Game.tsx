@@ -366,6 +366,11 @@ export default function Game() {
       return;
     }
     
+    // CRITICAL: Only show sequence after BOTH teams have voted (voting phase completed)
+    if (gameState.endGameVotingPhase !== "completed") {
+      return; // Wait for both teams to vote
+    }
+    
     // Only trigger if it's a new sequence (not the same one from before)
     const sequenceKey = `${gameState.endGameGuessSequence.targetPlayer}-${gameState.endGameGuessSequence.guessType}`;
     if (endGameGuessRef.current === sequenceKey) {
@@ -379,7 +384,7 @@ export default function Game() {
     setShowEndGameGuessSequence(true);
     setSequenceStep(0);
     
-    // Also hide the voting dialog since a guess has been made
+    // Also hide the voting dialog since both teams have voted
     setShowEndGameVoting(false);
     
     // Progress through steps with delays
@@ -392,7 +397,7 @@ export default function Game() {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [gameState?.endGameGuessSequence, gameState?.phase]);
+  }, [gameState?.endGameGuessSequence, gameState?.phase, gameState?.endGameVotingPhase]);
 
   const handleCopyRoomCode = () => {
     if (roomCode) {

@@ -1498,19 +1498,8 @@ export class MemStorage implements IStorage {
       // Transition to winner voting phase
       room.endGameVotingPhase = "winner_voting";
       
-      // Initialize sequence for loser's guess (for backward compatibility)
-      room.endGameGuessSequence = {
-        guessingTeam: player.team,
-        guessingTeamName: guessingTeamName,
-        targetPlayer: targetPlayer.username,
-        targetTeam: targetPlayer.team,
-        targetTeamName: targetTeamName,
-        guessType: room.chaosModeType,
-        actualRole: targetPlayer.secretRole,
-        success: guessCorrect,
-        finalWinner: room.winner, // Will be updated if both teams vote
-        finalWinnerName: room.winner === "dark" ? room.darkTeamName : room.lightTeamName
-      };
+      // DO NOT set endGameGuessSequence here - wait until both teams have voted
+      // This prevents the reveal sequence from starting after just the first team votes
       
       // Mark for legacy compatibility
       room.endGameGuessUsed = true;
