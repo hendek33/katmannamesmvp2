@@ -259,12 +259,12 @@ export function EndGameVoting({
                     "text-white font-bold",
                     player.team === "dark" ? "bg-blue-600" : "bg-red-500"
                   )}>
-                    {player.name.substring(0, 1).toUpperCase()}
+                    {player.username.substring(0, 1).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 text-left">
-                  <div className="font-medium text-white text-sm">{player.name}</div>
+                  <div className="font-medium text-white text-sm">{player.username}</div>
                   <div className="flex items-center gap-2 text-xs">
                     <span className={cn(
                       "px-1.5 py-0.5 rounded",
@@ -305,7 +305,7 @@ export function EndGameVoting({
               }).map(player => (
                 <div key={player.id} className="flex items-center gap-1 px-2 py-1 bg-gray-700/50 rounded text-xs">
                   <div className="w-2 h-2 bg-green-400 rounded-full" />
-                  <span className="text-gray-300">{player.name}</span>
+                  <span className="text-gray-300">{player.username}</span>
                 </div>
               ))}
             </div>
