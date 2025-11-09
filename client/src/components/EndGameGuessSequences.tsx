@@ -4,12 +4,16 @@ import { motion, AnimatePresence } from "framer-motion";
 interface EndGameGuessSequencesProps {
   sequences?: any[]; // Array of sequences from backend
   singleSequence?: any; // Fallback for legacy single sequence
+  darkTeamName?: string;
+  lightTeamName?: string;
   onComplete?: () => void;
 }
 
 export function EndGameGuessSequences({ 
   sequences, 
   singleSequence,
+  darkTeamName = "Katman Koyu",
+  lightTeamName = "Katman Açık",
   onComplete 
 }: EndGameGuessSequencesProps) {
   const [step, setStep] = useState(0);
@@ -71,7 +75,7 @@ export function EndGameGuessSequences({
   };
   
   const getTeamLabel = (team: string) => {
-    return team === "dark" ? "Katman Koyu" : "Katman Açık";
+    return team === "dark" ? darkTeamName : lightTeamName;
   };
   
   // Determine final winner

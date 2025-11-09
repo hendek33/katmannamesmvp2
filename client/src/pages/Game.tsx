@@ -828,6 +828,8 @@ export default function Game() {
         <EndGameGuessSequences
           sequences={(gameState as any)?.endGameGuessSequences}
           singleSequence={gameState?.endGameGuessSequence}
+          darkTeamName={gameState.darkTeamName}
+          lightTeamName={gameState.lightTeamName}
           onComplete={() => setShowEndGameGuessSequence(false)}
         />
       )}
