@@ -741,32 +741,17 @@ export class MemStorage implements IStorage {
         // Assign cards based on prophetVisibility setting
         const visibility = room.prophetVisibility || "own_team";
         if (visibility === "own_team") {
-          // Give prophet 3 random cards from their team
+          // Give prophet all cards from their team
           const darkCards = room.cards.filter(c => c.type === "dark").map(c => c.id);
-          // Fisher-Yates shuffle for better randomization
-          for (let i = darkCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [darkCards[i], darkCards[j]] = [darkCards[j], darkCards[i]];
-          }
-          darkProphet.knownCards = darkCards.slice(0, Math.min(3, darkCards.length));
+          darkProphet.knownCards = darkCards;
         } else if (visibility === "both_teams") {
-          // Give prophet 3 random cards from both teams (not neutral/assassin)
+          // Give prophet all cards from both teams (not neutral/assassin)
           const teamCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
-          // Fisher-Yates shuffle for better randomization
-          for (let i = teamCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [teamCards[i], teamCards[j]] = [teamCards[j], teamCards[i]];
-          }
-          darkProphet.knownCards = teamCards.slice(0, Math.min(3, teamCards.length));
+          darkProphet.knownCards = teamCards;
         } else if (visibility === "all_cards") {
-          // Give prophet 3 random cards from all types
+          // Give prophet all cards
           const allCards = room.cards.map(c => c.id);
-          // Fisher-Yates shuffle for better randomization
-          for (let i = allCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [allCards[i], allCards[j]] = [allCards[j], allCards[i]];
-          }
-          darkProphet.knownCards = allCards.slice(0, Math.min(3, allCards.length));
+          darkProphet.knownCards = allCards;
         }
       }
       
@@ -779,32 +764,17 @@ export class MemStorage implements IStorage {
         // Assign cards based on prophetVisibility setting
         const visibility = room.prophetVisibility || "own_team";
         if (visibility === "own_team") {
-          // Give prophet 3 random cards from their team
+          // Give prophet all cards from their team
           const lightCards = room.cards.filter(c => c.type === "light").map(c => c.id);
-          // Fisher-Yates shuffle for better randomization
-          for (let i = lightCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [lightCards[i], lightCards[j]] = [lightCards[j], lightCards[i]];
-          }
-          lightProphet.knownCards = lightCards.slice(0, Math.min(3, lightCards.length));
+          lightProphet.knownCards = lightCards;
         } else if (visibility === "both_teams") {
-          // Give prophet 3 random cards from both teams (not neutral/assassin)
+          // Give prophet all cards from both teams (not neutral/assassin)
           const teamCards = room.cards.filter(c => c.type === "dark" || c.type === "light").map(c => c.id);
-          // Fisher-Yates shuffle for better randomization
-          for (let i = teamCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [teamCards[i], teamCards[j]] = [teamCards[j], teamCards[i]];
-          }
-          lightProphet.knownCards = teamCards.slice(0, Math.min(3, teamCards.length));
+          lightProphet.knownCards = teamCards;
         } else if (visibility === "all_cards") {
-          // Give prophet 3 random cards from all types
+          // Give prophet all cards
           const allCards = room.cards.map(c => c.id);
-          // Fisher-Yates shuffle for better randomization
-          for (let i = allCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [allCards[i], allCards[j]] = [allCards[j], allCards[i]];
-          }
-          lightProphet.knownCards = allCards.slice(0, Math.min(3, allCards.length));
+          lightProphet.knownCards = allCards;
         }
       }
     } else if (room.chaosModeType === "double_agent") {

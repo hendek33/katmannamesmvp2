@@ -594,20 +594,20 @@ export default function Lobby() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="own_team">
-                              Sadece Kendi Takımı (3 kart)
+                              Sadece Kendi Takımı
                             </SelectItem>
                             <SelectItem value="both_teams">
-                              Her İki Takım (3 kart)
+                              Her İki Takım
                             </SelectItem>
                             <SelectItem value="all_cards">
-                              Tüm Kartlar (3 kart, beyaz ve siyah dahil)
+                              Tüm Kartlar (beyaz ve siyah dahil)
                             </SelectItem>
                           </SelectContent>
                         </Select>
                         <p className="text-[9px] text-violet-400/70">
-                          {prophetVisibility === "own_team" && "Kahinler sadece kendi takımlarının kartlarından 3 tanesini görebilir"}
-                          {prophetVisibility === "both_teams" && "Kahinler her iki takımın kartlarından rastgele 3 tanesini görebilir"}
-                          {prophetVisibility === "all_cards" && "Kahinler beyaz ve siyah kartlar dahil tüm kartlardan rastgele 3 tanesini görebilir"}
+                          {prophetVisibility === "own_team" && "Kahinler kendi takımlarının tüm kartlarını görebilir"}
+                          {prophetVisibility === "both_teams" && "Kahinler her iki takımın tüm kartlarını görebilir (beyaz ve siyah hariç)"}
+                          {prophetVisibility === "all_cards" && "Kahinler beyaz ve siyah kartlar dahil tüm kartları görebilir"}
                         </p>
                       </div>
                     </div>
