@@ -34,44 +34,6 @@ function AnimatedText({ text, className = "", delay = 0 }: { text: string; class
   );
 }
 
-// Dramatik sayaç component
-function DramaticCounter({ onComplete }: { onComplete: () => void }) {
-  const [count, setCount] = useState(3);
-  
-  useEffect(() => {
-    if (count > 0) {
-      const timer = setTimeout(() => {
-        setCount(count - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
-      onComplete();
-    }
-  }, [count, onComplete]);
-  
-  if (count === 0) return null;
-  
-  return (
-    <div 
-      className="absolute inset-0 flex items-center justify-center z-[110]"
-      style={{
-        animation: `countPulse 1s ease-out`,
-        animationIterationCount: 1,
-      }}
-    >
-      <div 
-        className="text-[200px] md:text-[300px] font-black text-purple-500"
-        style={{
-          textShadow: '0 0 100px rgba(168,85,247,0.8), 0 0 200px rgba(168,85,247,0.5)',
-          animation: 'countBounce 1s ease-out',
-        }}
-      >
-        {count}
-      </div>
-    </div>
-  );
-}
-
 // Parçacık efekti component
 function ParticleEffect({ type }: { type: 'success' | 'fail' }) {
   return (
@@ -96,7 +58,7 @@ function ParticleEffect({ type }: { type: 'success' | 'fail' }) {
 }
 
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
-  const [phase, setPhase] = useState<'countdown' | 'reveal' | 'decision' | 'result' | 'video' | 'finished'>('countdown');
+  const [phase, setPhase] = useState<'reveal' | 'decision' | 'result' | 'video' | 'finished'>('reveal');
   const [showDrumRoll, setShowDrumRoll] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
   const [shake, setShake] = useState(false);
@@ -143,10 +105,6 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
   const handleVideoComplete = () => {
     setPhase('finished');
     onComplete?.();
-  };
-  
-  const handleCountdownComplete = () => {
-    // Countdown bitince hiçbir şey yapma, timer'lar halledecek
   };
   
   if (!sequence || phase === 'finished') return null;
@@ -204,16 +162,11 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       {/* Parçacık efektleri */}
       {showParticles && <ParticleEffect type={isCorrect ? 'success' : 'fail'} />}
       
-      {/* Sayaç */}
-      {phase === 'countdown' && (
-        <DramaticCounter onComplete={handleCountdownComplete} />
-      )}
-      
       {/* Ana içerik */}
       <div className="max-w-5xl w-full text-center space-y-12 relative z-10">
         
-        {/* Başlık - her zaman görünsün (countdown hariç) */}
-        {phase !== 'countdown' && (
+        {/* Başlık - her zaman görünsün */}
+        {(
           <div 
             className="text-5xl md:text-7xl font-black text-purple-400 drop-shadow-[0_0_40px_rgba(168,85,247,0.6)]"
             style={{
