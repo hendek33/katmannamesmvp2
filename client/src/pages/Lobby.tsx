@@ -862,14 +862,6 @@ export default function Lobby() {
                   <h4 className="font-semibold text-amber-400 text-base mb-3">⚡ Oyun Kuralları</h4>
                   <ul className="text-sm space-y-2 leading-relaxed">
                     <li className="flex items-start">
-                      <span className="mr-1">•</span>
-                      <span>Kahinler lobide oyun ayarında ayarlanmış kartların yerlerini bilir</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-1">•</span>
-                      <span>Oyun sonunda <span className="text-cyan-400 font-semibold">kaybeden takımın</span> karşı takımın Kahinini tahmin etme hakkı bulunur, ama bu hak bazı kurallara tabiidir</span>
-                    </li>
-                    <li className="flex items-start">
                       <span className="mr-1 text-red-500">•</span>
                       <span><span className="text-red-500 font-bold">Siyah kelime bulunursa</span> kahin tahmininde bulunulamaz, <span className="text-red-400 font-semibold">hükmen kaybedilir</span></span>
                     </li>
