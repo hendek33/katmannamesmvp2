@@ -72,29 +72,49 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     
     hasStartedRef.current = true;
     
-    // Zamanlama
-    const timer1 = setTimeout(() => setPhase('reveal'), 4000);  // 3s sayaç + 1s bekleme
-    const timer2 = setTimeout(() => setPhase('decision'), 8000); // 4s reveal gösterimi
-    const timer3 = setTimeout(() => {
+    // Faz süreleri (milisaniye)
+    const phaseDurations = {
+      reveal: 1500,      // İlk mesaj görüntülenme süresi
+      decisionIntro: 500, // Decision'a geçiş
+      drumRoll: 2000,     // Davul rulosu animasyonu
+      result: 3000        // Sonuç gösterimi
+    };
+    
+    // Kümülatif zamanlama hesaplaması
+    let elapsed = 0;
+    
+    // Timer 1: Reveal → Decision
+    elapsed += phaseDurations.reveal;
+    const timer1 = setTimeout(() => setPhase('decision'), elapsed);
+    
+    // Timer 2: Drum roll başlangıcı
+    elapsed += phaseDurations.decisionIntro;
+    const timer2 = setTimeout(() => {
       setShowDrumRoll(true);
-    }, 10000); // Decision'dan 2s sonra drum roll
-    const timer4 = setTimeout(() => {
+    }, elapsed);
+    
+    // Timer 3: Decision → Result
+    elapsed += phaseDurations.drumRoll;
+    const timer3 = setTimeout(() => {
       setPhase('result');
       setShowDrumRoll(false);
       setShake(true);
       setShowParticles(true);
       setTimeout(() => setShake(false), 500);
-    }, 14000); // 6s decision gösterimi
-    const timer5 = setTimeout(() => {
+    }, elapsed);
+    
+    // Timer 4: Result → Video/Finished
+    elapsed += phaseDurations.result;
+    const timer4 = setTimeout(() => {
       if (sequence.success) {
         setPhase('video');
       } else {
         setPhase('finished');
         onComplete?.();
       }
-    }, 20000); // 6s result gösterimi
+    }, elapsed);
     
-    timersRef.current = [timer1, timer2, timer3, timer4, timer5];
+    timersRef.current = [timer1, timer2, timer3, timer4];
     
     return () => {
       timersRef.current.forEach(timer => clearTimeout(timer));
