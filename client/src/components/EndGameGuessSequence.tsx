@@ -362,34 +362,59 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
               )}
             </div>
             
-            {/* Kazanan takım */}
+            {/* Kazanan takım veya beraberlik */}
             <div className="text-6xl md:text-8xl font-black">
-              <div
-                className={cn(
-                  "mb-4",
-                  sequence.finalWinner === "dark" 
-                    ? "text-blue-400" 
-                    : "text-red-400"
-                )}
-                style={{
-                  animation: 'winnerReveal 1.5s ease-out forwards',
-                  animationDelay: '1.2s',
-                  opacity: 0,
-                  textShadow: sequence.finalWinner === "dark"
-                    ? '0 0 80px rgba(59,130,246,1), 0 0 160px rgba(59,130,246,0.5)'
-                    : '0 0 80px rgba(239,68,68,1), 0 0 160px rgba(239,68,68,0.5)',
-                }}
-              >
-                🏆 {sequence.finalWinnerName} 🏆
-              </div>
-              <AnimatedText 
-                text="TAKIMI KAZANDI!" 
-                className={cn(
-                  "text-5xl md:text-6xl",
-                  sequence.finalWinner === "dark" ? "text-blue-300" : "text-red-300"
-                )}
-                delay={1.8} 
-              />
+              {isCorrect ? (
+                // Doğru tahmin - Beraberlik
+                <>
+                  <div
+                    className="text-yellow-400 mb-4"
+                    style={{
+                      animation: 'winnerReveal 1.5s ease-out forwards',
+                      animationDelay: '1.2s',
+                      opacity: 0,
+                      textShadow: '0 0 80px rgba(250,204,21,1), 0 0 160px rgba(250,204,21,0.5)',
+                    }}
+                  >
+                    🤝 BERABERLIK 🤝
+                  </div>
+                  <AnimatedText 
+                    text="SAĞLANDI!" 
+                    className="text-5xl md:text-6xl text-yellow-300"
+                    delay={1.8} 
+                  />
+                </>
+              ) : (
+                // Yanlış tahmin - Normal kazanan
+                <>
+                  <div
+                    className={cn(
+                      "mb-4",
+                      sequence.finalWinner === "dark" 
+                        ? "text-blue-400" 
+                        : "text-red-400"
+                    )}
+                    style={{
+                      animation: 'winnerReveal 1.5s ease-out forwards',
+                      animationDelay: '1.2s',
+                      opacity: 0,
+                      textShadow: sequence.finalWinner === "dark"
+                        ? '0 0 80px rgba(59,130,246,1), 0 0 160px rgba(59,130,246,0.5)'
+                        : '0 0 80px rgba(239,68,68,1), 0 0 160px rgba(239,68,68,0.5)',
+                    }}
+                  >
+                    🏆 {sequence.finalWinnerName} 🏆
+                  </div>
+                  <AnimatedText 
+                    text="TAKIMI KAZANDI!" 
+                    className={cn(
+                      "text-5xl md:text-6xl",
+                      sequence.finalWinner === "dark" ? "text-blue-300" : "text-red-300"
+                    )}
+                    delay={1.8} 
+                  />
+                </>
+              )}
             </div>
           </div>
         )}
