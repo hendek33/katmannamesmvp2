@@ -144,10 +144,8 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
           className="relative"
           style={{
             opacity: videoReady ? 1 : 0,
-            animation: videoReady
-              ? (isClosing 
-                ? 'zoomOutRotate 0.5s ease-in forwards'
-                : 'zoomInRotate 0.8s ease-out forwards')
+            animation: videoReady && !isClosing
+              ? 'fadeIn 0.5s ease-in-out forwards'
               : 'none',
             transition: 'opacity 0.3s ease-in-out'
           }}
@@ -208,28 +206,6 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
         @keyframes fadeOut {
           from { opacity: 1; }
           to { opacity: 0; }
-        }
-        
-        @keyframes zoomInRotate {
-          from {
-            transform: scale(0) rotate(-180deg);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes zoomOutRotate {
-          from {
-            transform: scale(1) rotate(0deg);
-            opacity: 1;
-          }
-          to {
-            transform: scale(0) rotate(180deg);
-            opacity: 0;
-          }
         }
         
         @keyframes fadeInDown {
