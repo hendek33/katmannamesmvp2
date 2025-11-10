@@ -816,7 +816,23 @@ export default function Lobby() {
       
       {/* Chaos Mode Details Dialog */}
       <AlertDialog open={showChaosDetails} onOpenChange={setShowChaosDetails}>
-        <AlertDialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800">
+        <AlertDialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800 
+          [&::-webkit-scrollbar]:w-2
+          [&::-webkit-scrollbar-track]:bg-slate-800/20
+          [&::-webkit-scrollbar-track]:rounded-full
+          [&::-webkit-scrollbar-track]:backdrop-blur-sm
+          [&::-webkit-scrollbar-thumb]:bg-gradient-to-b
+          [&::-webkit-scrollbar-thumb]:from-cyan-500/40
+          [&::-webkit-scrollbar-thumb]:to-blue-500/40
+          [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-thumb]:border
+          [&::-webkit-scrollbar-thumb]:border-cyan-400/20
+          [&::-webkit-scrollbar-thumb]:shadow-lg
+          hover:[&::-webkit-scrollbar-thumb]:from-cyan-500/60
+          hover:[&::-webkit-scrollbar-thumb]:to-blue-500/60
+          hover:[&::-webkit-scrollbar-thumb]:shadow-cyan-400/30
+          [&::-webkit-scrollbar-thumb]:transition-all
+          [&::-webkit-scrollbar-thumb]:duration-200">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
               🔮 KAHİN MODU NEDİR?
