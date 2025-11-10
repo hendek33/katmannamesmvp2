@@ -74,7 +74,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     
     // Faz süreleri (milisaniye)
     const phaseDurations = {
-      reveal: 1500,      // İlk mesaj görüntülenme süresi
+      reveal: 3000,      // İlk mesaj görüntülenme süresi (3 saniye)
       decisionIntro: 500, // Decision'a geçiş
       drumRoll: 2000,     // Davul rulosu animasyonu
       result: 3000        // Sonuç gösterimi
