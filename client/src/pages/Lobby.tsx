@@ -883,7 +883,7 @@ export default function Lobby() {
                     </li>
                     <li className="flex items-start">
                       <span className="mr-1 text-yellow-500">•</span>
-                      <span>Kahin tahminini doğru yaparak kazanmak <span className="text-yellow-400 font-bold">yarım puan</span> sayılır</span>
+                      <span>Kahin tahminini doğru yaparak kazanmak <span className="text-yellow-400 font-bold">beraberlik</span> sayılır</span>
                     </li>
                   </ul>
                 </div>
