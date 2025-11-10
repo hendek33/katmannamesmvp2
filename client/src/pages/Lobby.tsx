@@ -816,25 +816,25 @@ export default function Lobby() {
       
       {/* Chaos Mode Details Dialog */}
       <AlertDialog open={showChaosDetails} onOpenChange={setShowChaosDetails}>
-        <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800">
+        <AlertDialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+            <AlertDialogTitle className="text-2xl bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
               🔮 KAHİN MODU NEDİR?
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-4 pt-4">
-                <p className="text-sm">
+              <div className="space-y-5 pt-4">
+                <p className="text-base">
                   Kahin Modu, klasik Katmannames oyununa gizli bir rol ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
                   Her takıma atanan gizli Kahin, oyunun dinamiğini tamamen değiştirir!
                 </p>
                 
-                <div className="space-y-3">
-                  <div className="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">🔮</span>
-                      <h4 className="font-bold text-cyan-500">Kahin Rolü</h4>
+                <div className="space-y-4">
+                  <div className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-2xl">🔮</span>
+                      <h4 className="font-bold text-lg text-cyan-500">Kahin Rolü</h4>
                     </div>
-                    <p className="text-xs">
+                    <p className="text-sm leading-relaxed">
                       Her takımda 1 tane gizli Kahin bulunur. Oyun başında moderatörün ayarlayacağı kurallardaki kartların yerini bilir. 
                       Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
                       <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Ama tahmin yapabilmenin bazı koşulları vardır.</span>
@@ -842,14 +842,15 @@ export default function Lobby() {
                   </div>
                 </div>
                 
-                <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <h4 className="font-semibold text-amber-400 mb-2">⚡ Oyun Kuralları</h4>
-                  <ul className="text-xs space-y-1">
+                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                  <h4 className="font-semibold text-amber-400 text-base mb-3">⚡ Oyun Kuralları</h4>
+                  <ul className="text-sm space-y-2 leading-relaxed">
                     <li>• Kahinler lobide oyun ayarında ayarlanmış kartların yerlerini bilir</li>
                     <li>• Oyun sonunda kaybeden takımının karşı takımın Kahinini tahmin etme hakkı bulunur, ama bu hak bazı kurallara tabiidir</li>
                     <li>• Siyah kelime bulunursa kahin tahmininde bulunulamaz, hükmen kaybedilir</li>
                     <li>• Karşı takımın son kalan kelimesi bulunursa kahin tahmininde bulunulamaz, hükmen kaybedilir</li>
                     <li>• Üst üste iki tur kelime açmadan tahmini bitiren takım oyun sonunda kahin tahmininde bulunamaz</li>
+                    <li>• Kahin tahminini doğru yaparak kazanmak yarım puan sayılır</li>
                   </ul>
                 </div>
               </div>
