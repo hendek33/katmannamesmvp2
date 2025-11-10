@@ -1215,18 +1215,6 @@ export default function Game() {
                     <ArrowLeft className="w-3 h-3 mr-1" />
                     <span className="text-xs">Lobiye Dön</span>
                   </Button>
-                  <Button
-                    onClick={() => toast({
-                      title: "Yakında Gelecek",
-                      description: "Oyun düzenleme özelliği yakında eklenecek.",
-                    })}
-                    size="sm"
-                    variant="secondary"
-                    className="h-7"
-                  >
-                    <Settings className="w-3 h-3 mr-1" />
-                    <span className="text-xs">Oyunu Düzenle</span>
-                  </Button>
                 </div>
               ) : (
                 <div className="flex items-center gap-3 px-3 py-1 bg-slate-800/50 rounded-lg border border-slate-700/50">
