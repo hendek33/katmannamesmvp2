@@ -146,42 +146,22 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
             opacity: videoReady ? 1 : 0,
             animation: videoReady
               ? (isClosing 
-                ? 'mysticalDisappear 0.8s ease-in forwards'
-                : 'mysticalAppear 1.5s ease-out forwards')
+                ? 'zoomOutRotate 0.5s ease-in forwards'
+                : 'zoomInRotate 0.8s ease-out forwards')
               : 'none',
             transition: 'opacity 0.3s ease-in-out'
           }}
         >
-          {/* Portal glow effects - multiple layers */}
+          {/* Glow effect */}
           <div 
-            className="absolute -inset-12 rounded-full blur-3xl opacity-40"
-            style={{
-              background: team === "dark" 
-                ? 'radial-gradient(circle, rgba(147,51,234,0.6) 0%, rgba(59,130,246,0.4) 50%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(147,51,234,0.6) 0%, rgba(239,68,68,0.4) 50%, transparent 70%)',
-              animation: videoReady ? 'portalPulse 3s ease-in-out infinite' : 'none'
-            }}
-          />
-          <div 
-            className="absolute -inset-8 rounded-full blur-2xl opacity-60"
+            className={cn(
+              "absolute -inset-8 rounded-full blur-3xl opacity-60",
+              videoReady ? "animate-pulse" : ""
+            )}
             style={{
               background: team === "dark" 
                 ? 'radial-gradient(circle, rgba(59,130,246,0.8) 0%, transparent 60%)'
-                : 'radial-gradient(circle, rgba(239,68,68,0.8) 0%, transparent 60%)',
-              animation: videoReady ? 'mysticRotate 5s linear infinite' : 'none'
-            }}
-          />
-          <div 
-            className="absolute -inset-4 rounded-full opacity-30"
-            style={{
-              background: `conic-gradient(from 0deg, 
-                transparent, 
-                ${team === "dark" ? 'rgba(147,51,234,0.8)' : 'rgba(217,70,239,0.8)'}, 
-                transparent, 
-                ${team === "dark" ? 'rgba(59,130,246,0.8)' : 'rgba(239,68,68,0.8)'}, 
-                transparent)`,
-              animation: videoReady ? 'spiralRotate 4s linear infinite' : 'none',
-              filter: 'blur(10px)'
+                : 'radial-gradient(circle, rgba(239,68,68,0.8) 0%, transparent 60%)'
             }}
           />
           
@@ -230,64 +210,25 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
           to { opacity: 0; }
         }
         
-        @keyframes mysticalAppear {
-          0% {
-            transform: scale(0) rotateY(90deg);
+        @keyframes zoomInRotate {
+          from {
+            transform: scale(0) rotate(-180deg);
             opacity: 0;
-            filter: blur(20px) brightness(2);
           }
-          20% {
-            transform: scale(1.2) rotateY(75deg);
-            opacity: 0.3;
-            filter: blur(15px) brightness(1.8);
-          }
-          40% {
-            transform: scale(0.9) rotateY(45deg);
-            opacity: 0.6;
-            filter: blur(10px) brightness(1.5);
-          }
-          60% {
-            transform: scale(1.1) rotateY(20deg);
-            opacity: 0.8;
-            filter: blur(5px) brightness(1.3);
-          }
-          80% {
-            transform: scale(0.95) rotateY(5deg);
-            opacity: 0.9;
-            filter: blur(2px) brightness(1.1);
-          }
-          90% {
-            transform: scale(1.02) rotateY(0deg);
-            opacity: 0.95;
-            filter: blur(1px) brightness(1.05);
-          }
-          100% {
-            transform: scale(1) rotateY(0deg);
+          to {
+            transform: scale(1) rotate(0deg);
             opacity: 1;
-            filter: blur(0px) brightness(1);
           }
         }
         
-        @keyframes mysticalDisappear {
-          0% {
-            transform: scale(1) rotateY(0deg);
+        @keyframes zoomOutRotate {
+          from {
+            transform: scale(1) rotate(0deg);
             opacity: 1;
-            filter: blur(0px) brightness(1);
           }
-          30% {
-            transform: scale(1.05) rotateY(-20deg);
-            opacity: 0.8;
-            filter: blur(3px) brightness(1.2);
-          }
-          60% {
-            transform: scale(0.8) rotateY(-60deg);
-            opacity: 0.5;
-            filter: blur(8px) brightness(1.5);
-          }
-          100% {
-            transform: scale(0) rotateY(-90deg);
+          to {
+            transform: scale(0) rotate(180deg);
             opacity: 0;
-            filter: blur(20px) brightness(2);
           }
         }
         
@@ -325,35 +266,6 @@ export function ProphetVideo({ team, teamName, onComplete }: ProphetVideoProps) 
           100% {
             filter: brightness(1.2) saturate(1.2);
             transform: scale(1);
-          }
-        }
-        
-        @keyframes portalPulse {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.4;
-          }
-          50% {
-            transform: scale(1.3);
-            opacity: 0.7;
-          }
-        }
-        
-        @keyframes mysticRotate {
-          from {
-            transform: rotate(0deg) scale(1);
-          }
-          to {
-            transform: rotate(360deg) scale(1);
-          }
-        }
-        
-        @keyframes spiralRotate {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(-360deg);
           }
         }
       `}</style>
