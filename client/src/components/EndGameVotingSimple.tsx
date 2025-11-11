@@ -124,24 +124,25 @@ export function EndGameVoting({
   // Full View with Glassmorphism and Animation
   return (
     <>
-      <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex flex-col items-center justify-center p-4">
-        {/* Prophet Selection Video - Fixed distance above modal */}
-        <div className="mb-4 pointer-events-none">
-          <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900" style={{ willChange: 'transform' }}>
-            <video
-              ref={videoRef}
-              src={base64Url || videoSrc}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-              loop
-              playsInline
-              style={{ transform: 'translateZ(0)' }}
-            />
-            {/* Purple gradient overlay for better blending */}
-            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent" />
-          </div>
+      {/* Prophet Selection Video - Completely isolated from modal */}
+      <div className="fixed top-[18%] left-1/2 transform -translate-x-1/2 z-[92] pointer-events-none">
+        <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900" style={{ isolation: 'isolate', backfaceVisibility: 'hidden', transform: 'translate3d(-50%, 0, 0) translateZ(0)' }}>
+          <video
+            ref={videoRef}
+            src={base64Url || videoSrc}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{ willChange: 'auto' }}
+          />
+          {/* Purple gradient overlay for better blending */}
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent" />
         </div>
+      </div>
+      
+      <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex flex-col items-center justify-center p-4">
         
         {/* Modal Window */}
         <div 
@@ -212,9 +213,9 @@ export function EndGameVoting({
                   key={player.id}
                   onClick={() => handlePlayerClick(player.id)}
                   className={cn(
-                    "relative flex items-center gap-3 p-3 rounded-xl border backdrop-blur-sm transition-all duration-300",
+                    "relative flex items-center gap-3 p-3 rounded-xl border backdrop-blur-sm transition-colors duration-200",
                     "bg-gradient-to-br from-slate-800/30 via-slate-900/20 to-slate-800/30",
-                    isOnLosingTeam && !isProphetVotingDisabled && "cursor-pointer hover:from-purple-800/30 hover:via-purple-900/20 hover:to-purple-800/30 hover:scale-[1.02] hover:shadow-lg hover:shadow-purple-500/20",
+                    isOnLosingTeam && !isProphetVotingDisabled && "cursor-pointer hover:from-purple-800/30 hover:via-purple-900/20 hover:to-purple-800/30",
                     isSelected ? "border-purple-400/60 from-purple-900/40 via-purple-800/30 to-purple-900/40 shadow-lg shadow-purple-500/30" : "border-slate-600/30",
                     isMostVoted && "border-amber-400/60 from-amber-900/30 via-amber-800/20 to-amber-900/30 ring-2 ring-amber-500/40 shadow-lg shadow-amber-500/20"
                   )}
