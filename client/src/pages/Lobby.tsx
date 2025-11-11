@@ -874,8 +874,8 @@ export default function Lobby() {
                       <span><span className="text-orange-400 font-semibold">Üst üste iki tur kelime açmadan</span> tahmini bitiren takım oyun sonunda <span className="text-orange-300">KAHİN TAHMİNİNDE BULUNAMAZ</span></span>
                     </li>
                     <li className="flex items-start">
-                      <span className="mr-1 text-purple-500">•</span>
-                      <span><span className="text-purple-400 font-semibold">Her takımın 3 tane beyaz kart açma hakkı vardır,</span> <span className="text-purple-500 font-bold">3'ten fazla açıldığı takdirde</span> <span className="text-purple-300">KAHİN TAHMİNİNDE BULUNULAMAZ</span></span>
+                      <span className="mr-1 text-amber-500">•</span>
+                      <span><span className="text-amber-400 font-semibold">Her takımın 3 tane beyaz kart açma hakkı vardır,</span> <span className="text-amber-500 font-bold">3'ten fazla açıldığı takdirde</span> <span className="text-amber-300">KAHİN TAHMİNİNDE BULUNULAMAZ</span></span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-1 text-yellow-500">•</span>
