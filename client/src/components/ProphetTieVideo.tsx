@@ -50,6 +50,7 @@ export function ProphetTieVideo({ onComplete }: ProphetTieVideoProps) {
         src={base64Url || videoSrc}
         className="w-full h-full object-contain"
         autoPlay
+        muted
         playsInline
         onEnded={handleVideoEnd}
         style={{ maxWidth: '100%', maxHeight: '100%' }}
