@@ -123,17 +123,18 @@ export function EndGameVoting({
 
   // Full View with Glassmorphism and Animation
   return (
-    <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
-      <div 
-        className={cn(
-          "bg-gradient-to-br from-slate-900/40 via-purple-900/20 to-slate-900/40 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-2xl",
-          "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-purple-500/20 before:via-transparent before:to-purple-500/20 before:opacity-50",
-          isAnimating && "animate-in fade-in-0 zoom-in-95 duration-500"
-        )}
-        style={{
-          boxShadow: '0 20px 70px -10px rgba(168,85,247,0.4), 0 10px 40px -10px rgba(168,85,247,0.3)',
-        }}
-      >
+    <>
+      <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+        <div 
+          className={cn(
+            "bg-gradient-to-br from-slate-900/40 via-purple-900/20 to-slate-900/40 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-2xl",
+            "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-purple-500/20 before:via-transparent before:to-purple-500/20 before:opacity-50",
+            isAnimating && "animate-in fade-in-0 zoom-in-95 duration-500"
+          )}
+          style={{
+            boxShadow: '0 20px 70px -10px rgba(168,85,247,0.4), 0 10px 40px -10px rgba(168,85,247,0.3)',
+          }}
+        >
         {/* Glassmorphic Header */}
         <div className="relative bg-gradient-to-r from-purple-900/30 via-purple-800/20 to-purple-900/30 backdrop-blur-md px-5 py-3 border-b border-purple-500/20 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -248,22 +249,22 @@ export function EndGameVoting({
             })}
           </div>
         </div>
-        
-        {/* Prophet Selection Video - Fixed at bottom right corner */}
-        <div className="absolute bottom-4 right-4 z-20">
-          <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
-            <video
-              ref={videoRef}
-              src={base64Url || videoSrc}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-            {/* Purple gradient overlay for better blending */}
-            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
-          </div>
+      </div>
+      
+      {/* Prophet Selection Video - Outside the modal, at bottom center */}
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-[91]">
+        <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
+          <video
+            ref={videoRef}
+            src={base64Url || videoSrc}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+          {/* Purple gradient overlay for better blending */}
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
         </div>
       </div>
       
@@ -310,6 +311,6 @@ export function EndGameVoting({
           }
         }
       `}</style>
-    </div>
+    </>
   );
 }
