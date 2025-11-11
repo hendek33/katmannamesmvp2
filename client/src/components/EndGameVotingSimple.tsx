@@ -250,9 +250,10 @@ export function EndGameVoting({
           </div>
         </div>
       </div>
+    </div>
       
-      {/* Prophet Selection Video - Outside the modal, at bottom center */}
-      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-[91]">
+    {/* Prophet Selection Video - Outside the modal, at bottom center */}
+    <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-[91]">
         <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
           <video
             ref={videoRef}
