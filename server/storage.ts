@@ -302,6 +302,7 @@ export class MemStorage implements IStorage {
       prophetVisibility: "own_team", // Default visibility for prophets
       prophetGuessUsed: { dark: false, light: false },
       consecutivePasses: { dark: 0, light: 0 }, // Track consecutive passes
+      neutralCardsRevealedByTeam: { dark: 0, light: 0 }, // Track neutral cards revealed
     };
 
     this.rooms.set(roomCode, { 
@@ -854,6 +855,9 @@ export class MemStorage implements IStorage {
       roomData.turnRevealMap = { dark: false, light: false };
     }
     
+    // Reset neutral cards revealed tracking
+    room.neutralCardsRevealedByTeam = { dark: 0, light: 0 };
+    
     // Start timer if timed mode is enabled
     if (room.timedMode) {
       room.currentTurnStartTime = Date.now();
@@ -1003,6 +1007,10 @@ export class MemStorage implements IStorage {
     } else {
       // Neutral card - always ends turn
       shouldEndTurn = true;
+      // Track neutral cards revealed by team
+      if (room.neutralCardsRevealedByTeam && room.currentTeam) {
+        room.neutralCardsRevealedByTeam[room.currentTeam]++;
+      }
     }
     
     // End turn if needed
@@ -1306,6 +1314,12 @@ export class MemStorage implements IStorage {
       return null; // Only losing team can vote
     }
     
+    // Check if losing team has revealed 3 or more neutral cards (forfeits prophet guess right)
+    if (room.neutralCardsRevealedByTeam && player.team && 
+        room.neutralCardsRevealedByTeam[player.team] >= 3) {
+      return null; // Team revealed too many neutral cards, cannot make prophet guess
+    }
+    
     // Get the target player and verify they're on the winning team
     const targetPlayer = room.players.find(p => p.id === targetPlayerId);
     if (!targetPlayer || targetPlayer.team !== room.winner) {
@@ -1384,6 +1398,12 @@ export class MemStorage implements IStorage {
     const player = room.players.find(p => p.id === playerId);
     if (!player || player.team === room.winner) {
       return null; // Only losing team can guess
+    }
+    
+    // Check if losing team has revealed 3 or more neutral cards (forfeits prophet guess right)
+    if (room.neutralCardsRevealedByTeam && player.team && 
+        room.neutralCardsRevealedByTeam[player.team] >= 3) {
+      return null; // Team revealed too many neutral cards, cannot make prophet guess
     }
     
     // Get the target player
