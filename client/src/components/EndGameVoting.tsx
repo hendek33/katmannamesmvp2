@@ -160,7 +160,7 @@ export function EndGameVoting({
           }}
         />
         
-        <div className="relative bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 rounded-xl border border-purple-500/30 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[80vh] overflow-y-auto">
+        <div className="relative bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 rounded-xl border border-purple-500/30 backdrop-blur-xl shadow-2xl overflow-hidden">
           {/* Top gradient strip */}
           <div 
             className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r"
@@ -188,7 +188,24 @@ export function EndGameVoting({
             Küçült
           </Button>
           
-          <div className="p-3 space-y-2">
+          {/* Prophet Selection Video - Fixed at bottom right */}
+          <div className="absolute bottom-4 right-4 z-20">
+            <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
+              <video
+                ref={videoRef}
+                src={base64Url || videoSrc}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+              {/* Purple gradient overlay for better blending */}
+              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
+            </div>
+          </div>
+          
+          <div className="p-3 space-y-2 max-h-[75vh] overflow-y-auto">
             {/* Compact Header with all info in one line */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -397,23 +414,6 @@ export function EndGameVoting({
             })}
               </div>
             </motion.div>
-          </div>
-          
-          {/* Prophet Selection Video - Circular at bottom */}
-          <div className="flex justify-center pb-4">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl">
-              <video
-                ref={videoRef}
-                src={base64Url || videoSrc}
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
-              {/* Purple gradient overlay for better blending */}
-              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
-            </div>
           </div>
         </div>
       </motion.div>
