@@ -124,7 +124,25 @@ export function EndGameVoting({
   // Full View with Glassmorphism and Animation
   return (
     <>
-      <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex flex-col items-center justify-center p-4">
+        {/* Prophet Selection Video - Fixed distance above modal */}
+        <div className="mb-4">
+          <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
+            <video
+              ref={videoRef}
+              src={base64Url || videoSrc}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+            {/* Purple gradient overlay for better blending */}
+            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
+          </div>
+        </div>
+        
+        {/* Modal Window */}
         <div 
           className={cn(
             "bg-gradient-to-br from-slate-900/40 via-purple-900/20 to-slate-900/40 backdrop-blur-xl rounded-2xl border border-purple-500/30 shadow-2xl w-full max-w-2xl",
@@ -250,23 +268,6 @@ export function EndGameVoting({
           </div>
         </div>
       </div>
-    </div>
-      
-    {/* Prophet Selection Video - Positioned above the modal */}
-    <div className="fixed top-[15%] left-1/2 transform -translate-x-1/2 z-[91]">
-        <div className="relative w-56 h-56 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
-          <video
-            ref={videoRef}
-            src={base64Url || videoSrc}
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
-          {/* Purple gradient overlay for better blending */}
-          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
-        </div>
       </div>
       
       <style>{`
