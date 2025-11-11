@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { GameState } from "@shared/schema";
 import { Zap, Sparkles, Star } from "lucide-react";
+import { ProphetTieVideo } from "./ProphetTieVideo";
 
 interface EndGameGuessSequenceProps {
   sequence: GameState["endGameGuessSequence"];
@@ -57,7 +58,7 @@ function ParticleEffect({ type }: { type: 'success' | 'fail' }) {
 }
 
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
-  const [phase, setPhase] = useState<'reveal' | 'decision' | 'result' | 'finished'>('reveal');
+  const [phase, setPhase] = useState<'reveal' | 'decision' | 'result' | 'video' | 'finished'>('reveal');
   const [showDrumRoll, setShowDrumRoll] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
   const [shake, setShake] = useState(false);
@@ -102,11 +103,15 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       setTimeout(() => setShake(false), 500);
     }, elapsed);
     
-    // Timer 4: Result → Finished (video kaldırıldı, beraberlikte video yok)
+    // Timer 4: Result → Video/Finished
     elapsed += phaseDurations.result;
     const timer4 = setTimeout(() => {
-      setPhase('finished');
-      onComplete?.();
+      if (sequence.success) {
+        setPhase('video');
+      } else {
+        setPhase('finished');
+        onComplete?.();
+      }
     }, elapsed);
     
     timersRef.current = [timer1, timer2, timer3, timer4];
@@ -117,11 +122,21 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     };
   }, []);
   
+  const handleVideoComplete = () => {
+    setPhase('finished');
+    onComplete?.();
+  };
+
   if (!sequence || phase === 'finished') return null;
   
   const roleText = "Kahin";
   const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
   const isCorrect = sequence.success;
+  
+  // Video gösteriliyorsa (beraberlik durumu)
+  if (phase === 'video' && isCorrect) {
+    return <ProphetTieVideo onComplete={handleVideoComplete} />;
+  }
   
   return (
     <div 
