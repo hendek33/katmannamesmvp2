@@ -1594,6 +1594,11 @@ export default function Game() {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-red-200/80 font-semibold uppercase">Kalan Kart</p>
+                  {gameState.chaosMode && gameState.chaosModeType === "prophet" && gameState.neutralCardsRevealedByTeam && (
+                    <p className="text-[9px] lg:text-[10px] xl:text-xs 2xl:text-sm text-red-300/80 font-medium">
+                      Beyaz Hakkı: {Math.max(0, 3 - gameState.neutralCardsRevealedByTeam.light)}/3
+                    </p>
+                  )}
                 </div>
                 {/* Player List - Separated by Role */}
                 <div className="mt-2 pt-2 border-t border-red-700/30 space-y-1">
@@ -1853,6 +1858,11 @@ export default function Game() {
                   <div className="text-center relative z-10">
                     <div className="text-[10px] font-bold text-blue-100">{gameState.darkTeamName}</div>
                     <div className="text-xl font-black text-blue-100">{gameState.darkCardsRemaining}</div>
+                    {gameState.chaosMode && gameState.chaosModeType === "prophet" && gameState.neutralCardsRevealedByTeam && (
+                      <div className="text-[8px] font-semibold text-blue-200 mt-0.5">
+                        Beyaz: {Math.max(0, 3 - gameState.neutralCardsRevealedByTeam.dark)}/3
+                      </div>
+                    )}
                     {gameState.currentTeam === "dark" && (
                       <div className="text-[9px] font-bold">
                         <span className="text-blue-300">Sıradaki takım: </span>
@@ -1872,6 +1882,11 @@ export default function Game() {
                   <div className="text-center relative z-10">
                     <div className="text-[10px] font-bold text-red-100">{gameState.lightTeamName}</div>
                     <div className="text-xl font-black text-red-100">{gameState.lightCardsRemaining}</div>
+                    {gameState.chaosMode && gameState.chaosModeType === "prophet" && gameState.neutralCardsRevealedByTeam && (
+                      <div className="text-[8px] font-semibold text-red-200 mt-0.5">
+                        Beyaz: {Math.max(0, 3 - gameState.neutralCardsRevealedByTeam.light)}/3
+                      </div>
+                    )}
                     {gameState.currentTeam === "light" && (
                       <div className="text-[9px] font-bold">
                         <span className="text-red-300">Sıradaki takım: </span>
@@ -2137,6 +2152,11 @@ export default function Game() {
                 </div>
                 <div className="space-y-0.5">
                   <p className="text-[10px] lg:text-xs xl:text-sm 2xl:text-base text-blue-200/80 font-semibold uppercase">Kalan Kart</p>
+                  {gameState.chaosMode && gameState.chaosModeType === "prophet" && gameState.neutralCardsRevealedByTeam && (
+                    <p className="text-[9px] lg:text-[10px] xl:text-xs 2xl:text-sm text-blue-300/80 font-medium">
+                      Beyaz Hakkı: {Math.max(0, 3 - gameState.neutralCardsRevealedByTeam.dark)}/3
+                    </p>
+                  )}
                 </div>
                 {/* Player List - Separated by Role */}
                 <div className="mt-2 pt-2 border-t border-blue-700/30 space-y-1">
