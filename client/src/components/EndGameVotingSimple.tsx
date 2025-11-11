@@ -17,7 +17,7 @@ interface EndGameVotingProps {
   onConfirm: (targetPlayerId: string) => void;
   chaosType: "prophet" | "double_agent";
   consecutivePasses?: { dark: number; light: number };
-  disableReason?: "assassin" | "opponent_last_card" | "consecutive_passes" | null;
+  disableReason?: "assassin" | "opponent_last_card" | "consecutive_passes" | "neutral_cards" | null;
 }
 
 export function EndGameVoting({
@@ -68,6 +68,8 @@ export function EndGameVoting({
       return "Karşı takımın son kartı bulunduğu için kahin tahmini devre dışı!";
     } else if (disableReason === "consecutive_passes" || hasConsecutivePasses) {
       return "2 kez üst üste pas geçildiği için kahin tahmini devre dışı!";
+    } else if (disableReason === "neutral_cards") {
+      return "3 veya daha fazla beyaz kart açıldığı için kahin tahmini devre dışı!";
     }
     return null;
   };

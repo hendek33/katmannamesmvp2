@@ -768,13 +768,18 @@ export default function Game() {
         const hasConsecutivePasses = gameState.consecutivePasses && 
           gameState.consecutivePasses[losingTeam] >= 2;
         
-        let disableReason: "assassin" | "opponent_last_card" | "consecutive_passes" | null = null;
+        const hasTooManyNeutralCards = gameState.neutralCardsRevealedByTeam && 
+          gameState.neutralCardsRevealedByTeam[losingTeam] >= 3;
+        
+        let disableReason: "assassin" | "opponent_last_card" | "consecutive_passes" | "neutral_cards" | null = null;
         if (wasAssassinRevealed) {
           disableReason = "assassin";
         } else if (wasLosingTeamRevealedWinningCard) {
           disableReason = "opponent_last_card";
         } else if (hasConsecutivePasses) {
           disableReason = "consecutive_passes";
+        } else if (hasTooManyNeutralCards) {
+          disableReason = "neutral_cards";
         }
         
         return (
