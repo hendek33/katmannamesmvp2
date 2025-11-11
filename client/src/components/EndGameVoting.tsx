@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import type { Player, Team } from "@shared/schema";
 import { motion } from "framer-motion";
 import { Minimize2, Maximize2 } from "lucide-react";
+import { useInlineVideo } from "@/hooks/useInlineVideo";
 
 interface EndGameVotingProps {
   winningTeam: "dark" | "light";
@@ -36,6 +37,12 @@ export function EndGameVoting({
   const [hasVoted, setHasVoted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  
+  // Prophet selection window video
+  const videoSrc = "/kahin seçim penceresi.webm";
+  const { videoRef, base64Url } = useInlineVideo(videoSrc, {
+    autoPlay: true
+  });
   
   // Show with delay
   useEffect(() => {
@@ -390,6 +397,23 @@ export function EndGameVoting({
             })}
               </div>
             </motion.div>
+          </div>
+          
+          {/* Prophet Selection Video - Circular at bottom */}
+          <div className="flex justify-center pb-4">
+            <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl">
+              <video
+                ref={videoRef}
+                src={base64Url || videoSrc}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+              {/* Purple gradient overlay for better blending */}
+              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
+            </div>
           </div>
         </div>
       </motion.div>
