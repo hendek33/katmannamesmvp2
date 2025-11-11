@@ -91,6 +91,10 @@ export interface GameState {
     dark: number;
     light: number;
   };
+  neutralCardsRevealedByTeam?: { // Track neutral cards revealed by each team
+    dark: number;
+    light: number;
+  };
 }
 
 export interface RoomListItem {
