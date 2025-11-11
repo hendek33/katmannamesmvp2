@@ -126,8 +126,8 @@ export function EndGameVoting({
     <>
       <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex flex-col items-center justify-center p-4">
         {/* Prophet Selection Video - Fixed distance above modal */}
-        <div className="mb-4">
-          <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
+        <div className="mb-4 pointer-events-none">
+          <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900" style={{ willChange: 'transform' }}>
             <video
               ref={videoRef}
               src={base64Url || videoSrc}
@@ -136,9 +136,10 @@ export function EndGameVoting({
               muted
               loop
               playsInline
+              style={{ transform: 'translateZ(0)' }}
             />
             {/* Purple gradient overlay for better blending */}
-            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent" />
           </div>
         </div>
         
