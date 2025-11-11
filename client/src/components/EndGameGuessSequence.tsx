@@ -75,7 +75,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     // Faz süreleri (milisaniye)
     const phaseDurations = {
       reveal: 4000,      // İlk mesaj görüntülenme süresi (3 saniye)
-      decisionIntro: 100, // Decision'a geçiş
+      decisionIntro: 0, // Decision'a geçiş
       drumRoll: 4000,     // Davul rulosu animasyonu
       result: 5000        // Sonuç gösterimi
     };
@@ -343,7 +343,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
                       textShadow: '0 0 80px rgba(250,204,21,1), 0 0 160px rgba(250,204,21,0.5)',
                     }}
                   >
-                    🤝 BERABERLIK 🤝
+                    BERABERLIK
                   </div>
                   <AnimatedText 
                     text="SAĞLANDI!" 
@@ -370,7 +370,7 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
                         : '0 0 80px rgba(239,68,68,1), 0 0 160px rgba(239,68,68,0.5)',
                     }}
                   >
-                    🏆 {sequence.finalWinnerName} 🏆
+                     {sequence.finalWinnerName} 
                   </div>
                   <AnimatedText 
                     text="TAKIMI KAZANDI!" 
