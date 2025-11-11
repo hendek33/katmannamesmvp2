@@ -125,9 +125,15 @@ export function EndGameVoting({
   return (
     <>
       <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-md flex flex-col items-center justify-center p-4">
-        {/* Prophet Selection Video - Fixed distance above modal */}
+        {/* Prophet Selection Video - Fixed distance above modal with same animation */}
         <div className="mb-4 pointer-events-none">
-          <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900" style={{ willChange: 'transform' }}>
+          <div 
+            className={cn(
+              "relative w-64 h-64 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900",
+              isAnimating && "animate-in fade-in-0 zoom-in-95 duration-500"
+            )} 
+            style={{ willChange: 'transform' }}
+          >
             <video
               ref={videoRef}
               src={base64Url || videoSrc}
