@@ -804,7 +804,7 @@ export default function Game() {
       )}
 
       {/* Game End Notification - Auto disappears (only for non-assassin wins, if video is not showing) */}
-      {gameState.phase === "ended" && gameState.winner && !wasAssassinRevealed && !showNormalWinVideo && (
+      {gameState.phase === "ended" && gameState.winner && !wasAssassinRevealed && !showNormalWinVideo && !normalWinShownRef.current && (
         <div 
           className="fixed inset-x-0 top-32 z-50 flex justify-center px-4 pointer-events-none"
           style={{
