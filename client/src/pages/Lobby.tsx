@@ -851,7 +851,7 @@ export default function Lobby() {
                       <h4 className="font-bold text-lg text-cyan-500">Kahin Rolü</h4>
                     </div>
                     <p className="text-sm leading-relaxed">
-                      Her takımda 1 tane gizli Kahin bulunur. Oyun başında moderatörün ayarlayacağı kurallardaki kartların yerini bilir. 
+                      Her takımda 1 tane gizli Kahin bulunur. 
                       Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
                       <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Ama tahmin yapabilmenin bazı koşulları vardır.</span>
                     </p>
@@ -861,14 +861,6 @@ export default function Lobby() {
                 <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                   <h4 className="font-semibold text-amber-400 text-base mb-3">⚡ Oyun Kuralları</h4>
                   <ul className="text-sm space-y-2 leading-relaxed">
-                    <li className="flex items-start">
-                      <span className="mr-1">•</span>
-                      <span>Kahinler lobide oyun ayarında ayarlanmış kartların yerlerini bilir</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-1">•</span>
-                      <span>Oyun sonunda <span className="text-cyan-400 font-semibold">kaybeden takımın</span> karşı takımın Kahinini tahmin etme hakkı bulunur, ama bu hak bazı kurallara tabiidir</span>
-                    </li>
                     <li className="flex items-start">
                       <span className="mr-1 text-red-500">•</span>
                       <span><span className="text-red-500 font-bold">Siyah kelime açılırsa</span> KAHİN TAHMİNİNDE BULUNULAMAZ, <span className="text-red-400 font-semibold">hükmen kaybedilir</span></span>
@@ -880,6 +872,10 @@ export default function Lobby() {
                     <li className="flex items-start">
                       <span className="mr-1 text-orange-500">•</span>
                       <span><span className="text-orange-400 font-semibold">Üst üste iki tur kelime açmadan</span> tahmini bitiren takım oyun sonunda <span className="text-orange-300">KAHİN TAHMİNİNDE BULUNAMAZ</span></span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-1 text-purple-500">•</span>
+                      <span><span className="text-purple-400 font-semibold">Her takımın 3 tane beyaz kart açma hakkı vardır,</span> <span className="text-purple-500 font-bold">3'ten fazla açıldığı takdirde</span> <span className="text-purple-300">KAHİN TAHMİNİNDE BULUNULAMAZ</span></span>
                     </li>
                     <li className="flex items-start">
                       <span className="mr-1 text-yellow-500">•</span>
