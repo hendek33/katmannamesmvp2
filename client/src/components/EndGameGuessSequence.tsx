@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import type { GameState } from "@shared/schema";
-import { NormalWinVideo } from "./NormalWinVideo";
 import { Zap, Sparkles, Star } from "lucide-react";
 
 interface EndGameGuessSequenceProps {
@@ -58,7 +57,7 @@ function ParticleEffect({ type }: { type: 'success' | 'fail' }) {
 }
 
 export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
-  const [phase, setPhase] = useState<'reveal' | 'decision' | 'result' | 'video' | 'finished'>('reveal');
+  const [phase, setPhase] = useState<'reveal' | 'decision' | 'result' | 'finished'>('reveal');
   const [showDrumRoll, setShowDrumRoll] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
   const [shake, setShake] = useState(false);
@@ -74,10 +73,10 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     
     // Faz süreleri (milisaniye)
     const phaseDurations = {
-      reveal: 3000,      // İlk mesaj görüntülenme süresi (3 saniye)
-      decisionIntro: 500, // Decision'a geçiş
-      drumRoll: 2000,     // Davul rulosu animasyonu
-      result: 3000        // Sonuç gösterimi
+      reveal: 4000,      // İlk mesaj görüntülenme süresi (3 saniye)
+      decisionIntro: 100, // Decision'a geçiş
+      drumRoll: 4000,     // Davul rulosu animasyonu
+      result: 5000        // Sonuç gösterimi
     };
     
     // Kümülatif zamanlama hesaplaması
@@ -103,15 +102,11 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
       setTimeout(() => setShake(false), 500);
     }, elapsed);
     
-    // Timer 4: Result → Video/Finished
+    // Timer 4: Result → Finished (video kaldırıldı, beraberlikte video yok)
     elapsed += phaseDurations.result;
     const timer4 = setTimeout(() => {
-      if (sequence.success) {
-        setPhase('video');
-      } else {
-        setPhase('finished');
-        onComplete?.();
-      }
+      setPhase('finished');
+      onComplete?.();
     }, elapsed);
     
     timersRef.current = [timer1, timer2, timer3, timer4];
@@ -122,27 +117,11 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
     };
   }, []);
   
-  const handleVideoComplete = () => {
-    setPhase('finished');
-    onComplete?.();
-  };
-  
   if (!sequence || phase === 'finished') return null;
   
   const roleText = "Kahin";
   const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
   const isCorrect = sequence.success;
-  
-  // Video gösteriliyorsa
-  if (phase === 'video' && isCorrect && sequence.finalWinner && sequence.finalWinnerName) {
-    return (
-      <NormalWinVideo 
-        winnerTeam={sequence.finalWinner}
-        winnerTeamName={sequence.finalWinnerName}
-        onComplete={handleVideoComplete}
-      />
-    );
-  }
   
   return (
     <div 
