@@ -1314,9 +1314,9 @@ export class MemStorage implements IStorage {
       return null; // Only losing team can vote
     }
     
-    // Check if losing team has revealed 3 or more neutral cards (forfeits prophet guess right)
+    // Check if losing team has revealed more than 3 neutral cards (forfeits prophet guess right)
     if (room.neutralCardsRevealedByTeam && player.team && 
-        room.neutralCardsRevealedByTeam[player.team] >= 3) {
+        room.neutralCardsRevealedByTeam[player.team] > 3) {
       return null; // Team revealed too many neutral cards, cannot make prophet guess
     }
     
@@ -1400,9 +1400,9 @@ export class MemStorage implements IStorage {
       return null; // Only losing team can guess
     }
     
-    // Check if losing team has revealed 3 or more neutral cards (forfeits prophet guess right)
+    // Check if losing team has revealed more than 3 neutral cards (forfeits prophet guess right)
     if (room.neutralCardsRevealedByTeam && player.team && 
-        room.neutralCardsRevealedByTeam[player.team] >= 3) {
+        room.neutralCardsRevealedByTeam[player.team] > 3) {
       return null; // Team revealed too many neutral cards, cannot make prophet guess
     }
     

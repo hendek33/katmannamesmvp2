@@ -769,7 +769,7 @@ export default function Game() {
           gameState.consecutivePasses[losingTeam] >= 2;
         
         const hasTooManyNeutralCards = gameState.neutralCardsRevealedByTeam && 
-          gameState.neutralCardsRevealedByTeam[losingTeam] >= 3;
+          gameState.neutralCardsRevealedByTeam[losingTeam] > 3;
         
         let disableReason: "assassin" | "opponent_last_card" | "consecutive_passes" | "neutral_cards" | null = null;
         if (wasAssassinRevealed) {

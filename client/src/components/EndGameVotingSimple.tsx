@@ -69,7 +69,7 @@ export function EndGameVoting({
     } else if (disableReason === "consecutive_passes" || hasConsecutivePasses) {
       return "2 kez üst üste pas geçildiği için kahin tahmini devre dışı!";
     } else if (disableReason === "neutral_cards") {
-      return "3 veya daha fazla beyaz kart açıldığı için kahin tahmini devre dışı!";
+      return "3'ten fazla beyaz kart açıldığı için kahin tahmini devre dışı!";
     }
     return null;
   };
