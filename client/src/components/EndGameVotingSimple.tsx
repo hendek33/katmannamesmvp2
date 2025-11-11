@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { Player } from "@shared/schema";
 import { Minimize2, Maximize2 } from "lucide-react";
+import { useInlineVideo } from "@/hooks/useInlineVideo";
 
 interface EndGameVotingProps {
   winningTeam: "dark" | "light";
@@ -37,6 +38,12 @@ export function EndGameVoting({
   const [isVisible, setIsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  
+  // Prophet selection window video
+  const videoSrc = "/kahin seçim penceresi.webm";
+  const { videoRef, base64Url } = useInlineVideo(videoSrc, {
+    autoPlay: true
+  });
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -239,6 +246,23 @@ export function EndGameVoting({
                 </div>
               );
             })}
+          </div>
+        </div>
+        
+        {/* Prophet Selection Video - Fixed at bottom right corner */}
+        <div className="absolute bottom-4 right-4 z-20">
+          <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-2xl bg-slate-900">
+            <video
+              ref={videoRef}
+              src={base64Url || videoSrc}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+            {/* Purple gradient overlay for better blending */}
+            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent pointer-events-none" />
           </div>
         </div>
       </div>
