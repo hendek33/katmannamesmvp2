@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Users, Crown, Eye, Target, Edit2, Check, X, WifiOff, UserX } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface PlayerListProps {
   players: Player[];
@@ -40,6 +40,24 @@ export function PlayerList({
   // Check if teams have required roles for game start
   const darkHasSpymaster = darkTeam.some(p => p.role === "spymaster");
   const lightHasSpymaster = lightTeam.some(p => p.role === "spymaster");
+  
+  // Lift editing state up to prevent loss on re-renders
+  const [editingTeam, setEditingTeam] = useState<Team | null>(null);
+  const [editedDarkName, setEditedDarkName] = useState(darkTeamName);
+  const [editedLightName, setEditedLightName] = useState(lightTeamName);
+  
+  // Sync edited names when props change (but not when editing)
+  useEffect(() => {
+    if (editingTeam !== "dark") {
+      setEditedDarkName(darkTeamName);
+    }
+  }, [darkTeamName, editingTeam]);
+  
+  useEffect(() => {
+    if (editingTeam !== "light") {
+      setEditedLightName(lightTeamName);
+    }
+  }, [lightTeamName, editingTeam]);
 
   const TeamSection = ({ team, title, players: teamPlayers, gradient }: { 
     team: Team; 
@@ -47,19 +65,20 @@ export function PlayerList({
     players: Player[];
     gradient: string;
   }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedName, setEditedName] = useState(title);
+    const isEditing = editingTeam === team;
+    const editedName = team === "dark" ? editedDarkName : editedLightName;
+    const setEditedName = team === "dark" ? setEditedDarkName : setEditedLightName;
 
     const handleSaveName = () => {
       // Don't save if empty
       if (!editedName.trim()) {
-        setIsEditing(false);
+        setEditingTeam(null);
         return;
       }
       if (onTeamNameChange) {
         onTeamNameChange(team, editedName.trim());
       }
-      setIsEditing(false);
+      setEditingTeam(null);
     };
 
     const hasSpymaster = teamPlayers.some(p => p.role === "spymaster");
@@ -108,7 +127,7 @@ export function PlayerList({
                   className="text-sm sm:text-base text-slate-400 italic hover:text-slate-200 transition-colors cursor-pointer"
                   onClick={() => {
                     setEditedName("");
-                    setIsEditing(true);
+                    setEditingTeam(team);
                   }}
                 >
                   Takım ismi belirle
@@ -123,7 +142,7 @@ export function PlayerList({
                   className="h-6 w-6 p-0 opacity-70 hover:opacity-100"
                   onClick={() => {
                     setEditedName(title);
-                    setIsEditing(true);
+                    setEditingTeam(team);
                   }}
                 >
                   <Edit2 className="w-3 h-3" />
