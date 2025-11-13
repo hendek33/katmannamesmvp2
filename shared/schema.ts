@@ -21,6 +21,8 @@ export interface Player {
   introductionDislikes?: { [playerId: string]: Team }; // Who disliked during introduction
   introductionBoos?: { [playerId: string]: Team }; // Who booed during introduction
   introductionApplause?: { [playerId: string]: Team }; // Who applauded during introduction
+  kickChatLikes?: number; // Kick chat likes count for this player's introduction
+  kickChatDislikes?: number; // Kick chat dislikes count for this player's introduction
 }
 
 export interface Card {

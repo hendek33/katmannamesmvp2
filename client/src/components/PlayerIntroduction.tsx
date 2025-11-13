@@ -422,8 +422,8 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1.5">
-                              {/* Kick Chat Vote Percentage */}
-                              {kickChatConfig?.enabled && kickChatVotes && (
+                              {/* Kick Chat Vote Percentage - Only show for currently introducing player */}
+                              {kickChatConfig?.enabled && kickChatVotes && player.id === currentIntroducingPlayer && (
                                 <div 
                                   className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
                                   style={{ 
@@ -439,8 +439,8 @@ export function PlayerIntroduction({
                                   >
                                     {(() => {
                                       const total = (kickChatVotes.likes || 0) + (kickChatVotes.dislikes || 0);
-                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 50;
-                                      return `K:${percentage}%`;
+                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 0;
+                                      return total > 0 ? `K:${percentage}%` : 'K:0%';
                                     })()}
                                   </motion.span>
                                 </div>
@@ -586,8 +586,8 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1.5">
-                              {/* Kick Chat Vote Percentage */}
-                              {kickChatConfig?.enabled && kickChatVotes && (
+                              {/* Kick Chat Vote Percentage - Only show for currently introducing player */}
+                              {kickChatConfig?.enabled && kickChatVotes && player.id === currentIntroducingPlayer && (
                                 <div 
                                   className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
                                   style={{ 
@@ -603,8 +603,8 @@ export function PlayerIntroduction({
                                   >
                                     {(() => {
                                       const total = (kickChatVotes.likes || 0) + (kickChatVotes.dislikes || 0);
-                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 50;
-                                      return `K:${percentage}%`;
+                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 0;
+                                      return total > 0 ? `K:${percentage}%` : 'K:0%';
                                     })()}
                                   </motion.span>
                                 </div>
