@@ -627,6 +627,10 @@ export default function Game() {
   const handleLikeDislike = (targetPlayerId: string, isLike: boolean) => {
     send("like_introduction", { targetPlayerId, isLike });
   };
+  
+  const handleBooApplaud = (targetPlayerId: string, isBoo: boolean) => {
+    send("boo_applaud_introduction", { targetPlayerId, isBoo });
+  };
 
   const handleSkipIntroduction = () => {
     send("skip_introduction", {});
@@ -1925,6 +1929,7 @@ export default function Game() {
                   onSelectPlayer={handleSelectPlayerForIntroduction}
                   onFinishIntroduction={handleFinishIntroduction}
                   onLikeDislike={handleLikeDislike}
+                  onBooApplaud={handleBooApplaud}
                   onSkipIntroduction={handleSkipIntroduction}
                 />
               </div>
