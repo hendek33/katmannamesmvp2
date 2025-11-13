@@ -422,8 +422,8 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1.5">
-                              {/* Kick Chat Vote Percentage - Placeholder for now */}
-                              {kickChatConfig?.enabled && (
+                              {/* Kick Chat Vote Percentage */}
+                              {kickChatConfig?.enabled && kickChatVotes && (
                                 <div 
                                   className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
                                   style={{ 
@@ -437,7 +437,11 @@ export function PlayerIntroduction({
                                     animate={{ opacity: [0.7, 1, 0.7] }}
                                     transition={{ duration: 2, repeat: Infinity }}
                                   >
-                                    K:-%
+                                    {(() => {
+                                      const total = (kickChatVotes.likes || 0) + (kickChatVotes.dislikes || 0);
+                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 50;
+                                      return `K:${percentage}%`;
+                                    })()}
                                   </motion.span>
                                 </div>
                               )}
@@ -582,8 +586,8 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1.5">
-                              {/* Kick Chat Vote Percentage - Placeholder for now */}
-                              {kickChatConfig?.enabled && (
+                              {/* Kick Chat Vote Percentage */}
+                              {kickChatConfig?.enabled && kickChatVotes && (
                                 <div 
                                   className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
                                   style={{ 
@@ -597,7 +601,11 @@ export function PlayerIntroduction({
                                     animate={{ opacity: [0.7, 1, 0.7] }}
                                     transition={{ duration: 2, repeat: Infinity }}
                                   >
-                                    K:-%
+                                    {(() => {
+                                      const total = (kickChatVotes.likes || 0) + (kickChatVotes.dislikes || 0);
+                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 50;
+                                      return `K:${percentage}%`;
+                                    })()}
                                   </motion.span>
                                 </div>
                               )}
