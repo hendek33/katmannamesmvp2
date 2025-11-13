@@ -21,7 +21,7 @@ export class KickChatService extends EventEmitter {
   private config: KickChatConfig | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
   private messageHistory: KickChatMessage[] = [];
-  private maxHistorySize = 30; // Reduced to save memory
+  private maxHistorySize = 300; // Increased for better history tracking
   private isConnected = false;
   
   // Vote tracking for introduction phase
