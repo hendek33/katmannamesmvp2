@@ -97,6 +97,18 @@ Büyük değişiklikler yapmadan önce sor.
   - Daha iyi görsel geri bildirim için seçili oylarda gölge ışıltısı
   - Oy kaydedildiğinde akıcı sıçrama animasyonu
 
+### Yuhlama ve Alkışlama Özelliği Eklendi (13 Kasım 2025)
+- **4 Reaksiyon Tipi**: Oyuncu tanıtımları sırasında artık 4 farklı reaksiyon verilebilir:
+  - Beğen (yeşil kalp) - pozitif geri bildirim
+  - Beğenme (kırmızı baş parmağı aşağı) - negatif geri bildirim  
+  - Yuhlama (mor ses ikonu) - güçlü olumsuz tepki
+  - Alkışla (amber parıltı) - güçlü olumlu tepki
+- **2x2 Grid Düzeni**: Reaksiyonlar 2x2 grid düzeninde gösterilir (üstte beğen/beğenme, altta yuhlama/alkışlama)
+- **Özel Partikül Efektleri**: Her reaksiyon tipi için benzersiz animasyonlar:
+  - Yuhlama: Mor ses simgesi, sarsıntı efekti ve yanlara yayılma
+  - Alkışlama: Amber parıltı simgesi, 360° döndürme ve büyük ölçek animasyonu
+- **Görsel Geri Bildirim**: Her reaksiyon kartı hover efektleri, seçim vurgusu ve takım renkli oy sayaçları içerir
+
 ### Video Performans Optimizasyonları (5 Kasım 2025)
 - **Base64 Video Dönüştürme**: Uygulama yüklendiğinde tüm videoları base64 formatına dönüştürmek için VideoBase64Converter servisi uygulandı
 - **Satır İçi Video Oynatma**: Takılma olmadan video oynatma için useInlineVideo hook'u kullanılarak TurnVideoInline bileşeni oluşturuldu
