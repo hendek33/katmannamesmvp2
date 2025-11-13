@@ -628,9 +628,6 @@ export default function Game() {
     send("like_introduction", { targetPlayerId, isLike });
   };
   
-  const handleBooApplaud = (targetPlayerId: string, isBoo: boolean) => {
-    send("boo_applaud_introduction", { targetPlayerId, isBoo });
-  };
 
   const handleSkipIntroduction = () => {
     send("skip_introduction", {});
@@ -1929,8 +1926,16 @@ export default function Game() {
                   onSelectPlayer={handleSelectPlayerForIntroduction}
                   onFinishIntroduction={handleFinishIntroduction}
                   onLikeDislike={handleLikeDislike}
-                  onBooApplaud={handleBooApplaud}
                   onSkipIntroduction={handleSkipIntroduction}
+                  onTriggerTaunt={handleTriggerTaunt}
+                  onInsultClick={handleInsultClick}
+                  onSendInsultToPlayer={handleSendInsultToPlayer}
+                  tauntEnabled={tauntEnabled}
+                  insultEnabled={insultEnabled}
+                  globalTauntCooldown={globalTauntCooldown}
+                  globalInsultCooldown={globalInsultCooldown}
+                  showInsultDialog={showInsultV2Dialog}
+                  setShowInsultDialog={setShowInsultV2Dialog}
                 />
               </div>
             ) : (

@@ -11,8 +11,16 @@ interface PlayerIntroductionProps {
   onSelectPlayer: (playerId: string) => void;
   onFinishIntroduction: (playerId: string) => void;
   onLikeDislike: (targetPlayerId: string, isLike: boolean) => void;
-  onBooApplaud: (targetPlayerId: string, isBoo: boolean) => void;
   onSkipIntroduction: () => void;
+  onTriggerTaunt: () => void;
+  onInsultClick: () => void;
+  onSendInsultToPlayer: (targetId: string) => void;
+  tauntEnabled: boolean;
+  insultEnabled: boolean;
+  globalTauntCooldown: number;
+  globalInsultCooldown: number;
+  showInsultDialog: boolean;
+  setShowInsultDialog: (show: boolean) => void;
 }
 
 export function PlayerIntroduction({
@@ -21,13 +29,20 @@ export function PlayerIntroduction({
   onSelectPlayer,
   onFinishIntroduction,
   onLikeDislike,
-  onBooApplaud,
   onSkipIntroduction,
+  onTriggerTaunt,
+  onInsultClick,
+  onSendInsultToPlayer,
+  tauntEnabled,
+  insultEnabled,
+  globalTauntCooldown,
+  globalInsultCooldown,
+  showInsultDialog,
+  setShowInsultDialog,
 }: PlayerIntroductionProps) {
   const [showTitle, setShowTitle] = useState(true);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
-  const [particles, setParticles] = useState<{id: number, x: number, y: number, type: 'like' | 'dislike' | 'boo' | 'applaud', delay?: number}[]>([]);
-  const [fallingItems, setFallingItems] = useState<{id: number, x: number, text: string, type: 'boo' | 'applaud'}[]>([]);
+  const [particles, setParticles] = useState<{id: number, x: number, y: number, type: 'like' | 'dislike', delay?: number}[]>([]);
   const [dotCount, setDotCount] = useState(1);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
@@ -44,9 +59,7 @@ export function PlayerIntroduction({
   // Check if current player already voted and which option
   const hasVotedLike = introducingPlayer?.introductionLikes && playerId in introducingPlayer.introductionLikes;
   const hasVotedDislike = introducingPlayer?.introductionDislikes && playerId in introducingPlayer.introductionDislikes;
-  const hasVotedBoo = introducingPlayer?.introductionBoos && playerId in introducingPlayer.introductionBoos;
   const hasVoted = hasVotedLike || hasVotedDislike;
-  const hasBooed = hasVotedBoo;
   
   useEffect(() => {
     // Hide title after 3.5 seconds
@@ -101,35 +114,10 @@ export function PlayerIntroduction({
     }
   };
   
-  const handleBoo = () => {
-    if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
-      // Create falling items across the entire screen width
-      const newItems: {id: number, x: number, text: string, type: 'boo' | 'applaud'}[] = [];
-      const count = 5; // More items for better effect
-      
-      for (let i = 0; i < count; i++) {
-        newItems.push({
-          id: Date.now() + i + Math.random(),
-          x: Math.random() * window.innerWidth, // Use full screen width
-          text: 'YUUH!',
-          type: 'boo'
-        });
-      }
-      
-      setFallingItems(prev => [...prev, ...newItems]);
-      
-      // Remove falling items after animation
-      setTimeout(() => {
-        setFallingItems(prev => prev.filter(item => !newItems.some(n => n.id === item.id)));
-      }, 2000);
-      
-      onBooApplaud(currentIntroducingPlayer, true);
-    }
-  };
   
-  // Get likes, dislikes, and boos for current introducing player
+  // Get likes and dislikes for current introducing player
   const getReactions = () => {
-    if (!introducingPlayer) return { likes: [], dislikes: [], boos: [] };
+    if (!introducingPlayer) return { likes: [], dislikes: [] };
     
     const likes = Object.entries(introducingPlayer.introductionLikes || {}).map(([voterId, team]) => {
       const voter = gameState.players.find(p => p.id === voterId);
@@ -141,15 +129,10 @@ export function PlayerIntroduction({
       return { username: voter?.username || "Unknown", team };
     });
     
-    const boos = Object.entries(introducingPlayer.introductionBoos || {}).map(([voterId, team]) => {
-      const voter = gameState.players.find(p => p.id === voterId);
-      return { username: voter?.username || "Unknown", team };
-    });
-    
-    return { likes, dislikes, boos };
+    return { likes, dislikes };
   };
   
-  const { likes, dislikes, boos } = getReactions();
+  const { likes, dislikes } = getReactions();
   
   // Show title animation first
   if (showTitle) {
@@ -665,16 +648,16 @@ export function PlayerIntroduction({
                   opacity: 0
                 }}
                 animate={{ 
-                  scale: particle.type === 'applaud' ? [0, 2, 1.8, 0] : particle.type === 'boo' ? [0.5, 1.2, 0] : [0.5, 1.5, 0],
-                  y: particle.type === 'boo' ? -120 : particle.type === 'applaud' ? -100 : -80,
-                  x: particle.type === 'boo' ? (Math.random() - 0.5) * 100 : 0,
+                  scale: [0.5, 1.5, 0],
+                  y: -80,
+                  x: 0,
                   opacity: [0, 1, 0],
-                  rotate: particle.type === 'applaud' ? [0, 360] : particle.type === 'boo' ? [-10, 10, -10, 10, 0] : 0
+                  rotate: 0
                 }}
                 exit={{ opacity: 0 }}
                 transition={{ 
-                  duration: particle.type === 'applaud' ? 1.2 : particle.type === 'boo' ? 1 : 0.8,
-                  ease: particle.type === 'boo' ? "easeInOut" : "easeOut"
+                  duration: 0.8,
+                  ease: "easeOut"
                 }}
                 className="fixed pointer-events-none z-50"
                 style={{ 
@@ -687,12 +670,6 @@ export function PlayerIntroduction({
                 )}
                 {particle.type === 'dislike' && (
                   <ThumbsDown className="w-8 h-8 text-red-400 fill-red-400" />
-                )}
-                {particle.type === 'boo' && (
-                  <Volume2 className="w-10 h-10 text-purple-400 fill-purple-300" />
-                )}
-                {particle.type === 'applaud' && (
-                  <Sparkles className="w-10 h-10 text-amber-400 fill-amber-300" />
                 )}
               </motion.div>
             ))}
@@ -929,61 +906,77 @@ export function PlayerIntroduction({
             </div>
           </Card>
           
-          {/* Boo Button - Outside the card */}
+          {/* Taunt and Insult Buttons - Outside the card */}
           {playerId !== currentIntroducingPlayer && (
-            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-50">
               <Button
-                onClick={handleBoo}
+                onClick={onTriggerTaunt}
+                disabled={globalTauntCooldown > 0 || !tauntEnabled}
                 size="sm"
                 variant="outline"
-                className="bg-purple-900/80 hover:bg-purple-800 text-white border-purple-500 backdrop-blur-sm"
-                data-testid="boo-button"
+                className={`
+                  ${globalTauntCooldown > 0 || !tauntEnabled
+                    ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed"
+                    : currentPlayer?.team === "dark"
+                      ? "bg-blue-900/80 hover:bg-blue-800 text-white border-blue-500"
+                      : "bg-red-900/80 hover:bg-red-800 text-white border-red-500"}
+                  backdrop-blur-sm transition-colors
+                `}
+                data-testid="button-trigger-taunt"
               >
-                Yuhla
+                {globalTauntCooldown > 0 ? `${globalTauntCooldown}s` : "Hareket Çek"}
               </Button>
+              <Button
+                onClick={onInsultClick}
+                disabled={globalInsultCooldown > 0 || !insultEnabled}
+                size="sm"
+                variant="outline"
+                className={`
+                  ${globalInsultCooldown > 0 || !insultEnabled
+                    ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed"
+                    : currentPlayer?.team === "dark"
+                      ? "bg-purple-900/80 hover:bg-purple-800 text-white border-purple-500"
+                      : "bg-orange-900/80 hover:bg-orange-800 text-white border-orange-500"}
+                  backdrop-blur-sm transition-colors
+                `}
+                data-testid="button-send-insult"
+              >
+                {globalInsultCooldown > 0 ? `${globalInsultCooldown}s` : "Laf Sok"}
+              </Button>
+            </div>
+          )}
+          
+          {/* Insult Target Selection Dialog */}
+          {showInsultDialog && insultEnabled && globalInsultCooldown === 0 && (
+            <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
+              <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-3 space-y-2 shadow-2xl min-w-[200px]">
+                <div className="text-amber-100 font-bold text-sm mb-2">Kime laf sokacaksın?</div>
+                {gameState.players
+                  .filter(p => p.id !== playerId)
+                  .map(player => (
+                    <button
+                      key={player.id}
+                      onClick={() => {
+                        onSendInsultToPlayer(player.id);
+                        setShowInsultDialog(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded hover:bg-amber-500/20 text-white text-sm transition-colors"
+                    >
+                      {player.username} ({player.team === "dark" ? "Koyu" : "Açık"})
+                    </button>
+                  ))}
+                <button
+                  onClick={() => setShowInsultDialog(false)}
+                  className="w-full text-center px-3 py-1 rounded bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 text-sm mt-2"
+                >
+                  İptal
+                </button>
+              </div>
             </div>
           )}
         </motion.div>
       )}
       
-      {/* Falling Effects */}
-      <AnimatePresence>
-        {fallingItems.map((item) => (
-          <motion.div
-            key={item.id}
-            className="fixed pointer-events-none z-[200]"
-            initial={{ 
-              x: item.x,
-              y: -200, // Start well above viewport for proper "falling from top" effect
-              opacity: 1,
-              rotate: Math.random() * 30 - 15
-            }}
-            animate={{ 
-              y: window.innerHeight + 100,
-              x: item.x + (Math.random() - 0.5) * 100, // Some horizontal drift for natural effect
-              rotate: [0, -15, 15, -10, 5, 0], // Shaking effect for boo
-            }}
-            exit={{ opacity: 0 }}
-            transition={{ 
-              duration: 2, // Good duration for falling effect
-              ease: "easeIn",
-              rotate: {
-                duration: 0.5,
-                repeat: 4, // Continuous shake
-                ease: "easeInOut"
-              }
-            }}
-            style={{
-              fontSize: '2.5rem',
-              fontWeight: 'bold',
-              color: '#a855f7',
-              textShadow: '0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.5)'
-            }}
-          >
-            {item.text}
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 }
