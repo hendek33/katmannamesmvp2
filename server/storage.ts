@@ -2043,6 +2043,46 @@ export class MemStorage implements IStorage {
     return room;
   }
 
+  booOrApplaudIntroduction(roomCode: string, playerId: string, targetPlayerId: string, isBoo: boolean): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Must be in introduction phase
+    if (room.phase !== "introduction") return null;
+    if (!room.introductionPhase) return null;
+    
+    // Must be introducing someone
+    if (!room.introductionPhase.currentIntroducingPlayer) return null;
+    
+    // Can only boo/applaud the currently introducing player
+    if (room.introductionPhase.currentIntroducingPlayer !== targetPlayerId) return null;
+    
+    // Cannot boo/applaud yourself
+    if (playerId === targetPlayerId) return null;
+    
+    const player = room.players.find(p => p.id === playerId);
+    const target = room.players.find(p => p.id === targetPlayerId);
+    if (!player || !target) return null;
+    
+    // Initialize boo/applause maps if not exists
+    if (!target.introductionBoos) target.introductionBoos = {};
+    if (!target.introductionApplause) target.introductionApplause = {};
+    
+    // Remove previous vote if exists
+    delete target.introductionBoos[playerId];
+    delete target.introductionApplause[playerId];
+    
+    // Add new vote
+    if (isBoo) {
+      target.introductionBoos[playerId] = player.team;
+    } else {
+      target.introductionApplause[playerId] = player.team;
+    }
+    
+    return room;
+  }
+
   skipIntroduction(roomCode: string, playerId: string): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;

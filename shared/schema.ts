@@ -200,6 +200,11 @@ export const likeIntroductionSchema = z.object({
 
 export const skipIntroductionSchema = z.object({});
 
+export const booApplaudIntroductionSchema = z.object({
+  targetPlayerId: z.string(),
+  isBoo: z.boolean(), // true for boo, false for applaud
+});
+
 // Taunt broadcast payload
 export interface TauntBroadcast {
   playerId: string;
@@ -227,3 +232,4 @@ export type SelectPlayerForIntroductionInput = z.infer<typeof selectPlayerForInt
 export type FinishIntroductionInput = z.infer<typeof finishIntroductionSchema>;
 export type LikeIntroductionInput = z.infer<typeof likeIntroductionSchema>;
 export type SkipIntroductionInput = z.infer<typeof skipIntroductionSchema>;
+export type BooApplaudIntroductionInput = z.infer<typeof booApplaudIntroductionSchema>;
