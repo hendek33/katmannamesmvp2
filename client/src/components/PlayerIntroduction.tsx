@@ -594,7 +594,7 @@ export function PlayerIntroduction({
           
           {/* Skip Button for controller - Centered at bottom */}
           {isController && (
-            <div className="flex justify-center mt-10 mb-4">
+            <div className="flex justify-center mt-16 mb-6">
               <motion.div
                 initial={{ scale: 0.8, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
