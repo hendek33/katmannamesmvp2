@@ -42,7 +42,6 @@ export default function ChatOverlay({
   const [isExpanded, setIsExpanded] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const lastMessageRef = useRef<HTMLDivElement>(null);
 
   // Update local messages when prop messages change
@@ -53,7 +52,8 @@ export default function ChatOverlay({
   // Auto scroll to bottom when new message arrives
   useEffect(() => {
     if (lastMessageRef.current && isExpanded) {
-      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+      // Use scrollIntoView without smooth behavior to avoid animations
+      lastMessageRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
     }
   }, [localMessages, isExpanded]);
 
@@ -70,20 +70,20 @@ export default function ChatOverlay({
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0 }}
         animate={{ 
-          opacity: 1, 
-          scale: isMinimized ? 0.95 : 1,
-          width: isMinimized ? 'auto' : isExpanded ? '320px' : '320px',
+          opacity: 1,
           height: isMinimized ? 'auto' : isExpanded ? '400px' : '60px'
         }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2, ease: 'easeInOut' }}
         className={cn(
-          "fixed z-50 bg-black/85 backdrop-blur-xl border border-purple-500/30 rounded-xl shadow-2xl overflow-hidden",
+          "fixed z-50 bg-black/90 backdrop-blur-sm border border-purple-500/30 rounded-xl shadow-2xl overflow-hidden",
           positionStyles[position],
-          "shadow-purple-500/20"
+          "shadow-purple-500/20",
+          !isMinimized && "w-80"
         )}
+        style={{ contain: 'layout style paint' }}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600/20 to-amber-600/20 border-b border-white/10 p-3">
@@ -146,7 +146,7 @@ export default function ChatOverlay({
 
         {/* Messages Area */}
         {!isMinimized && isExpanded && (
-          <ScrollArea className="flex-1 h-full p-3" ref={scrollAreaRef}>
+          <ScrollArea className="flex-1 h-full p-3">
             <div className="space-y-2">
               {localMessages.length === 0 ? (
                 <div className="text-center text-gray-400 text-sm py-8">
@@ -158,9 +158,9 @@ export default function ChatOverlay({
                 localMessages.map((message, index) => (
                   <motion.div
                     key={message.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
                     className={cn(
                       "rounded-lg p-2 bg-white/5 border",
                       message.isVote 
@@ -240,40 +240,6 @@ export default function ChatOverlay({
           </motion.div>
         )}
 
-        {/* Floating animation particles */}
-        {showVoteInstructions && !isMinimized && (
-          <div className="absolute pointer-events-none inset-0 overflow-hidden">
-            <motion.div
-              className="absolute top-10 left-10"
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.3, 0.6, 0.3]
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <Sparkles className="w-4 h-4 text-purple-400" />
-            </motion.div>
-            <motion.div
-              className="absolute bottom-10 right-10"
-              animate={{
-                y: [0, 30, 0],
-                opacity: [0.3, 0.6, 0.3]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1
-              }}
-            >
-              <Sparkles className="w-4 h-4 text-amber-400" />
-            </motion.div>
-          </div>
-        )}
       </motion.div>
     </AnimatePresence>
   );
