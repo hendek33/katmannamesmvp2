@@ -421,9 +421,29 @@ export function PlayerIntroduction({
                             </div>
                           </div>
                           {hasBeenIntroduced && (
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1.5">
+                              {/* Kick Chat Vote Percentage - Placeholder for now */}
+                              {kickChatConfig?.enabled && (
+                                <div 
+                                  className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
+                                  style={{ 
+                                    position: 'relative',
+                                    zIndex: 10
+                                  }}
+                                  title="Kick Chat Oylama Yüzdesi"
+                                >
+                                  <motion.span 
+                                    className="text-sm"
+                                    animate={{ opacity: [0.7, 1, 0.7] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                  >
+                                    K:-%
+                                  </motion.span>
+                                </div>
+                              )}
+                              {/* Like Indicator - Bigger */}
                               <div 
-                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                className="inline-flex items-center px-2 py-1 rounded-md text-sm font-bold shadow-md" 
                                 style={{ 
                                   backgroundColor: 'rgb(22, 163, 74)',
                                   color: 'rgb(255, 255, 255)',
@@ -432,11 +452,12 @@ export function PlayerIntroduction({
                                   zIndex: 10
                                 }}
                               >
-                                <ThumbsUp className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <ThumbsUp className="w-4 h-4 mr-1" style={{ color: 'rgb(255, 255, 255)' }} />
                                 <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionLikes || {}).length}</span>
                               </div>
+                              {/* Dislike Indicator - Bigger */}
                               <div 
-                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                className="inline-flex items-center px-2 py-1 rounded-md text-sm font-bold shadow-md" 
                                 style={{ 
                                   backgroundColor: 'rgb(220, 38, 38)',
                                   color: 'rgb(255, 255, 255)',
@@ -445,7 +466,7 @@ export function PlayerIntroduction({
                                   zIndex: 10
                                 }}
                               >
-                                <ThumbsDown className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <ThumbsDown className="w-4 h-4 mr-1" style={{ color: 'rgb(255, 255, 255)' }} />
                                 <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionDislikes || {}).length}</span>
                               </div>
                             </div>
@@ -560,9 +581,29 @@ export function PlayerIntroduction({
                             </div>
                           </div>
                           {hasBeenIntroduced && (
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1.5">
+                              {/* Kick Chat Vote Percentage - Placeholder for now */}
+                              {kickChatConfig?.enabled && (
+                                <div 
+                                  className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
+                                  style={{ 
+                                    position: 'relative',
+                                    zIndex: 10
+                                  }}
+                                  title="Kick Chat Oylama Yüzdesi"
+                                >
+                                  <motion.span 
+                                    className="text-sm"
+                                    animate={{ opacity: [0.7, 1, 0.7] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                  >
+                                    K:-%
+                                  </motion.span>
+                                </div>
+                              )}
+                              {/* Like Indicator - Bigger */}
                               <div 
-                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                className="inline-flex items-center px-2 py-1 rounded-md text-sm font-bold shadow-md" 
                                 style={{ 
                                   backgroundColor: 'rgb(22, 163, 74)',
                                   color: 'rgb(255, 255, 255)',
@@ -571,11 +612,12 @@ export function PlayerIntroduction({
                                   zIndex: 10
                                 }}
                               >
-                                <ThumbsUp className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <ThumbsUp className="w-4 h-4 mr-1" style={{ color: 'rgb(255, 255, 255)' }} />
                                 <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionLikes || {}).length}</span>
                               </div>
+                              {/* Dislike Indicator - Bigger */}
                               <div 
-                                className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold" 
+                                className="inline-flex items-center px-2 py-1 rounded-md text-sm font-bold shadow-md" 
                                 style={{ 
                                   backgroundColor: 'rgb(220, 38, 38)',
                                   color: 'rgb(255, 255, 255)',
@@ -584,7 +626,7 @@ export function PlayerIntroduction({
                                   zIndex: 10
                                 }}
                               >
-                                <ThumbsDown className="w-3 h-3 mr-0.5" style={{ color: 'rgb(255, 255, 255)' }} />
+                                <ThumbsDown className="w-4 h-4 mr-1" style={{ color: 'rgb(255, 255, 255)' }} />
                                 <span style={{ color: 'rgb(255, 255, 255)' }}>{Object.keys(player.introductionDislikes || {}).length}</span>
                               </div>
                             </div>
