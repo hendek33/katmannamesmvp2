@@ -19,6 +19,8 @@ export interface Player {
   introduced?: boolean; // Whether player has been introduced
   introductionLikes?: { [playerId: string]: Team }; // Who liked during introduction
   introductionDislikes?: { [playerId: string]: Team }; // Who disliked during introduction
+  introductionBoos?: { [playerId: string]: Team }; // Who booed during introduction
+  introductionApplause?: { [playerId: string]: Team }; // Who applauded during introduction
 }
 
 export interface Card {
