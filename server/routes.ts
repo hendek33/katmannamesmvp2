@@ -26,7 +26,6 @@ import {
   finishIntroductionSchema,
   likeIntroductionSchema,
   skipIntroductionSchema,
-  booApplaudIntroductionSchema,
 } from "@shared/schema";
 
 interface WSClient extends WebSocket {
@@ -1538,30 +1537,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
-          case "boo_applaud_introduction": {
-            if (!ws.roomCode || !ws.playerId) {
-              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
-              return;
-            }
-
-            const validation = booApplaudIntroductionSchema.safeParse(payload);
-            if (!validation.success) {
-              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
-              return;
-            }
-
-            const result = storage.booOrApplaudIntroduction(ws.roomCode, ws.playerId, validation.data.targetPlayerId, validation.data.isBoo);
-            if (!result) {
-              sendToClient(ws, { type: "error", payload: { message: "Tepki verilemedi" } });
-              return;
-            }
-
-            broadcastToRoom(ws.roomCode, {
-              type: "introduction_booed_applauded",
-              payload: { gameState: result },
-            });
-            break;
-          }
 
           case "skip_introduction": {
             if (!ws.roomCode || !ws.playerId) {
