@@ -996,7 +996,7 @@ export function PlayerIntroduction({
                   <VoteIndicator
                     isVisible={true}
                     voteStats={kickChatVotes}
-                    className="mx-auto w-80 max-w-full"
+                    className="w-full"
                   />
                 )}
               </div>

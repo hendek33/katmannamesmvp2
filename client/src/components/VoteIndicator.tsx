@@ -69,9 +69,9 @@ export default function VoteIndicator({
       >
         {/* Glassmorphism Container */}
         <div className="relative overflow-hidden rounded-xl">
-          {/* Background Blur Layer */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-pink-900/20 backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          {/* Background Blur Layer - Green Theme */}
+          <div className="absolute inset-0 bg-gradient-to-br from-green-900/40 via-green-800/30 to-emerald-900/40 backdrop-blur-xl" />
+          <div className="absolute inset-0 bg-green-950/50 backdrop-blur-sm" />
           
           {/* Glass Border Effect */}
           <div className="absolute inset-0 rounded-xl border border-white/20" />
