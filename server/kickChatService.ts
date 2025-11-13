@@ -193,14 +193,14 @@ export class KickChatService extends EventEmitter {
   private cleanupMemory(): void {
     // Clear old rate limit data
     const now = Date.now();
-    for (const [username, timestamps] of this.userMessageTimestamps.entries()) {
-      const recentTimestamps = timestamps.filter(t => now - t < 60000);
+    this.userMessageTimestamps.forEach((timestamps, username) => {
+      const recentTimestamps = timestamps.filter((t: number) => now - t < 60000);
       if (recentTimestamps.length === 0) {
         this.userMessageTimestamps.delete(username);
       } else {
         this.userMessageTimestamps.set(username, recentTimestamps);
       }
-    }
+    });
     
     // Clear old vote data if session ended
     if (!this.activeVoteSession && this.voteCollector.size > 0) {
