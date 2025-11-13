@@ -187,14 +187,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Rate limiting for WebSocket messages
+  const messageRateLimiter = new Map<string, { count: number; resetTime: number }>();
+  const MAX_MESSAGES_PER_SECOND = 10;
+  const RATE_LIMIT_WINDOW = 1000; // 1 second
+  
   wss.on("connection", (ws: WSClient) => {
     ws.isAlive = true;
+    let messageCount = 0;
+    let lastReset = Date.now();
 
     ws.on("pong", () => {
       ws.isAlive = true;
     });
 
     ws.on("message", async (data: Buffer) => {
+      // Simple flood protection
+      const now = Date.now();
+      if (now - lastReset > RATE_LIMIT_WINDOW) {
+        messageCount = 0;
+        lastReset = now;
+      }
+      
+      messageCount++;
+      if (messageCount > MAX_MESSAGES_PER_SECOND) {
+        console.warn(`[WebSocket] Rate limit exceeded for client ${ws.playerId || 'unknown'}`);
+        sendToClient(ws, {
+          type: "error",
+          payload: { message: "Çok fazla mesaj gönderiyorsunuz. Lütfen yavaşlayın." }
+        });
+        return;
+      }
+      
       try {
         const message = JSON.parse(data.toString());
         const { type, payload } = message;
