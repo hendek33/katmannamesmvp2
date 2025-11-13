@@ -1,0 +1,264 @@
+(function () {
+  "use strict";
+
+  // ======= CONFIG =======
+  // Kick WebSocket URL'si (şu an senin gördüğün)
+  const KICK_WS_URL =
+    "wss://ws-us2.pusher.com/app/32cbd69e4b950bf97679?protocol=7&client=js&version=8.4.0&flash=false";
+
+  // Chatroom ID'yi buraya gir (DevTools -> Network -> WS -> chatrooms.xxxx.v2)
+  const CHATROOM_ID = 24495088; // BURAYI DEĞİŞTİR
+
+  // Son kaç ms içindeki mesajlara bakılsın? (60 sn)
+  const WORD_WINDOW_MS = 60_000;
+
+  // Minimum kelime uzunluğu
+  const MIN_WORD_LENGTH = 2;
+
+  // İstemediğin kelimeleri buraya ekleyebilirsin
+  const STOP_WORDS = new Set([
+    "ya",
+    "abi",
+    "la",
+    "lan",
+    "kanka",
+    "lol",
+    "gg",
+    // istediğini ekle
+  ]);
+
+  // Kaç kelime gösterelim panelde?
+  const TOP_N = 5;
+
+  // ======= STATE =======
+  const wordCounts = new Map();
+  const messageWindow = []; // { words: string[], time: number }
+
+  let ws = null;
+  let overlayEl = null;
+  let isOverlayVisible = true;
+
+  // ======= KELİME İŞLEME =======
+
+  function addMessageToStats(text) {
+    const now = Date.now();
+    const words = text
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .split(/\s+/)
+      .filter(
+        (w) => w && w.length >= MIN_WORD_LENGTH && !STOP_WORDS.has(w)
+      );
+
+    if (!words.length) return;
+
+    messageWindow.push({ words, time: now });
+
+    for (const w of words) {
+      wordCounts.set(w, (wordCounts.get(w) ?? 0) + 1);
+    }
+
+    cleanupOldMessages(now);
+  }
+
+  function cleanupOldMessages(now = Date.now()) {
+    while (
+      messageWindow.length &&
+      now - messageWindow[0].time > WORD_WINDOW_MS
+    ) {
+      const { words } = messageWindow.shift();
+      for (const w of words) {
+        const current = wordCounts.get(w);
+        if (!current || current <= 1) {
+          wordCounts.delete(w);
+        } else {
+          wordCounts.set(w, current - 1);
+        }
+      }
+    }
+  }
+
+  function getTopWords(limit = TOP_N) {
+    const arr = [...wordCounts.entries()];
+    arr.sort((a, b) => b[1] - a[1]);
+    return arr.slice(0, limit).map(([word, count]) => ({ word, count }));
+  }
+
+  // ======= OVERLAY UI =======
+
+  function createOverlay() {
+    overlayEl = document.createElement("div");
+    overlayEl.id = "kick-chat-word-stats-overlay";
+    overlayEl.style.position = "fixed";
+    overlayEl.style.top = "10px";
+    overlayEl.style.right = "10px";
+    overlayEl.style.zIndex = "999999";
+    overlayEl.style.background = "rgba(0,0,0,0.8)";
+    overlayEl.style.color = "#fff";
+    overlayEl.style.fontFamily =
+      "system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    overlayEl.style.fontSize = "12px";
+    overlayEl.style.padding = "8px 10px";
+    overlayEl.style.borderRadius = "8px";
+    overlayEl.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
+    overlayEl.style.minWidth = "200px";
+    overlayEl.style.maxWidth = "260px";
+    overlayEl.style.pointerEvents = "auto";
+    overlayEl.style.cursor = "default";
+    overlayEl.style.whiteSpace = "pre-line";
+
+    overlayEl.innerText = "Kick kelime istatistiği yükleniyor...";
+
+    // Başlık + toggle
+    const header = document.createElement("div");
+    header.style.display = "flex";
+    header.style.justifyContent = "space-between";
+    header.style.alignItems = "center";
+    header.style.marginBottom = "4px";
+
+    const title = document.createElement("span");
+    title.textContent = "Kick Chat Stats";
+    title.style.fontWeight = "bold";
+    title.style.fontSize = "11px";
+
+    const toggleBtn = document.createElement("button");
+    toggleBtn.textContent = "X";
+    toggleBtn.style.background = "transparent";
+    toggleBtn.style.color = "#fff";
+    toggleBtn.style.border = "none";
+    toggleBtn.style.cursor = "pointer";
+    toggleBtn.style.fontSize = "11px";
+    toggleBtn.style.padding = "0 4px";
+
+    toggleBtn.addEventListener("click", () => {
+      isOverlayVisible = !isOverlayVisible;
+      if (isOverlayVisible) {
+        overlayEl.style.opacity = "1";
+      } else {
+        overlayEl.style.opacity = "0";
+      }
+    });
+
+    header.appendChild(title);
+    header.appendChild(toggleBtn);
+
+    const content = document.createElement("div");
+    content.id = "kick-chat-word-stats-overlay-content";
+
+    overlayEl.innerHTML = "";
+    overlayEl.appendChild(header);
+    overlayEl.appendChild(content);
+
+    document.body.appendChild(overlayEl);
+  }
+
+  function updateOverlay() {
+    if (!overlayEl) return;
+    const content = overlayEl.querySelector(
+      "#kick-chat-word-stats-overlay-content"
+    );
+    if (!content) return;
+
+    cleanupOldMessages();
+
+    const topWords = getTopWords();
+    if (!topWords.length) {
+      content.textContent = `Son ${(WORD_WINDOW_MS / 1000).toFixed(
+        0
+      )} sn'de veri yok.`;
+      return;
+    }
+
+    const lines = [
+      `Son ${(WORD_WINDOW_MS / 1000).toFixed(0)} sn (TOP ${TOP_N}):`,
+      "",
+    ];
+    topWords.forEach((item, idx) => {
+      lines.push(`${idx + 1}. ${item.word}  (${item.count})`);
+    });
+
+    content.textContent = lines.join("\n");
+  }
+
+  // ======= KICK WEBSOCKET =======
+
+  function connectWebSocket() {
+    const channelName = `chatrooms.${CHATROOM_ID}.v2`;
+    console.log("[KickChatStats] bağlanıyor:", KICK_WS_URL, channelName);
+
+    ws = new WebSocket(KICK_WS_URL);
+
+    ws.addEventListener("open", () => {
+      console.log("[KickChatStats] WebSocket open");
+
+      const subPayload = {
+        event: "pusher:subscribe",
+        data: {
+          auth: "",
+          channel: channelName,
+        },
+      };
+
+      ws.send(JSON.stringify(subPayload));
+      console.log("[KickChatStats] subscribe gönderildi:", subPayload);
+    });
+
+    ws.addEventListener("message", (event) => {
+      let outer;
+      try {
+        outer = JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
+      // Sadece chat mesajı event'i ile ilgileniyoruz
+      if (outer.event === "App\\Events\\ChatMessageEvent") {
+        try {
+          const inner = JSON.parse(outer.data);
+          const content = inner.content;
+          const username = inner.sender?.username;
+
+          if (content) {
+            console.log(`[KickChatStats] ${username}: ${content}`);
+            addMessageToStats(content);
+          }
+        } catch (e) {
+          console.error("[KickChatStats] inner parse hata:", e);
+        }
+      }
+    });
+
+    ws.addEventListener("close", () => {
+      console.warn(
+        "[KickChatStats] WebSocket kapandı. 5 sn sonra yeniden denenecek..."
+      );
+      setTimeout(connectWebSocket, 5000);
+    });
+
+    ws.addEventListener("error", (err) => {
+      console.error("[KickChatStats] WebSocket hata:", err);
+    });
+  }
+
+  // ======= INIT =======
+
+  function init() {
+    createOverlay();
+    connectWebSocket();
+
+    // Her 1 sn paneli güncelle
+    setInterval(updateOverlay, 1000);
+
+    console.log("[KickChatStats] script çalışıyor.");
+    console.log(
+      `[KickChatStats] Herhangi bir siteden Kick chat'ini izliyorsun. Chatroom ID: ${CHATROOM_ID}`
+    );
+  }
+
+  // Sayfa load olduğunda başlat
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    init();
+  } else {
+    window.addEventListener("DOMContentLoaded", init);
+  }
+})();
