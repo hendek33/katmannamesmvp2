@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight, Star, Zap, Volume2, Megaphone, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import ChatOverlay from "./ChatOverlay";
+import VoteIndicator from './VoteIndicator';
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 interface PlayerIntroductionProps {
@@ -991,17 +991,12 @@ export function PlayerIntroduction({
                 </motion.div>
                 </div>
                 
-                {/* Kick Chat Overlay - Below Voting Cards */}
+                {/* Kick Chat Vote Indicator - Below Voting Cards */}
                 {showChatOverlay && kickChatConfig?.enabled && (
-                  <ChatOverlay
+                  <VoteIndicator
                     isVisible={true}
-                    position="anchored"
-                    messages={kickChatMessages}
                     voteStats={kickChatVotes}
-                    title="Kick Chat"
-                    showVoteInstructions={true}
-                    className="mx-auto"
-                    style={{ width: '320px', maxWidth: '100%' }}
+                    className="mx-auto w-80 max-w-full"
                   />
                 )}
               </div>
