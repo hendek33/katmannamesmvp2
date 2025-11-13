@@ -875,8 +875,10 @@ export function PlayerIntroduction({
                 </div>
               </div>
               
-              {/* Voting Stats - Clickable Cards */}
-              <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
+              {/* Voting Stats Container with Chat */}
+              <div className="flex flex-col items-center gap-4 w-full">
+                {/* Voting Stats - Clickable Cards */}
+                <div className="grid grid-cols-2 gap-4 w-full">
                 {/* Likes - Clickable Card */}
                 <motion.div
                   className={`relative bg-green-900/30 border-2 rounded-lg p-4 
@@ -987,6 +989,21 @@ export function PlayerIntroduction({
                     ))}
                   </div>
                 </motion.div>
+                </div>
+                
+                {/* Kick Chat Overlay - Below Voting Cards */}
+                {showChatOverlay && kickChatConfig?.enabled && (
+                  <ChatOverlay
+                    isVisible={true}
+                    position="anchored"
+                    messages={kickChatMessages}
+                    voteStats={kickChatVotes}
+                    title="Kick Chat"
+                    showVoteInstructions={true}
+                    className="mx-auto"
+                    style={{ width: '320px', maxWidth: '100%' }}
+                  />
+                )}
               </div>
               
               {/* Action Buttons */}
@@ -1010,17 +1027,6 @@ export function PlayerIntroduction({
         </motion.div>
       )}
       
-      {/* Kick Chat Overlay */}
-      {showChatOverlay && currentIntroducingPlayer && kickChatConfig?.enabled && (
-        <ChatOverlay
-          isVisible={true}
-          position="bottom-right"
-          messages={kickChatMessages}
-          voteStats={kickChatVotes}
-          title="Kick Chat"
-          showVoteInstructions={true}
-        />
-      )}
     </div>
   );
 }

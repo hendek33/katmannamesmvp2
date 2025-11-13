@@ -19,7 +19,7 @@ interface ChatMessage {
 
 interface ChatOverlayProps {
   isVisible?: boolean;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'anchored';
   messages?: ChatMessage[];
   voteStats?: {
     likes: number;
@@ -28,6 +28,8 @@ interface ChatOverlayProps {
   maxMessages?: number;
   title?: string;
   showVoteInstructions?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export default function ChatOverlay({
@@ -37,7 +39,9 @@ export default function ChatOverlay({
   voteStats = { likes: 0, dislikes: 0 },
   maxMessages = 50,
   title = 'Kick Chat',
-  showVoteInstructions = false
+  showVoteInstructions = false,
+  className = '',
+  style = {}
 }: ChatOverlayProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -62,10 +66,14 @@ export default function ChatOverlay({
     'top-left': 'top-4 left-4',
     'top-right': 'top-4 right-4',
     'bottom-left': 'bottom-4 left-4',
-    'bottom-right': 'bottom-4 right-4'
+    'bottom-right': 'bottom-4 right-4',
+    'anchored': '' // No fixed positioning for anchored mode
   };
 
   if (!isVisible) return null;
+
+  // Determine positioning class based on mode
+  const positionClass = position === 'anchored' ? 'relative' : 'fixed';
 
   return (
     <AnimatePresence>
@@ -78,12 +86,13 @@ export default function ChatOverlay({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
         className={cn(
-          "fixed z-50 bg-black/90 backdrop-blur-sm border border-purple-500/30 rounded-xl shadow-2xl overflow-hidden",
-          positionStyles[position],
+          `${positionClass} z-50 bg-black/90 backdrop-blur-sm border border-purple-500/30 rounded-xl shadow-2xl overflow-hidden`,
+          position !== 'anchored' && positionStyles[position],
           "shadow-purple-500/20",
-          !isMinimized && "w-80"
+          !isMinimized && "w-80",
+          className
         )}
-        style={{ contain: 'layout style paint' }}
+        style={{ contain: 'layout style paint', ...style }}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-600/20 to-amber-600/20 border-b border-white/10 p-3">
