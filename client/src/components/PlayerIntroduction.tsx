@@ -422,8 +422,8 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1.5">
-                              {/* Kick Chat Vote Percentage - Only show for currently introducing player */}
-                              {kickChatConfig?.enabled && kickChatVotes && player.id === currentIntroducingPlayer && (
+                              {/* Kick Chat Vote Percentage - Show per player */}
+                              {kickChatConfig?.enabled && (player.kickChatLikes !== undefined || player.kickChatDislikes !== undefined) && (
                                 <div 
                                   className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
                                   style={{ 
@@ -438,9 +438,11 @@ export function PlayerIntroduction({
                                     transition={{ duration: 2, repeat: Infinity }}
                                   >
                                     {(() => {
-                                      const total = (kickChatVotes.likes || 0) + (kickChatVotes.dislikes || 0);
-                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 0;
-                                      return total > 0 ? `K:${percentage}%` : 'K:0%';
+                                      const likes = player.kickChatLikes || 0;
+                                      const dislikes = player.kickChatDislikes || 0;
+                                      const total = likes + dislikes;
+                                      const percentage = total > 0 ? Math.round((likes / total) * 100) : 0;
+                                      return total > 0 ? `K:${percentage}%` : 'K:-%';
                                     })()}
                                   </motion.span>
                                 </div>
@@ -586,8 +588,8 @@ export function PlayerIntroduction({
                           </div>
                           {hasBeenIntroduced && (
                             <div className="flex items-center gap-1.5">
-                              {/* Kick Chat Vote Percentage - Only show for currently introducing player */}
-                              {kickChatConfig?.enabled && kickChatVotes && player.id === currentIntroducingPlayer && (
+                              {/* Kick Chat Vote Percentage - Show per player */}
+                              {kickChatConfig?.enabled && (player.kickChatLikes !== undefined || player.kickChatDislikes !== undefined) && (
                                 <div 
                                   className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-gradient-to-r from-purple-600/80 to-blue-600/80 text-white shadow-lg"
                                   style={{ 
@@ -602,9 +604,11 @@ export function PlayerIntroduction({
                                     transition={{ duration: 2, repeat: Infinity }}
                                   >
                                     {(() => {
-                                      const total = (kickChatVotes.likes || 0) + (kickChatVotes.dislikes || 0);
-                                      const percentage = total > 0 ? Math.round((kickChatVotes.likes / total) * 100) : 0;
-                                      return total > 0 ? `K:${percentage}%` : 'K:0%';
+                                      const likes = player.kickChatLikes || 0;
+                                      const dislikes = player.kickChatDislikes || 0;
+                                      const total = likes + dislikes;
+                                      const percentage = total > 0 ? Math.round((likes / total) * 100) : 0;
+                                      return total > 0 ? `K:${percentage}%` : 'K:-%';
                                     })()}
                                   </motion.span>
                                 </div>
