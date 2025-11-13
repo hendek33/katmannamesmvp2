@@ -45,9 +45,8 @@ export function PlayerIntroduction({
   const hasVotedLike = introducingPlayer?.introductionLikes && playerId in introducingPlayer.introductionLikes;
   const hasVotedDislike = introducingPlayer?.introductionDislikes && playerId in introducingPlayer.introductionDislikes;
   const hasVotedBoo = introducingPlayer?.introductionBoos && playerId in introducingPlayer.introductionBoos;
-  const hasVotedApplaud = introducingPlayer?.introductionApplause && playerId in introducingPlayer.introductionApplause;
   const hasVoted = hasVotedLike || hasVotedDislike;
-  const hasBooed = hasVotedBoo || hasVotedApplaud;
+  const hasBooed = hasVotedBoo;
   
   useEffect(() => {
     // Hide title after 3.5 seconds
@@ -102,18 +101,18 @@ export function PlayerIntroduction({
     }
   };
   
-  const handleBooApplaud = (isBoo: boolean) => {
+  const handleBoo = () => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
-      // Create fewer falling items for better performance
+      // Create falling items across the entire screen width
       const newItems: {id: number, x: number, text: string, type: 'boo' | 'applaud'}[] = [];
-      const count = isBoo ? 3 : 4; // Reduced count for performance
+      const count = 5; // More items for better effect
       
       for (let i = 0; i < count; i++) {
         newItems.push({
           id: Date.now() + i + Math.random(),
-          x: Math.random() * (window.innerWidth - 100), // Random horizontal position
-          text: isBoo ? 'YUUH!' : '👏',
-          type: isBoo ? 'boo' : 'applaud'
+          x: Math.random() * window.innerWidth, // Use full screen width
+          text: 'YUUH!',
+          type: 'boo'
         });
       }
       
@@ -122,15 +121,15 @@ export function PlayerIntroduction({
       // Remove falling items after animation
       setTimeout(() => {
         setFallingItems(prev => prev.filter(item => !newItems.some(n => n.id === item.id)));
-      }, 2000); // Reduced timeout for better performance
+      }, 2000);
       
-      onBooApplaud(currentIntroducingPlayer, isBoo);
+      onBooApplaud(currentIntroducingPlayer, true);
     }
   };
   
-  // Get likes, dislikes, boos and applause for current introducing player
+  // Get likes, dislikes, and boos for current introducing player
   const getReactions = () => {
-    if (!introducingPlayer) return { likes: [], dislikes: [], boos: [], applause: [] };
+    if (!introducingPlayer) return { likes: [], dislikes: [], boos: [] };
     
     const likes = Object.entries(introducingPlayer.introductionLikes || {}).map(([voterId, team]) => {
       const voter = gameState.players.find(p => p.id === voterId);
@@ -147,15 +146,10 @@ export function PlayerIntroduction({
       return { username: voter?.username || "Unknown", team };
     });
     
-    const applause = Object.entries(introducingPlayer.introductionApplause || {}).map(([voterId, team]) => {
-      const voter = gameState.players.find(p => p.id === voterId);
-      return { username: voter?.username || "Unknown", team };
-    });
-    
-    return { likes, dislikes, boos, applause };
+    return { likes, dislikes, boos };
   };
   
-  const { likes, dislikes, boos, applause } = getReactions();
+  const { likes, dislikes, boos } = getReactions();
   
   // Show title animation first
   if (showTitle) {
@@ -935,26 +929,17 @@ export function PlayerIntroduction({
             </div>
           </Card>
           
-          {/* Boo and Applause Buttons - Outside the card */}
+          {/* Boo Button - Outside the card */}
           {playerId !== currentIntroducingPlayer && (
-            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-50">
+            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
               <Button
-                onClick={() => handleBooApplaud(true)}
+                onClick={handleBoo}
                 size="sm"
                 variant="outline"
                 className="bg-purple-900/80 hover:bg-purple-800 text-white border-purple-500 backdrop-blur-sm"
                 data-testid="boo-button"
               >
                 Yuhla
-              </Button>
-              <Button
-                onClick={() => handleBooApplaud(false)}
-                size="sm"
-                variant="outline"
-                className="bg-amber-900/80 hover:bg-amber-800 text-white border-amber-500 backdrop-blur-sm"
-                data-testid="applaud-button"
-              >
-                Alkışla
               </Button>
             </div>
           )}
@@ -975,26 +960,24 @@ export function PlayerIntroduction({
             }}
             animate={{ 
               y: window.innerHeight + 100,
-              x: item.x + (Math.random() - 0.5) * 50, // Reduced horizontal drift
-              rotate: item.type === 'boo' ? [0, -15, 15, -10, 5, 0] : 180, // Less rotation for performance
+              x: item.x + (Math.random() - 0.5) * 100, // Some horizontal drift for natural effect
+              rotate: [0, -15, 15, -10, 5, 0], // Shaking effect for boo
             }}
             exit={{ opacity: 0 }}
             transition={{ 
-              duration: 1.5, // Faster for better performance
+              duration: 2, // Good duration for falling effect
               ease: "easeIn",
               rotate: {
-                duration: item.type === 'boo' ? 0.5 : 1.5,
-                repeat: item.type === 'boo' ? 3 : 0, // Fewer repeats
-                ease: item.type === 'boo' ? "easeInOut" : "linear"
+                duration: 0.5,
+                repeat: 4, // Continuous shake
+                ease: "easeInOut"
               }
             }}
             style={{
-              fontSize: item.type === 'boo' ? '2rem' : '3rem',
+              fontSize: '2.5rem',
               fontWeight: 'bold',
-              color: item.type === 'boo' ? '#a855f7' : '#fbbf24',
-              textShadow: item.type === 'boo' 
-                ? '0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.5)' 
-                : '0 0 20px rgba(251, 191, 36, 0.8), 0 0 40px rgba(251, 191, 36, 0.5)'
+              color: '#a855f7',
+              textShadow: '0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.5)'
             }}
           >
             {item.text}
