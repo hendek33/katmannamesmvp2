@@ -538,14 +538,24 @@ export default function Game() {
   };
 
   const handleTriggerTaunt = () => {
-    if (globalTauntCooldown > 0 || !playerId || !tauntEnabled) return;
+    // During introduction phase, always allow taunt regardless of tauntEnabled
+    if (gameState?.phase === "introduction") {
+      if (globalTauntCooldown > 0 || !playerId) return;
+    } else {
+      if (globalTauntCooldown > 0 || !playerId || !tauntEnabled) return;
+    }
     
     send("trigger_taunt", {});
     // Global cooldown will be set when server broadcasts the event
   };
 
   const handleInsultClick = () => {
-    if (globalInsultCooldown > 0 || !playerId || !insultEnabled) return;
+    // During introduction phase, always allow insult regardless of insultEnabled
+    if (gameState?.phase === "introduction") {
+      if (globalInsultCooldown > 0 || !playerId) return;
+    } else {
+      if (globalInsultCooldown > 0 || !playerId || !insultEnabled) return;
+    }
     setShowInsultV2Dialog(!showInsultV2Dialog);
   };
   
@@ -1653,15 +1663,15 @@ export default function Game() {
               />
             )}
             
-            {/* Action Buttons - Below Blue Team Panel (Hidden for Spymasters) */}
-            {currentPlayer && (gameState.phase === "playing" || gameState.phase === "introduction") && currentPlayer.role !== "spymaster" && (
+            {/* Action Buttons - Below Blue Team Panel (Hidden for Spymasters during playing phase only) */}
+            {currentPlayer && ((gameState.phase === "playing" && currentPlayer.role !== "spymaster") || gameState.phase === "introduction") && (
               <div className="mt-4 space-y-2">
                 {/* Action Buttons Container */}
                 <div className="flex gap-2">
                   {/* Taunt Button */}
                   <div className="relative flex-1">
                     <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      globalTauntCooldown > 0 || !tauntEnabled
+                      globalTauntCooldown > 0 || (!tauntEnabled && gameState.phase !== "introduction")
                         ? "bg-gray-600/20"
                         : currentPlayer.team === "dark" 
                           ? "bg-blue-600/40" 
@@ -1669,11 +1679,11 @@ export default function Game() {
                     }`} />
                     <button
                       onClick={handleTriggerTaunt}
-                      disabled={globalTauntCooldown > 0 || !tauntEnabled}
+                      disabled={globalTauntCooldown > 0 || (!tauntEnabled && gameState.phase !== "introduction")}
                       className={`
                         relative w-full h-12 px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
                         backdrop-blur-md border shadow-lg transition-colors
-                        ${globalTauntCooldown > 0 || !tauntEnabled 
+                        ${globalTauntCooldown > 0 || (!tauntEnabled && gameState.phase !== "introduction")
                           ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
                             ? "bg-blue-900/60 border-blue-600/50 text-blue-100 cursor-pointer hover:scale-105 hover:bg-blue-900/80 hover:border-blue-500/60"
@@ -1695,7 +1705,7 @@ export default function Game() {
                       )}
                       
                       <span className="relative z-10">
-                        {!tauntEnabled ? (
+                        {!tauntEnabled && gameState.phase !== "introduction" ? (
                           <span className="flex items-center justify-center gap-1.5">
                             <EyeOff className="w-4 h-4" />
                             Devre Dışı
@@ -1718,7 +1728,7 @@ export default function Game() {
                   {/* Insult Button */}
                   <div className="relative flex-1 insult-button-container">
                     <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      globalInsultCooldown > 0 || !insultEnabled
+                      globalInsultCooldown > 0 || (!insultEnabled && gameState.phase !== "introduction")
                         ? "bg-gray-600/20"
                         : currentPlayer.team === "dark" 
                           ? "bg-purple-600/40" 
@@ -1726,11 +1736,11 @@ export default function Game() {
                     }`} />
                     <button
                       onClick={handleInsultClick}
-                      disabled={globalInsultCooldown > 0 || !insultEnabled}
+                      disabled={globalInsultCooldown > 0 || (!insultEnabled && gameState.phase !== "introduction")}
                       className={`
                         relative w-full h-12 px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
                         backdrop-blur-md border shadow-lg transition-colors
-                        ${globalInsultCooldown > 0 || !insultEnabled 
+                        ${globalInsultCooldown > 0 || (!insultEnabled && gameState.phase !== "introduction")
                           ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
                           : currentPlayer.team === "dark"
                             ? "bg-purple-900/60 border-purple-600/50 text-purple-100 cursor-pointer hover:scale-105 hover:bg-purple-900/80 hover:border-purple-500/60"
@@ -1752,7 +1762,7 @@ export default function Game() {
                       )}
                       
                       <span className="relative z-10">
-                        {!insultEnabled ? (
+                        {!insultEnabled && gameState.phase !== "introduction" ? (
                           <span className="flex items-center justify-center gap-1.5">
                             <EyeOff className="w-4 h-4" />
                             Devre Dışı
@@ -1772,7 +1782,7 @@ export default function Game() {
                     </button>
                     
                     {/* Player Selection List */}
-                    {showInsultV2Dialog && insultEnabled && globalInsultCooldown === 0 && (
+                    {showInsultV2Dialog && (insultEnabled || gameState.phase === "introduction") && globalInsultCooldown === 0 && (
                       <div className="absolute top-full mt-2 left-0 right-0 z-50">
                         <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
                           {gameState.players
