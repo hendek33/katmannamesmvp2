@@ -1577,22 +1577,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            const result = storage.finishPlayerIntroduction(ws.roomCode, ws.playerId, validation.data.playerId);
+            // Get kick chat votes before finishing introduction
+            let kickVotes = { likes: 0, dislikes: 0 };
+            const kickConfig = storage.getKickChatConfig(ws.roomCode);
+            if (kickConfig?.enabled) {
+              kickVotes = kickChatService.endVoteSession();
+            }
+            
+            const result = storage.finishPlayerIntroduction(ws.roomCode, ws.playerId, validation.data.playerId, kickVotes);
             if (!result) {
               sendToClient(ws, { type: "error", payload: { message: "Tanıtım bitirilemedi" } });
               return;
             }
             
-            // End vote session for Kick chat if enabled
-            const kickConfig = storage.getKickChatConfig(ws.roomCode);
+            // Broadcast final vote results
             if (kickConfig?.enabled) {
-              const voteResults = kickChatService.endVoteSession();
               const roomCode = ws.roomCode;
               
               // Broadcast final vote results
               broadcastToRoom(roomCode, {
                 type: "kick_chat_vote",
-                payload: voteResults
+                payload: kickVotes
               });
               
               // Reset votes for next player

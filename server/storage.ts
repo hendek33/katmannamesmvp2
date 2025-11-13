@@ -1983,7 +1983,7 @@ export class MemStorage implements IStorage {
     return room;
   }
 
-  finishPlayerIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null {
+  finishPlayerIntroduction(roomCode: string, playerId: string, targetPlayerId: string, kickVotes?: { likes: number; dislikes: number }): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
     const room = roomData.gameState;
@@ -2004,6 +2004,12 @@ export class MemStorage implements IStorage {
     const target = room.players.find(p => p.id === targetPlayerId);
     if (!target) return null;
     target.introduced = true;
+    
+    // Save kick chat votes if provided
+    if (kickVotes) {
+      target.kickChatLikes = kickVotes.likes;
+      target.kickChatDislikes = kickVotes.dislikes;
+    }
     
     // Add to introduced list
     if (!room.introductionPhase.playersIntroduced) {
