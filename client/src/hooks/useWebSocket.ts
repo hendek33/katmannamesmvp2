@@ -333,11 +333,30 @@ export function useWebSocket() {
                 setKickChatVotes(prev => {
                   // Check if this is a vote event or a vote summary
                   if (message.payload?.vote) {
-                    // Individual vote event - aggregate it
-                    const isLike = message.payload.vote === 'like';
+                    // Individual vote event - handle vote changes
+                    const newVote = message.payload.vote;
+                    const previousVote = message.payload.previousVote;
+                    
+                    let newLikes = prev.likes;
+                    let newDislikes = prev.dislikes;
+                    
+                    // Remove previous vote if it existed
+                    if (previousVote === 'like') {
+                      newLikes = Math.max(0, newLikes - 1);
+                    } else if (previousVote === 'dislike') {
+                      newDislikes = Math.max(0, newDislikes - 1);
+                    }
+                    
+                    // Add new vote
+                    if (newVote === 'like') {
+                      newLikes += 1;
+                    } else if (newVote === 'dislike') {
+                      newDislikes += 1;
+                    }
+                    
                     return {
-                      likes: prev.likes + (isLike ? 1 : 0),
-                      dislikes: prev.dislikes + (!isLike ? 1 : 0)
+                      likes: newLikes,
+                      dislikes: newDislikes
                     };
                   } else if ('likes' in message.payload && 'dislikes' in message.payload) {
                     // Vote summary (e.g., end of session or reset)

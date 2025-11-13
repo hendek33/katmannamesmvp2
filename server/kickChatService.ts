@@ -140,21 +140,29 @@ export class KickChatService extends EventEmitter {
     
     // Check for vote commands
     if (content === '1' || content.toLowerCase() === 'like') {
-      if (!this.voteCollector.has(message.username)) {
+      const previousVote = this.voteCollector.get(message.username);
+      
+      // Update vote if it's new or different
+      if (previousVote !== 'like') {
         this.voteCollector.set(message.username, 'like');
         this.emit('vote', {
           username: message.username,
           vote: 'like',
+          previousVote: previousVote || null,
           playerId: this.activeVoteSession,
           chatroomId: this.config?.chatroomId
         });
       }
     } else if (content === '2' || content.toLowerCase() === 'dislike') {
-      if (!this.voteCollector.has(message.username)) {
+      const previousVote = this.voteCollector.get(message.username);
+      
+      // Update vote if it's new or different
+      if (previousVote !== 'dislike') {
         this.voteCollector.set(message.username, 'dislike');
         this.emit('vote', {
           username: message.username,
           vote: 'dislike',
+          previousVote: previousVote || null,
           playerId: this.activeVoteSession,
           chatroomId: this.config?.chatroomId
         });
