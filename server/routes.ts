@@ -27,6 +27,7 @@ import {
   likeIntroductionSchema,
   skipIntroductionSchema,
 } from "@shared/schema";
+import { kickChatService } from "./kickChatService";
 
 interface WSClient extends WebSocket {
   playerId?: string;
@@ -146,6 +147,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       consecutivePasses: gameState.consecutivePasses,
     };
   }
+
+  // Set up Kick chat service event listeners
+  kickChatService.on('message', (message) => {
+    // Forward chat messages to all rooms that have Kick chat enabled
+    // For now, we'll broadcast to all rooms - we can refine this later
+    roomClients.forEach((clients, roomCode) => {
+      broadcastToRoom(roomCode, {
+        type: 'kick_chat_message',
+        payload: message
+      });
+    });
+  });
+  
+  kickChatService.on('vote', (voteData) => {
+    // Forward vote events during introduction phase
+    roomClients.forEach((clients, roomCode) => {
+      broadcastToRoom(roomCode, {
+        type: 'kick_chat_vote',
+        payload: voteData
+      });
+    });
+  });
 
   wss.on("connection", (ws: WSClient) => {
     ws.isAlive = true;
@@ -1554,6 +1577,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "game_started",
               payload: { gameState: result },
             });
+            break;
+          }
+          
+          case "update_kick_chat_config": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+            
+            // Check if player is room owner
+            const gameState = storage.getRoom(ws.roomCode);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              return;
+            }
+            
+            const player = gameState.players.find(p => p.id === ws.playerId);
+            if (!player || !player.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi Kick chat ayarlarını değiştirebilir" } });
+              return;
+            }
+            
+            // Validate config
+            const validation = z.object({
+              enabled: z.boolean(),
+              chatroomId: z.number().optional(),
+              channelName: z.string().optional()
+            }).safeParse(payload);
+            
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz Kick chat ayarları" } });
+              return;
+            }
+            
+            // Update Kick chat service configuration
+            const config = validation.data;
+            if (config.chatroomId) {
+              kickChatService.updateConfig({
+                enabled: config.enabled,
+                chatroomId: config.chatroomId,
+                channelName: config.channelName
+              });
+              
+              // Store config in room for persistence (we'll add this to storage later)
+              // storage.updateKickChatConfig(ws.roomCode, config);
+            }
+            
+            // Broadcast config update to all clients
+            broadcastToRoom(ws.roomCode, {
+              type: "kick_chat_config_updated",
+              payload: config
+            });
+            
+            sendToClient(ws, { type: "update_kick_chat_config_response", payload: { success: true } });
             break;
           }
 

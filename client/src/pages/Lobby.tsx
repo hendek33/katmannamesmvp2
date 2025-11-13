@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Lock, LockOpen, Edit2, Loader2, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Lock, LockOpen, Edit2, Loader2, X, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { PlayerList } from "@/components/PlayerList";
@@ -41,6 +41,12 @@ export default function Lobby() {
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [isChangingName, setIsChangingName] = useState(false);
+  
+  // Kick chat configuration state
+  const [kickChatEnabled, setKickChatEnabled] = useState(false);
+  const [kickChatroomId, setKickChatroomId] = useState("");
+  const [kickChannelName, setKickChannelName] = useState("");
+  
   const { toast } = useToast();
   
   const playerId = localStorage.getItem("katmannames_player_id");
@@ -192,6 +198,15 @@ export default function Lobby() {
       timedMode: mode,
       spymasterTime: spyTime,
       guesserTime: guessTime 
+    });
+  };
+  
+  const handleKickChatUpdate = (enabled: boolean, chatroomId: string, channelName: string) => {
+    const parsedChatroomId = chatroomId ? parseInt(chatroomId, 10) : undefined;
+    send("update_kick_chat_config", { 
+      enabled,
+      chatroomId: parsedChatroomId,
+      channelName: channelName || undefined
     });
   };
 
@@ -748,6 +763,72 @@ export default function Lobby() {
                       </div>
                     </div>
                   )}
+                  </div>
+                </div>
+                
+                {/* Kick Chat Integration - Enhanced Glassmorphism */}
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
+                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5 text-purple-400" />
+                        <h3 className="text-base font-bold text-slate-100">Kick Chat Entegrasyonu</h3>
+                      </div>
+                      <Switch
+                        checked={kickChatEnabled}
+                        disabled={!currentPlayer?.isRoomOwner}
+                        onCheckedChange={(checked) => {
+                          if (currentPlayer?.isRoomOwner) {
+                            setKickChatEnabled(checked);
+                            handleKickChatUpdate(checked, kickChatroomId, kickChannelName);
+                          }
+                        }}
+                        data-testid="switch-kick-chat"
+                      />
+                    </div>
+                    
+                    {kickChatEnabled && (
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs text-slate-400 mb-1">Chatroom ID</Label>
+                          <Input
+                            type="number"
+                            value={kickChatroomId}
+                            onChange={(e) => setKickChatroomId(e.target.value)}
+                            onBlur={() => {
+                              if (currentPlayer?.isRoomOwner) {
+                                handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
+                              }
+                            }}
+                            disabled={!currentPlayer?.isRoomOwner}
+                            placeholder="Örn: 24495088"
+                            className="bg-black/30 border-white/20 text-white text-sm h-8"
+                            data-testid="input-kick-chatroom-id"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-slate-400 mb-1">Kanal Adı (Opsiyonel)</Label>
+                          <Input
+                            type="text"
+                            value={kickChannelName}
+                            onChange={(e) => setKickChannelName(e.target.value)}
+                            onBlur={() => {
+                              if (currentPlayer?.isRoomOwner) {
+                                handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
+                              }
+                            }}
+                            disabled={!currentPlayer?.isRoomOwner}
+                            placeholder="Örn: hype"
+                            className="bg-black/30 border-white/20 text-white text-sm h-8"
+                            data-testid="input-kick-channel-name"
+                          />
+                        </div>
+                        <p className="text-[9px] text-violet-400/70">
+                          Tanışma aşamasında chat'ten "1" beğeni, "2" beğenmeme olarak sayılacak
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
