@@ -666,14 +666,16 @@ export function PlayerIntroduction({
                   opacity: 0
                 }}
                 animate={{ 
-                  scale: [0.5, 1.5, 0],
-                  y: -80,
-                  opacity: [0, 1, 0]
+                  scale: particle.type === 'applaud' ? [0, 2, 1.8, 0] : particle.type === 'boo' ? [0.5, 1.2, 0] : [0.5, 1.5, 0],
+                  y: particle.type === 'boo' ? -120 : particle.type === 'applaud' ? -100 : -80,
+                  x: particle.type === 'boo' ? (Math.random() - 0.5) * 100 : 0,
+                  opacity: [0, 1, 0],
+                  rotate: particle.type === 'applaud' ? [0, 360] : particle.type === 'boo' ? [-10, 10, -10, 10, 0] : 0
                 }}
                 exit={{ opacity: 0 }}
                 transition={{ 
-                  duration: 0.8,
-                  ease: "easeOut"
+                  duration: particle.type === 'applaud' ? 1.2 : particle.type === 'boo' ? 1 : 0.8,
+                  ease: particle.type === 'boo' ? "easeInOut" : "easeOut"
                 }}
                 className="fixed pointer-events-none z-50"
                 style={{ 
@@ -681,10 +683,17 @@ export function PlayerIntroduction({
                   top: particle.y,
                 }}
               >
-                {particle.type === 'like' ? (
+                {particle.type === 'like' && (
                   <Heart className="w-8 h-8 text-green-400 fill-green-400" />
-                ) : (
+                )}
+                {particle.type === 'dislike' && (
                   <ThumbsDown className="w-8 h-8 text-red-400 fill-red-400" />
+                )}
+                {particle.type === 'boo' && (
+                  <Volume2 className="w-10 h-10 text-purple-400 fill-purple-300" />
+                )}
+                {particle.type === 'applaud' && (
+                  <Sparkles className="w-10 h-10 text-amber-400 fill-amber-300" />
                 )}
               </motion.div>
             ))}
