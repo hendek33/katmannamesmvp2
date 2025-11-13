@@ -104,13 +104,13 @@ export function PlayerIntroduction({
   
   const handleBooApplaud = (isBoo: boolean) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
-      // Create multiple falling items from random positions
+      // Create fewer falling items for better performance
       const newItems: {id: number, x: number, text: string, type: 'boo' | 'applaud'}[] = [];
-      const count = isBoo ? 5 : 8; // More applause emojis
+      const count = isBoo ? 3 : 4; // Reduced count for performance
       
       for (let i = 0; i < count; i++) {
         newItems.push({
-          id: Date.now() + i,
+          id: Date.now() + i + Math.random(),
           x: Math.random() * (window.innerWidth - 100), // Random horizontal position
           text: isBoo ? 'YUUH!' : '👏',
           type: isBoo ? 'boo' : 'applaud'
@@ -122,7 +122,7 @@ export function PlayerIntroduction({
       // Remove falling items after animation
       setTimeout(() => {
         setFallingItems(prev => prev.filter(item => !newItems.some(n => n.id === item.id)));
-      }, 3000);
+      }, 2000); // Reduced timeout for better performance
       
       onBooApplaud(currentIntroducingPlayer, isBoo);
     }
@@ -969,22 +969,22 @@ export function PlayerIntroduction({
             className="fixed pointer-events-none z-[200]"
             initial={{ 
               x: item.x,
-              y: -50,
+              y: -200, // Start well above viewport for proper "falling from top" effect
               opacity: 1,
               rotate: Math.random() * 30 - 15
             }}
             animate={{ 
               y: window.innerHeight + 100,
-              x: item.x + (Math.random() - 0.5) * 100,
-              rotate: item.type === 'boo' ? [0, -15, 15, -10, 5, 0] : 360,
+              x: item.x + (Math.random() - 0.5) * 50, // Reduced horizontal drift
+              rotate: item.type === 'boo' ? [0, -15, 15, -10, 5, 0] : 180, // Less rotation for performance
             }}
             exit={{ opacity: 0 }}
             transition={{ 
-              duration: item.type === 'boo' ? 2.5 : 2,
+              duration: 1.5, // Faster for better performance
               ease: "easeIn",
               rotate: {
-                duration: item.type === 'boo' ? 0.5 : 2,
-                repeat: item.type === 'boo' ? 5 : 1,
+                duration: item.type === 'boo' ? 0.5 : 1.5,
+                repeat: item.type === 'boo' ? 3 : 0, // Fewer repeats
                 ease: item.type === 'boo' ? "easeInOut" : "linear"
               }
             }}
