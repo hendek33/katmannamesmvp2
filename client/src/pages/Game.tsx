@@ -1927,15 +1927,6 @@ export default function Game() {
                   onFinishIntroduction={handleFinishIntroduction}
                   onLikeDislike={handleLikeDislike}
                   onSkipIntroduction={handleSkipIntroduction}
-                  onTriggerTaunt={handleTriggerTaunt}
-                  onInsultClick={handleInsultClick}
-                  onSendInsultToPlayer={handleSendInsultToPlayer}
-                  tauntEnabled={tauntEnabled}
-                  insultEnabled={insultEnabled}
-                  globalTauntCooldown={globalTauntCooldown}
-                  globalInsultCooldown={globalInsultCooldown}
-                  showInsultDialog={showInsultV2Dialog}
-                  setShowInsultDialog={setShowInsultV2Dialog}
                 />
               </div>
             ) : (

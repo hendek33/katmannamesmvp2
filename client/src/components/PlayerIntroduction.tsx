@@ -12,15 +12,6 @@ interface PlayerIntroductionProps {
   onFinishIntroduction: (playerId: string) => void;
   onLikeDislike: (targetPlayerId: string, isLike: boolean) => void;
   onSkipIntroduction: () => void;
-  onTriggerTaunt: () => void;
-  onInsultClick: () => void;
-  onSendInsultToPlayer: (targetId: string) => void;
-  tauntEnabled: boolean;
-  insultEnabled: boolean;
-  globalTauntCooldown: number;
-  globalInsultCooldown: number;
-  showInsultDialog: boolean;
-  setShowInsultDialog: (show: boolean) => void;
 }
 
 export function PlayerIntroduction({
@@ -30,15 +21,6 @@ export function PlayerIntroduction({
   onFinishIntroduction,
   onLikeDislike,
   onSkipIntroduction,
-  onTriggerTaunt,
-  onInsultClick,
-  onSendInsultToPlayer,
-  tauntEnabled,
-  insultEnabled,
-  globalTauntCooldown,
-  globalInsultCooldown,
-  showInsultDialog,
-  setShowInsultDialog,
 }: PlayerIntroductionProps) {
   const [showTitle, setShowTitle] = useState(true);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
@@ -905,75 +887,6 @@ export function PlayerIntroduction({
               </div>
             </div>
           </Card>
-          
-          {/* Taunt and Insult Buttons - Outside the card */}
-          {playerId !== currentIntroducingPlayer && (
-            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-50">
-              <Button
-                onClick={onTriggerTaunt}
-                disabled={globalTauntCooldown > 0 || !tauntEnabled}
-                size="sm"
-                variant="outline"
-                className={`
-                  ${globalTauntCooldown > 0 || !tauntEnabled
-                    ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed"
-                    : currentPlayer?.team === "dark"
-                      ? "bg-blue-900/80 hover:bg-blue-800 text-white border-blue-500"
-                      : "bg-red-900/80 hover:bg-red-800 text-white border-red-500"}
-                  backdrop-blur-sm transition-colors
-                `}
-                data-testid="button-trigger-taunt"
-              >
-                {globalTauntCooldown > 0 ? `${globalTauntCooldown}s` : "Hareket Çek"}
-              </Button>
-              <Button
-                onClick={onInsultClick}
-                disabled={globalInsultCooldown > 0 || !insultEnabled}
-                size="sm"
-                variant="outline"
-                className={`
-                  ${globalInsultCooldown > 0 || !insultEnabled
-                    ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed"
-                    : currentPlayer?.team === "dark"
-                      ? "bg-purple-900/80 hover:bg-purple-800 text-white border-purple-500"
-                      : "bg-orange-900/80 hover:bg-orange-800 text-white border-orange-500"}
-                  backdrop-blur-sm transition-colors
-                `}
-                data-testid="button-send-insult"
-              >
-                {globalInsultCooldown > 0 ? `${globalInsultCooldown}s` : "Laf Sok"}
-              </Button>
-            </div>
-          )}
-          
-          {/* Insult Target Selection Dialog */}
-          {showInsultDialog && insultEnabled && globalInsultCooldown === 0 && (
-            <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50">
-              <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-3 space-y-2 shadow-2xl min-w-[200px]">
-                <div className="text-amber-100 font-bold text-sm mb-2">Kime laf sokacaksın?</div>
-                {gameState.players
-                  .filter(p => p.id !== playerId)
-                  .map(player => (
-                    <button
-                      key={player.id}
-                      onClick={() => {
-                        onSendInsultToPlayer(player.id);
-                        setShowInsultDialog(false);
-                      }}
-                      className="w-full text-left px-3 py-2 rounded hover:bg-amber-500/20 text-white text-sm transition-colors"
-                    >
-                      {player.username} ({player.team === "dark" ? "Koyu" : "Açık"})
-                    </button>
-                  ))}
-                <button
-                  onClick={() => setShowInsultDialog(false)}
-                  className="w-full text-center px-3 py-1 rounded bg-gray-700/50 hover:bg-gray-600/50 text-gray-300 text-sm mt-2"
-                >
-                  İptal
-                </button>
-              </div>
-            </div>
-          )}
         </motion.div>
       )}
       
