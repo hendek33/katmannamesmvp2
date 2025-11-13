@@ -21,12 +21,19 @@ export class KickChatService extends EventEmitter {
   private config: KickChatConfig | null = null;
   private reconnectTimer: NodeJS.Timeout | null = null;
   private messageHistory: KickChatMessage[] = [];
-  private maxHistorySize = 100;
+  private maxHistorySize = 30; // Reduced to save memory
   private isConnected = false;
   
   // Vote tracking for introduction phase
   private voteCollector: Map<string, 'like' | 'dislike'> = new Map();
   private activeVoteSession: string | null = null;
+  
+  // Rate limiting and flood protection
+  private userMessageTimestamps: Map<string, number[]> = new Map();
+  private maxMessagesPerSecond = 3; // Max 3 messages per second per user
+  private maxMessagesPerMinute = 30; // Max 30 messages per minute per user
+  private bannedUsers: Set<string> = new Set(); // Temporarily banned users
+  private lastMemoryCleanup = Date.now();
   
   private KICK_WS_URL = 'wss://ws-us2.pusher.com/app/32cbd69e4b950bf97679?protocol=7&client=js&version=8.4.0&flash=false';
   
@@ -111,19 +118,42 @@ export class KickChatService extends EventEmitter {
   }
   
   private processChatMessage(data: any): void {
+    const username = data.sender?.username || 'Anonymous';
+    
+    // Clean up old data periodically (every 5 minutes)
+    const now = Date.now();
+    if (now - this.lastMemoryCleanup > 300000) {
+      this.cleanupMemory();
+      this.lastMemoryCleanup = now;
+    }
+    
+    // Check if user is temporarily banned
+    if (this.bannedUsers.has(username)) {
+      return; // Silently ignore messages from banned users
+    }
+    
+    // Rate limiting check
+    if (!this.checkRateLimit(username)) {
+      console.log(`[KickChat] Rate limit exceeded for user: ${username}`);
+      // Temporarily ban user for 1 minute if they're flooding
+      this.bannedUsers.add(username);
+      setTimeout(() => this.bannedUsers.delete(username), 60000);
+      return;
+    }
+    
     const message: KickChatMessage = {
       id: data.id || Math.random().toString(36),
-      username: data.sender?.username || 'Anonymous',
+      username: username,
       content: data.content || '',
       badges: data.sender?.identity?.badges || [],
       color: data.sender?.identity?.color || '#FFFFFF',
       timestamp: Date.now()
     };
     
-    // Add to history
+    // Add to history with strict limit
     this.messageHistory.push(message);
     if (this.messageHistory.length > this.maxHistorySize) {
-      this.messageHistory.shift();
+      this.messageHistory = this.messageHistory.slice(-this.maxHistorySize); // Keep only last N messages
     }
     
     // Check for vote commands during active vote session
@@ -133,6 +163,56 @@ export class KickChatService extends EventEmitter {
     
     // Emit the message event with chatroomId
     this.emit('message', { ...message, chatroomId: this.config?.chatroomId });
+  }
+  
+  private checkRateLimit(username: string): boolean {
+    const now = Date.now();
+    const timestamps = this.userMessageTimestamps.get(username) || [];
+    
+    // Remove timestamps older than 1 minute
+    const recentTimestamps = timestamps.filter(t => now - t < 60000);
+    
+    // Check per-second limit (sliding window)
+    const lastSecondTimestamps = recentTimestamps.filter(t => now - t < 1000);
+    if (lastSecondTimestamps.length >= this.maxMessagesPerSecond) {
+      return false;
+    }
+    
+    // Check per-minute limit
+    if (recentTimestamps.length >= this.maxMessagesPerMinute) {
+      return false;
+    }
+    
+    // Add current timestamp
+    recentTimestamps.push(now);
+    this.userMessageTimestamps.set(username, recentTimestamps);
+    
+    return true;
+  }
+  
+  private cleanupMemory(): void {
+    // Clear old rate limit data
+    const now = Date.now();
+    for (const [username, timestamps] of this.userMessageTimestamps.entries()) {
+      const recentTimestamps = timestamps.filter(t => now - t < 60000);
+      if (recentTimestamps.length === 0) {
+        this.userMessageTimestamps.delete(username);
+      } else {
+        this.userMessageTimestamps.set(username, recentTimestamps);
+      }
+    }
+    
+    // Clear old vote data if session ended
+    if (!this.activeVoteSession && this.voteCollector.size > 0) {
+      this.voteCollector.clear();
+    }
+    
+    // Ensure message history doesn't grow beyond limit
+    if (this.messageHistory.length > this.maxHistorySize) {
+      this.messageHistory = this.messageHistory.slice(-this.maxHistorySize);
+    }
+    
+    console.log(`[KickChat] Memory cleanup completed. Active users: ${this.userMessageTimestamps.size}`);
   }
   
   private processVote(message: KickChatMessage): void {
@@ -225,6 +305,10 @@ export class KickChatService extends EventEmitter {
     this.messageHistory = [];
     this.voteCollector.clear();
     this.activeVoteSession = null;
+    
+    // Clear rate limiting data
+    this.userMessageTimestamps.clear();
+    this.bannedUsers.clear();
   }
   
   isActive(): boolean {
