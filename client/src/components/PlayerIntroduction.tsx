@@ -27,6 +27,7 @@ export function PlayerIntroduction({
   const [showTitle, setShowTitle] = useState(true);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
   const [particles, setParticles] = useState<{id: number, x: number, y: number, type: 'like' | 'dislike' | 'boo' | 'applaud', delay?: number}[]>([]);
+  const [fallingItems, setFallingItems] = useState<{id: number, x: number, text: string, type: 'boo' | 'applaud'}[]>([]);
   const [dotCount, setDotCount] = useState(1);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
@@ -101,23 +102,27 @@ export function PlayerIntroduction({
     }
   };
   
-  const handleBooApplaud = (isBoo: boolean, event: React.MouseEvent) => {
+  const handleBooApplaud = (isBoo: boolean) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
-      // Add particle effect for boo/applaud
-      const rect = event.currentTarget.getBoundingClientRect();
-      const newParticle = {
-        id: Date.now(),
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-        type: isBoo ? 'boo' as const : 'applaud' as const
-      };
+      // Create multiple falling items from random positions
+      const newItems: {id: number, x: number, text: string, type: 'boo' | 'applaud'}[] = [];
+      const count = isBoo ? 5 : 8; // More applause emojis
       
-      setParticles(prev => [...prev, newParticle]);
+      for (let i = 0; i < count; i++) {
+        newItems.push({
+          id: Date.now() + i,
+          x: Math.random() * (window.innerWidth - 100), // Random horizontal position
+          text: isBoo ? 'YUUH!' : '👏',
+          type: isBoo ? 'boo' : 'applaud'
+        });
+      }
       
-      // Remove particle after animation
+      setFallingItems(prev => [...prev, ...newItems]);
+      
+      // Remove falling items after animation
       setTimeout(() => {
-        setParticles(prev => prev.filter(p => p.id !== newParticle.id));
-      }, 800);
+        setFallingItems(prev => prev.filter(item => !newItems.some(n => n.id === item.id)));
+      }, 3000);
       
       onBooApplaud(currentIntroducingPlayer, isBoo);
     }
@@ -798,7 +803,7 @@ export function PlayerIntroduction({
               </div>
               
               {/* Voting Stats - Clickable Cards */}
-              <div className="grid grid-cols-2 gap-3 mb-4 flex-1">
+              <div className="grid grid-cols-2 gap-4 mb-4 flex-1">
                 {/* Likes - Clickable Card */}
                 <motion.div
                   className={`relative bg-green-900/30 border-2 rounded-lg p-4 
@@ -909,116 +914,6 @@ export function PlayerIntroduction({
                     ))}
                   </div>
                 </motion.div>
-                
-                {/* Boo - Clickable Card */}
-                <motion.div
-                  className={`relative bg-purple-900/30 border-2 rounded-lg p-4 
-                    ${hasVotedBoo ? 'border-purple-400 bg-purple-800/50' : 'border-purple-500/50'}
-                    ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-purple-900/50 hover:border-purple-400/70' : ''}`}
-                  onClick={(e) => {
-                    if (playerId !== currentIntroducingPlayer) {
-                      handleBooApplaud(true, e);
-                    }
-                  }}
-                  whileHover={playerId !== currentIntroducingPlayer ? { 
-                    scale: 1.02,
-                    y: -2,
-                    transition: { duration: 0.2 }
-                  } : {}}
-                  whileTap={playerId !== currentIntroducingPlayer ? { 
-                    scale: 0.98,
-                    transition: { duration: 0.1 }
-                  } : {}}
-                  data-testid="boo-card"
-                >
-                  <div className="flex items-center justify-center mb-2">
-                    <Volume2 className="w-6 h-6 text-purple-400 mr-2" />
-                    <span className="text-2xl font-bold text-purple-400">{boos.length}</span>
-                  </div>
-                  {playerId !== currentIntroducingPlayer && (
-                    <motion.div 
-                      className="text-center text-sm text-purple-400 font-medium mb-2"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      {hasVotedBoo ? 'Seçildi ✓' : 'Yuhlama 🔊'}
-                    </motion.div>
-                  )}
-                  <div className="flex flex-wrap gap-1 max-h-20 overflow-hidden">
-                    {boos.map((boo, index) => (
-                      <div
-                        key={`boo-${boo.username}`}
-                        className="inline-block"
-                      >
-                        <div 
-                          className="inline-flex items-center px-2 py-1 rounded text-xs font-bold"
-                          style={{ 
-                            backgroundColor: boo.team === "dark" ? 'rgb(29, 78, 216)' : 'rgb(185, 28, 28)',
-                            color: 'rgb(255, 255, 255)',
-                            opacity: '1 !important'
-                          }}
-                        >
-                          <span style={{ color: 'rgb(255, 255, 255)' }}>{boo.username}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-                
-                {/* Applaud - Clickable Card */}
-                <motion.div
-                  className={`relative bg-amber-900/30 border-2 rounded-lg p-4 
-                    ${hasVotedApplaud ? 'border-amber-400 bg-amber-800/50' : 'border-amber-500/50'}
-                    ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-amber-900/50 hover:border-amber-400/70' : ''}`}
-                  onClick={(e) => {
-                    if (playerId !== currentIntroducingPlayer) {
-                      handleBooApplaud(false, e);
-                    }
-                  }}
-                  whileHover={playerId !== currentIntroducingPlayer ? { 
-                    scale: 1.02,
-                    y: -2,
-                    transition: { duration: 0.2 }
-                  } : {}}
-                  whileTap={playerId !== currentIntroducingPlayer ? { 
-                    scale: 0.98,
-                    transition: { duration: 0.1 }
-                  } : {}}
-                  data-testid="applaud-card"
-                >
-                  <div className="flex items-center justify-center mb-2">
-                    <Sparkles className="w-6 h-6 text-amber-400 mr-2" />
-                    <span className="text-2xl font-bold text-amber-400">{applause.length}</span>
-                  </div>
-                  {playerId !== currentIntroducingPlayer && (
-                    <motion.div 
-                      className="text-center text-sm text-amber-400 font-medium mb-2"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      {hasVotedApplaud ? 'Seçildi ✓' : 'Alkışla 👏'}
-                    </motion.div>
-                  )}
-                  <div className="flex flex-wrap gap-1 max-h-20 overflow-hidden">
-                    {applause.map((applaud, index) => (
-                      <div
-                        key={`applaud-${applaud.username}`}
-                        className="inline-block"
-                      >
-                        <div 
-                          className="inline-flex items-center px-2 py-1 rounded text-xs font-bold"
-                          style={{ 
-                            backgroundColor: applaud.team === "dark" ? 'rgb(29, 78, 216)' : 'rgb(185, 28, 28)',
-                            color: 'rgb(255, 255, 255)',
-                            opacity: '1 !important'
-                          }}
-                        >
-                          <span style={{ color: 'rgb(255, 255, 255)' }}>{applaud.username}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
               </div>
               
               {/* Action Buttons */}
@@ -1039,8 +934,73 @@ export function PlayerIntroduction({
               </div>
             </div>
           </Card>
+          
+          {/* Boo and Applause Buttons - Outside the card */}
+          {playerId !== currentIntroducingPlayer && (
+            <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3 z-50">
+              <Button
+                onClick={() => handleBooApplaud(true)}
+                size="sm"
+                variant="outline"
+                className="bg-purple-900/80 hover:bg-purple-800 text-white border-purple-500 backdrop-blur-sm"
+                data-testid="boo-button"
+              >
+                Yuhla
+              </Button>
+              <Button
+                onClick={() => handleBooApplaud(false)}
+                size="sm"
+                variant="outline"
+                className="bg-amber-900/80 hover:bg-amber-800 text-white border-amber-500 backdrop-blur-sm"
+                data-testid="applaud-button"
+              >
+                Alkışla
+              </Button>
+            </div>
+          )}
         </motion.div>
       )}
+      
+      {/* Falling Effects */}
+      <AnimatePresence>
+        {fallingItems.map((item) => (
+          <motion.div
+            key={item.id}
+            className="fixed pointer-events-none z-[200]"
+            initial={{ 
+              x: item.x,
+              y: -50,
+              opacity: 1,
+              rotate: Math.random() * 30 - 15
+            }}
+            animate={{ 
+              y: window.innerHeight + 100,
+              x: item.x + (Math.random() - 0.5) * 100,
+              rotate: item.type === 'boo' ? [0, -15, 15, -10, 5, 0] : 360,
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ 
+              duration: item.type === 'boo' ? 2.5 : 2,
+              ease: "easeIn",
+              rotate: {
+                duration: item.type === 'boo' ? 0.5 : 2,
+                repeat: item.type === 'boo' ? 5 : 1,
+                ease: item.type === 'boo' ? "easeInOut" : "linear"
+              }
+            }}
+            style={{
+              fontSize: item.type === 'boo' ? '2rem' : '3rem',
+              fontWeight: 'bold',
+              color: item.type === 'boo' ? '#a855f7' : '#fbbf24',
+              textShadow: item.type === 'boo' 
+                ? '0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.5)' 
+                : '0 0 20px rgba(251, 191, 36, 0.8), 0 0 40px rgba(251, 191, 36, 0.5)'
+            }}
+          >
+            {item.text}
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
