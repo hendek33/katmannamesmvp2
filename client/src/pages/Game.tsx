@@ -967,7 +967,7 @@ export default function Game() {
               <Card className="w-full px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-amber-900/30 hover:shadow-amber-500/20 transition-all">
             <div className="flex justify-center items-center gap-1 h-full">
               {/* Moderator Controls for Taunt/Insult */}
-              {currentPlayer?.isRoomOwner && gameState.phase === "playing" && (
+              {currentPlayer?.isRoomOwner && (gameState.phase === "playing" || gameState.phase === "introduction") && (
                 <>
                   <Button
                     onClick={() => {
@@ -1654,7 +1654,7 @@ export default function Game() {
             )}
             
             {/* Action Buttons - Below Blue Team Panel (Hidden for Spymasters) */}
-            {currentPlayer && gameState.phase === "playing" && currentPlayer.role !== "spymaster" && (
+            {currentPlayer && (gameState.phase === "playing" || gameState.phase === "introduction") && currentPlayer.role !== "spymaster" && (
               <div className="mt-4 space-y-2">
                 {/* Action Buttons Container */}
                 <div className="flex gap-2">
