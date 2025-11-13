@@ -1519,11 +1519,12 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     
-    // Check if taunt feature is enabled (defaults to true if not set)
-    if (roomData.tauntEnabled === false) return null;
+    // During introduction phase, taunt is always enabled
+    // During playing phase, check if taunt feature is enabled (defaults to true if not set)
+    if (room.phase !== "introduction" && roomData.tauntEnabled === false) return null;
     
-    // Only during playing phase
-    if (room.phase !== "playing") return null;
+    // Only during introduction or playing phase
+    if (room.phase !== "playing" && room.phase !== "introduction") return null;
     
     // Find the player
     const player = room.players.find(p => p.id === playerId);
@@ -1570,11 +1571,12 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     
-    // Check if insult feature is enabled (defaults to true if not set)
-    if (roomData.insultEnabled === false) return null;
+    // During introduction phase, insult is always enabled
+    // During playing phase, check if insult feature is enabled (defaults to true if not set)
+    if (room.phase !== "introduction" && roomData.insultEnabled === false) return null;
     
-    // Only during playing phase
-    if (room.phase !== "playing") return null;
+    // Only during introduction or playing phase
+    if (room.phase !== "playing" && room.phase !== "introduction") return null;
     
     // Find the player
     const player = room.players.find(p => p.id === playerId);
@@ -1789,8 +1791,9 @@ export class MemStorage implements IStorage {
     
     const room = roomData.gameState;
 
-    // Check if insult is enabled
-    if (!roomData.insultEnabled) return null;
+    // During introduction phase, insult is always enabled
+    // During playing phase, check if insult is enabled
+    if (room.phase !== "introduction" && !roomData.insultEnabled) return null;
 
     // Get sender and target
     const sender = room.players.find(p => p.id === senderId);
