@@ -594,58 +594,139 @@ export function PlayerIntroduction({
           
           {/* Skip Button for controller - Centered at bottom */}
           {isController && (
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-10 mb-4">
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 260, 
+                  damping: 20,
+                  delay: 0.4 
+                }}
+                whileHover={{ 
+                  scale: 1.08,
+                  transition: {
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 10
+                  }
+                }}
+                whileTap={{ 
+                  scale: 0.92,
+                  rotate: [0, -2, 2, -2, 0],
+                  transition: {
+                    rotate: {
+                      duration: 0.3,
+                      times: [0, 0.25, 0.5, 0.75, 1]
+                    },
+                    scale: {
+                      duration: 0.1
+                    }
+                  }
+                }}
+                className="relative"
               >
+                {/* Outer glow ring */}
+                <motion.div
+                  className="absolute -inset-3 rounded-2xl bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 opacity-40 blur-xl"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.4, 0.6, 0.4]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                
                 <Button
                   onClick={onSkipIntroduction}
-                  className="relative px-6 py-4 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-bold text-base rounded-xl shadow-2xl shadow-amber-500/30 border-2 border-amber-400/50 backdrop-blur-sm transition-all duration-300 overflow-hidden group"
+                  className="relative px-8 py-5 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-bold text-lg rounded-2xl shadow-2xl shadow-amber-600/40 border-2 border-amber-400/60 backdrop-blur-sm transition-all duration-300 overflow-hidden transform-gpu"
                   data-testid="skip-introduction-button"
                 >
                   {/* Animated background shimmer */}
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12"
                     animate={{
-                      x: [-200, 200, -200]
+                      x: [-400, 400, -400]
                     }}
                     transition={{
-                      duration: 3,
+                      duration: 4,
                       repeat: Infinity,
-                      ease: "linear"
+                      ease: "easeInOut"
                     }}
                   />
                   
-                  {/* Pulsing glow effect */}
+                  {/* Hover pulse effect */}
                   <motion.div
-                    className="absolute inset-0 rounded-xl"
+                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100"
                     animate={{
                       boxShadow: [
-                        "inset 0 0 20px rgba(251, 191, 36, 0.3)",
-                        "inset 0 0 40px rgba(251, 191, 36, 0.5)",
-                        "inset 0 0 20px rgba(251, 191, 36, 0.3)"
+                        "inset 0 0 30px rgba(251, 191, 36, 0.4)",
+                        "inset 0 0 60px rgba(251, 191, 36, 0.6)",
+                        "inset 0 0 30px rgba(251, 191, 36, 0.4)"
                       ]
                     }}
-                    transition={{ duration: 2, repeat: Infinity }}
+                    transition={{ 
+                      duration: 1.5, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
                   />
                   
-                  <div className="relative flex items-center gap-2">
+                  {/* Click ripple effect container */}
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none"
+                    initial={false}
+                    whileTap={{
+                      scale: [1, 1.5, 2],
+                      opacity: [0.5, 0.3, 0]
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="absolute inset-0 rounded-2xl bg-white/30" />
+                  </motion.div>
+                  
+                  <div className="relative flex items-center justify-center gap-3 z-10">
                     <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
+                      animate={{ 
+                        scale: [1, 1.3, 1],
+                        rotate: [0, -10, 10, 0]
+                      }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
                     >
-                      <Play className="w-5 h-5 fill-current" />
+                      <Play className="w-6 h-6 fill-current drop-shadow-md" />
                     </motion.div>
-                    <span className="tracking-wide">Oyuna Başla</span>
+                    
+                    <span className="tracking-wider text-shadow-lg">
+                      Oyuna Başla
+                    </span>
+                    
                     <motion.div
-                      animate={{ rotate: [0, 360] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                      animate={{ 
+                        rotate: [0, 360],
+                        scale: [1, 1.2, 1]
+                      }}
+                      transition={{ 
+                        rotate: {
+                          duration: 4,
+                          repeat: Infinity,
+                          ease: "linear"
+                        },
+                        scale: {
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }
+                      }}
                     >
-                      <Sparkles className="w-4 h-4 text-yellow-300" />
+                      <Sparkles className="w-5 h-5 text-yellow-300 drop-shadow-md" />
                     </motion.div>
                   </div>
                 </Button>
