@@ -279,16 +279,62 @@ export function PlayerIntroduction({
     <div className="grid-area px-4 py-2">
       {/* Skip Button for controller */}
       {isController && (
-        <div className="flex justify-end mb-2">
-          <Button
-            onClick={onSkipIntroduction}
-            variant="secondary"
-            size="sm"
-            data-testid="skip-introduction-button"
+        <div className="flex justify-end mb-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <SkipForward className="w-4 h-4 mr-1" />
-            Atla ve Oyuna Başla
-          </Button>
+            <Button
+              onClick={onSkipIntroduction}
+              className="relative px-8 py-6 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-bold text-lg rounded-xl shadow-2xl shadow-amber-500/30 border-2 border-amber-400/50 backdrop-blur-sm transition-all duration-300 overflow-hidden group"
+              data-testid="skip-introduction-button"
+            >
+              {/* Animated background shimmer */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                animate={{
+                  x: [-200, 200, -200]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              />
+              
+              {/* Pulsing glow effect */}
+              <motion.div
+                className="absolute inset-0 rounded-xl"
+                animate={{
+                  boxShadow: [
+                    "inset 0 0 20px rgba(251, 191, 36, 0.3)",
+                    "inset 0 0 40px rgba(251, 191, 36, 0.5)",
+                    "inset 0 0 20px rgba(251, 191, 36, 0.3)"
+                  ]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              
+              <div className="relative flex items-center gap-3">
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <SkipForward className="w-6 h-6" />
+                </motion.div>
+                <span className="tracking-wide">Atla ve Oyuna Başla</span>
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                >
+                  <Sparkles className="w-5 h-5 text-yellow-300" />
+                </motion.div>
+              </div>
+            </Button>
+          </motion.div>
         </div>
       )}
       

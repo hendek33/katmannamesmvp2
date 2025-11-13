@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -501,21 +502,74 @@ export default function Lobby() {
                     </div>
                   </div>
                   
-                  {/* Start Button - Codenames Style */}
+                  {/* Start Button - Beautiful Glassmorphism Style */}
                   {currentPlayer?.isRoomOwner && (
-                    <Button
-                      onClick={handleStartGame}
-                      disabled={!canStartGame}
-                      className={`w-full py-5 text-base font-semibold transition-all backdrop-blur-xl border ${
-                        canStartGame 
-                          ? 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border-emerald-600/40 hover:border-emerald-500/60 shadow-lg'
-                          : 'bg-slate-800/30 text-slate-600 border-slate-700/30 cursor-not-allowed'
-                      }`}
-                      data-testid="button-start-game"
+                    <motion.div
+                      initial={{ scale: 0.95, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 200 }}
+                      whileHover={canStartGame ? { scale: 1.02 } : {}}
+                      whileTap={canStartGame ? { scale: 0.98 } : {}}
                     >
-                      <Play className="w-4 h-4 mr-2" />
-                      Oyunu Başlat
-                    </Button>
+                      <Button
+                        onClick={handleStartGame}
+                        disabled={!canStartGame}
+                        className={`relative w-full py-6 text-lg font-bold rounded-xl transition-all duration-300 overflow-hidden ${
+                          canStartGame 
+                            ? 'bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-500 hover:via-green-500 hover:to-teal-500 text-white shadow-2xl shadow-emerald-500/40 border-2 border-emerald-400/50 backdrop-blur-sm'
+                            : 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-500 border-2 border-slate-700/30 cursor-not-allowed opacity-60'
+                        }`}
+                        data-testid="button-start-game"
+                      >
+                        {canStartGame && (
+                          <>
+                            {/* Animated background shimmer for enabled state */}
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                              animate={{
+                                x: [-200, 200, -200]
+                              }}
+                              transition={{
+                                duration: 3,
+                                repeat: Infinity,
+                                ease: "linear"
+                              }}
+                            />
+                            
+                            {/* Pulsing glow effect for enabled state */}
+                            <motion.div
+                              className="absolute inset-0 rounded-xl"
+                              animate={{
+                                boxShadow: [
+                                  "inset 0 0 20px rgba(16, 185, 129, 0.3)",
+                                  "inset 0 0 40px rgba(16, 185, 129, 0.5)",
+                                  "inset 0 0 20px rgba(16, 185, 129, 0.3)"
+                                ]
+                              }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                            />
+                          </>
+                        )}
+                        
+                        <div className="relative flex items-center justify-center gap-3">
+                          <motion.div
+                            animate={canStartGame ? { scale: [1, 1.2, 1] } : {}}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          >
+                            <Play className="w-6 h-6 fill-current" />
+                          </motion.div>
+                          <span className="tracking-wide">Oyunu Başlat</span>
+                          {canStartGame && (
+                            <motion.div
+                              animate={{ rotate: [0, 360] }}
+                              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            >
+                              <Sparkles className="w-5 h-5 text-yellow-300" />
+                            </motion.div>
+                          )}
+                        </div>
+                      </Button>
+                    </motion.div>
                   )}
                 </div>
                 </div>
