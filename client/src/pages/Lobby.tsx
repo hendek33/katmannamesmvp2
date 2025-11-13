@@ -790,43 +790,56 @@ export default function Lobby() {
                     
                     {kickChatEnabled && (
                       <div className="space-y-3">
-                        <div>
-                          <Label className="text-xs text-slate-400 mb-1">Chatroom ID</Label>
-                          <Input
-                            type="number"
-                            value={kickChatroomId}
-                            onChange={(e) => setKickChatroomId(e.target.value)}
-                            onBlur={() => {
-                              if (currentPlayer?.isRoomOwner) {
-                                handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
-                              }
-                            }}
-                            disabled={!currentPlayer?.isRoomOwner}
-                            placeholder="Örn: 24495088"
-                            className="bg-black/30 border-white/20 text-white text-sm h-8"
-                            data-testid="input-kick-chatroom-id"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-slate-400 mb-1">Kanal Adı (Opsiyonel)</Label>
-                          <Input
-                            type="text"
-                            value={kickChannelName}
-                            onChange={(e) => setKickChannelName(e.target.value)}
-                            onBlur={() => {
-                              if (currentPlayer?.isRoomOwner) {
-                                handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
-                              }
-                            }}
-                            disabled={!currentPlayer?.isRoomOwner}
-                            placeholder="Örn: hype"
-                            className="bg-black/30 border-white/20 text-white text-sm h-8"
-                            data-testid="input-kick-channel-name"
-                          />
-                        </div>
-                        <p className="text-[9px] text-violet-400/70">
-                          Tanışma aşamasında chat'ten "1" beğeni, "2" beğenmeme olarak sayılacak
-                        </p>
+                        {currentPlayer?.isRoomOwner ? (
+                          <>
+                            <div>
+                              <Label className="text-xs text-slate-400 mb-1">Chatroom ID</Label>
+                              <Input
+                                type="number"
+                                value={kickChatroomId}
+                                onChange={(e) => setKickChatroomId(e.target.value)}
+                                onBlur={() => {
+                                  if (currentPlayer?.isRoomOwner) {
+                                    handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
+                                  }
+                                }}
+                                disabled={!currentPlayer?.isRoomOwner}
+                                placeholder="Örn: 24495088"
+                                className="bg-black/30 border-white/20 text-white text-sm h-8"
+                                data-testid="input-kick-chatroom-id"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-slate-400 mb-1">Kanal Adı (Opsiyonel)</Label>
+                              <Input
+                                type="text"
+                                value={kickChannelName}
+                                onChange={(e) => setKickChannelName(e.target.value)}
+                                onBlur={() => {
+                                  if (currentPlayer?.isRoomOwner) {
+                                    handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
+                                  }
+                                }}
+                                disabled={!currentPlayer?.isRoomOwner}
+                                placeholder="Örn: hype"
+                                className="bg-black/30 border-white/20 text-white text-sm h-8"
+                                data-testid="input-kick-channel-name"
+                              />
+                            </div>
+                            <p className="text-[9px] text-violet-400/70">
+                              Tanışma aşamasında chat'ten "1" beğeni, "2" beğenmeme olarak sayılacak
+                            </p>
+                          </>
+                        ) : (
+                          <div className="p-2 rounded-lg bg-purple-900/20 border border-purple-600/20">
+                            <p className="text-xs text-purple-300">
+                              ✅ Chat entegrasyonu aktif
+                            </p>
+                            <p className="text-[9px] text-purple-400/70 mt-1">
+                              Tanışma aşamasında chat'ten "1" beğeni, "2" beğenmeme olarak sayılacak
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
