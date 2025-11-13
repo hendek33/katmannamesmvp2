@@ -16,6 +16,7 @@ interface RoomData {
   endGameGuessVotes?: Map<string, Set<string>>; // hedefOyuncuId -> Oy veren oyuncu ID'lerinin seti
   usedWords?: Set<string>; // Aynı odadaki oyunlarda tekrarı önlemek için kullanılan kelimeleri takip et
   turnRevealMap?: { dark: boolean; light: boolean }; // Takımın kendi turunda kart açıp açmadığını takip et
+  kickChatConfig?: { enabled: boolean; chatroomId?: number; channelName?: string }; // Kick chat configuration
 }
 
 export interface IStorage {
@@ -53,6 +54,8 @@ export interface IStorage {
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number } | null;
+  updateKickChatConfig(roomCode: string, config: { enabled: boolean; chatroomId?: number; channelName?: string }): boolean;
+  getKickChatConfig(roomCode: string): { enabled: boolean; chatroomId?: number; channelName?: string } | null;
   // Tanıtım aşaması metodları
   startIntroduction(roomCode: string): GameState | null;
   selectPlayerForIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -1900,6 +1903,21 @@ export class MemStorage implements IStorage {
       teamTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
       teamInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
     };
+  }
+  
+  updateKickChatConfig(roomCode: string, config: { enabled: boolean; chatroomId?: number; channelName?: string }): boolean {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return false;
+    
+    roomData.kickChatConfig = config;
+    return true;
+  }
+  
+  getKickChatConfig(roomCode: string): { enabled: boolean; chatroomId?: number; channelName?: string } | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    
+    return roomData.kickChatConfig || { enabled: false };
   }
 
   startIntroduction(roomCode: string): GameState | null {

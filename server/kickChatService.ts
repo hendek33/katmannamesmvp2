@@ -131,8 +131,8 @@ export class KickChatService extends EventEmitter {
       this.processVote(message);
     }
     
-    // Emit the message event
-    this.emit('message', message);
+    // Emit the message event with chatroomId
+    this.emit('message', { ...message, chatroomId: this.config?.chatroomId });
   }
   
   private processVote(message: KickChatMessage): void {
@@ -145,7 +145,8 @@ export class KickChatService extends EventEmitter {
         this.emit('vote', {
           username: message.username,
           vote: 'like',
-          playerId: this.activeVoteSession
+          playerId: this.activeVoteSession,
+          chatroomId: this.config?.chatroomId
         });
       }
     } else if (content === '2' || content.toLowerCase() === 'dislike') {
@@ -154,7 +155,8 @@ export class KickChatService extends EventEmitter {
         this.emit('vote', {
           username: message.username,
           vote: 'dislike',
-          playerId: this.activeVoteSession
+          playerId: this.activeVoteSession,
+          chatroomId: this.config?.chatroomId
         });
       }
     }

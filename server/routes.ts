@@ -150,9 +150,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Set up Kick chat service event listeners
   kickChatService.on('message', (message) => {
-    // Forward chat messages to all rooms that have Kick chat enabled
-    // For now, we'll broadcast to all rooms - we can refine this later
+    // Forward chat messages only to rooms that have Kick chat enabled
     roomClients.forEach((clients, roomCode) => {
+      const kickConfig = storage.getKickChatConfig(roomCode);
+      if (!kickConfig?.enabled) return;
+      
+      // If chatroomId is specified, only broadcast to matching rooms
+      if (kickConfig.chatroomId && 
+          kickConfig.chatroomId !== message.chatroomId) {
+        return;
+      }
+      
       broadcastToRoom(roomCode, {
         type: 'kick_chat_message',
         payload: message
@@ -161,8 +169,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   kickChatService.on('vote', (voteData) => {
-    // Forward vote events during introduction phase
+    // Forward vote events only to rooms with Kick chat enabled
     roomClients.forEach((clients, roomCode) => {
+      const kickConfig = storage.getKickChatConfig(roomCode);
+      if (!kickConfig?.enabled) return;
+      
+      // If chatroomId is specified, only broadcast to matching rooms  
+      if (kickConfig.chatroomId && 
+          kickConfig.chatroomId !== voteData.chatroomId) {
+        return;
+      }
+      
       broadcastToRoom(roomCode, {
         type: 'kick_chat_vote',
         payload: voteData
@@ -509,12 +526,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             roomClients.get(validation.data.roomCode)!.add(ws);
 
             const cardImages = storage.getCardImages(validation.data.roomCode);
+            const kickConfig = storage.getKickChatConfig(validation.data.roomCode);
             sendToClient(ws, {
               type: "room_joined",
               payload: { 
                 playerId, 
                 gameState: getFilteredGameState(gameState, playerId),
-                cardImages: cardImages || {}
+                cardImages: cardImages || {},
+                kickChatConfig: kickConfig || { enabled: false }
               },
             });
             
@@ -1502,6 +1521,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
               sendToClient(ws, { type: "error", payload: { message: "Oyuncu seçilemedi" } });
               return;
             }
+            
+            // Start vote session for Kick chat if enabled
+            const kickConfig = storage.getKickChatConfig(ws.roomCode);
+            if (kickConfig?.enabled && validation.data.playerId) {
+              kickChatService.startVoteSession(validation.data.playerId);
+              
+              // Broadcast initial vote state
+              broadcastToRoom(ws.roomCode, {
+                type: "kick_chat_vote",
+                payload: { likes: 0, dislikes: 0 }
+              });
+            }
 
             broadcastToRoom(ws.roomCode, {
               type: "player_introducing",
@@ -1526,6 +1557,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (!result) {
               sendToClient(ws, { type: "error", payload: { message: "Tanıtım bitirilemedi" } });
               return;
+            }
+            
+            // End vote session for Kick chat if enabled
+            const kickConfig = storage.getKickChatConfig(ws.roomCode);
+            if (kickConfig?.enabled) {
+              const voteResults = kickChatService.endVoteSession();
+              const roomCode = ws.roomCode;
+              
+              // Broadcast final vote results
+              broadcastToRoom(roomCode, {
+                type: "kick_chat_vote",
+                payload: voteResults
+              });
+              
+              // Reset votes for next player
+              setTimeout(() => {
+                broadcastToRoom(roomCode, {
+                  type: "kick_chat_vote",
+                  payload: { likes: 0, dislikes: 0 }
+                });
+              }, 3000);
             }
 
             broadcastToRoom(ws.roomCode, {
@@ -1572,6 +1624,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
               sendToClient(ws, { type: "error", payload: { message: "Tanıtım atlanamadı" } });
               return;
             }
+            
+            // End any active vote session if Kick chat is enabled
+            const kickConfig = storage.getKickChatConfig(ws.roomCode);
+            if (kickConfig?.enabled) {
+              kickChatService.endVoteSession();
+              
+              // Clear votes
+              broadcastToRoom(ws.roomCode, {
+                type: "kick_chat_vote",
+                payload: { likes: 0, dislikes: 0 }
+              });
+            }
 
             broadcastToRoom(ws.roomCode, {
               type: "game_started",
@@ -1613,21 +1677,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Update Kick chat service configuration
             const config = validation.data;
-            if (config.chatroomId) {
+            
+            // Store config in room for persistence
+            storage.updateKickChatConfig(ws.roomCode, config);
+            
+            // Only update service if enabled with valid chatroomId
+            if (config.enabled && config.chatroomId) {
               kickChatService.updateConfig({
-                enabled: config.enabled,
+                enabled: true,
                 chatroomId: config.chatroomId,
                 channelName: config.channelName
               });
-              
-              // Store config in room for persistence (we'll add this to storage later)
-              // storage.updateKickChatConfig(ws.roomCode, config);
+            } else {
+              // Disconnect if disabled
+              kickChatService.disconnect();
             }
             
             // Broadcast config update to all clients
             broadcastToRoom(ws.roomCode, {
               type: "kick_chat_config_updated",
-              payload: config
+              payload: { config }
             });
             
             sendToClient(ws, { type: "update_kick_chat_config_response", payload: { success: true } });

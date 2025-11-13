@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight, Star, Zap, Volume2, Megaphone, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ChatOverlay from "./ChatOverlay";
+import { useWebSocketContext } from "@/contexts/WebSocketContext";
 
 interface PlayerIntroductionProps {
   gameState: GameState;
@@ -13,8 +14,6 @@ interface PlayerIntroductionProps {
   onFinishIntroduction: (playerId: string) => void;
   onLikeDislike: (targetPlayerId: string, isLike: boolean) => void;
   onSkipIntroduction: () => void;
-  onKickChatMessage?: (message: any) => void;
-  onKickChatVote?: (vote: any) => void;
 }
 
 export function PlayerIntroduction({
@@ -29,11 +28,10 @@ export function PlayerIntroduction({
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
   const [particles, setParticles] = useState<{id: number, x: number, y: number, type: 'like' | 'dislike', delay?: number}[]>([]);
   const [dotCount, setDotCount] = useState(1);
-  
-  // Kick chat state
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
-  const [chatVoteStats, setChatVoteStats] = useState({ likes: 0, dislikes: 0 });
   const [showChatOverlay, setShowChatOverlay] = useState(true);
+  
+  // Get Kick chat data from context
+  const { kickChatMessages, kickChatVotes, kickChatConfig } = useWebSocketContext();
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team spymaster controls
@@ -1013,12 +1011,12 @@ export function PlayerIntroduction({
       )}
       
       {/* Kick Chat Overlay */}
-      {showChatOverlay && currentIntroducingPlayer && (
+      {showChatOverlay && currentIntroducingPlayer && kickChatConfig?.enabled && (
         <ChatOverlay
           isVisible={true}
           position="bottom-right"
-          messages={chatMessages}
-          voteStats={chatVoteStats}
+          messages={kickChatMessages}
+          voteStats={kickChatVotes}
           title="Kick Chat"
           showVoteInstructions={true}
         />

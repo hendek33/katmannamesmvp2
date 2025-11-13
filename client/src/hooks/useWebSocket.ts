@@ -25,6 +25,9 @@ export function useWebSocket() {
   const [insultEnabled, setInsultEnabled] = useState<boolean>(true);
   const [globalTauntCooldown, setGlobalTauntCooldown] = useState<number>(0);
   const [globalInsultCooldown, setGlobalInsultCooldown] = useState<number>(0);
+  const [kickChatMessages, setKickChatMessages] = useState<any[]>([]);
+  const [kickChatVotes, setKickChatVotes] = useState({ likes: 0, dislikes: 0 });
+  const [kickChatConfig, setKickChatConfig] = useState<any>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -113,6 +116,9 @@ export function useWebSocket() {
                 if (message.payload.cardImages) {
                   setCardImages(message.payload.cardImages);
                 }
+                if (message.payload.kickChatConfig) {
+                  setKickChatConfig(message.payload.kickChatConfig);
+                }
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.gameState.roomCode);
                 break;
@@ -131,10 +137,17 @@ export function useWebSocket() {
                 if (message.payload.cardImages) {
                   setCardImages(message.payload.cardImages);
                 }
+                // Reset kick chat votes when game starts
+                setKickChatVotes({ likes: 0, dislikes: 0 });
                 break;
 
               // Introduction phase handlers
               case "player_introducing":
+                setGameState(message.payload.gameState);
+                // Reset votes when a new player starts introducing
+                setKickChatVotes({ likes: 0, dislikes: 0 });
+                break;
+                
               case "introduction_finished":
               case "introduction_liked":
                 setGameState(message.payload.gameState);
@@ -305,6 +318,43 @@ export function useWebSocket() {
                 setGlobalTauntCooldown(message.payload.teamTauntCooldown || 0);
                 setGlobalInsultCooldown(message.payload.teamInsultCooldown || 0);
                 break;
+                
+              case "kick_chat_message":
+                setKickChatMessages(prev => {
+                  if (!message.payload?.id) return prev;
+                  if (prev.some(msg => msg.id === message.payload.id)) return prev;
+                  const next = [...prev, message.payload];
+                  const limit = message.payload?.historyLimit ?? 50;
+                  return next.slice(-limit);
+                });
+                break;
+                
+              case "kick_chat_vote":
+                setKickChatVotes(prev => {
+                  // Check if this is a vote event or a vote summary
+                  if (message.payload?.vote) {
+                    // Individual vote event - aggregate it
+                    const isLike = message.payload.vote === 'like';
+                    return {
+                      likes: prev.likes + (isLike ? 1 : 0),
+                      dislikes: prev.dislikes + (!isLike ? 1 : 0)
+                    };
+                  } else if ('likes' in message.payload && 'dislikes' in message.payload) {
+                    // Vote summary (e.g., end of session or reset)
+                    return {
+                      likes: message.payload.likes || 0,
+                      dislikes: message.payload.dislikes || 0
+                    };
+                  }
+                  return prev;
+                });
+                break;
+                
+              case "kick_chat_config_updated":
+                if (message.payload?.config) {
+                  setKickChatConfig(message.payload.config);
+                }
+                break;
             }
           } catch (err) {
           }
@@ -398,6 +448,10 @@ export function useWebSocket() {
     globalInsultCooldown,
     setGlobalTauntCooldown,
     setGlobalInsultCooldown,
+    kickChatMessages,
+    kickChatVotes,
+    kickChatConfig,
+    setKickChatMessages,
     send,
   };
 }

@@ -24,6 +24,10 @@ interface WebSocketContextType {
   globalInsultCooldown: number;
   setGlobalTauntCooldown: (value: number | ((prev: number) => number)) => void;
   setGlobalInsultCooldown: (value: number | ((prev: number) => number)) => void;
+  kickChatMessages: any[];
+  kickChatVotes: { likes: number; dislikes: number };
+  kickChatConfig: any;
+  setKickChatMessages: (value: any[] | ((prev: any[]) => any[])) => void;
   send: (type: string, payload: any) => void;
 }
 
