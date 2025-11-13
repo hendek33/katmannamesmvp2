@@ -1000,25 +1000,79 @@ export function PlayerIntroduction({
                   />
                 )}
               </div>
-              
-              {/* Action Buttons */}
-              <div className="flex justify-center gap-3">
-                {/* Finish button for controller */}
-                {isController && (
-                  <Button
-                    onClick={handleFinishIntroduction}
-                    size="sm"
-                    variant="outline"
-                    className="bg-white/10 hover:bg-white/20 text-white border-white/30"
-                    data-testid="finish-introduction-button"
-                  >
-                    Tanıtımı Bitir
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                )}
-              </div>
             </div>
           </Card>
+          
+          {/* Finish Button - Outside Card */}
+          {isController && (
+            <motion.div 
+              className="mt-6 flex justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, type: "spring" }}
+            >
+              <motion.button
+                onClick={handleFinishIntroduction}
+                className="relative group px-8 py-4 rounded-xl font-bold text-lg overflow-hidden shadow-2xl"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                data-testid="finish-introduction-button"
+              >
+                {/* Animated gradient background */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600"
+                  animate={{
+                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                  style={{
+                    backgroundSize: "200% 100%"
+                  }}
+                />
+                
+                {/* Glowing border effect */}
+                <motion.div
+                  className="absolute inset-0 rounded-xl"
+                  animate={{
+                    boxShadow: [
+                      "0 0 20px rgba(168, 85, 247, 0.5)",
+                      "0 0 40px rgba(236, 72, 153, 0.7)",
+                      "0 0 20px rgba(168, 85, 247, 0.5)"
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                
+                {/* Button content */}
+                <div className="relative z-10 flex items-center gap-2 text-white">
+                  <span>Tanıtımı Bitir</span>
+                  <motion.div
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </motion.div>
+                </div>
+                
+                {/* Shimmer effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  initial={{ x: "-100%" }}
+                  animate={{ x: "100%" }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatDelay: 1,
+                    ease: "easeInOut"
+                  }}
+                />
+              </motion.button>
+            </motion.div>
+          )}
         </motion.div>
       )}
       
