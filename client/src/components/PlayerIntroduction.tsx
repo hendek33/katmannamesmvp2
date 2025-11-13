@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { GameState, Player } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight, Star, Zap, Volume2, Megaphone } from "lucide-react";
+import { ThumbsUp, ThumbsDown, SkipForward, Crown, Users, Sparkles, Heart, UserCircle, ChevronRight, Star, Zap, Volume2, Megaphone, Play } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface PlayerIntroductionProps {
@@ -604,7 +604,7 @@ export function PlayerIntroduction({
               >
                 <Button
                   onClick={onSkipIntroduction}
-                  className="relative px-8 py-6 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-bold text-lg rounded-xl shadow-2xl shadow-amber-500/30 border-2 border-amber-400/50 backdrop-blur-sm transition-all duration-300 overflow-hidden group"
+                  className="relative px-6 py-4 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white font-bold text-base rounded-xl shadow-2xl shadow-amber-500/30 border-2 border-amber-400/50 backdrop-blur-sm transition-all duration-300 overflow-hidden group"
                   data-testid="skip-introduction-button"
                 >
                   {/* Animated background shimmer */}
@@ -633,19 +633,19 @@ export function PlayerIntroduction({
                     transition={{ duration: 2, repeat: Infinity }}
                   />
                   
-                  <div className="relative flex items-center gap-3">
+                  <div className="relative flex items-center gap-2">
                     <motion.div
-                      animate={{ x: [0, 5, 0] }}
+                      animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
-                      <SkipForward className="w-6 h-6" />
+                      <Play className="w-5 h-5 fill-current" />
                     </motion.div>
-                    <span className="tracking-wide">Atla ve Oyuna Başla</span>
+                    <span className="tracking-wide">Oyuna Başla</span>
                     <motion.div
                       animate={{ rotate: [0, 360] }}
                       transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                     >
-                      <Sparkles className="w-5 h-5 text-yellow-300" />
+                      <Sparkles className="w-4 h-4 text-yellow-300" />
                     </motion.div>
                   </div>
                 </Button>
