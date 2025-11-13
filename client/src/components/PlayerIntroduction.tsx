@@ -442,7 +442,7 @@ export function PlayerIntroduction({
                                       const dislikes = player.kickChatDislikes || 0;
                                       const total = likes + dislikes;
                                       const percentage = total > 0 ? Math.round((likes / total) * 100) : 0;
-                                      return total > 0 ? `K:${percentage}%` : 'K:-%';
+                                      return total > 0 ? `Kick:${percentage}%` : 'Kick:-%';
                                     })()}
                                   </motion.span>
                                 </div>
@@ -608,7 +608,7 @@ export function PlayerIntroduction({
                                       const dislikes = player.kickChatDislikes || 0;
                                       const total = likes + dislikes;
                                       const percentage = total > 0 ? Math.round((likes / total) * 100) : 0;
-                                      return total > 0 ? `K:${percentage}%` : 'K:-%';
+                                      return total > 0 ? `Kick:${percentage}%` : 'Kick:-%';
                                     })()}
                                   </motion.span>
                                 </div>
