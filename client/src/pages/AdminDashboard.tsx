@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,9 @@ import {
   RefreshCw,
   User,
   Crown,
-  Bot as BotIcon
+  Bot as BotIcon,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -53,9 +55,12 @@ export default function AdminDashboard() {
   const [players, setPlayers] = useState<AdminPlayerInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const ws = useRef<WebSocket | null>(null);
+  const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const reconnectAttempts = useRef(0);
+  const maxReconnectAttempts = 5;
 
   // Get token from localStorage
   const token = localStorage.getItem("adminToken");
@@ -66,66 +71,74 @@ export default function AdminDashboard() {
       return;
     }
 
-    fetchAdminData(true);
+    const connectWebSocket = () => {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
+      
+      ws.current = new WebSocket(wsUrl);
+      
+      ws.current.onopen = () => {
+        setIsConnected(true);
+        setError(null);
+        reconnectAttempts.current = 0;
+        
+        // Send admin authentication
+        ws.current?.send(JSON.stringify({
+          type: "admin_connect",
+          payload: { token }
+        }));
+      };
+      
+      ws.current.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        
+        if (message.type === "admin_data") {
+          const { overview, rooms, players } = message.payload;
+          setOverview(overview);
+          setRooms(rooms);
+          setPlayers(players);
+          setLastUpdated(new Date());
+          setIsLoading(false);
+        } else if (message.type === "error") {
+          setError(message.payload.message);
+          if (message.payload.message === "Geçersiz admin oturumu") {
+            localStorage.removeItem("adminToken");
+            setLocation("/admin");
+          }
+        }
+      };
+      
+      ws.current.onerror = () => {
+        setError("WebSocket bağlantı hatası");
+        setIsConnected(false);
+      };
+      
+      ws.current.onclose = () => {
+        setIsConnected(false);
+        
+        if (reconnectAttempts.current < maxReconnectAttempts) {
+          reconnectAttempts.current++;
+          reconnectTimeout.current = setTimeout(() => {
+            connectWebSocket();
+          }, 2000 * reconnectAttempts.current);
+        } else {
+          setError("Bağlantı kurulamadı. Lütfen sayfayı yenileyin.");
+        }
+      };
+    };
     
-    // Auto-refresh every 5 seconds
-    const interval = setInterval(() => {
-      fetchAdminData(false);  // Don't show loading spinner on auto-refresh
-    }, 5000);
+    connectWebSocket();
     
-    return () => clearInterval(interval);
-  }, [token, refreshKey]);
-
-  const fetchAdminData = async (showLoading = true) => {
-    if (showLoading) {
-      setIsLoading(true);
-    } else {
-      setIsRefreshing(true);
-    }
-    setError(null);
-
-    try {
-      // Fetch all admin data in parallel
-      const [overviewRes, roomsRes, playersRes] = await Promise.all([
-        fetch("/api/admin/overview", {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch("/api/admin/rooms", {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch("/api/admin/players", {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      // Check for auth errors
-      if (overviewRes.status === 401 || roomsRes.status === 401 || playersRes.status === 401) {
-        localStorage.removeItem("adminToken");
-        setLocation("/admin");
-        return;
+    return () => {
+      if (reconnectTimeout.current) {
+        clearTimeout(reconnectTimeout.current);
       }
-
-      if (!overviewRes.ok || !roomsRes.ok || !playersRes.ok) {
-        throw new Error("Veri alınamadı");
+      if (ws.current) {
+        ws.current.close();
       }
+    };
+  }, [token]);
 
-      const [overviewData, roomsData, playersData] = await Promise.all([
-        overviewRes.json(),
-        roomsRes.json(),
-        playersRes.json()
-      ]);
-
-      setOverview(overviewData);
-      setRooms(roomsData);
-      setPlayers(playersData);
-      setLastUpdated(new Date());
-    } catch (err: any) {
-      setError(err.message || "Bir hata oluştu");
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  };
 
   const handleLogout = async () => {
     await fetch("/api/admin/logout", {
@@ -133,11 +146,20 @@ export default function AdminDashboard() {
       headers: { Authorization: `Bearer ${token}` }
     });
     localStorage.removeItem("adminToken");
+    if (ws.current) {
+      ws.current.close();
+    }
     setLocation("/admin");
   };
 
   const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1);
+    // Send request for fresh data through WebSocket
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        type: "admin_connect",
+        payload: { token }
+      }));
+    }
   };
 
   const getPhaseDisplay = (phase: string) => {
@@ -191,22 +213,27 @@ export default function AdminDashboard() {
             </div>
             
             <div className="flex items-center gap-4">
-              {lastUpdated && (
-                <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <span>Son güncelleme:</span>
-                  <span className="text-slate-300">
-                    {lastUpdated.toLocaleTimeString('tr-TR')}
-                  </span>
-                  {isRefreshing && (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    >
-                      <RefreshCw className="w-3 h-3 text-purple-400" />
-                    </motion.div>
-                  )}
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {isConnected ? (
+                  <div className="flex items-center gap-1 text-xs text-green-400">
+                    <Wifi className="w-3 h-3" />
+                    <span>Bağlı</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-xs text-red-400">
+                    <WifiOff className="w-3 h-3" />
+                    <span>Bağlantı Yok</span>
+                  </div>
+                )}
+                {lastUpdated && (
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span>Son güncelleme:</span>
+                    <span className="text-slate-300">
+                      {lastUpdated.toLocaleTimeString('tr-TR')}
+                    </span>
+                  </div>
+                )}
+              </div>
               
               <Button
                 onClick={handleRefresh}
@@ -215,7 +242,7 @@ export default function AdminDashboard() {
                 className="border-white/20 hover:bg-white/10"
                 data-testid="button-refresh"
               >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw className="w-4 h-4" />
               </Button>
               <Button
                 onClick={handleLogout}

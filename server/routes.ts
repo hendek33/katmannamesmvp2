@@ -110,6 +110,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   }
+  
+  // Broadcast updates to all connected admin panels
+  function broadcastToAdmins() {
+    const adminData = {
+      overview: storage.getAdminOverview(),
+      rooms: storage.getAdminRooms(),
+      players: storage.getAdminPlayers()
+    };
+    
+    const messageStr = JSON.stringify({
+      type: "admin_data",
+      payload: adminData
+    });
+    
+    wss.clients.forEach((client: any) => {
+      if (client.readyState === WebSocket.OPEN && client.isAdmin) {
+        client.send(messageStr);
+      }
+    });
+  }
 
   function sendToClient(client: WSClient, message: any) {
     if (client.readyState === WebSocket.OPEN) {
@@ -240,6 +260,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
             sendToClient(ws, {
               type: "pong",
               payload: {},
+            });
+            break;
+          }
+          
+          case "admin_connect": {
+            // Admin panel WebSocket connection
+            const token = payload.token;
+            if (!token || !storage.validateAdminSession(token)) {
+              sendToClient(ws, {
+                type: "error",
+                payload: { message: "Geçersiz admin oturumu" }
+              });
+              ws.close();
+              return;
+            }
+            
+            // Mark this as an admin connection
+            (ws as any).isAdmin = true;
+            (ws as any).adminToken = token;
+            
+            // Send initial data
+            sendToClient(ws, {
+              type: "admin_data",
+              payload: {
+                overview: storage.getAdminOverview(),
+                rooms: storage.getAdminRooms(),
+                players: storage.getAdminPlayers()
+              }
             });
             break;
           }
@@ -470,6 +518,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "room_created",
               payload: { roomCode, playerId, gameState: getFilteredGameState(gameState, playerId) },
             });
+            
+            // Notify admins about new room
+            broadcastToAdmins();
             break;
           }
 
@@ -580,6 +631,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 payload: { gameState },
               }, ws);
             }
+            
+            // Notify admins about player joined
+            broadcastToAdmins();
             break;
           }
 
@@ -1239,6 +1293,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
 
             sendToClient(ws, { type: "left_room", payload: {} });
+            
+            // Notify admins about player leaving
+            broadcastToAdmins();
             break;
           }
 
@@ -1306,6 +1363,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
             }
 
+            // Notify admins about player kicked
+            broadcastToAdmins();
             break;
           }
 
