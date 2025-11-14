@@ -435,77 +435,153 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Players Table */}
+        {/* Players Table - Grouped by Room */}
         <Card className="backdrop-blur-xl bg-black/40 border-white/10">
           <CardHeader>
-            <CardTitle className="text-white">Aktif Oyuncular</CardTitle>
+            <CardTitle className="text-white">Odalara Göre Aktif Oyuncular</CardTitle>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-96">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left py-2 text-slate-400 font-medium">İsim</th>
-                      <th className="text-left py-2 text-slate-400 font-medium">Oda</th>
-                      <th className="text-left py-2 text-slate-400 font-medium">Takım</th>
-                      <th className="text-left py-2 text-slate-400 font-medium">Rol</th>
-                      <th className="text-center py-2 text-slate-400 font-medium">Özellikler</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+              {(() => {
+                // Group players by room
+                const playersByRoom = players.reduce((acc, player) => {
+                  if (!acc[player.roomCode]) {
+                    acc[player.roomCode] = [];
+                  }
+                  acc[player.roomCode].push(player);
+                  return acc;
+                }, {} as Record<string, typeof players>);
+                
+                const roomCodes = Object.keys(playersByRoom).sort();
+                
+                if (roomCodes.length === 0) {
+                  return (
+                    <div className="text-center py-8 text-slate-400">
+                      Aktif oyuncu bulunmuyor
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div className="space-y-4">
                     <AnimatePresence>
-                      {players.map((player, index) => {
-                        const team = getTeamDisplay(player.team);
+                      {roomCodes.map((roomCode, roomIndex) => {
+                        const room = rooms.find(r => r.roomCode === roomCode);
+                        const phase = room ? getPhaseDisplay(room.gamePhase) : null;
+                        
                         return (
-                          <motion.tr
-                            key={player.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20 }}
-                            transition={{ delay: index * 0.02 }}
-                            className="border-b border-white/5 hover:bg-white/5"
-                            data-testid={`player-row-${player.id}`}
+                          <motion.div
+                            key={roomCode}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ delay: roomIndex * 0.1 }}
+                            className="border border-white/10 rounded-lg overflow-hidden"
                           >
-                            <td className="py-2 text-white flex items-center gap-2">
-                              <User className="w-4 h-4 text-slate-400" />
-                              {player.name}
-                            </td>
-                            <td className="py-2 text-slate-300 font-mono">{player.roomCode}</td>
-                            <td className={`py-2 ${team.color}`}>
-                              {team.text}
-                            </td>
-                            <td className="py-2 text-slate-300">
-                              {getRoleDisplay(player.role)}
-                            </td>
-                            <td className="py-2 text-center">
-                              <div className="flex items-center justify-center gap-1">
-                                {player.isRoomOwner && (
-                                  <Badge className="bg-yellow-500 text-white border-0">
-                                    <Crown className="w-3 h-3 mr-1" />
-                                    Sahip
-                                  </Badge>
-                                )}
-                                {player.isBot && (
-                                  <Badge className="bg-gray-500 text-white border-0">
-                                    <BotIcon className="w-3 h-3 mr-1" />
-                                    Bot
-                                  </Badge>
-                                )}
+                            {/* Room Header */}
+                            <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 px-4 py-3 border-b border-white/10">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <Home className="w-4 h-4 text-purple-400" />
+                                    <span className="font-mono text-white font-semibold text-lg">
+                                      {roomCode}
+                                    </span>
+                                  </div>
+                                  {phase && (
+                                    <Badge className={`${phase.color} text-white border-0`}>
+                                      {phase.text}
+                                    </Badge>
+                                  )}
+                                  {room?.hasPassword && (
+                                    <Badge className="bg-emerald-500 text-white border-0">
+                                      Şifreli
+                                    </Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-3 text-sm">
+                                  {room && room.gamePhase === "playing" && (
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-slate-400">Skor:</span>
+                                      <span className="text-blue-400 font-semibold">{room.darkScore}</span>
+                                      <span className="text-slate-400">-</span>
+                                      <span className="text-red-400 font-semibold">{room.lightScore}</span>
+                                    </div>
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                    <Users className="w-4 h-4 text-slate-400" />
+                                    <span className="text-slate-300">
+                                      {playersByRoom[roomCode].length} Oyuncu
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                            </td>
-                          </motion.tr>
+                            </div>
+                            
+                            {/* Players in Room */}
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm">
+                                <thead>
+                                  <tr className="border-b border-white/5">
+                                    <th className="text-left px-4 py-2 text-slate-400 font-medium">İsim</th>
+                                    <th className="text-left px-4 py-2 text-slate-400 font-medium">Takım</th>
+                                    <th className="text-left px-4 py-2 text-slate-400 font-medium">Rol</th>
+                                    <th className="text-center px-4 py-2 text-slate-400 font-medium">Özellikler</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {playersByRoom[roomCode].map((player, index) => {
+                                    const team = getTeamDisplay(player.team);
+                                    return (
+                                      <motion.tr
+                                        key={player.id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: index * 0.02 }}
+                                        className="border-b border-white/5 hover:bg-white/5"
+                                        data-testid={`player-row-${player.id}`}
+                                      >
+                                        <td className="px-4 py-2 text-white">
+                                          <div className="flex items-center gap-2">
+                                            <User className="w-4 h-4 text-slate-400" />
+                                            {player.name}
+                                          </div>
+                                        </td>
+                                        <td className={`px-4 py-2 ${team.color}`}>
+                                          {team.text}
+                                        </td>
+                                        <td className="px-4 py-2 text-slate-300">
+                                          {getRoleDisplay(player.role)}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                          <div className="flex items-center justify-center gap-1">
+                                            {player.isRoomOwner && (
+                                              <Badge className="bg-yellow-500 text-white border-0">
+                                                <Crown className="w-3 h-3 mr-1" />
+                                                Sahip
+                                              </Badge>
+                                            )}
+                                            {player.isBot && (
+                                              <Badge className="bg-gray-500 text-white border-0">
+                                                <BotIcon className="w-3 h-3 mr-1" />
+                                                Bot
+                                              </Badge>
+                                            )}
+                                          </div>
+                                        </td>
+                                      </motion.tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          </motion.div>
                         );
                       })}
                     </AnimatePresence>
-                  </tbody>
-                </table>
-                {players.length === 0 && (
-                  <div className="text-center py-8 text-slate-400">
-                    Aktif oyuncu bulunmuyor
                   </div>
-                )}
-              </div>
+                );
+              })()}
             </ScrollArea>
           </CardContent>
         </Card>
