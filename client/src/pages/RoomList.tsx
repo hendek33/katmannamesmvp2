@@ -89,9 +89,6 @@ export default function RoomList() {
         style={{ backgroundImage: 'url(/arkaplan.webp)' }}
       />
 
-      {/* Darker overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/70" />
-
       <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 sm:p-6">
         {/* Main container - darker glassmorphism */}
         <div className="w-full max-w-5xl">
