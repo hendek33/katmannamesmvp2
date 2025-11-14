@@ -54,6 +54,8 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Get token from localStorage
   const token = localStorage.getItem("adminToken");
@@ -64,11 +66,22 @@ export default function AdminDashboard() {
       return;
     }
 
-    fetchAdminData();
+    fetchAdminData(true);
+    
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      fetchAdminData(false);  // Don't show loading spinner on auto-refresh
+    }, 5000);
+    
+    return () => clearInterval(interval);
   }, [token, refreshKey]);
 
-  const fetchAdminData = async () => {
-    setIsLoading(true);
+  const fetchAdminData = async (showLoading = true) => {
+    if (showLoading) {
+      setIsLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
     setError(null);
 
     try {
@@ -105,10 +118,12 @@ export default function AdminDashboard() {
       setOverview(overviewData);
       setRooms(roomsData);
       setPlayers(playersData);
+      setLastUpdated(new Date());
     } catch (err: any) {
       setError(err.message || "Bir hata oluştu");
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -175,7 +190,24 @@ export default function AdminDashboard() {
               <h1 className="text-xl font-bold text-white">Admin Paneli</h1>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              {lastUpdated && (
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <span>Son güncelleme:</span>
+                  <span className="text-slate-300">
+                    {lastUpdated.toLocaleTimeString('tr-TR')}
+                  </span>
+                  {isRefreshing && (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    >
+                      <RefreshCw className="w-3 h-3 text-purple-400" />
+                    </motion.div>
+                  )}
+                </div>
+              )}
+              
               <Button
                 onClick={handleRefresh}
                 variant="outline"
@@ -183,7 +215,7 @@ export default function AdminDashboard() {
                 className="border-white/20 hover:bg-white/10"
                 data-testid="button-refresh"
               >
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               </Button>
               <Button
                 onClick={handleLogout}
