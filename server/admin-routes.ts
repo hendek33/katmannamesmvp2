@@ -125,4 +125,18 @@ export function registerAdminRoutes(app: Express): void {
     const players = storage.getAdminPlayers();
     res.json(players);
   });
+
+  // Admin room history endpoint
+  app.get('/api/admin/history', requireAdmin, (req: Request, res: Response) => {
+    const limit = parseInt(req.query.limit as string) || 100;
+    const offset = parseInt(req.query.offset as string) || 0;
+    const history = storage.getAdminRoomHistory(limit, offset);
+    res.json(history);
+  });
+
+  // Admin history stats endpoint
+  app.get('/api/admin/history-stats', requireAdmin, (req: Request, res: Response) => {
+    const stats = storage.getAdminHistoryStats();
+    res.json(stats);
+  });
 }

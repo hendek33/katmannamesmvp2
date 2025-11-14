@@ -71,6 +71,13 @@ export interface IStorage {
   getAdminRooms(): import("@shared/schema").AdminRoomSummary[];
   getAdminPlayers(): import("@shared/schema").AdminPlayerInfo[];
   getAdminRoomDetails(roomCode: string): import("@shared/schema").AdminRoomSummary | null;
+  getAdminRoomHistory(limit?: number, offset?: number): import("@shared/schema").RoomHistory[];
+  getAdminHistoryStats(): { 
+    totalGamesPlayed: number; 
+    averageDuration: number; 
+    totalPlayersServed: number;
+    gamesInLast24Hours: number;
+  };
 }
 
 // Hakaret şablonları
@@ -1705,6 +1712,8 @@ export class MemStorage implements IStorage {
   cleanupEmptyRooms(): void {
     Array.from(this.rooms.entries()).forEach(([roomCode, roomData]) => {
       if (roomData.gameState.players.length === 0) {
+        // Finalize room history before deleting room
+        this.finalizeRoomHistory(roomCode);
         this.rooms.delete(roomCode);
         
         // Also clean up any disconnected players from this room
@@ -2203,6 +2212,13 @@ export class MemStorage implements IStorage {
     // Find existing history entry for this room (if active)
     let historyEntry = this.roomHistory.find(h => h.roomCode === roomCode && h.status === "active");
     
+    // Filter out temporary reservations - only include players actually in a room
+    const validPlayers = room.players.filter(p => {
+      // Check if this player is actually in this room (not just a temp reservation)
+      const playerRoom = this.playerToRoom.get(p.id);
+      return playerRoom === roomCode;
+    });
+    
     if (!historyEntry) {
       // Create new history entry
       historyEntry = {
@@ -2210,9 +2226,9 @@ export class MemStorage implements IStorage {
         roomCode,
         createdAt: room.createdAt,
         status: "active",
-        maxPlayerCount: room.players.length,
-        totalPlayers: room.players.map(p => p.id),
-        playerNames: room.players.reduce((acc, p) => {
+        maxPlayerCount: validPlayers.length,
+        totalPlayers: validPlayers.map(p => p.id),
+        playerNames: validPlayers.reduce((acc, p) => {
           acc[p.id] = p.username;
           return acc;
         }, {} as Record<string, string>),
@@ -2232,10 +2248,10 @@ export class MemStorage implements IStorage {
       }
     } else {
       // Update existing history entry
-      historyEntry.maxPlayerCount = Math.max(historyEntry.maxPlayerCount, room.players.length);
+      historyEntry.maxPlayerCount = Math.max(historyEntry.maxPlayerCount, validPlayers.length);
       
-      // Add new players to the list
-      room.players.forEach(p => {
+      // Add new valid players to the list
+      validPlayers.forEach(p => {
         if (!historyEntry!.totalPlayers.includes(p.id)) {
           historyEntry!.totalPlayers.push(p.id);
           historyEntry!.playerNames[p.id] = p.username;
@@ -2260,19 +2276,60 @@ export class MemStorage implements IStorage {
     
     if (historyEntry) {
       historyEntry.endedAt = Date.now();
-      historyEntry.status = roomData?.gameState.winner ? "ended" : "abandoned";
       
       if (roomData) {
         const room = roomData.gameState;
         
+        // Recalculate final player roster from current room state
+        const finalPlayers = room.players.filter(p => {
+          const playerRoom = this.playerToRoom.get(p.id);
+          return playerRoom === roomCode;
+        });
+        
+        // Update max player count if current is higher
+        historyEntry.maxPlayerCount = Math.max(historyEntry.maxPlayerCount, finalPlayers.length);
+        
+        // Ensure all final players are in the history
+        finalPlayers.forEach(p => {
+          if (!historyEntry.totalPlayers.includes(p.id)) {
+            historyEntry.totalPlayers.push(p.id);
+          }
+          // Update player names with latest values
+          historyEntry.playerNames[p.id] = p.username;
+        });
+        
+        // Update phase if changed
+        if (!historyEntry.gamePhases.includes(room.phase)) {
+          historyEntry.gamePhases.push(room.phase);
+        }
+        
+        // Determine final status
+        if (room.winner) {
+          historyEntry.status = "ended";
+        } else if (room.phase === "playing" || room.phase === "ended") {
+          historyEntry.status = "ended";
+        } else {
+          historyEntry.status = "abandoned";
+        }
+        
         // Save final scores if game was played
         if (room.phase === "playing" || room.phase === "ended") {
+          const darkScore = room.cards.filter(c => c.type === "dark" && c.revealed).length;
+          const lightScore = room.cards.filter(c => c.type === "light" && c.revealed).length;
+          
           historyEntry.finalScores = {
-            dark: 9 - room.darkCardsRemaining,
-            light: 8 - room.lightCardsRemaining,
+            dark: darkScore,
+            light: lightScore,
             winner: room.winner
           };
         }
+        
+        // Update team names with final values
+        historyEntry.darkTeamName = room.darkTeamName;
+        historyEntry.lightTeamName = room.lightTeamName;
+      } else {
+        // Room was already deleted, mark as abandoned
+        historyEntry.status = "abandoned";
       }
       
       // Calculate game duration
@@ -2453,6 +2510,50 @@ export class MemStorage implements IStorage {
       currentTurn: room.currentTeam || undefined,
       cardsRevealed: room.revealHistory.length,
       createdAt: new Date(room.createdAt)
+    };
+  }
+  
+  // Get room history for admin panel
+  getAdminRoomHistory(limit: number = 100, offset: number = 0): import("@shared/schema").RoomHistory[] {
+    // Sort by createdAt, newest first
+    const sortedHistory = [...this.roomHistory].sort((a, b) => b.createdAt - a.createdAt);
+    
+    // Apply pagination
+    return sortedHistory.slice(offset, offset + limit);
+  }
+  
+  // Get room history stats for admin overview
+  getAdminHistoryStats(): { 
+    totalGamesPlayed: number; 
+    averageDuration: number; 
+    totalPlayersServed: number;
+    gamesInLast24Hours: number;
+  } {
+    const now = Date.now();
+    const oneDayAgo = now - (24 * 60 * 60 * 1000);
+    
+    const completedGames = this.roomHistory.filter(h => h.status === "ended");
+    const gamesLast24h = this.roomHistory.filter(h => h.createdAt > oneDayAgo);
+    
+    // Calculate unique players across all history
+    const uniquePlayers = new Set<string>();
+    this.roomHistory.forEach(h => {
+      h.totalPlayers.forEach(pid => uniquePlayers.add(pid));
+    });
+    
+    // Calculate average duration
+    const durationsMs = completedGames
+      .filter(h => h.gameDuration)
+      .map(h => h.gameDuration!);
+    const avgDuration = durationsMs.length > 0 
+      ? durationsMs.reduce((a, b) => a + b, 0) / durationsMs.length 
+      : 0;
+    
+    return {
+      totalGamesPlayed: this.roomHistory.length,
+      averageDuration: avgDuration,
+      totalPlayersServed: uniquePlayers.size,
+      gamesInLast24Hours: gamesLast24h.length
     };
   }
 }

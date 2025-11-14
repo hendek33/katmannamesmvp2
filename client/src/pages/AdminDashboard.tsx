@@ -429,7 +429,7 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-2 w-full max-w-sm mx-auto bg-black/40 backdrop-blur-xl p-1">
+          <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto bg-black/40 backdrop-blur-xl p-1">
             <TabsTrigger value="rooms" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <Home className="w-4 h-4 mr-2" />
               Odalar
@@ -437,6 +437,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="players" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <Users className="w-4 h-4 mr-2" />
               Oyuncular
+            </TabsTrigger>
+            <TabsTrigger value="history" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              <Clock className="w-4 h-4 mr-2" />
+              Geçmiş
             </TabsTrigger>
           </TabsList>
 
