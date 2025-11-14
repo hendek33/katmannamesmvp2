@@ -28,6 +28,7 @@ import {
   skipIntroductionSchema,
 } from "@shared/schema";
 import { kickChatService } from "./kickChatService";
+import { registerAdminRoutes } from "./admin-routes";
 
 interface WSClient extends WebSocket {
   playerId?: string;
@@ -37,6 +38,9 @@ interface WSClient extends WebSocket {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register admin routes
+  registerAdminRoutes(app);
+  
   const httpServer = createServer(app);
   const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
 

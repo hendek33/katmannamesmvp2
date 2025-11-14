@@ -62,6 +62,15 @@ export interface IStorage {
   finishPlayerIntroduction(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   likeIntroduction(roomCode: string, playerId: string, targetPlayerId: string, isLike: boolean): GameState | null;
   skipIntroduction(roomCode: string, playerId: string): GameState | null;
+  
+  // Admin methods
+  createAdminSession(): string; // Returns generated token
+  validateAdminSession(token: string): boolean;
+  deleteAdminSession(token: string): void;
+  getAdminOverview(): import("@shared/schema").AdminOverview;
+  getAdminRooms(): import("@shared/schema").AdminRoomSummary[];
+  getAdminPlayers(): import("@shared/schema").AdminPlayerInfo[];
+  getAdminRoomDetails(roomCode: string): import("@shared/schema").AdminRoomSummary | null;
 }
 
 // Hakaret şablonları
@@ -104,6 +113,7 @@ export class MemStorage implements IStorage {
   private activeUsernames: Map<string, string>; // kullanıcıAdı -> oyuncuId, global olarak aktif kullanıcı adlarını takip eder
   private playerIdToUsername: Map<string, string>; // oyuncuId -> kullanıcıAdı temizlik için
   private disconnectedPlayers: Map<string, { player: Player; roomCode: string; disconnectedAt: number }>; // Zaman damgası ile bağlantısı kopan oyuncuları takip et
+  private adminSessions: Map<string, import("@shared/schema").AdminSession>; // Admin sessions
 
   constructor() {
     this.rooms = new Map();
@@ -115,9 +125,11 @@ export class MemStorage implements IStorage {
     this.activeUsernames = new Map(); // Global olarak aktif kullanıcı adlarını takip et
     this.playerIdToUsername = new Map(); // oyuncuId'den kullanıcı adı eşleşmesini takip et
     this.disconnectedPlayers = new Map(); // Yeniden bağlanma için bağlantısı kopan oyuncuları takip et
+    this.adminSessions = new Map(); // Admin oturumları için
     
     setInterval(() => this.cleanupEmptyRooms(), 60000);
     setInterval(() => this.cleanupDisconnectedPlayers(), 30000); // Eski bağlantısı kopmuş oyuncuları her 30 saniyede temizle
+    setInterval(() => this.cleanupExpiredAdminSessions(), 300000); // Her 5 dakikada admin oturumlarını temizle
   }
 
   private cleanupDisconnectedPlayers(): void {
@@ -2168,6 +2180,131 @@ export class MemStorage implements IStorage {
     }
     
     return room;
+  }
+
+  // Admin methods implementation
+  private cleanupExpiredAdminSessions(): void {
+    const now = Date.now();
+    for (const [token, session] of this.adminSessions.entries()) {
+      if (session.expiresAt.getTime() < now) {
+        this.adminSessions.delete(token);
+      }
+    }
+  }
+
+  createAdminSession(): string {
+    const token = randomUUID(); // Generate cryptographically secure token
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
+    this.adminSessions.set(token, {
+      token,
+      createdAt: now,
+      expiresAt
+    });
+    return token;
+  }
+
+  validateAdminSession(token: string): boolean {
+    const session = this.adminSessions.get(token);
+    if (!session) return false;
+    
+    const now = Date.now();
+    if (session.expiresAt.getTime() < now) {
+      this.adminSessions.delete(token);
+      return false;
+    }
+    
+    // Refresh expiry on valid session
+    session.expiresAt = new Date(now + 24 * 60 * 60 * 1000);
+    return true;
+  }
+
+  deleteAdminSession(token: string): void {
+    this.adminSessions.delete(token);
+  }
+
+  getAdminOverview(): import("@shared/schema").AdminOverview {
+    let totalPlayers = 0;
+    let activeGames = 0;
+    let lobbyRooms = 0;
+    
+    for (const roomData of this.rooms.values()) {
+      const room = roomData.gameState;
+      totalPlayers += room.players.length;
+      
+      if (room.phase === "playing") {
+        activeGames++;
+      } else if (room.phase === "lobby") {
+        lobbyRooms++;
+      }
+    }
+    
+    return {
+      totalRooms: this.rooms.size,
+      totalPlayers,
+      activeGames,
+      lobbyRooms
+    };
+  }
+
+  getAdminRooms(): import("@shared/schema").AdminRoomSummary[] {
+    const rooms: import("@shared/schema").AdminRoomSummary[] = [];
+    
+    for (const [roomCode, roomData] of this.rooms.entries()) {
+      const room = roomData.gameState;
+      rooms.push({
+        roomCode,
+        hasPassword: room.hasPassword,
+        playerCount: room.players.length,
+        gamePhase: room.phase,
+        darkScore: room.darkCardsRemaining,
+        lightScore: room.lightCardsRemaining,
+        currentTurn: room.currentTeam,
+        cardsRevealed: room.revealHistory.length,
+        createdAt: new Date(room.createdAt)
+      });
+    }
+    
+    return rooms;
+  }
+
+  getAdminPlayers(): import("@shared/schema").AdminPlayerInfo[] {
+    const players: import("@shared/schema").AdminPlayerInfo[] = [];
+    
+    for (const [roomCode, roomData] of this.rooms.entries()) {
+      const room = roomData.gameState;
+      for (const player of room.players) {
+        players.push({
+          id: player.id,
+          name: player.username,
+          roomCode,
+          team: player.team,
+          role: player.role,
+          isRoomOwner: player.isRoomOwner,
+          isBot: player.isBot
+        });
+      }
+    }
+    
+    return players;
+  }
+
+  getAdminRoomDetails(roomCode: string): import("@shared/schema").AdminRoomSummary | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    
+    const room = roomData.gameState;
+    return {
+      roomCode,
+      hasPassword: room.hasPassword,
+      playerCount: room.players.length,
+      gamePhase: room.phase,
+      darkScore: room.darkCardsRemaining,
+      lightScore: room.lightCardsRemaining,
+      currentTurn: room.currentTeam,
+      cardsRevealed: room.revealHistory.length,
+      createdAt: new Date(room.createdAt)
+    };
   }
 }
 

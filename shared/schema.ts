@@ -235,3 +235,39 @@ export type FinishIntroductionInput = z.infer<typeof finishIntroductionSchema>;
 export type LikeIntroductionInput = z.infer<typeof likeIntroductionSchema>;
 export type SkipIntroductionInput = z.infer<typeof skipIntroductionSchema>;
 export type BooApplaudIntroductionInput = z.infer<typeof booApplaudIntroductionSchema>;
+
+// Admin types
+export interface AdminSession {
+  token: string;
+  createdAt: Date;
+  expiresAt: Date;
+}
+
+export interface AdminOverview {
+  totalRooms: number;
+  totalPlayers: number;
+  activeGames: number;
+  lobbyRooms: number;
+}
+
+export interface AdminRoomSummary {
+  roomCode: string;
+  hasPassword: boolean;
+  playerCount: number;
+  gamePhase: string;
+  darkScore: number;
+  lightScore: number;
+  currentTurn?: string;
+  cardsRevealed: number;
+  createdAt: Date;
+}
+
+export interface AdminPlayerInfo {
+  id: string;
+  name: string;
+  roomCode: string;
+  team?: string;
+  role?: string;
+  isRoomOwner: boolean;
+  isBot: boolean;
+}

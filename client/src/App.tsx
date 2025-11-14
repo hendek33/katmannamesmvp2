@@ -12,6 +12,8 @@ import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
 import Game from "@/pages/Game";
 import GameEnd from "@/pages/GameEnd";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -22,6 +24,8 @@ function Router() {
       <Route path="/lobby" component={Lobby} />
       <Route path="/game" component={Game} />
       <Route path="/end" component={GameEnd} />
+      <Route path="/admin" component={AdminLogin} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
