@@ -283,10 +283,10 @@ export interface AdminPlayerInfo {
 
 // Room History for admin tracking
 export interface RoomHistory {
-  id: string;
+  historyId: string; // Unique ID for this history entry
   roomCode: string;
-  createdAt: Date;
-  endedAt?: Date;
+  createdAt: number; // Unix timestamp
+  endedAt?: number; // Unix timestamp
   status: "active" | "ended" | "abandoned";
   maxPlayerCount: number;
   totalPlayers: string[]; // Array of all player IDs who joined

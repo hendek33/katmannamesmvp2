@@ -105,7 +105,8 @@ const insultMessages = [
 
 export class MemStorage implements IStorage {
   private rooms: Map<string, RoomData>;
-  private roomHistory: Map<string, import("@shared/schema").RoomHistory>; // Room history tracking
+  private roomHistory: import("@shared/schema").RoomHistory[]; // Room history as array for multiple entries
+  private maxHistorySize = 1000; // Limit history to last 1000 entries
   private playerToRoom: Map<string, string>;
   private lastInsultTime: Map<string, number>; // odaKodu -> zaman damgası
   private playerInsultCooldown: Map<string, number>; // oyuncuId -> zaman damgası
@@ -118,7 +119,7 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.rooms = new Map();
-    this.roomHistory = new Map(); // Initialize room history
+    this.roomHistory = []; // Initialize room history as array
     this.playerToRoom = new Map();
     this.lastInsultTime = new Map();
     this.playerInsultCooldown = new Map();
@@ -334,6 +335,9 @@ export class MemStorage implements IStorage {
       turnRevealMap: { dark: false, light: false } // Track if teams revealed cards
     });
     this.playerToRoom.set(playerId, roomCode);
+    
+    // Create initial history entry for new room
+    this.createOrUpdateRoomHistory(roomCode);
 
     return { roomCode, playerId, gameState };
   }
@@ -426,6 +430,9 @@ export class MemStorage implements IStorage {
 
     room.players.push(player);
     this.playerToRoom.set(playerId, roomCode);
+    
+    // Update room history with new player
+    this.createOrUpdateRoomHistory(roomCode);
 
     return { playerId, gameState: room, isReconnect: false };
   }
@@ -1681,6 +1688,8 @@ export class MemStorage implements IStorage {
     }
 
     if (room.players.length === 0) {
+      // Finalize room history before deleting room
+      this.finalizeRoomHistory(roomCode);
       this.rooms.delete(roomCode);
     } else {
       // Transfer ownership if needed
@@ -2182,6 +2191,95 @@ export class MemStorage implements IStorage {
     }
     
     return room;
+  }
+
+  // Helper method to create or update room history entry
+  private createOrUpdateRoomHistory(roomCode: string): void {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return;
+    
+    const room = roomData.gameState;
+    
+    // Find existing history entry for this room (if active)
+    let historyEntry = this.roomHistory.find(h => h.roomCode === roomCode && h.status === "active");
+    
+    if (!historyEntry) {
+      // Create new history entry
+      historyEntry = {
+        historyId: randomUUID(),
+        roomCode,
+        createdAt: room.createdAt,
+        status: "active",
+        maxPlayerCount: room.players.length,
+        totalPlayers: room.players.map(p => p.id),
+        playerNames: room.players.reduce((acc, p) => {
+          acc[p.id] = p.username;
+          return acc;
+        }, {} as Record<string, string>),
+        gamePhases: [room.phase],
+        hasPassword: room.hasPassword,
+        darkTeamName: room.darkTeamName,
+        lightTeamName: room.lightTeamName,
+        chaosMode: room.chaosMode,
+        timedMode: room.timedMode
+      };
+      
+      this.roomHistory.push(historyEntry);
+      
+      // Enforce history size limit
+      if (this.roomHistory.length > this.maxHistorySize) {
+        this.roomHistory.shift(); // Remove oldest entry
+      }
+    } else {
+      // Update existing history entry
+      historyEntry.maxPlayerCount = Math.max(historyEntry.maxPlayerCount, room.players.length);
+      
+      // Add new players to the list
+      room.players.forEach(p => {
+        if (!historyEntry!.totalPlayers.includes(p.id)) {
+          historyEntry!.totalPlayers.push(p.id);
+          historyEntry!.playerNames[p.id] = p.username;
+        }
+      });
+      
+      // Track phase progression
+      if (!historyEntry.gamePhases.includes(room.phase)) {
+        historyEntry.gamePhases.push(room.phase);
+      }
+      
+      // Update team names if changed
+      historyEntry.darkTeamName = room.darkTeamName;
+      historyEntry.lightTeamName = room.lightTeamName;
+    }
+  }
+  
+  // Helper method to finalize room history when room ends
+  private finalizeRoomHistory(roomCode: string): void {
+    const roomData = this.rooms.get(roomCode);
+    const historyEntry = this.roomHistory.find(h => h.roomCode === roomCode && h.status === "active");
+    
+    if (historyEntry) {
+      historyEntry.endedAt = Date.now();
+      historyEntry.status = roomData?.gameState.winner ? "ended" : "abandoned";
+      
+      if (roomData) {
+        const room = roomData.gameState;
+        
+        // Save final scores if game was played
+        if (room.phase === "playing" || room.phase === "ended") {
+          historyEntry.finalScores = {
+            dark: 9 - room.darkCardsRemaining,
+            light: 8 - room.lightCardsRemaining,
+            winner: room.winner
+          };
+        }
+      }
+      
+      // Calculate game duration
+      if (historyEntry.endedAt && historyEntry.createdAt) {
+        historyEntry.gameDuration = historyEntry.endedAt - historyEntry.createdAt;
+      }
+    }
   }
 
   // Admin methods implementation
