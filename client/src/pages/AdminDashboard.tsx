@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Shield, 
   Users, 
@@ -15,9 +18,22 @@ import {
   Crown,
   Bot as BotIcon,
   Wifi,
-  WifiOff
+  WifiOff,
+  Search,
+  Filter,
+  Activity,
+  Clock,
+  AlertCircle,
+  TrendingUp,
+  UserPlus,
+  UserMinus,
+  Copy,
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface AdminOverview {
   totalRooms: number;
@@ -50,6 +66,7 @@ interface AdminPlayerInfo {
 
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [rooms, setRooms] = useState<AdminRoomSummary[]>([]);
   const [players, setPlayers] = useState<AdminPlayerInfo[]>([]);
@@ -57,6 +74,10 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterPhase, setFilterPhase] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [copiedRoom, setCopiedRoom] = useState<string | null>(null);
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef(0);
@@ -78,6 +99,7 @@ export default function AdminDashboard() {
       ws.current = new WebSocket(wsUrl);
       
       ws.current.onopen = () => {
+        console.log("Admin WebSocket connected");
         setIsConnected(true);
         setError(null);
         reconnectAttempts.current = 0;
@@ -90,37 +112,44 @@ export default function AdminDashboard() {
       };
       
       ws.current.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        
-        if (message.type === "admin_data") {
-          const { overview, rooms, players } = message.payload;
-          setOverview(overview);
-          setRooms(rooms);
-          setPlayers(players);
-          setLastUpdated(new Date());
-          setIsLoading(false);
-        } else if (message.type === "error") {
-          setError(message.payload.message);
-          if (message.payload.message === "Geçersiz admin oturumu") {
-            localStorage.removeItem("adminToken");
-            setLocation("/admin");
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === "admin_data") {
+            setOverview(data.payload.overview);
+            setRooms(data.payload.rooms);
+            setPlayers(data.payload.players);
+            setLastUpdated(new Date());
+            setIsLoading(false);
+          } else if (data.type === "error") {
+            setError(data.payload.message);
+            if (data.payload.message === "Geçersiz admin oturumu") {
+              localStorage.removeItem("adminToken");
+              setLocation("/admin");
+            }
           }
+        } catch (err) {
+          console.error("Failed to parse WebSocket message:", err);
         }
       };
       
-      ws.current.onerror = () => {
-        setError("WebSocket bağlantı hatası");
+      ws.current.onerror = (error) => {
+        console.error("Admin WebSocket error:", error);
+        setError("Bağlantı hatası");
         setIsConnected(false);
       };
       
       ws.current.onclose = () => {
+        console.log("Admin WebSocket disconnected");
         setIsConnected(false);
         
+        // Attempt reconnection
         if (reconnectAttempts.current < maxReconnectAttempts) {
-          reconnectAttempts.current++;
           reconnectTimeout.current = setTimeout(() => {
+            reconnectAttempts.current++;
+            console.log(`Reconnection attempt ${reconnectAttempts.current}`);
             connectWebSocket();
-          }, 2000 * reconnectAttempts.current);
+          }, 3000);
         } else {
           setError("Bağlantı kurulamadı. Lütfen sayfayı yenileyin.");
         }
@@ -164,11 +193,11 @@ export default function AdminDashboard() {
 
   const getPhaseDisplay = (phase: string) => {
     switch (phase) {
-      case "lobby": return { text: "Lobi", color: "bg-yellow-500" };
-      case "introduction": return { text: "Tanışma", color: "bg-purple-500" };
-      case "playing": return { text: "Oyunda", color: "bg-green-500" };
-      case "ended": return { text: "Bitti", color: "bg-gray-500" };
-      default: return { text: phase, color: "bg-gray-500" };
+      case "lobby": return { text: "Lobi", color: "bg-yellow-500", icon: Clock };
+      case "introduction": return { text: "Tanışma", color: "bg-purple-500", icon: UserPlus };
+      case "playing": return { text: "Oyunda", color: "bg-green-500", icon: Activity };
+      case "ended": return { text: "Bitti", color: "bg-gray-500", icon: CheckCircle2 };
+      default: return { text: phase, color: "bg-gray-500", icon: AlertCircle };
     }
   };
 
@@ -184,6 +213,42 @@ export default function AdminDashboard() {
     if (role === "spymaster") return "Şef";
     if (role === "guesser") return "Ajan";
     return role;
+  };
+
+  const copyRoomCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedRoom(code);
+    toast({
+      title: "Kopyalandı!",
+      description: `Oda kodu ${code} panoya kopyalandı.`,
+    });
+    setTimeout(() => setCopiedRoom(null), 2000);
+  };
+
+  // Filter rooms based on search and phase
+  const filteredRooms = rooms.filter(room => {
+    const matchesSearch = room.roomCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.playerCount.toString().includes(searchTerm);
+    const matchesPhase = filterPhase === "all" || room.gamePhase === filterPhase;
+    return matchesSearch && matchesPhase;
+  });
+
+  // Filter players based on search
+  const filteredPlayers = players.filter(player =>
+    player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    player.roomCode.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Calculate statistics
+  const stats = {
+    avgPlayersPerRoom: rooms.length > 0 ? (players.length / rooms.length).toFixed(1) : "0",
+    gamesInProgress: rooms.filter(r => r.gamePhase === "playing").length,
+    totalBots: players.filter(p => p.isBot).length,
+    recentActivity: rooms.filter(r => {
+      const created = new Date(r.createdAt);
+      const now = new Date();
+      return (now.getTime() - created.getTime()) < 3600000; // Last hour
+    }).length
   };
 
   if (isLoading) {
@@ -202,35 +267,45 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950">
       {/* Header */}
-      <div className="backdrop-blur-xl bg-black/40 border-b border-white/10 sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
+      <div className="backdrop-blur-xl bg-black/40 border-b border-white/10 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 w-full lg:w-auto">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-white">Yönetim Merkezi</h1>
+                  <p className="text-xs text-slate-400">Katmannames Admin Paneli</p>
+                </div>
               </div>
-              <h1 className="text-xl font-bold text-white">Admin Paneli</h1>
+              
+              {/* Search Bar */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Input
+                  type="text"
+                  placeholder="Oda kodu veya oyuncu ara..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-black/40 border-white/20 text-white placeholder:text-slate-500 focus:border-purple-500 transition-colors"
+                  data-testid="input-search"
+                />
+              </div>
             </div>
             
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 {isConnected ? (
                   <div className="flex items-center gap-1 text-xs text-green-400">
-                    <Wifi className="w-3 h-3" />
-                    <span>Bağlı</span>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                    <span>Canlı Bağlantı</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 text-xs text-red-400">
-                    <WifiOff className="w-3 h-3" />
+                    <div className="w-2 h-2 bg-red-400 rounded-full" />
                     <span>Bağlantı Yok</span>
-                  </div>
-                )}
-                {lastUpdated && (
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                    <span>Son güncelleme:</span>
-                    <span className="text-slate-300">
-                      {lastUpdated.toLocaleTimeString('tr-TR')}
-                    </span>
                   </div>
                 )}
               </div>
@@ -260,101 +335,91 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
         {error && (
-          <Card className="mb-6 backdrop-blur-xl bg-red-900/20 border-red-600/50">
-            <CardContent className="p-4">
-              <p className="text-red-400">{error}</p>
-            </CardContent>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="mb-6 backdrop-blur-xl bg-red-900/20 border-red-600/50">
+              <CardContent className="p-4 flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+                <p className="text-red-400">{error}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
 
-        {/* Overview Cards */}
+        {/* Quick Stats - Always Visible */}
         {overview && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <Card className="backdrop-blur-xl bg-black/40 border-white/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-400">
-                    Toplam Oda
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    <Home className="w-8 h-8 text-purple-400" />
-                    <span className="text-3xl font-bold text-white">
-                      {overview.totalRooms}
-                    </span>
+              <Card className="backdrop-blur-xl bg-gradient-to-br from-purple-900/20 to-purple-600/20 border-purple-500/30">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-purple-300 mb-1">Toplam Oda</p>
+                      <p className="text-2xl font-bold text-white">{overview.totalRooms}</p>
+                    </div>
+                    <Home className="w-8 h-8 text-purple-400 opacity-50" />
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <Card className="backdrop-blur-xl bg-black/40 border-white/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-400">
-                    Toplam Oyuncu
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-8 h-8 text-blue-400" />
-                    <span className="text-3xl font-bold text-white">
-                      {overview.totalPlayers}
-                    </span>
+              <Card className="backdrop-blur-xl bg-gradient-to-br from-blue-900/20 to-blue-600/20 border-blue-500/30">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-blue-300 mb-1">Toplam Oyuncu</p>
+                      <p className="text-2xl font-bold text-white">{overview.totalPlayers}</p>
+                    </div>
+                    <Users className="w-8 h-8 text-blue-400 opacity-50" />
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
             >
-              <Card className="backdrop-blur-xl bg-black/40 border-white/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-400">
-                    Aktif Oyunlar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    <Gamepad2 className="w-8 h-8 text-green-400" />
-                    <span className="text-3xl font-bold text-white">
-                      {overview.activeGames}
-                    </span>
+              <Card className="backdrop-blur-xl bg-gradient-to-br from-green-900/20 to-green-600/20 border-green-500/30">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-green-300 mb-1">Aktif Oyunlar</p>
+                      <p className="text-2xl font-bold text-white">{stats.gamesInProgress}</p>
+                    </div>
+                    <Gamepad2 className="w-8 h-8 text-green-400 opacity-50" />
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <Card className="backdrop-blur-xl bg-black/40 border-white/10">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-slate-400">
-                    Lobi Odaları
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    <Home className="w-8 h-8 text-yellow-400" />
-                    <span className="text-3xl font-bold text-white">
-                      {overview.lobbyRooms}
-                    </span>
+              <Card className="backdrop-blur-xl bg-gradient-to-br from-amber-900/20 to-amber-600/20 border-amber-500/30">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-amber-300 mb-1">Bot Sayısı</p>
+                      <p className="text-2xl font-bold text-white">{stats.totalBots}</p>
+                    </div>
+                    <BotIcon className="w-8 h-8 text-amber-400 opacity-50" />
                   </div>
                 </CardContent>
               </Card>
@@ -362,89 +427,145 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Rooms Table */}
-        <Card className="backdrop-blur-xl bg-black/40 border-white/10 mb-6">
-          <CardHeader>
-            <CardTitle className="text-white">Aktif Odalar</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-2 text-slate-400 font-medium">Kod</th>
-                    <th className="text-left py-2 text-slate-400 font-medium">Durum</th>
-                    <th className="text-center py-2 text-slate-400 font-medium">Oyuncular</th>
-                    <th className="text-center py-2 text-slate-400 font-medium">Skor</th>
-                    <th className="text-center py-2 text-slate-400 font-medium">Açılan</th>
-                    <th className="text-left py-2 text-slate-400 font-medium">Şifre</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <AnimatePresence>
-                    {rooms.map((room, index) => {
-                      const phase = getPhaseDisplay(room.gamePhase);
-                      return (
-                        <motion.tr
-                          key={room.roomCode}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 20 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-b border-white/5 hover:bg-white/5"
-                          data-testid={`room-row-${room.roomCode}`}
-                        >
-                          <td className="py-2 text-white font-mono">{room.roomCode}</td>
-                          <td className="py-2">
-                            <Badge className={`${phase.color} text-white border-0`}>
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid grid-cols-2 w-full max-w-sm mx-auto bg-black/40 backdrop-blur-xl p-1">
+            <TabsTrigger value="rooms" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              <Home className="w-4 h-4 mr-2" />
+              Odalar
+            </TabsTrigger>
+            <TabsTrigger value="players" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              <Users className="w-4 h-4 mr-2" />
+              Oyuncular
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Rooms Tab */}
+          <TabsContent value="rooms" className="space-y-6">
+            {/* Filter Bar */}
+            <div className="flex items-center gap-4">
+              <Select value={filterPhase} onValueChange={setFilterPhase}>
+                <SelectTrigger className="w-48 bg-black/40 border-white/20 text-white">
+                  <SelectValue placeholder="Durum Filtresi" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tümü</SelectItem>
+                  <SelectItem value="lobby">Lobi</SelectItem>
+                  <SelectItem value="introduction">Tanışma</SelectItem>
+                  <SelectItem value="playing">Oyunda</SelectItem>
+                  <SelectItem value="ended">Bitti</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="text-sm text-slate-400">
+                {filteredRooms.length} oda gösteriliyor
+              </div>
+            </div>
+
+            {/* Rooms Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <AnimatePresence>
+                {filteredRooms.map((room, index) => {
+                  const phase = getPhaseDisplay(room.gamePhase);
+                  const PhaseIcon = phase.icon;
+                  return (
+                    <motion.div
+                      key={room.roomCode}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Card className="backdrop-blur-xl bg-black/40 border-white/10 hover:border-purple-500/50 transition-all">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-mono text-white font-bold">
+                                {room.roomCode}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => copyRoomCode(room.roomCode)}
+                                className="h-6 w-6 p-0"
+                              >
+                                {copiedRoom === room.roomCode ? (
+                                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                ) : (
+                                  <Copy className="w-4 h-4 text-slate-400" />
+                                )}
+                              </Button>
+                            </div>
+                            <Badge className={`${phase.color} text-white border-0 flex items-center gap-1`}>
+                              <PhaseIcon className="w-3 h-3" />
                               {phase.text}
                             </Badge>
-                          </td>
-                          <td className="py-2 text-center text-slate-300">{room.playerCount}</td>
-                          <td className="py-2 text-center">
-                            {room.gamePhase === "playing" && (
-                              <span className="text-slate-300">
-                                <span className="text-blue-400">{room.darkScore}</span>
-                                {" - "}
-                                <span className="text-red-400">{room.lightScore}</span>
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-2 text-center text-slate-300">
-                            {room.cardsRevealed > 0 ? room.cardsRevealed : "-"}
-                          </td>
-                          <td className="py-2">
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-slate-400">Oyuncular:</span>
+                            <span className="text-white font-semibold">{room.playerCount}</span>
+                          </div>
+                          {room.gamePhase === "playing" && (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-400">Skor:</span>
+                              <div>
+                                <span className="text-blue-400 font-semibold">{room.darkScore}</span>
+                                <span className="text-slate-400 mx-1">-</span>
+                                <span className="text-red-400 font-semibold">{room.lightScore}</span>
+                              </div>
+                            </div>
+                          )}
+                          {room.cardsRevealed > 0 && (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-slate-400">Açılan Kart:</span>
+                              <span className="text-white">{room.cardsRevealed}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 pt-2">
                             {room.hasPassword && (
-                              <Badge className="bg-emerald-500 text-white border-0">
+                              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/50">
+                                <Eye className="w-3 h-3 mr-1" />
                                 Şifreli
                               </Badge>
                             )}
-                          </td>
-                        </motion.tr>
-                      );
-                    })}
-                  </AnimatePresence>
-                </tbody>
-              </table>
-              {rooms.length === 0 && (
-                <div className="text-center py-8 text-slate-400">
-                  Aktif oda bulunmuyor
-                </div>
-              )}
+                            <Badge className="bg-slate-500/20 text-slate-400 border-slate-500/50 text-xs">
+                              {new Date(room.createdAt).toLocaleTimeString('tr-TR', { 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              })}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
-          </CardContent>
-        </Card>
+            
+            {filteredRooms.length === 0 && (
+              <Card className="backdrop-blur-xl bg-black/40 border-white/10">
+                <CardContent className="p-12 text-center">
+                  <Home className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                  <p className="text-slate-400 text-lg">Aktif oda bulunmuyor</p>
+                  <p className="text-slate-500 text-sm mt-2">Oyuncular oda oluşturduğunda burada görünecek</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
 
-        {/* Players Table - Grouped by Room */}
-        <Card className="backdrop-blur-xl bg-black/40 border-white/10">
-          <CardHeader>
-            <CardTitle className="text-white">Odalara Göre Aktif Oyuncular</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-96">
+          {/* Players Tab */}
+          <TabsContent value="players" className="space-y-6">
+            <div className="text-sm text-slate-400 mb-4">
+              {filteredPlayers.length} oyuncu gösteriliyor
+            </div>
+
+            {/* Players by Room */}
+            <div className="space-y-4">
               {(() => {
                 // Group players by room
-                const playersByRoom = players.reduce((acc, player) => {
+                const playersByRoom = filteredPlayers.reduce((acc, player) => {
                   if (!acc[player.roomCode]) {
                     acc[player.roomCode] = [];
                   }
@@ -456,28 +577,32 @@ export default function AdminDashboard() {
                 
                 if (roomCodes.length === 0) {
                   return (
-                    <div className="text-center py-8 text-slate-400">
-                      Aktif oyuncu bulunmuyor
-                    </div>
+                    <Card className="backdrop-blur-xl bg-black/40 border-white/10">
+                      <CardContent className="p-12 text-center">
+                        <Users className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                        <p className="text-slate-400 text-lg">Aktif oyuncu bulunmuyor</p>
+                        <p className="text-slate-500 text-sm mt-2">Oyuncular oyuna katıldığında burada görünecek</p>
+                      </CardContent>
+                    </Card>
                   );
                 }
                 
                 return (
-                  <div className="space-y-4">
-                    <AnimatePresence>
-                      {roomCodes.map((roomCode, roomIndex) => {
-                        const room = rooms.find(r => r.roomCode === roomCode);
-                        const phase = room ? getPhaseDisplay(room.gamePhase) : null;
-                        
-                        return (
-                          <motion.div
-                            key={roomCode}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ delay: roomIndex * 0.1 }}
-                            className="border border-white/10 rounded-lg overflow-hidden"
-                          >
+                  <AnimatePresence>
+                    {roomCodes.map((roomCode, roomIndex) => {
+                      const room = rooms.find(r => r.roomCode === roomCode);
+                      const phase = room ? getPhaseDisplay(room.gamePhase) : null;
+                      const PhaseIcon = phase?.icon || AlertCircle;
+                      
+                      return (
+                        <motion.div
+                          key={roomCode}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ delay: roomIndex * 0.1 }}
+                        >
+                          <Card className="backdrop-blur-xl bg-black/40 border-white/10 overflow-hidden">
                             {/* Room Header */}
                             <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 px-4 py-3 border-b border-white/10">
                               <div className="flex items-center justify-between">
@@ -487,104 +612,81 @@ export default function AdminDashboard() {
                                     <span className="font-mono text-white font-semibold text-lg">
                                       {roomCode}
                                     </span>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => copyRoomCode(roomCode)}
+                                      className="h-6 w-6 p-0"
+                                    >
+                                      {copiedRoom === roomCode ? (
+                                        <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                      ) : (
+                                        <Copy className="w-4 h-4 text-slate-400" />
+                                      )}
+                                    </Button>
                                   </div>
                                   {phase && (
-                                    <Badge className={`${phase.color} text-white border-0`}>
+                                    <Badge className={`${phase.color} text-white border-0 flex items-center gap-1`}>
+                                      <PhaseIcon className="w-3 h-3" />
                                       {phase.text}
                                     </Badge>
                                   )}
-                                  {room?.hasPassword && (
-                                    <Badge className="bg-emerald-500 text-white border-0">
-                                      Şifreli
-                                    </Badge>
-                                  )}
                                 </div>
-                                <div className="flex items-center gap-3 text-sm">
-                                  {room && room.gamePhase === "playing" && (
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-slate-400">Skor:</span>
-                                      <span className="text-blue-400 font-semibold">{room.darkScore}</span>
-                                      <span className="text-slate-400">-</span>
-                                      <span className="text-red-400 font-semibold">{room.lightScore}</span>
-                                    </div>
-                                  )}
-                                  <div className="flex items-center gap-2">
-                                    <Users className="w-4 h-4 text-slate-400" />
-                                    <span className="text-slate-300">
-                                      {playersByRoom[roomCode].length} Oyuncu
-                                    </span>
-                                  </div>
+                                <div className="flex items-center gap-2 text-sm text-slate-300">
+                                  <Users className="w-4 h-4 text-slate-400" />
+                                  {playersByRoom[roomCode].length} Oyuncu
                                 </div>
                               </div>
                             </div>
                             
-                            {/* Players in Room */}
-                            <div className="overflow-x-auto">
-                              <table className="w-full text-sm">
-                                <thead>
-                                  <tr className="border-b border-white/5">
-                                    <th className="text-left px-4 py-2 text-slate-400 font-medium">İsim</th>
-                                    <th className="text-left px-4 py-2 text-slate-400 font-medium">Takım</th>
-                                    <th className="text-left px-4 py-2 text-slate-400 font-medium">Rol</th>
-                                    <th className="text-center px-4 py-2 text-slate-400 font-medium">Özellikler</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {playersByRoom[roomCode].map((player, index) => {
-                                    const team = getTeamDisplay(player.team);
-                                    return (
-                                      <motion.tr
-                                        key={player.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.02 }}
-                                        className="border-b border-white/5 hover:bg-white/5"
-                                        data-testid={`player-row-${player.id}`}
-                                      >
-                                        <td className="px-4 py-2 text-white">
-                                          <div className="flex items-center gap-2">
-                                            <User className="w-4 h-4 text-slate-400" />
-                                            {player.name}
-                                          </div>
-                                        </td>
-                                        <td className={`px-4 py-2 ${team.color}`}>
-                                          {team.text}
-                                        </td>
-                                        <td className="px-4 py-2 text-slate-300">
-                                          {getRoleDisplay(player.role)}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                          <div className="flex items-center justify-center gap-1">
-                                            {player.isRoomOwner && (
-                                              <Badge className="bg-yellow-500 text-white border-0">
-                                                <Crown className="w-3 h-3 mr-1" />
-                                                Sahip
-                                              </Badge>
-                                            )}
-                                            {player.isBot && (
-                                              <Badge className="bg-gray-500 text-white border-0">
-                                                <BotIcon className="w-3 h-3 mr-1" />
-                                                Bot
-                                              </Badge>
-                                            )}
-                                          </div>
-                                        </td>
-                                      </motion.tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
+                            {/* Players Grid */}
+                            <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {playersByRoom[roomCode].map((player, index) => {
+                                const team = getTeamDisplay(player.team);
+                                return (
+                                  <motion.div
+                                    key={player.id}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.02 }}
+                                    className="bg-black/30 rounded-lg p-3 border border-white/5"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-2">
+                                        <User className="w-4 h-4 text-slate-400" />
+                                        <span className="text-white font-medium">{player.name}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        {player.isRoomOwner && (
+                                          <Crown className="w-4 h-4 text-yellow-400" />
+                                        )}
+                                        {player.isBot && (
+                                          <BotIcon className="w-4 h-4 text-gray-400" />
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-2 text-sm">
+                                      <span className={team.color}>
+                                        {team.text}
+                                      </span>
+                                      <span className="text-slate-400">
+                                        {getRoleDisplay(player.role)}
+                                      </span>
+                                    </div>
+                                  </motion.div>
+                                );
+                              })}
                             </div>
-                          </motion.div>
-                        );
-                      })}
-                    </AnimatePresence>
-                  </div>
+                          </Card>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
                 );
               })()}
-            </ScrollArea>
-          </CardContent>
-        </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
