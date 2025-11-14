@@ -30,7 +30,12 @@ import {
   Copy,
   CheckCircle2,
   Eye,
-  EyeOff
+  EyeOff,
+  Award,
+  UserCheck,
+  Timer,
+  Calendar,
+  Trophy
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
@@ -64,12 +69,40 @@ interface AdminPlayerInfo {
   isBot: boolean;
 }
 
+interface RoomHistory {
+  historyId: string;
+  roomCode: string;
+  createdAt: number;
+  endedAt?: number;
+  status: "active" | "ended" | "abandoned";
+  maxPlayerCount: number;
+  totalPlayers: string[];
+  playerNames: Record<string, string>;
+  gamePhases: string[];
+  hasPassword: boolean;
+  darkTeamName: string;
+  lightTeamName: string;
+  chaosMode: boolean;
+  timedMode: boolean;
+  finalScores?: { dark: number; light: number; winner?: string | null };
+  gameDuration?: number;
+}
+
+interface HistoryStats {
+  totalGamesPlayed: number;
+  averageDuration: number;
+  totalPlayersServed: number;
+  gamesInLast24Hours: number;
+}
+
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [rooms, setRooms] = useState<AdminRoomSummary[]>([]);
   const [players, setPlayers] = useState<AdminPlayerInfo[]>([]);
+  const [roomHistory, setRoomHistory] = useState<RoomHistory[]>([]);
+  const [historyStats, setHistoryStats] = useState<HistoryStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -168,6 +201,45 @@ export default function AdminDashboard() {
     };
   }, [token]);
 
+  // Fetch history data when history tab is selected
+  useEffect(() => {
+    if (activeTab === 'history' && token) {
+      // Fetch history data
+      fetch('/api/admin/history?limit=100', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            setRoomHistory(data);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to fetch room history:', err);
+          toast({
+            title: "Hata",
+            description: "Oyun geçmişi yüklenemedi",
+            variant: "destructive"
+          });
+        });
+
+      // Fetch history stats
+      fetch('/api/admin/history-stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          setHistoryStats(data);
+        })
+        .catch(err => {
+          console.error('Failed to fetch history stats:', err);
+        });
+    }
+  }, [activeTab, token, toast]);
 
   const handleLogout = async () => {
     await fetch("/api/admin/logout", {
@@ -689,6 +761,194 @@ export default function AdminDashboard() {
                 );
               })()}
             </div>
+          </TabsContent>
+
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            {/* History Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <Card className="backdrop-blur-xl bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-white/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Toplam Oyun</CardTitle>
+                    <Trophy className="h-4 w-4 text-yellow-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{historyStats?.totalGamesPlayed || 0}</div>
+                    <p className="text-xs text-muted-foreground">Tüm zamanlar</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Card className="backdrop-blur-xl bg-gradient-to-br from-green-900/20 to-cyan-900/20 border-white/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Benzersiz Oyuncular</CardTitle>
+                    <UserCheck className="h-4 w-4 text-green-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{historyStats?.totalPlayersServed || 0}</div>
+                    <p className="text-xs text-muted-foreground">Toplam katılım</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Card className="backdrop-blur-xl bg-gradient-to-br from-blue-900/20 to-indigo-900/20 border-white/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Ortalama Süre</CardTitle>
+                    <Timer className="h-4 w-4 text-blue-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {historyStats?.averageDuration 
+                        ? `${Math.round(historyStats.averageDuration / 60000)} dk`
+                        : "0 dk"}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Oyun başına</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <Card className="backdrop-blur-xl bg-gradient-to-br from-amber-900/20 to-orange-900/20 border-white/10">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Son 24 Saat</CardTitle>
+                    <Activity className="h-4 w-4 text-amber-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{historyStats?.gamesInLast24Hours || 0}</div>
+                    <p className="text-xs text-muted-foreground">Oyun sayısı</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+
+            {/* History List */}
+            <Card className="backdrop-blur-xl bg-black/40 border-white/10">
+              <CardHeader className="border-b border-white/10">
+                <CardTitle className="text-xl">Oyun Geçmişi</CardTitle>
+                <p className="text-sm text-slate-400">Son 100 oyun kaydı</p>
+              </CardHeader>
+              <CardContent className="p-0">
+                <ScrollArea className="h-[500px]">
+                  {roomHistory.length === 0 ? (
+                    <div className="p-12 text-center">
+                      <Clock className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                      <p className="text-slate-400 text-lg">Henüz oyun geçmişi bulunmuyor</p>
+                      <p className="text-slate-500 text-sm mt-2">Oynanan oyunlar burada görünecek</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-white/5">
+                      {roomHistory.map((history, index) => {
+                        const duration = history.gameDuration 
+                          ? Math.round(history.gameDuration / 60000) 
+                          : 0;
+                        const winnerTeam = history.finalScores?.winner === 'dark' 
+                          ? history.darkTeamName
+                          : history.finalScores?.winner === 'light'
+                          ? history.lightTeamName
+                          : null;
+                        
+                        return (
+                          <motion.div
+                            key={history.historyId}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="p-4 hover:bg-white/5 transition-colors"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-lg font-bold text-purple-400">
+                                    {history.roomCode}
+                                  </span>
+                                  {history.hasPassword && (
+                                    <Badge variant="outline" className="text-xs">
+                                      <Shield className="w-3 h-3 mr-1" />
+                                      Şifreli
+                                    </Badge>
+                                  )}
+                                  {history.chaosMode && (
+                                    <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-xs">
+                                      Kaos
+                                    </Badge>
+                                  )}
+                                  {history.status === 'ended' ? (
+                                    <Badge className="bg-green-600/20 text-green-400">
+                                      Tamamlandı
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="bg-yellow-600/20 text-yellow-400">
+                                      Terk Edildi
+                                    </Badge>
+                                  )}
+                                </div>
+                                
+                                <div className="flex items-center gap-4 text-sm">
+                                  <span className="text-slate-400">
+                                    <Users className="w-4 h-4 inline mr-1" />
+                                    {history.maxPlayerCount} oyuncu
+                                  </span>
+                                  <span className="text-slate-400">
+                                    <Timer className="w-4 h-4 inline mr-1" />
+                                    {duration} dakika
+                                  </span>
+                                  <span className="text-slate-400">
+                                    <Calendar className="w-4 h-4 inline mr-1" />
+                                    {new Date(history.createdAt).toLocaleString('tr-TR', {
+                                      day: '2-digit',
+                                      month: '2-digit',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                </div>
+                                
+                                {history.finalScores && (
+                                  <div className="flex items-center gap-4">
+                                    <span className="text-blue-400">
+                                      {history.darkTeamName}: {history.finalScores.dark}
+                                    </span>
+                                    <span className="text-slate-400">-</span>
+                                    <span className="text-red-400">
+                                      {history.lightTeamName}: {history.finalScores.light}
+                                    </span>
+                                    {winnerTeam && (
+                                      <Badge className="bg-yellow-600/20 text-yellow-400">
+                                        <Trophy className="w-3 h-3 mr-1" />
+                                        {winnerTeam} Kazandı
+                                      </Badge>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </ScrollArea>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
