@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -47,7 +47,7 @@ interface AdminPlayerInfo {
 }
 
 export default function AdminDashboard() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [rooms, setRooms] = useState<AdminRoomSummary[]>([]);
   const [players, setPlayers] = useState<AdminPlayerInfo[]>([]);
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!token) {
-      navigate("/admin");
+      setLocation("/admin");
       return;
     }
 
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
       // Check for auth errors
       if (overviewRes.status === 401 || roomsRes.status === 401 || playersRes.status === 401) {
         localStorage.removeItem("adminToken");
-        navigate("/admin");
+        setLocation("/admin");
         return;
       }
 
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
       headers: { Authorization: `Bearer ${token}` }
     });
     localStorage.removeItem("adminToken");
-    navigate("/admin");
+    setLocation("/admin");
   };
 
   const handleRefresh = () => {

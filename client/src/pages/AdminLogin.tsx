@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -12,7 +12,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export default function AdminLogin() {
       localStorage.setItem("adminToken", data.token);
       
       // Navigate to admin dashboard
-      navigate("/admin/dashboard");
+      setLocation("/admin/dashboard");
     } catch (err: any) {
       setError(err.message || "Bir hata oluştu");
     } finally {
