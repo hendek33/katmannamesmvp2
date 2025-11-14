@@ -659,6 +659,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "game_updated",
               payload: { gameState },
             });
+            
+            // Notify admins about team selection
+            broadcastToAdmins();
             break;
           }
 
@@ -684,6 +687,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "game_updated",
               payload: { gameState },
             });
+            
+            // Notify admins about role selection
+            broadcastToAdmins();
             break;
           }
 
@@ -716,6 +722,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "game_updated",
               payload: { gameState },
             });
+            
+            // Notify admins about bot addition
+            broadcastToAdmins();
             break;
           }
 
@@ -747,6 +756,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             storage.removePlayer(ws.roomCode, validation.data.botId);
             const updatedRoom = storage.getRoom(ws.roomCode);
+            
+            // Notify admins about bot removal
+            broadcastToAdmins();
             
             if (updatedRoom) {
               broadcastToRoom(ws.roomCode, {
@@ -1087,6 +1099,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
 
             const gameState = storage.startGame(ws.roomCode);
+            
+            // Notify admins about game start
+            broadcastToAdmins();
+            
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Oyun başlatılamadı. Her takımda bir İpucu Veren olmalı." } });
               return;
@@ -1139,6 +1155,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               payload: { gameState },
             });
             
+            // Notify admins about clue given
+            broadcastToAdmins();
+            
             // Timer continues for guessers after clue is given
             const room = storage.getRoom(ws.roomCode);
             if (room && room.timedMode) {
@@ -1187,6 +1206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               type: "votes_updated", 
               payload: { votes: votes ? Object.fromEntries(votes) : {} },
             });
+            
+            // Notify admins about card revealed
+            broadcastToAdmins();
             break;
           }
 
@@ -1393,6 +1415,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             // Stop timer when returning to lobby
             stopRoomTimer(ws.roomCode);
+            
+            // Notify admins about lobby return
+            broadcastToAdmins();
             break;
           }
 
