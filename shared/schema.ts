@@ -280,3 +280,27 @@ export interface AdminPlayerInfo {
   isRoomOwner: boolean;
   isBot: boolean;
 }
+
+// Room History for admin tracking
+export interface RoomHistory {
+  id: string;
+  roomCode: string;
+  createdAt: Date;
+  endedAt?: Date;
+  status: "active" | "ended" | "abandoned";
+  maxPlayerCount: number;
+  totalPlayers: string[]; // Array of all player IDs who joined
+  playerNames: { [playerId: string]: string }; // Map of player IDs to names
+  gamePhases: GamePhase[]; // All phases the game went through
+  finalScores?: {
+    dark: number;
+    light: number;
+    winner?: Team;
+  };
+  gameDuration?: number; // Duration in milliseconds
+  hasPassword: boolean;
+  darkTeamName?: string;
+  lightTeamName?: string;
+  chaosMode?: boolean;
+  timedMode?: boolean;
+}

@@ -105,6 +105,7 @@ const insultMessages = [
 
 export class MemStorage implements IStorage {
   private rooms: Map<string, RoomData>;
+  private roomHistory: Map<string, import("@shared/schema").RoomHistory>; // Room history tracking
   private playerToRoom: Map<string, string>;
   private lastInsultTime: Map<string, number>; // odaKodu -> zaman damgası
   private playerInsultCooldown: Map<string, number>; // oyuncuId -> zaman damgası
@@ -117,6 +118,7 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.rooms = new Map();
+    this.roomHistory = new Map(); // Initialize room history
     this.playerToRoom = new Map();
     this.lastInsultTime = new Map();
     this.playerInsultCooldown = new Map();
