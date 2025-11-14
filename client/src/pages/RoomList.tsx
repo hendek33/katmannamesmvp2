@@ -89,33 +89,33 @@ export default function RoomList() {
         style={{ backgroundImage: 'url(/arkaplan.webp)' }}
       />
 
-      {/* Simple dark overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/50" />
+      {/* Darker overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/70" />
 
       <div className="relative z-10 h-full flex flex-col items-center justify-center p-4 sm:p-6">
-        {/* Main container - simpler glassmorphism */}
+        {/* Main container - darker glassmorphism */}
         <div className="w-full max-w-5xl">
-          {/* Simple header */}
-          <div className="backdrop-blur-md bg-white/10 rounded-t-2xl border border-white/10 p-6">
+          {/* Darker header */}
+          <div className="backdrop-blur-md bg-slate-900/60 rounded-t-2xl border border-slate-700/30 p-6">
             <div className="flex items-center justify-center gap-3 mb-2">
-              <Home className="w-6 h-6 text-white" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-white">
+              <Home className="w-6 h-6 text-slate-300" />
+              <h1 className="text-3xl sm:text-4xl font-bold text-slate-100">
                 Oyun Odaları
               </h1>
             </div>
-            <p className="text-center text-sm text-white/70">
+            <p className="text-center text-sm text-slate-400">
               Bir odaya katıl veya yeni oda oluştur
             </p>
           </div>
 
-          {/* Content area - simple glass effect */}
-          <div className="backdrop-blur bg-white/5 border-x border-b border-white/10 rounded-b-2xl">
+          {/* Content area - darker glass effect */}
+          <div className="backdrop-blur bg-slate-900/40 border-x border-b border-slate-700/30 rounded-b-2xl">
             <div className="p-4 sm:p-6 flex flex-col h-full">
-              {/* Simple action buttons */}
+              {/* Darker action buttons */}
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="rounded-lg p-4 bg-white/10 border border-white/10 hover:bg-white/15 transition-colors duration-200 text-white font-semibold"
+                  className="rounded-lg p-4 bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800/70 transition-colors duration-200 text-slate-200 font-semibold"
                 >
                   <div className="flex items-center justify-center gap-2">
                     <Plus className="w-5 h-5" />
@@ -125,7 +125,7 @@ export default function RoomList() {
                 
                 <button
                   onClick={() => setShowJoinModal(true)}
-                  className="rounded-lg p-4 bg-white/10 border border-white/10 hover:bg-white/15 transition-colors duration-200 text-white font-semibold"
+                  className="rounded-lg p-4 bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800/70 transition-colors duration-200 text-slate-200 font-semibold"
                 >
                   <div className="flex items-center justify-center gap-2">
                     <LogIn className="w-5 h-5" />
@@ -134,19 +134,19 @@ export default function RoomList() {
                 </button>
               </div>
 
-              {/* Room list - simplified */}
+              {/* Room list - darker */}
               <div className="flex-1 space-y-3 overflow-y-auto pr-2 min-h-0 max-h-[500px]">
                 {roomsList.length === 0 ? (
-                  <div className="bg-white/5 rounded-lg border border-white/10 p-12 text-center">
-                    <Home className="w-16 h-16 mx-auto text-white/50 mb-4" />
-                    <p className="text-lg font-semibold text-white/80 mb-2">Henüz aktif oda yok</p>
-                    <p className="text-sm text-white/50">İlk odayı sen oluştur ve arkadaşlarını davet et!</p>
+                  <div className="bg-slate-800/30 rounded-lg border border-slate-700/40 p-12 text-center">
+                    <Home className="w-16 h-16 mx-auto text-slate-500 mb-4" />
+                    <p className="text-lg font-semibold text-slate-300 mb-2">Henüz aktif oda yok</p>
+                    <p className="text-sm text-slate-500">İlk odayı sen oluştur ve arkadaşlarını davet et!</p>
                   </div>
                 ) : (
                   roomsList.map((room: RoomListItem & { ownerName?: string }) => (
                     <div
                       key={room.roomCode}
-                      className="bg-white/8 rounded-lg border border-white/10 hover:bg-white/10 transition-colors duration-200 cursor-pointer"
+                      className="bg-slate-800/40 rounded-lg border border-slate-700/40 hover:bg-slate-800/60 transition-colors duration-200 cursor-pointer"
                       onClick={() => handleJoinRoom(room.roomCode, room.hasPassword)}
                     >
                       <div className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -154,21 +154,21 @@ export default function RoomList() {
                         <div className="flex flex-wrap items-center gap-3">
                           {/* Room owner */}
                           <div className="flex items-center gap-2">
-                            <Crown className="w-4 h-4 text-yellow-500" />
-                            <span className="text-base font-bold text-white">
+                            <Crown className="w-4 h-4 text-amber-600" />
+                            <span className="text-base font-bold text-slate-200">
                               {room.ownerName ? `${room.ownerName}'in Odası` : "Oda"}
                             </span>
                           </div>
                           
                           {/* Player count */}
-                          <div className="flex items-center gap-1 text-sm text-white/70">
+                          <div className="flex items-center gap-1 text-sm text-slate-400">
                             <Users className="w-4 h-4" />
                             <span>{room.playerCount} Oyuncu</span>
                           </div>
                           
                           {/* Password indicator */}
                           {room.hasPassword && (
-                            <div className="flex items-center gap-1 text-sm text-yellow-500">
+                            <div className="flex items-center gap-1 text-sm text-amber-600">
                               <Lock className="w-3 h-3" />
                               <span className="text-xs">Şifreli</span>
                             </div>
@@ -177,22 +177,22 @@ export default function RoomList() {
 
                         {/* Right side - Status and join button */}
                         <div className="flex items-center gap-3 self-end sm:self-auto">
-                          {/* Simple phase badge */}
+                          {/* Darker phase badge */}
                           <div className={`
                             px-3 py-1 rounded text-xs font-medium
                             ${room.phase === "lobby" 
-                              ? "bg-green-500/20 text-green-400" 
+                              ? "bg-emerald-900/40 text-emerald-400" 
                               : room.phase === "playing"
-                              ? "bg-blue-500/20 text-blue-400"
-                              : "bg-gray-500/20 text-gray-400"
+                              ? "bg-blue-900/40 text-blue-400"
+                              : "bg-slate-800/50 text-slate-500"
                             }
                           `}>
                             {getPhaseText(room.phase)}
                           </div>
                           
-                          {/* Simple join button */}
+                          {/* Darker join button */}
                           <button
-                            className="px-4 py-2 rounded bg-white/10 hover:bg-white/20 text-white font-medium text-sm transition-colors duration-200"
+                            className="px-4 py-2 rounded bg-slate-700/50 hover:bg-slate-700/70 text-slate-200 font-medium text-sm transition-colors duration-200"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleJoinRoom(room.roomCode, room.hasPassword);
@@ -247,21 +247,21 @@ function CreateRoomModal({ username, onClose, send }: {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
       <div className="w-full max-w-md">
-        <div className="rounded-lg backdrop-blur bg-slate-900/90 border border-white/10">
-          {/* Simple modal header */}
+        <div className="rounded-lg backdrop-blur bg-slate-900/95 border border-slate-700/50">
+          {/* Darker modal header */}
           <div className="p-6 pb-0">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Plus className="w-5 h-5 text-white" />
-              <h2 className="text-xl font-semibold text-white">
+              <Plus className="w-5 h-5 text-slate-300" />
+              <h2 className="text-xl font-semibold text-slate-100">
                 Yeni Oda Oluştur
               </h2>
             </div>
           </div>
           
           <div className="p-6 space-y-4">
-            {/* Simple password checkbox */}
+            {/* Darker password checkbox */}
             <div className="flex items-center gap-3">
               <input 
                 type="checkbox"
@@ -270,16 +270,16 @@ function CreateRoomModal({ username, onClose, send }: {
                 onChange={(e) => setHasPassword(e.target.checked)}
                 className="w-4 h-4"
               />
-              <label htmlFor="hasPassword" className="text-white/80 flex items-center gap-2 cursor-pointer">
-                <Lock className="w-4 h-4" />
+              <label htmlFor="hasPassword" className="text-slate-300 flex items-center gap-2 cursor-pointer">
+                <Lock className="w-4 h-4 text-slate-400" />
                 Şifreli oda oluştur
               </label>
             </div>
 
-            {/* Simple password input */}
+            {/* Darker password input */}
             {hasPassword && (
               <div>
-                <label className="block text-sm text-white/60 mb-2">
+                <label className="block text-sm text-slate-400 mb-2">
                   Oda Şifresi
                 </label>
                 <input 
@@ -287,23 +287,23 @@ function CreateRoomModal({ username, onClose, send }: {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Güvenli bir şifre girin"
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-600"
                 />
               </div>
             )}
 
-            {/* Simple action buttons */}
+            {/* Darker action buttons */}
             <div className="flex gap-3 mt-6">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 rounded bg-white/10 text-white hover:bg-white/15 transition-colors"
+                className="flex-1 py-2 rounded bg-slate-800/50 text-slate-200 hover:bg-slate-800/70 transition-colors"
               >
                 İptal
               </button>
               <button
                 onClick={handleCreate}
                 disabled={hasPassword && !password}
-                className="flex-1 py-2 rounded bg-blue-600/80 text-white hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 rounded bg-blue-700/70 text-slate-100 hover:bg-blue-700/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Oluştur
               </button>
@@ -337,23 +337,23 @@ function JoinRoomModal({ username, onClose, send }: {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
       <div className="w-full max-w-md">
-        <div className="rounded-lg backdrop-blur bg-slate-900/90 border border-white/10">
-          {/* Simple modal header */}
+        <div className="rounded-lg backdrop-blur bg-slate-900/95 border border-slate-700/50">
+          {/* Darker modal header */}
           <div className="p-6 pb-0">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <LogIn className="w-5 h-5 text-white" />
-              <h2 className="text-xl font-semibold text-white">
+              <LogIn className="w-5 h-5 text-slate-300" />
+              <h2 className="text-xl font-semibold text-slate-100">
                 Oda Kodu ile Katıl
               </h2>
             </div>
           </div>
           
           <div className="p-6 space-y-4">
-            {/* Simple room code input */}
+            {/* Darker room code input */}
             <div>
-              <label className="block text-sm text-white/60 mb-2">
+              <label className="block text-sm text-slate-400 mb-2">
                 Oda Kodu
               </label>
               <input 
@@ -362,11 +362,11 @@ function JoinRoomModal({ username, onClose, send }: {
                 onChange={(e) => setRoomCode(e.target.value.toLocaleUpperCase('tr-TR'))}
                 placeholder="ABC123"
                 maxLength={6}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded text-white text-center text-2xl font-bold tracking-wider placeholder-white/40 focus:outline-none focus:border-white/40"
+                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded text-slate-100 text-center text-2xl font-bold tracking-wider placeholder-slate-500 focus:outline-none focus:border-slate-600"
               />
             </div>
 
-            {/* Simple password checkbox */}
+            {/* Darker password checkbox */}
             <div className="flex items-center gap-3">
               <input 
                 type="checkbox"
@@ -375,16 +375,16 @@ function JoinRoomModal({ username, onClose, send }: {
                 onChange={(e) => setNeedsPassword(e.target.checked)}
                 className="w-4 h-4"
               />
-              <label htmlFor="needsPassword" className="text-white/80 flex items-center gap-2 cursor-pointer">
-                <Lock className="w-4 h-4" />
+              <label htmlFor="needsPassword" className="text-slate-300 flex items-center gap-2 cursor-pointer">
+                <Lock className="w-4 h-4 text-slate-400" />
                 Oda şifreli
               </label>
             </div>
 
-            {/* Simple password input */}
+            {/* Darker password input */}
             {needsPassword && (
               <div>
-                <label className="block text-sm text-white/60 mb-2">
+                <label className="block text-sm text-slate-400 mb-2">
                   Oda Şifresi
                 </label>
                 <input 
@@ -392,23 +392,23 @@ function JoinRoomModal({ username, onClose, send }: {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Şifre girin"
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded text-slate-200 placeholder-slate-500 focus:outline-none focus:border-slate-600"
                 />
               </div>
             )}
 
-            {/* Simple action buttons */}
+            {/* Darker action buttons */}
             <div className="flex gap-3 mt-6">
               <button
                 onClick={onClose}
-                className="flex-1 py-2 rounded bg-white/10 text-white hover:bg-white/15 transition-colors"
+                className="flex-1 py-2 rounded bg-slate-800/50 text-slate-200 hover:bg-slate-800/70 transition-colors"
               >
                 İptal
               </button>
               <button
                 onClick={handleJoin}
                 disabled={!roomCode.trim() || (needsPassword && !password)}
-                className="flex-1 py-2 rounded bg-red-600/80 text-white hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2 rounded bg-red-700/70 text-slate-100 hover:bg-red-700/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Katıl
               </button>
