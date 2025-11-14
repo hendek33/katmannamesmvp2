@@ -1,5 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
+import { adminLoginSchema } from "@shared/schema";
 
 // Admin configuration
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123'; // Default for development
@@ -7,7 +8,15 @@ const loginAttempts = new Map<string, { count: number; lastAttempt: number }>();
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOGIN_ATTEMPT_WINDOW = 15 * 60 * 1000; // 15 minutes
 
-// Rate limiting helper
+// Rate limiting helpers
+function normalizeIp(req: Request): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string') {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.ip || req.socket.remoteAddress || 'unknown';
+}
+
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const attempts = loginAttempts.get(ip);
@@ -34,6 +43,10 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+function resetRateLimit(ip: string): void {
+  loginAttempts.delete(ip);
+}
+
 // Admin authentication middleware
 function requireAdmin(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split(' ')[1]; // Bearer token
@@ -46,20 +59,29 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
 }
 
 export function registerAdminRoutes(app: Express): void {
-  // Admin login endpoint
+  // Admin login endpoint with Zod validation
   app.post('/api/admin/login', (req: Request, res: Response) => {
-    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    const ip = normalizeIp(req);
     
     // Check rate limit
     if (!checkRateLimit(ip)) {
       return res.status(429).json({ error: 'Too many login attempts. Please try again later.' });
     }
     
-    const { password } = req.body;
+    // Validate request body with Zod
+    const validation = adminLoginSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ error: 'Invalid request format' });
+    }
     
-    if (!password || password !== ADMIN_PASSWORD) {
+    const { password } = validation.data;
+    
+    if (password !== ADMIN_PASSWORD) {
       return res.status(401).json({ error: 'Invalid password' });
     }
+    
+    // Reset rate limit on successful login
+    resetRateLimit(ip);
     
     const token = storage.createAdminSession();
     res.json({ token });

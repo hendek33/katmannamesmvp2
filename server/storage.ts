@@ -1,5 +1,5 @@
 import type { GameState, Player, Card, CardType, Team, Clue, RoomListItem } from "@shared/schema";
-import { randomUUID } from "crypto";
+import { randomUUID, scryptSync, timingSafeEqual, randomBytes } from "crypto";
 import { getRandomWords } from "./words";
 
 interface RoomData {
@@ -2185,42 +2185,88 @@ export class MemStorage implements IStorage {
   // Admin methods implementation
   private cleanupExpiredAdminSessions(): void {
     const now = Date.now();
-    for (const [token, session] of this.adminSessions.entries()) {
+    const entries = Array.from(this.adminSessions.entries());
+    for (const [token, session] of entries) {
       if (session.expiresAt.getTime() < now) {
         this.adminSessions.delete(token);
       }
     }
   }
 
+  private hashToken(secret: string): string {
+    const salt = randomBytes(16);
+    return salt.toString('hex') + ':' + scryptSync(secret, salt, 32).toString('hex');
+  }
+
+  private verifyToken(secret: string, hash: string): boolean {
+    const [saltHex, hashHex] = hash.split(':');
+    if (!saltHex || !hashHex) return false;
+    
+    const salt = Buffer.from(saltHex, 'hex');
+    const storedHash = Buffer.from(hashHex, 'hex');
+    const computedHash = scryptSync(secret, salt, 32);
+    
+    return timingSafeEqual(storedHash, computedHash);
+  }
+
   createAdminSession(): string {
-    const token = randomUUID(); // Generate cryptographically secure token
+    const tokenId = randomUUID();
+    const secret = randomBytes(32).toString('hex');
+    const fullToken = `${tokenId}.${secret}`; // Return tokenId.secret format
+    
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
-    this.adminSessions.set(token, {
-      token,
+    const expiresAt = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hour sliding window
+    const hardExpiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hour hard limit
+    
+    this.adminSessions.set(tokenId, {
+      tokenId,
+      hashedSecret: this.hashToken(secret),
       createdAt: now,
-      expiresAt
+      expiresAt,
+      hardExpiresAt
     });
-    return token;
+    
+    return fullToken;
   }
 
   validateAdminSession(token: string): boolean {
-    const session = this.adminSessions.get(token);
+    const [tokenId, secret] = token.split('.');
+    if (!tokenId || !secret) return false;
+    
+    const session = this.adminSessions.get(tokenId);
     if (!session) return false;
     
-    const now = Date.now();
-    if (session.expiresAt.getTime() < now) {
-      this.adminSessions.delete(token);
+    // Verify the secret matches
+    if (!this.verifyToken(secret, session.hashedSecret)) {
       return false;
     }
     
-    // Refresh expiry on valid session
-    session.expiresAt = new Date(now + 24 * 60 * 60 * 1000);
+    const now = Date.now();
+    
+    // Check hard expiry (24 hours absolute limit)
+    if (session.hardExpiresAt.getTime() < now) {
+      this.adminSessions.delete(tokenId);
+      return false;
+    }
+    
+    // Check sliding window expiry
+    if (session.expiresAt.getTime() < now) {
+      this.adminSessions.delete(tokenId);
+      return false;
+    }
+    
+    // Refresh sliding window (but respect hard limit)
+    const newExpiry = new Date(now + 2 * 60 * 60 * 1000); // 2 hours from now
+    session.expiresAt = new Date(Math.min(newExpiry.getTime(), session.hardExpiresAt.getTime()));
+    
     return true;
   }
 
   deleteAdminSession(token: string): void {
-    this.adminSessions.delete(token);
+    const [tokenId] = token.split('.');
+    if (tokenId) {
+      this.adminSessions.delete(tokenId);
+    }
   }
 
   getAdminOverview(): import("@shared/schema").AdminOverview {
@@ -2228,7 +2274,8 @@ export class MemStorage implements IStorage {
     let activeGames = 0;
     let lobbyRooms = 0;
     
-    for (const roomData of this.rooms.values()) {
+    const roomValues = Array.from(this.rooms.values());
+    for (const roomData of roomValues) {
       const room = roomData.gameState;
       totalPlayers += room.players.length;
       
@@ -2250,7 +2297,8 @@ export class MemStorage implements IStorage {
   getAdminRooms(): import("@shared/schema").AdminRoomSummary[] {
     const rooms: import("@shared/schema").AdminRoomSummary[] = [];
     
-    for (const [roomCode, roomData] of this.rooms.entries()) {
+    const roomEntries = Array.from(this.rooms.entries());
+    for (const [roomCode, roomData] of roomEntries) {
       const room = roomData.gameState;
       rooms.push({
         roomCode,
@@ -2259,7 +2307,7 @@ export class MemStorage implements IStorage {
         gamePhase: room.phase,
         darkScore: room.darkCardsRemaining,
         lightScore: room.lightCardsRemaining,
-        currentTurn: room.currentTeam,
+        currentTurn: room.currentTeam || undefined,
         cardsRevealed: room.revealHistory.length,
         createdAt: new Date(room.createdAt)
       });
@@ -2271,15 +2319,16 @@ export class MemStorage implements IStorage {
   getAdminPlayers(): import("@shared/schema").AdminPlayerInfo[] {
     const players: import("@shared/schema").AdminPlayerInfo[] = [];
     
-    for (const [roomCode, roomData] of this.rooms.entries()) {
+    const roomEntries = Array.from(this.rooms.entries());
+    for (const [roomCode, roomData] of roomEntries) {
       const room = roomData.gameState;
       for (const player of room.players) {
         players.push({
           id: player.id,
           name: player.username,
           roomCode,
-          team: player.team,
-          role: player.role,
+          team: player.team || undefined,
+          role: player.role || undefined,
           isRoomOwner: player.isRoomOwner,
           isBot: player.isBot
         });
@@ -2301,7 +2350,7 @@ export class MemStorage implements IStorage {
       gamePhase: room.phase,
       darkScore: room.darkCardsRemaining,
       lightScore: room.lightCardsRemaining,
-      currentTurn: room.currentTeam,
+      currentTurn: room.currentTeam || undefined,
       cardsRevealed: room.revealHistory.length,
       createdAt: new Date(room.createdAt)
     };

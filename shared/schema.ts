@@ -236,11 +236,20 @@ export type LikeIntroductionInput = z.infer<typeof likeIntroductionSchema>;
 export type SkipIntroductionInput = z.infer<typeof skipIntroductionSchema>;
 export type BooApplaudIntroductionInput = z.infer<typeof booApplaudIntroductionSchema>;
 
+// Admin schemas
+export const adminLoginSchema = z.object({
+  password: z.string().min(1, "Şifre gereklidir").max(100, "Şifre çok uzun")
+});
+
+export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
+
 // Admin types
 export interface AdminSession {
-  token: string;
+  tokenId: string; // Public identifier
+  hashedSecret: string; // Hashed token secret
   createdAt: Date;
   expiresAt: Date;
+  hardExpiresAt: Date; // Absolute 24h expiry
 }
 
 export interface AdminOverview {
