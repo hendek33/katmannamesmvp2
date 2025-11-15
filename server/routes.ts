@@ -207,18 +207,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         setTimeout(() => {
           const messages = kickChatMessageBuffer.get(roomCode);
           if (messages && messages.length > 0) {
-            // Send batched messages (limit to maxBatchSize)
-            broadcastToRoom(roomCode, {
-              type: 'kick_chat_messages_batch',
-              payload: messages.slice(0, maxBatchSize)
-            });
+            // Send all messages in chunks if needed
+            let remaining = [...messages];
+            while (remaining.length > 0) {
+              const chunk = remaining.slice(0, maxBatchSize);
+              broadcastToRoom(roomCode, {
+                type: 'kick_chat_messages_batch',
+                payload: chunk
+              });
+              remaining = remaining.slice(maxBatchSize);
+            }
             kickChatMessageBuffer.delete(roomCode);
           }
         }, kickChatBatchInterval);
       }
       
       const buffer = kickChatMessageBuffer.get(roomCode);
-      if (buffer && buffer.length < maxBatchSize) {
+      if (buffer) {
+        // Always add message to buffer - no limit on buffer size
+        // Messages will be sent in chunks when timer triggers
         buffer.push(message);
       }
     });
