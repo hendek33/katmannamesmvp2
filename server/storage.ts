@@ -1131,6 +1131,10 @@ export class MemStorage implements IStorage {
       roomData.turnRevealMap = { dark: false, light: false };
     }
     room.endGameGuessSequence = undefined;
+    
+    // Clear taunt and insult cooldowns when restarting game
+    roomData.teamTauntCooldown = {};
+    roomData.teamInsultCooldown = {};
 
     return room;
   }
@@ -1167,6 +1171,10 @@ export class MemStorage implements IStorage {
     if (roomData.turnRevealMap) {
       roomData.turnRevealMap = { dark: false, light: false };
     }
+    
+    // Clear taunt and insult cooldowns when returning to lobby
+    roomData.teamTauntCooldown = {};
+    roomData.teamInsultCooldown = {};
 
     return room;
   }
