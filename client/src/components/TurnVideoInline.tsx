@@ -97,12 +97,16 @@ export function TurnVideoInline({ team, teamName, onComplete, isGameStart = fals
           />
           
           {/* Video in circular frame */}
-          <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 shadow-2xl"
+          <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden"
             style={{
-              borderColor: team === "dark" ? '#3b82f6' : '#ef4444',
+              border: `4px solid ${team === "dark" ? '#3b82f6' : '#ef4444'}`,
               boxShadow: team === "dark" 
-                ? '0 0 60px rgba(59,130,246,0.6), inset 0 0 30px rgba(59,130,246,0.3)'
-                : '0 0 60px rgba(239,68,68,0.6), inset 0 0 30px rgba(239,68,68,0.3)'
+                ? '0 0 40px rgba(59,130,246,0.5)'
+                : '0 0 40px rgba(239,68,68,0.5)',
+              transform: 'translateZ(0)', // Force GPU acceleration
+              backfaceVisibility: 'hidden', // Prevent flickering
+              WebkitBackfaceVisibility: 'hidden',
+              willChange: 'transform' // Optimize for animations
             }}
           >
             {base64Url && (
@@ -112,6 +116,10 @@ export function TurnVideoInline({ team, teamName, onComplete, isGameStart = fals
                 muted
                 playsInline
                 className="w-full h-full object-cover"
+                style={{
+                  transform: 'translateZ(0)',
+                  WebkitTransform: 'translateZ(0)'
+                }}
               />
             )}
             
