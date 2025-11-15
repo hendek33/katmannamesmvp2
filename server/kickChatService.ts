@@ -1,5 +1,7 @@
 import { WebSocket } from 'ws';
 import { EventEmitter } from 'events';
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
 interface KickChatMessage {
   id: string;
@@ -23,6 +25,7 @@ export class KickChatService extends EventEmitter {
   private messageHistory: KickChatMessage[] = [];
   private maxHistorySize = 500; // Increased for extended history tracking
   private isConnected = false;
+  private purify: any; // DOMPurify instance for XSS protection
   
   // Vote tracking for introduction phase
   private voteCollector: Map<string, 'like' | 'dislike'> = new Map();
@@ -40,6 +43,40 @@ export class KickChatService extends EventEmitter {
   constructor() {
     super();
     this.setMaxListeners(50); // Increase max listeners for multiple rooms
+    
+    // Initialize DOMPurify for XSS protection
+    const window = new JSDOM('').window;
+    this.purify = DOMPurify(window as any);
+  }
+  
+  // Sanitize user input to prevent XSS attacks
+  private sanitizeInput(input: string): string {
+    if (!input) return '';
+    
+    // Configure DOMPurify to be very strict
+    const config = {
+      ALLOWED_TAGS: [], // No HTML tags allowed
+      ALLOWED_ATTR: [], // No attributes allowed
+      KEEP_CONTENT: true, // Keep text content
+      RETURN_DOM: false,
+      RETURN_DOM_FRAGMENT: false,
+      RETURN_DOM_IMPORT: false,
+      FORCE_BODY: false,
+      SANITIZE_DOM: true,
+      IN_PLACE: false,
+      USE_PROFILES: { html: false, svg: false, svgFilters: false, mathMl: false }
+    };
+    
+    // Remove HTML tags and dangerous content
+    const sanitized = this.purify.sanitize(input, config);
+    
+    // Additional protection: remove any remaining special characters that could be dangerous
+    return sanitized
+      .replace(/[<>]/g, '') // Remove any remaining angle brackets
+      .replace(/javascript:/gi, '') // Remove javascript: protocol
+      .replace(/on\w+=/gi, '') // Remove event handlers
+      .trim()
+      .substring(0, 500); // Limit message length
   }
   
   async connect(config: KickChatConfig): Promise<void> {
@@ -118,7 +155,9 @@ export class KickChatService extends EventEmitter {
   }
   
   private processChatMessage(data: any): void {
-    const username = data.sender?.username || 'Anonymous';
+    // Sanitize username to prevent XSS
+    const rawUsername = data.sender?.username || 'Anonymous';
+    const username = this.sanitizeInput(rawUsername);
     
     // Clean up old data periodically (every 5 minutes)
     const now = Date.now();
@@ -141,10 +180,13 @@ export class KickChatService extends EventEmitter {
       return;
     }
     
+    // Sanitize content to prevent XSS
+    const sanitizedContent = this.sanitizeInput(data.content || '');
+    
     const message: KickChatMessage = {
       id: data.id || Math.random().toString(36),
-      username: username,
-      content: data.content || '',
+      username: username, // Already sanitized
+      content: sanitizedContent, // Sanitized content
       badges: data.sender?.identity?.badges || [],
       color: data.sender?.identity?.color || '#FFFFFF',
       timestamp: Date.now()

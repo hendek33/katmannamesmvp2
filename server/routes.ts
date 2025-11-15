@@ -175,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Message batching for Kick chat to reduce server load
   const kickChatMessageBuffer = new Map<string, any[]>();
   const kickChatBatchInterval = 500; // Send messages every 500ms max
-  const maxBatchSize = 10; // Maximum messages per batch
+  const maxBatchSize = 30; // Maximum messages per batch - increased for high traffic
   
   // Set up Kick chat service event listeners with batching and filtering
   kickChatService.on('message', (message) => {
