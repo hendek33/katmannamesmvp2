@@ -207,17 +207,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         setTimeout(() => {
           const messages = kickChatMessageBuffer.get(roomCode);
           if (messages && messages.length > 0) {
-            // Send all messages in chunks if needed
+            // Send all messages in chunks with small delays between chunks
             let remaining = [...messages];
-            while (remaining.length > 0) {
-              const chunk = remaining.slice(0, maxBatchSize);
-              broadcastToRoom(roomCode, {
-                type: 'kick_chat_messages_batch',
-                payload: chunk
-              });
-              remaining = remaining.slice(maxBatchSize);
-            }
-            kickChatMessageBuffer.delete(roomCode);
+            let chunkIndex = 0;
+            
+            const sendNextChunk = () => {
+              if (remaining.length > 0) {
+                const chunk = remaining.slice(0, maxBatchSize);
+                broadcastToRoom(roomCode, {
+                  type: 'kick_chat_messages_batch',
+                  payload: chunk
+                });
+                remaining = remaining.slice(maxBatchSize);
+                
+                // If there are more chunks, send them with 50ms delay
+                if (remaining.length > 0) {
+                  chunkIndex++;
+                  setTimeout(sendNextChunk, 50 * chunkIndex); // Progressive delay: 50ms, 100ms, 150ms...
+                } else {
+                  // Only delete buffer after all chunks are sent
+                  kickChatMessageBuffer.delete(roomCode);
+                }
+              }
+            };
+            
+            // Start sending chunks
+            sendNextChunk();
+            // Buffer will be deleted after last chunk is sent
           }
         }, kickChatBatchInterval);
       }
