@@ -172,9 +172,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     };
   }
 
-  // Set up Kick chat service event listeners
+  // Message batching for Kick chat to reduce server load
+  const kickChatMessageBuffer = new Map<string, any[]>();
+  const kickChatBatchInterval = 500; // Send messages every 500ms max
+  const maxBatchSize = 10; // Maximum messages per batch
+  
+  // Set up Kick chat service event listeners with batching and filtering
   kickChatService.on('message', (message) => {
-    // Forward chat messages only to rooms that have Kick chat enabled
+    // Forward chat messages only to rooms that have Kick chat enabled AND are in appropriate phase
     roomClients.forEach((clients, roomCode) => {
       const kickConfig = storage.getKickChatConfig(roomCode);
       if (!kickConfig?.enabled) return;
@@ -185,10 +190,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
       
-      broadcastToRoom(roomCode, {
-        type: 'kick_chat_message',
-        payload: message
-      });
+      // PERFORMANCE FIX: Only forward messages to rooms that are actively in-game
+      const gameState = storage.getRoom(roomCode);
+      if (!gameState) return;
+      
+      // Only send messages during introduction phase where Kick chat is actually used
+      if (gameState.phase !== 'introduction') {
+        return; // Skip sending messages during lobby, playing, or ended phases
+      }
+      
+      // Add message to buffer for batching
+      if (!kickChatMessageBuffer.has(roomCode)) {
+        kickChatMessageBuffer.set(roomCode, []);
+        
+        // Set up batch sending for this room
+        setTimeout(() => {
+          const messages = kickChatMessageBuffer.get(roomCode);
+          if (messages && messages.length > 0) {
+            // Send batched messages (limit to maxBatchSize)
+            broadcastToRoom(roomCode, {
+              type: 'kick_chat_messages_batch',
+              payload: messages.slice(0, maxBatchSize)
+            });
+            kickChatMessageBuffer.delete(roomCode);
+          }
+        }, kickChatBatchInterval);
+      }
+      
+      const buffer = kickChatMessageBuffer.get(roomCode);
+      if (buffer && buffer.length < maxBatchSize) {
+        buffer.push(message);
+      }
     });
   });
   

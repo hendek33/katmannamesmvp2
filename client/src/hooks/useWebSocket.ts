@@ -320,11 +320,31 @@ export function useWebSocket() {
                 break;
                 
               case "kick_chat_message":
+                // Handle single message (legacy support)
                 setKickChatMessages(prev => {
                   if (!message.payload?.id) return prev;
                   if (prev.some(msg => msg.id === message.payload.id)) return prev;
                   const next = [...prev, message.payload];
                   const limit = message.payload?.historyLimit ?? 50;
+                  return next.slice(-limit);
+                });
+                break;
+                
+              case "kick_chat_messages_batch":
+                // Handle batched messages for better performance
+                setKickChatMessages(prev => {
+                  if (!message.payload || !Array.isArray(message.payload)) return prev;
+                  
+                  // Filter out duplicates and add new messages
+                  const existingIds = new Set(prev.map(msg => msg.id));
+                  const newMessages = message.payload.filter(msg => 
+                    msg?.id && !existingIds.has(msg.id)
+                  );
+                  
+                  if (newMessages.length === 0) return prev;
+                  
+                  const next = [...prev, ...newMessages];
+                  const limit = 50; // Keep last 50 messages
                   return next.slice(-limit);
                 });
                 break;
