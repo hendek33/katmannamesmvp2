@@ -678,7 +678,7 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="h-screen overflow-auto lg:overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
@@ -885,10 +885,10 @@ export default function Game() {
         </div>
       )}
       
-      {/* Zoom Viewport Container */}
-      <div className="zoom-viewport relative z-10 h-full" style={{ '--zoom': zoomLevel / 100 } as React.CSSProperties}>
+      {/* Zoom Viewport Container - Scrollable on Mobile */}
+      <div className="zoom-viewport relative z-10 h-full overflow-auto lg:overflow-hidden" style={{ '--zoom': zoomLevel / 100 } as React.CSSProperties}>
         <div className="zoom-layer">
-          <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
+          <div className="w-full flex-1 flex flex-col gap-2 min-h-0 pb-4 lg:pb-0">
         {/* Mobile Header - Responsive Stacked Layout */}
         <div className="lg:hidden flex flex-col gap-2 flex-shrink-0 mb-2">
           {/* Team Scores Row - Always visible on mobile */}

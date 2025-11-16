@@ -49,6 +49,19 @@
     -webkit-overflow-scrolling: touch;
     will-change: scroll-position;
   }
+  
+  /* Mobile scroll optimization for game view */
+  @media (max-width: 1024px) {
+    .zoom-viewport {
+      -webkit-overflow-scrolling: touch;
+      overflow-y: auto !important;
+      overflow-x: auto !important;
+    }
+    
+    .zoom-layer {
+      min-height: fit-content;
+    }
+  }
 }
 
 /* LIGHT MODE */
