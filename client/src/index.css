@@ -53,22 +53,26 @@
   /* Mobile scroll optimization for game view */
   @media (max-width: 1024px) {
     body, html {
-      overflow-x: hidden;
-      overflow-y: auto;
-      height: 100%;
+      overflow: auto;
+      height: auto;
+      min-height: 100%;
       position: relative;
+      -webkit-overflow-scrolling: touch;
     }
     
-    .zoom-viewport {
-      -webkit-overflow-scrolling: touch;
-      overflow: visible !important;
-      height: auto !important;
+    #root {
+      height: auto;
       min-height: 100vh;
     }
     
-    .zoom-layer {
-      min-height: fit-content;
+    .zoom-viewport {
+      overflow: visible !important;
       height: auto !important;
+    }
+    
+    .zoom-layer {
+      height: auto !important;
+      min-height: 100%;
     }
   }
 }
