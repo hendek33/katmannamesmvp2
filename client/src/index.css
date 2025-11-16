@@ -2,6 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile Optimizations */
+@layer base {
+  /* Prevent bounce scrolling and rubber-banding on iOS */
+  html {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body {
+    overscroll-behavior: none;
+    /* Prevent text selection on mobile for better gaming experience */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Allow text selection for input fields */
+  input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  
+  /* Optimize touch response */
+  button, a, .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Prevent zoom on double tap */
+  * {
+    touch-action: pan-x pan-y;
+  }
+  
+  /* Mobile performance: disable animations on low-end devices */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  /* Optimize scrolling performance */
+  .scroll-container {
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;
+  }
+}
+
 /* LIGHT MODE */
 :root {
   --button-outline: rgba(0,0,0, .10);
