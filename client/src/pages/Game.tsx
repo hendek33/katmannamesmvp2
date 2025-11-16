@@ -924,56 +924,104 @@ export default function Game() {
           
           {/* Room Info & Controls Row */}
           <Card className="px-2 py-1 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-slate-700/30">
-            <div className="flex items-center justify-between gap-1">
-              <div className="flex items-center gap-1">
-                <div className="text-[10px] text-muted-foreground">Oda:</div>
-                <div className="text-xs font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
-                  {showRoomCode ? roomCode : "••••"}
+            <div className="flex flex-col gap-1.5">
+              {/* First Row - Room Info */}
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center gap-1">
+                  <div className="text-[10px] text-muted-foreground">Oda:</div>
+                  <div className="text-xs font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
+                    {showRoomCode ? roomCode : "••••"}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowRoomCode(!showRoomCode)}
+                    className="h-7 w-7 sm:h-5 sm:w-5 p-0 touch-manipulation"
+                  >
+                    {showRoomCode ? (
+                      <EyeOff className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
+                    ) : (
+                      <Eye className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
+                    )}
+                  </Button>
                 </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setShowRoomCode(!showRoomCode)}
-                  className="h-7 w-7 sm:h-5 sm:w-5 p-0 touch-manipulation"
-                >
-                  {showRoomCode ? (
-                    <EyeOff className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
-                  ) : (
-                    <Eye className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
-                  )}
-                </Button>
-              </div>
-              
-              {/* Current Turn Indicator */}
-              <div className="flex items-center gap-1">
-                <div className={cn(
-                  "w-1.5 h-1.5 rounded-full animate-pulse",
-                  gameState.currentTeam === "dark" ? "bg-blue-500" : "bg-red-500"
-                )} />
-                <span className="text-[10px] font-medium">
-                  Sıra: <span className={gameState.currentTeam === "dark" ? "text-blue-400" : "text-red-400"}>
-                    {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                
+                {/* Current Turn Indicator */}
+                <div className="flex items-center gap-1">
+                  <div className={cn(
+                    "w-1.5 h-1.5 rounded-full animate-pulse",
+                    gameState.currentTeam === "dark" ? "bg-blue-500" : "bg-red-500"
+                  )} />
+                  <span className="text-[10px] font-medium">
+                    Sıra: <span className={gameState.currentTeam === "dark" ? "text-blue-400" : "text-red-400"}>
+                      {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                    </span>
                   </span>
-                </span>
-              </div>
-              
-              {/* Player Count & Zoom */}
-              <div className="flex items-center gap-1">
-                <Button
-                  onClick={handleZoomHelpClick}
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0 touch-manipulation"
-                  title="Yakınlaştırma"
-                  data-zoom-help-button
-                >
-                  <Info className="w-3 h-3" />
-                </Button>
-                <div className="flex items-center gap-0.5">
-                  <Users className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-[10px]">{gameState.players.length}</span>
+                </div>
+                
+                {/* Player Count & Zoom */}
+                <div className="flex items-center gap-1">
+                  <Button
+                    onClick={handleZoomHelpClick}
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 w-6 p-0 touch-manipulation"
+                    title="Yakınlaştırma"
+                    data-zoom-help-button
+                  >
+                    <Info className="w-3 h-3" />
+                  </Button>
+                  <div className="flex items-center gap-0.5">
+                    <Users className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-[10px]">{gameState.players.length}</span>
+                  </div>
                 </div>
               </div>
+              
+              {/* Second Row - Moderator Controls (Mobile Only) */}
+              {currentPlayer?.isRoomOwner && (gameState.phase === "playing" || gameState.phase === "introduction") && (
+                <div className="flex items-center justify-center gap-1 border-t border-slate-700/30 pt-1">
+                  <Button
+                    onClick={() => send("toggle_taunt", { enabled: !tauntEnabled })}
+                    size="sm"
+                    variant="ghost"
+                    className={cn(
+                      "h-6 px-2 text-[10px] font-medium touch-manipulation",
+                      tauntEnabled 
+                        ? "text-amber-400 bg-amber-500/20" 
+                        : "text-slate-400"
+                    )}
+                  >
+                    <Zap className={cn("w-3 h-3 mr-0.5", tauntEnabled && "animate-pulse")} />
+                    Hareket
+                  </Button>
+                  <Button
+                    onClick={() => send("toggle_insult", { enabled: !insultEnabled })}
+                    size="sm"
+                    variant="ghost"
+                    className={cn(
+                      "h-6 px-2 text-[10px] font-medium touch-manipulation",
+                      insultEnabled 
+                        ? "text-amber-400 bg-amber-500/20" 
+                        : "text-slate-400"
+                    )}
+                  >
+                    <MessageCircle className={cn("w-3 h-3 mr-0.5", insultEnabled && "animate-pulse")} />
+                    Laf
+                  </Button>
+                  {currentPlayer?.isRoomOwner && (
+                    <Button
+                      onClick={handleRestart}
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 px-2 text-[10px] font-medium text-green-400 touch-manipulation"
+                    >
+                      <RotateCcw className="w-3 h-3 mr-0.5" />
+                      Yenile
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </Card>
         </div>
