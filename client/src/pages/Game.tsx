@@ -902,12 +902,12 @@ export default function Game() {
                   size="sm"
                   variant="ghost"
                   onClick={() => setShowRoomCode(!showRoomCode)}
-                  className="h-5 w-5 p-0"
+                  className="h-7 w-7 sm:h-5 sm:w-5 p-0 touch-manipulation"
                 >
                   {showRoomCode ? (
-                    <EyeOff className="w-2.5 h-2.5" />
+                    <EyeOff className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
                   ) : (
-                    <Eye className="w-2.5 h-2.5" />
+                    <Eye className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
                   )}
                 </Button>
               </div>
