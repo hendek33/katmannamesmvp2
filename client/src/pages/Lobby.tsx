@@ -343,7 +343,7 @@ export default function Lobby() {
                       size="sm"
                       variant="ghost"
                       onClick={() => setShowRoomCode(!showRoomCode)}
-                      className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300"
+                      className="h-9 w-9 sm:h-7 sm:w-7 p-1 sm:p-0 hover:bg-white/10 text-slate-300 touch-manipulation"
                     >
                       {showRoomCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </Button>
@@ -351,7 +351,7 @@ export default function Lobby() {
                       size="sm"
                       variant="ghost"
                       onClick={handleCopyRoomCode}
-                      className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300"
+                      className="h-9 w-9 sm:h-7 sm:w-7 p-1 sm:p-0 hover:bg-white/10 text-slate-300 touch-manipulation"
                     >
                       {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                     </Button>
@@ -371,7 +371,7 @@ export default function Lobby() {
                   size="sm"
                   variant="ghost"
                   onClick={() => setShowRoomCode(!showRoomCode)}
-                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
+                  className="h-9 w-9 sm:h-6 sm:w-6 p-1 sm:p-0 text-slate-300 hover:bg-white/10 touch-manipulation"
                 >
                   {showRoomCode ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                 </Button>
@@ -379,7 +379,7 @@ export default function Lobby() {
                   size="sm"
                   variant="ghost"
                   onClick={handleCopyRoomCode}
-                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
+                  className="h-9 w-9 sm:h-6 sm:w-6 p-1 sm:p-0 text-slate-300 hover:bg-white/10 touch-manipulation"
                 >
                   {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                 </Button>
