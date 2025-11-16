@@ -75,6 +75,13 @@
       min-height: 100%;
     }
   }
+  
+  /* Mobile landscape optimizations */
+  @media (max-width: 1024px) and (orientation: landscape) {
+    .zoom-viewport {
+      padding-bottom: 60px !important;
+    }
+  }
 }
 
 /* LIGHT MODE */

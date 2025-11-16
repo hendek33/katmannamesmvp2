@@ -2085,19 +2085,19 @@ export default function Game() {
             )}
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 9999 }}>
+            <div className="fixed lg:absolute bottom-0 left-0 right-0 flex justify-center p-0 landscape:relative landscape:mt-2 landscape:mb-2" style={{ zIndex: 9999 }}>
               {/* Clue Display Card - Shows after clue is given */}
               {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
-                <Card className="px-5 py-3 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5">
-                      <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
+                <Card className="px-3 py-2 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up mx-2 landscape:mx-0">
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="flex items-center gap-1 sm:gap-1.5">
+                      <Lightbulb className="w-3 h-3 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
                       <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg sm:text-xl font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                        <span className="text-base sm:text-lg font-black text-white">{gameState.currentClue.count}</span>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-sm sm:text-xl font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                        <span className="text-xs sm:text-lg font-black text-white">{gameState.currentClue.count}</span>
                       </div>
                     </div>
                     {/* End Turn Button for Guessers - Now inside the card */}
@@ -2111,10 +2111,10 @@ export default function Game() {
                             description: "Sıra diğer takıma geçti",
                           });
                         }}
-                        size="default"
-                        className="h-10 sm:h-12 px-4 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-sm sm:text-base"
+                        size="sm"
+                        className="h-8 sm:h-12 px-3 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-base"
                       >
-                        <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        <Check className="w-3 h-3 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                         Tahmini Bitir
                       </Button>
                     )}
@@ -2123,11 +2123,11 @@ export default function Game() {
               )}
               
               {canGiveClue ? (
-                <Card className="px-4 py-2.5 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
-                      <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
-                      <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
+                <Card className="px-2 py-2 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg mx-2 landscape:mx-0">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-1 sm:gap-1.5">
+                      <Lightbulb className="w-3 h-3 sm:w-5 sm:h-5 text-amber-400" />
+                      <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider landscape:hidden sm:inline">İpucu</span>
                     </div>
                     <Input
                       data-testid="input-clue-word"
@@ -2136,29 +2136,29 @@ export default function Game() {
                       onChange={(e) => setClueWord(e.target.value.toLocaleUpperCase('tr-TR'))}
                       onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                       maxLength={20}
-                      className="w-44 sm:w-56 text-center font-bold uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-12 sm:h-14 text-slate-100 placeholder:text-slate-500"
-                      style={{fontSize: "21px"}}
+                      className="w-32 sm:w-56 text-center font-bold uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-8 sm:h-14 text-slate-100 placeholder:text-slate-500 text-sm sm:text-xl"
+                      style={{fontSize: window.innerWidth < 640 ? "14px" : "21px"}}
                     />
                     <div className="relative number-selector-container">
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                          className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-base rounded border border-slate-700"
+                          className="h-8 sm:h-12 w-8 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-sm sm:text-base rounded border border-slate-700"
                         >
                           -
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowNumberSelector(!showNumberSelector)}
-                          className="h-10 sm:h-12 w-12 sm:w-16 flex items-center justify-center bg-slate-900/70 hover:bg-slate-800/80 border border-amber-500/60 rounded text-lg font-black text-amber-400 cursor-pointer transition-all"
+                          className="h-8 sm:h-12 w-10 sm:w-16 flex items-center justify-center bg-slate-900/70 hover:bg-slate-800/80 border border-amber-500/60 rounded text-sm sm:text-lg font-black text-amber-400 cursor-pointer transition-all"
                         >
                           {clueCount}
                         </button>
                         <button
                           type="button"
                           onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                          className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-base rounded border border-slate-700"
+                          className="h-8 sm:h-12 w-8 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-sm sm:text-base rounded border border-slate-700"
                         >
                           +
                         </button>
@@ -2225,10 +2225,10 @@ export default function Game() {
                       onClick={handleGiveClue}
                       disabled={!clueWord.trim() || parseInt(clueCount) < 0}
                       data-testid="button-give-clue"
-                      size="default"
-                      className="h-10 sm:h-12 px-4 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-sm sm:text-base"
+                      size="sm"
+                      className="h-8 sm:h-12 px-3 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-base"
                     >
-                      <Send className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                      <Send className="w-3 h-3 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
                       Gönder
                     </Button>
                   </div>
