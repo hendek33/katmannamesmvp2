@@ -889,9 +889,41 @@ export default function Game() {
       <div className="zoom-viewport relative z-10 h-full" style={{ '--zoom': zoomLevel / 100 } as React.CSSProperties}>
         <div className="zoom-layer">
           <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
-        {/* Mobile Header */}
-        <div className="lg:hidden flex justify-between gap-2 flex-shrink-0 mb-2">
-          <Card className="flex-1 px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30">
+        {/* Mobile Header - Responsive Stacked Layout */}
+        <div className="lg:hidden flex flex-col gap-2 flex-shrink-0 mb-2">
+          {/* Team Scores Row - Always visible on mobile */}
+          <div className="flex gap-2">
+            {/* Light Team Score */}
+            <Card className="flex-1 px-2 py-1 border-2 shadow-xl bg-gradient-to-br from-red-950/80 to-red-900/70 backdrop-blur-md border-red-700/40">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-xs font-bold text-red-200">{gameState.lightTeamName}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-lg font-black text-red-100">{gameState.lightCardsRemaining}</span>
+                  <span className="text-[10px] text-red-300">kart</span>
+                </div>
+              </div>
+            </Card>
+            
+            {/* Dark Team Score */}
+            <Card className="flex-1 px-2 py-1 border-2 shadow-xl bg-gradient-to-br from-blue-950/80 to-blue-900/70 backdrop-blur-md border-blue-700/40">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                  <span className="text-xs font-bold text-blue-200">{gameState.darkTeamName}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-lg font-black text-blue-100">{gameState.darkCardsRemaining}</span>
+                  <span className="text-[10px] text-blue-300">kart</span>
+                </div>
+              </div>
+            </Card>
+          </div>
+          
+          {/* Room Info & Controls Row */}
+          <Card className="px-2 py-1 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-slate-700/30">
             <div className="flex items-center justify-between gap-1">
               <div className="flex items-center gap-1">
                 <div className="text-[10px] text-muted-foreground">Oda:</div>
@@ -911,20 +943,36 @@ export default function Game() {
                   )}
                 </Button>
               </div>
-              {/* Mobile Zoom Info Button */}
-              <Button
-                onClick={handleZoomHelpClick}
-                size="sm"
-                variant="ghost"
-                className="h-6 w-6 p-0"
-                title="Yakınlaştırma Bilgisi"
-                data-zoom-help-button
-              >
-                <Info className="w-3 h-3" />
-              </Button>
+              
+              {/* Current Turn Indicator */}
               <div className="flex items-center gap-1">
-                <Users className="w-3 h-3 text-muted-foreground" />
-                <span className="text-xs">{gameState.players.length}</span>
+                <div className={cn(
+                  "w-1.5 h-1.5 rounded-full animate-pulse",
+                  gameState.currentTeam === "dark" ? "bg-blue-500" : "bg-red-500"
+                )} />
+                <span className="text-[10px] font-medium">
+                  Sıra: <span className={gameState.currentTeam === "dark" ? "text-blue-400" : "text-red-400"}>
+                    {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
+                  </span>
+                </span>
+              </div>
+              
+              {/* Player Count & Zoom */}
+              <div className="flex items-center gap-1">
+                <Button
+                  onClick={handleZoomHelpClick}
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 w-6 p-0 touch-manipulation"
+                  title="Yakınlaştırma"
+                  data-zoom-help-button
+                >
+                  <Info className="w-3 h-3" />
+                </Button>
+                <div className="flex items-center gap-0.5">
+                  <Users className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-[10px]">{gameState.players.length}</span>
+                </div>
               </div>
             </div>
           </Card>
