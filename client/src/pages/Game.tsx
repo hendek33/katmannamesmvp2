@@ -85,6 +85,13 @@ export default function Game() {
   const [newUsername, setNewUsername] = useState("");
   const [isChangingName, setIsChangingName] = useState(false);
   
+  // Reset scroll position on mount - especially for mobile
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   // Kullanıcı adı değişikliği yanıtını işle
   useEffect(() => {
     if (usernameChangeStatus) {
@@ -678,7 +685,7 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
-    <div className="min-h-screen lg:h-screen overflow-y-auto lg:overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', WebkitOverflowScrolling: 'touch' }}>
+    <div className="h-screen overflow-y-auto lg:overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', WebkitOverflowScrolling: 'touch' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
