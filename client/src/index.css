@@ -53,21 +53,22 @@
   /* Mobile scroll optimization for game view */
   @media (max-width: 1024px) {
     body, html {
-      overflow: auto;
-      height: auto;
+      height: 100%;
       min-height: 100%;
+      overflow: auto;
       position: relative;
       -webkit-overflow-scrolling: touch;
     }
     
     #root {
-      height: auto;
       min-height: 100vh;
+      height: auto;
     }
     
     .zoom-viewport {
       overflow: visible !important;
       height: auto !important;
+      min-height: 100%;
     }
     
     .zoom-layer {
@@ -79,7 +80,7 @@
   /* Mobile landscape optimizations */
   @media (max-width: 1024px) and (orientation: landscape) {
     .zoom-viewport {
-      padding-bottom: 60px !important;
+      padding-bottom: 80px !important;
     }
   }
 }

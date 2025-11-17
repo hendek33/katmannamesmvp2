@@ -678,7 +678,7 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
-    <div className="h-full lg:h-screen overflow-y-auto lg:overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', WebkitOverflowScrolling: 'touch' }}>
+    <div className="min-h-screen lg:h-screen overflow-y-auto lg:overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', WebkitOverflowScrolling: 'touch' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
