@@ -50,37 +50,80 @@
     will-change: scroll-position;
   }
   
-  /* Mobile scroll optimization for game view */
+  /* KÖKLÜ MOBİL SCROLL ÇÖZÜMÜ */
+  .mobile-game-container {
+    min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+  
+  .mobile-zoom-viewport {
+    overflow: visible;
+    height: auto;
+    min-height: 100%;
+  }
+  
+  .mobile-zoom-layer {
+    height: auto;
+    min-height: 100%;
+  }
+  
   @media (max-width: 1024px) {
     body, html {
       height: 100%;
-      min-height: 100%;
-      overflow: auto;
-      position: relative;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible !important;
+      position: static !important;
+      overscroll-behavior: none;
     }
     
     #root {
       min-height: 100vh;
       height: auto;
+      overflow: visible !important;
     }
     
-    .zoom-viewport {
+    .mobile-game-container {
+      min-height: 100vh !important;
+      height: auto !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      position: relative !important;
+      -webkit-overflow-scrolling: touch !important;
+      transform: translateZ(0);
+      will-change: scroll-position;
+    }
+    
+    .mobile-zoom-viewport {
       overflow: visible !important;
       height: auto !important;
-      min-height: 100%;
+      position: relative !important;
     }
     
-    .zoom-layer {
+    .mobile-zoom-layer {
       height: auto !important;
-      min-height: 100%;
+      overflow: visible !important;
+      transform: none !important;
+    }
+    
+    /* Zoom layer override for mobile */
+    .zoom-layer {
+      transform: none !important;
+      height: auto !important;
+    }
+    
+    /* Fixed elementi relative yap */
+    .fixed {
+      position: relative !important;
     }
   }
   
   /* Mobile landscape optimizations */
   @media (max-width: 1024px) and (orientation: landscape) {
-    .zoom-viewport {
-      padding-bottom: 80px !important;
+    .mobile-game-container {
+      padding-bottom: 100px !important;
     }
   }
 }
