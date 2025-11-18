@@ -815,6 +815,7 @@ export default function Game() {
       {showEndGameGuessSequence && gameState?.endGameGuessSequence && (
         <EndGameGuessSequence
           sequence={gameState.endGameGuessSequence}
+          prophetWinMode={gameState.prophetWinMode}
           onComplete={() => setShowEndGameGuessSequence(false)}
         />
       )}

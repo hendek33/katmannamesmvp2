@@ -3,9 +3,11 @@ import { cn } from "@/lib/utils";
 import type { GameState } from "@shared/schema";
 import { Zap, Sparkles, Star } from "lucide-react";
 import { ProphetTieVideo } from "./ProphetTieVideo";
+import { NormalWinVideo } from "./NormalWinVideo";
 
 interface EndGameGuessSequenceProps {
   sequence: GameState["endGameGuessSequence"];
+  prophetWinMode?: "tie" | "guesser_wins";
   onComplete?: () => void;
 }
 
@@ -57,7 +59,7 @@ function ParticleEffect({ type }: { type: 'success' | 'fail' }) {
   );
 }
 
-export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSequenceProps) {
+export function EndGameGuessSequence({ sequence, prophetWinMode = "tie", onComplete }: EndGameGuessSequenceProps) {
   const [phase, setPhase] = useState<'reveal' | 'decision' | 'result' | 'video' | 'finished'>('reveal');
   const [showDrumRoll, setShowDrumRoll] = useState(false);
   const [showParticles, setShowParticles] = useState(false);
@@ -133,9 +135,28 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
   const actualRoleText = sequence.actualRole === "prophet" ? "KAHİN" : "NORMAL AJAN";
   const isCorrect = sequence.success;
   
-  // Video gösteriliyorsa (beraberlik durumu)
+  // Video gösteriliyorsa
   if (phase === 'video' && isCorrect) {
-    return <ProphetTieVideo onComplete={handleVideoComplete} />;
+    // Kahin tahmini için prophetWinMode'a göre video seç
+    if (sequence.guessType === "prophet") {
+      if (prophetWinMode === "tie") {
+        return <ProphetTieVideo onComplete={handleVideoComplete} />;
+      } else {
+        // guesser_wins - kazanan takım videosu göster
+        return <NormalWinVideo 
+          winnerTeam={sequence.finalWinner as "dark" | "light"}
+          winnerTeamName={sequence.finalWinnerName || sequence.guessingTeamName || ""}
+          onComplete={handleVideoComplete}
+        />;
+      }
+    } else {
+      // Double agent için her zaman kazanan videosu
+      return <NormalWinVideo 
+        winnerTeam={sequence.finalWinner as "dark" | "light"}
+        winnerTeamName={sequence.finalWinnerName || sequence.guessingTeamName || ""}
+        onComplete={handleVideoComplete}
+      />;
+    }
   }
   
   return (
@@ -332,25 +353,58 @@ export function EndGameGuessSequence({ sequence, onComplete }: EndGameGuessSeque
             {/* Kazanan takım veya beraberlik */}
             <div className="text-6xl md:text-8xl font-black">
               {isCorrect ? (
-                // Doğru tahmin - Beraberlik
-                <>
-                  <div
-                    className="text-yellow-400 mb-4"
-                    style={{
-                      animation: 'winnerReveal 1.5s ease-out forwards',
-                      animationDelay: '1.2s',
-                      opacity: 0,
-                      textShadow: '0 0 80px rgba(250,204,21,1), 0 0 160px rgba(250,204,21,0.5)',
-                    }}
-                  >
-                    BERABERLIK
-                  </div>
-                  <AnimatedText 
-                    text="SAĞLANDI!" 
-                    className="text-5xl md:text-6xl text-yellow-300"
-                    delay={1.8} 
-                  />
-                </>
+                // Doğru tahmin - prophetWinMode'a göre sonuç
+                sequence.guessType === "prophet" && prophetWinMode === "tie" ? (
+                  // Beraberlik
+                  <>
+                    <div
+                      className="text-yellow-400 mb-4"
+                      style={{
+                        animation: 'winnerReveal 1.5s ease-out forwards',
+                        animationDelay: '1.2s',
+                        opacity: 0,
+                        textShadow: '0 0 80px rgba(250,204,21,1), 0 0 160px rgba(250,204,21,0.5)',
+                      }}
+                    >
+                      BERABERLIK
+                    </div>
+                    <AnimatedText 
+                      text="SAĞLANDI!" 
+                      className="text-5xl md:text-6xl text-yellow-300"
+                      delay={1.8} 
+                    />
+                  </>
+                ) : (
+                  // Tahmin eden takım kazandı
+                  <>
+                    <div
+                      className={cn(
+                        "mb-4",
+                        sequence.finalWinner === "dark" 
+                          ? "text-blue-400" 
+                          : "text-red-400"
+                      )}
+                      style={{
+                        animation: 'winnerReveal 1.5s ease-out forwards',
+                        animationDelay: '1.2s',
+                        opacity: 0,
+                        textShadow: sequence.finalWinner === "dark"
+                          ? '0 0 80px rgba(59,130,246,1), 0 0 160px rgba(59,130,246,0.5)'
+                          : '0 0 80px rgba(239,68,68,1), 0 0 160px rgba(239,68,68,0.5)',
+                      }}
+                    >
+                       {sequence.finalWinnerName} 
+                    </div>
+                    <AnimatedText 
+                      text="TAKIMI KAZANDI!" 
+                      className={cn(
+                        "text-5xl md:text-6xl",
+                        sequence.finalWinner === "dark" ? "text-blue-300" : "text-red-300"
+                      )}
+                      delay={1.8} 
+                    />
+                  </>
+                )
               ) : (
                 // Yanlış tahmin - Normal kazanan
                 <>
