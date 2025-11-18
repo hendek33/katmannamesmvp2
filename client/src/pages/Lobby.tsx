@@ -1072,7 +1072,7 @@ export default function Lobby() {
                     </li>
                     <li className="flex items-start">
                       <span className="mr-1 text-yellow-500">•</span>
-                      <span>Kahin tahminini doğru yapmak <span className="text-yellow-400 font-bold">BERABERLİK</span> sayılır</span>
+                      <span>Kahin tahminini doğru yapmak oyun kuralına göre <span className="text-yellow-400 font-bold">BERABERLİK / KAZANÇ</span> sayılır</span>
                     </li>
                   </ul>
                 </div>

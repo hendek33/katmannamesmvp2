@@ -14,8 +14,8 @@ export function TomatoBubble({
   senderUsername, 
   fromTeam, 
   targetTeam, 
-  position = { x: 0.5, y: 0.5 },
-  targetPosition = { x: 0.5, y: 0.5 },
+  position,
+  targetPosition,
   timestamp 
 }: TomatoBubbleProps) {
   const [phase, setPhase] = useState<'throwing' | 'impact' | 'done'>('throwing');
@@ -56,22 +56,24 @@ export function TomatoBubble({
 
   if (phase === 'done') return null;
 
-  // Calculate start and end positions using provided positions or defaults based on teams
-  const startX = position.x * 100; // Convert 0-1 to percentage
-  const startY = position.y * 100;
-  const endX = targetPosition.x * 100;
-  const endY = targetPosition.y * 100;
+  // Calculate start and end positions based on team panels
+  // If positions are provided, use them; otherwise use team-based defaults
+  // Dark team panel is on the left (~15%), Light team panel is on the right (~85%)
+  const startX = position ? position.x * 100 : (fromTeam === 'dark' ? 15 : 85);
+  const startY = position ? position.y * 100 : 50;
+  const endX = targetPosition ? targetPosition.x * 100 : (targetTeam === 'dark' ? 15 : 85);
+  const endY = targetPosition ? targetPosition.y * 100 : 50;
   
   // Parabolic arc calculation for realistic trajectory
   const currentX = startX + (endX - startX) * progress;
-  const arcHeight = 25; // Higher arc for more dramatic effect
+  const arcHeight = 20; // Arc height for trajectory
   const currentY = startY + (endY - startY) * progress - arcHeight * Math.sin(progress * Math.PI);
   
   // Rotation increases throughout flight for spin effect
   const rotation = progress * 1080; // 3 full rotations
   
   // Scale grows as it approaches for impact effect
-  const scale = 1 + progress * 0.8;
+  const scale = 0.8 + progress * 0.4;
 
   return (
     <>
@@ -88,32 +90,32 @@ export function TomatoBubble({
         >
           {/* Tomato with enhanced motion effects */}
           <div className="relative">
-            {/* Main tomato */}
-            <span className="text-6xl drop-shadow-2xl filter brightness-110">
+            {/* Main tomato - smaller size */}
+            <span className="text-4xl drop-shadow-2xl filter brightness-110">
               🍅
             </span>
             
             {/* Enhanced motion trail with multiple layers */}
-            <div className="absolute inset-0 -z-10 -translate-x-3 -translate-y-1">
-              <span className="text-6xl opacity-40 blur-[2px]">🍅</span>
+            <div className="absolute inset-0 -z-10 -translate-x-2 -translate-y-1">
+              <span className="text-4xl opacity-40 blur-[2px]">🍅</span>
+            </div>
+            <div className="absolute inset-0 -z-10 -translate-x-4 -translate-y-1.5">
+              <span className="text-4xl opacity-25 blur-[4px]">🍅</span>
             </div>
             <div className="absolute inset-0 -z-10 -translate-x-6 -translate-y-2">
-              <span className="text-6xl opacity-25 blur-[4px]">🍅</span>
-            </div>
-            <div className="absolute inset-0 -z-10 -translate-x-9 -translate-y-3">
-              <span className="text-6xl opacity-15 blur-[6px]">🍅</span>
+              <span className="text-4xl opacity-15 blur-[6px]">🍅</span>
             </div>
             
             {/* Speed lines for dramatic effect */}
             {progress > 0.3 && (
               <div className="absolute inset-0 -z-20">
-                {[...Array(4)].map((_, i) => (
+                {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-16 h-0.5 bg-gradient-to-r from-red-500/60 to-transparent"
+                    className="absolute w-12 h-0.5 bg-gradient-to-r from-red-500/60 to-transparent"
                     style={{
-                      left: '-60px',
-                      top: `${12 + i * 8}px`,
+                      left: '-40px',
+                      top: `${8 + i * 6}px`,
                       transform: `rotate(-15deg)`,
                       opacity: 0.6 - i * 0.15,
                     }}
@@ -147,27 +149,27 @@ export function TomatoBubble({
             transform: 'translate(-50%, -50%)',
           }}
         >
-          {/* Explosive impact container */}
+          {/* Explosive impact container - smaller scale */}
           <div className="relative">
             {/* Central explosion blast */}
             <div className="absolute inset-0 flex items-center justify-center -z-10">
-              <div className="w-40 h-40 lg:w-56 lg:h-56 bg-gradient-radial from-red-600/90 via-red-500/60 to-transparent rounded-full animate-expand-splat" />
+              <div className="w-24 h-24 lg:w-32 lg:h-32 bg-gradient-radial from-red-600/90 via-red-500/60 to-transparent rounded-full animate-expand-splat" />
             </div>
             
             {/* Secondary shockwave */}
             <div className="absolute inset-0 flex items-center justify-center -z-20">
-              <div className="w-48 h-48 lg:w-64 lg:h-64 bg-gradient-radial from-orange-500/50 via-red-400/30 to-transparent rounded-full animate-expand-splat" 
+              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-gradient-radial from-orange-500/50 via-red-400/30 to-transparent rounded-full animate-expand-splat" 
                 style={{ animationDelay: '0.1s' }} />
             </div>
             
             {/* Splatter particles in all directions */}
-            {[...Array(16)].map((_, i) => {
-              const angle = (i * Math.PI * 2) / 16;
-              const distance = 100 + Math.random() * 40;
+            {[...Array(12)].map((_, i) => {
+              const angle = (i * Math.PI * 2) / 12;
+              const distance = 60 + Math.random() * 30;
               return (
                 <div
                   key={i}
-                  className="absolute w-6 h-6 lg:w-8 lg:h-8 bg-red-600 rounded-full animate-splatter shadow-lg"
+                  className="absolute w-4 h-4 lg:w-5 lg:h-5 bg-red-600 rounded-full animate-splatter shadow-lg"
                   style={{
                     left: '50%',
                     top: '50%',
@@ -180,13 +182,13 @@ export function TomatoBubble({
             })}
             
             {/* Additional smaller splatter particles */}
-            {[...Array(12)].map((_, i) => {
-              const angle = (i * Math.PI * 2) / 12 + 0.26;
-              const distance = 60 + Math.random() * 30;
+            {[...Array(8)].map((_, i) => {
+              const angle = (i * Math.PI * 2) / 8 + 0.26;
+              const distance = 40 + Math.random() * 20;
               return (
                 <div
                   key={`small-${i}`}
-                  className="absolute w-3 h-3 lg:w-4 lg:h-4 bg-red-500/80 rounded-full animate-splatter"
+                  className="absolute w-2 h-2 lg:w-3 lg:h-3 bg-red-500/80 rounded-full animate-splatter"
                   style={{
                     left: '50%',
                     top: '50%',
@@ -198,30 +200,30 @@ export function TomatoBubble({
               );
             })}
 
-            {/* Impact text with massive emphasis */}
+            {/* Impact text - smaller size */}
             <div className="absolute inset-0 flex items-center justify-center">
               <span className={cn(
-                "text-6xl lg:text-8xl font-black animate-impact-text drop-shadow-2xl",
+                "text-3xl lg:text-4xl font-black animate-impact-text drop-shadow-2xl",
                 "tracking-wider",
                 targetTeam === 'dark' 
-                  ? "text-blue-100 [text-shadow:_0_0_30px_rgb(59_130_246_/_80%)]" 
-                  : "text-red-100 [text-shadow:_0_0_30px_rgb(239_68_68_/_80%)]"
+                  ? "text-blue-100 [text-shadow:_0_0_20px_rgb(59_130_246_/_80%)]" 
+                  : "text-red-100 [text-shadow:_0_0_20px_rgb(239_68_68_/_80%)]"
               )}>
                 SPLAT!
               </span>
             </div>
             
-            {/* Multiple drip effects for realism */}
-            {[...Array(5)].map((_, i) => (
+            {/* Multiple drip effects for realism - smaller */}
+            {[...Array(4)].map((_, i) => (
               <div
                 key={`drip-${i}`}
                 className="absolute top-1/2"
                 style={{
-                  left: `calc(50% + ${(i - 2) * 20}px)`,
+                  left: `calc(50% + ${(i - 1.5) * 15}px)`,
                 }}
               >
                 <div 
-                  className="w-3 h-20 bg-gradient-to-b from-red-600/90 via-red-600/60 to-transparent animate-drip rounded-full"
+                  className="w-2 h-12 bg-gradient-to-b from-red-600/90 via-red-600/60 to-transparent animate-drip rounded-full"
                   style={{
                     animationDelay: `${i * 100}ms`,
                   }}
@@ -229,17 +231,17 @@ export function TomatoBubble({
               </div>
             ))}
             
-            {/* Juice splashes */}
-            {[...Array(8)].map((_, i) => {
-              const spreadAngle = (i * Math.PI) / 4;
+            {/* Juice splashes - fewer and smaller */}
+            {[...Array(6)].map((_, i) => {
+              const spreadAngle = (i * Math.PI) / 3;
               return (
                 <div
                   key={`juice-${i}`}
-                  className="absolute w-2 h-12 bg-gradient-to-b from-red-500/70 to-transparent animate-drip"
+                  className="absolute w-1.5 h-8 bg-gradient-to-b from-red-500/70 to-transparent animate-drip"
                   style={{
                     left: '50%',
                     top: '50%',
-                    transform: `rotate(${spreadAngle}rad) translateY(-20px)`,
+                    transform: `rotate(${spreadAngle}rad) translateY(-15px)`,
                     animationDelay: `${i * 80}ms`,
                   }}
                 />

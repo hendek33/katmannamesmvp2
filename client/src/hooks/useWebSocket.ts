@@ -328,7 +328,24 @@ export function useWebSocket() {
                     return prev;
                   }
                   
-                  return [...prev, message.payload];
+                  // Override position to use team panel locations
+                  // Dark team panel at 15%, Light team panel at 85%, both at 50% vertical
+                  const fromTeam = message.payload.fromTeam;
+                  const targetTeam = message.payload.targetTeam;
+                  
+                  const tomatoWithPanelPositions = {
+                    ...message.payload,
+                    position: { 
+                      x: fromTeam === 'dark' ? 0.15 : 0.85, 
+                      y: 0.50 
+                    },
+                    targetPosition: { 
+                      x: targetTeam === 'dark' ? 0.15 : 0.85, 
+                      y: 0.50 
+                    }
+                  };
+                  
+                  return [...prev, tomatoWithPanelPositions];
                 });
                 
                 // Update game state if provided
