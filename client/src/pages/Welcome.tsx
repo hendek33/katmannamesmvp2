@@ -158,7 +158,7 @@ export default function Welcome() {
         <HeroPhysicsCards 
           imageNames={cardImageNames}
           height={canvasHeight}
-          countMobile={12}
+          countMobile={18}
         />
         
         {/* Content Overlay */}

@@ -21,7 +21,7 @@ type Props = {
   countMobile?: number;
 };
 
-function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 12 }: Props) {
+function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 18 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const runningRef = useRef<boolean>(true);
 
@@ -34,7 +34,7 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 12 }: P
 
     // ---- Parametreler (Arda'nın sevdiği his) ----
     const params = {
-      count: 30,  // Orta seviye kart sayısı
+      count: 45,  // Daha fazla kart
       pushStrength: 0.7,
       pushRadius: 90,
       drag: 0.96,
