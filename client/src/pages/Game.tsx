@@ -22,8 +22,6 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { simpleSoundService as audioService } from "@/services/SimpleSoundService";
-import { SoundControls } from "@/components/SoundControls";
 import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command, Edit2, UserX } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -78,7 +76,6 @@ export default function Game() {
   const logContainerRef = useRef<HTMLDivElement>(null);
   const previousTurnRef = useRef<string | null>(null);
   const previousClueRef = useRef<string | null>(null);
-  const previousRevealHistoryRef = useRef<number>(0);
   const assassinShownRef = useRef<boolean>(false);
   const [zoomLevel, setZoomLevel] = useState(100);
   const [showZoomHelp, setShowZoomHelp] = useState(false);
@@ -236,7 +233,7 @@ export default function Game() {
     }
   }, [gameState?.revealHistory, gameState?.currentClue]);
 
-  // Detect clue changes and play sound
+  // Detect clue changes
   useEffect(() => {
     if (!gameState?.currentClue) {
       previousClueRef.current = null;
@@ -244,44 +241,8 @@ export default function Game() {
     }
 
     const clueKey = `${gameState.currentClue.word}-${gameState.currentClue.count}`;
-    
-    // Play sound if this is a new clue
-    if (previousClueRef.current && previousClueRef.current !== clueKey) {
-      audioService.playClueSubmit();
-    }
-    
     previousClueRef.current = clueKey;
   }, [gameState?.currentClue]);
-  
-  // Detect card reveals and play appropriate sound
-  useEffect(() => {
-    if (!gameState || !gameState.revealHistory) return;
-    
-    const currentHistoryLength = gameState.revealHistory.length;
-    
-    // Check if a new card was revealed
-    if (currentHistoryLength > previousRevealHistoryRef.current) {
-      const lastReveal = gameState.revealHistory[currentHistoryLength - 1] as any;
-      
-      if (lastReveal) {
-        // Play sound based on card type
-        if (lastReveal.type === "assassin") {
-          // Assassin sound will be played with the video
-        } else if (lastReveal.type === gameState.currentTeam) {
-          // Correct guess - team revealed their own card
-          audioService.playCardReveal();
-        } else if (lastReveal.type === "neutral") {
-          // Neutral card - play error sound
-          audioService.playError();
-        } else {
-          // Wrong guess - revealed opponent's card
-          audioService.playWrongGuess();
-        }
-      }
-    }
-    
-    previousRevealHistoryRef.current = currentHistoryLength;
-  }, [gameState?.revealHistory, gameState?.currentTeam]);
 
   // Removed auto refresh logic - no longer needed with improved video handling
 
@@ -308,8 +269,6 @@ export default function Game() {
       setCurrentTurn(gameState.currentTeam);
       setIsGameStart(true);
       setShowTurnVideo(true);
-      // Play game start sound
-      audioService.playGameStart();
       // Set the initial turn reference
       previousTurnRef.current = `${gameState.currentTeam}-${gameState.revealHistory.length}`;
       return; // Exit early to prevent turn video logic from running
@@ -334,13 +293,11 @@ export default function Game() {
         // Otherwise, delay to allow card reveal animation to complete
         if (isManualEndTurn) {
           setShowTurnVideo(true);
-          audioService.playTurnChange();
           setIsManualEndTurn(false); // Reset the flag
         } else {
           // Delay the turn video to allow card reveal animation to complete
           setTimeout(() => {
             setShowTurnVideo(true);
-            audioService.playTurnChange();
           }, 800); // 800ms delay for card animation to complete
         }
       }
@@ -358,9 +315,6 @@ export default function Game() {
       : null;
     
     if (lastReveal?.type === "assassin") {
-      // Play assassin sound effect
-      audioService.playSound('assassin');
-      
       // Find the assassin card position
       const assassinCardIndex = gameState.cards.findIndex(c => c.type === "assassin");
       if (assassinCardIndex !== -1) {
@@ -387,19 +341,11 @@ export default function Game() {
     
     // If last revealed card is NOT assassin, show normal win video immediately
     if (lastReveal && lastReveal.type !== "assassin") {
-      // Play victory sound for the winning team
-      const currentPlayer = gameState.players.find(p => p.id === playerId);
-      if (currentPlayer && currentPlayer.team === gameState.winner) {
-        audioService.playVictory();
-      } else {
-        audioService.playDefeat();
-      }
-      
       // Show video immediately to prevent duplicate win text
       normalWinShownRef.current = true;
       setShowNormalWinVideo(true);
     }
-  }, [gameState?.phase, gameState?.winner, gameState?.players, playerId]);
+  }, [gameState?.phase, gameState?.winner]);
 
   // Centralized prophet voting window management
   useEffect(() => {
@@ -977,8 +923,6 @@ export default function Game() {
               >
                 <Info className="w-3 h-3" />
               </Button>
-              {/* Mobile Sound Controls */}
-              <SoundControls className="h-6" />
               <div className="flex items-center gap-1">
                 <Users className="w-3 h-3 text-muted-foreground" />
                 <span className="text-xs">{gameState.players.length}</span>
@@ -1265,10 +1209,6 @@ export default function Game() {
                 <Info className="w-3 h-3 mr-1" />
                 <span className="text-xs">Büyüt/Küçült</span>
               </Button>
-              
-              {/* Sound Controls */}
-              <div className="w-px h-5 bg-amber-900/40" />
-              <SoundControls className="h-7" />
               
               {/* Game End Controls */}
               {gameState.phase === "ended" ? (
