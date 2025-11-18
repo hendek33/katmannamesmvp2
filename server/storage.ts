@@ -2005,10 +2005,10 @@ export class MemStorage implements IStorage {
     // Set cooldown for this player (2 seconds)
     roomData.playerTomatoCooldown.set(playerId, now + 2000);
     
-    // Generate positions very close to the top of the page (header area)
-    // Y position around 0.03 (3% from top, very close to header)
-    const startPosition = { x: Math.random(), y: 0.03 };
-    const endPosition = { x: Math.random(), y: 0.03 };
+    // Generate positions at the very top of the page (header area)
+    // Y position around 0.005 (0.5% from top, almost at the top edge)
+    const startPosition = { x: Math.random(), y: 0.005 };
+    const endPosition = { x: Math.random(), y: 0.005 };
     
     const tomatoData = {
       playerId,
