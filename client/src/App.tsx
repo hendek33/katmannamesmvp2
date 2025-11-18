@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { VideoBase64Converter } from "@/services/VideoBase64Converter";
 import { GameProtection } from "@/utils/protection";
+import { audioService } from "@/services/AudioService";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
@@ -36,6 +37,13 @@ function App() {
     // Initialize game protection system
     GameProtection.initializeProtection();
     
+    // Initialize audio service
+    audioService.initialize()
+      .catch(err => {
+        console.warn('Audio service initialization failed:', err);
+        // Game will work without sounds
+      });
+    
     // SADECE TEK BİR VİDEO YÜKLEME SERVİSİ - ÇOKLU YÜKLEME SORUNU ÇÖZÜLDÜ
     // VideoBase64Converter videolar bir kere yüklenir, base64'e çevrilir ve cache'lenir
     VideoBase64Converter.preloadAllAsBase64()
@@ -51,6 +59,7 @@ function App() {
     // Cleanup on unmount
     return () => {
       VideoBase64Converter.clearCache();
+      audioService.dispose();
     };
   }, []);
   
