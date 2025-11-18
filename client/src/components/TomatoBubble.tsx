@@ -59,11 +59,11 @@ export function TomatoBubble({
   // Calculate start and end positions based on team panels
   // If positions are provided, use them; otherwise use team-based defaults
   // Dark team panel is on the right (~85%), Light team panel is on the left (~15%)
-  // Default to 28% vertical (upper area, slightly higher than before)
+  // Default to 20% vertical (higher up on the page)
   const startX = position ? position.x * 100 : (fromTeam === 'dark' ? 85 : 15);
-  const startY = position ? position.y * 100 : 28;
+  const startY = position ? position.y * 100 : 20;
   const endX = targetPosition ? targetPosition.x * 100 : (targetTeam === 'dark' ? 85 : 15);
-  const endY = targetPosition ? targetPosition.y * 100 : 28;
+  const endY = targetPosition ? targetPosition.y * 100 : 20;
   
   // Parabolic arc calculation for realistic trajectory
   const currentX = startX + (endX - startX) * progress;
@@ -91,20 +91,20 @@ export function TomatoBubble({
         >
           {/* Tomato with enhanced motion effects */}
           <div className="relative">
-            {/* Main tomato - smaller size */}
-            <span className="text-4xl drop-shadow-2xl filter brightness-110">
+            {/* Main tomato - larger size */}
+            <span className="text-5xl drop-shadow-2xl filter brightness-110">
               🍅
             </span>
             
             {/* Enhanced motion trail with multiple layers */}
             <div className="absolute inset-0 -z-10 -translate-x-2 -translate-y-1">
-              <span className="text-4xl opacity-40 blur-[2px]">🍅</span>
+              <span className="text-5xl opacity-40 blur-[2px]">🍅</span>
             </div>
             <div className="absolute inset-0 -z-10 -translate-x-4 -translate-y-1.5">
-              <span className="text-4xl opacity-25 blur-[4px]">🍅</span>
+              <span className="text-5xl opacity-25 blur-[4px]">🍅</span>
             </div>
             <div className="absolute inset-0 -z-10 -translate-x-6 -translate-y-2">
-              <span className="text-4xl opacity-15 blur-[6px]">🍅</span>
+              <span className="text-5xl opacity-15 blur-[6px]">🍅</span>
             </div>
             
             {/* Speed lines for dramatic effect */}
