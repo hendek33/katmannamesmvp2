@@ -2021,6 +2021,8 @@ export class MemStorage implements IStorage {
       expiresAt: now + 3000, // Show for 3 seconds
     };
     
+    console.log('🍅 SERVER SENDING TOMATO:', { startY: startPosition.y, endY: endPosition.y });
+    
     return tomatoData;
   }
   
