@@ -29,20 +29,6 @@ export function TurnVideoInline({ team, teamName, onComplete, isGameStart = fals
       }, 500);
     }
   });
-  
-  // Safety timeout - force close after 6 seconds to prevent black screen
-  useEffect(() => {
-    const safetyTimer = setTimeout(() => {
-      console.warn('TurnVideo safety timeout - forcing close to prevent black screen');
-      setIsClosing(true);
-      setTimeout(() => {
-        setShow(false);
-        onComplete?.();
-      }, 500);
-    }, 6000);
-    
-    return () => clearTimeout(safetyTimer);
-  }, [onComplete]);
 
   if (!show) return null;
 

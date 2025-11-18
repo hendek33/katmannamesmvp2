@@ -36,7 +36,6 @@ export default function Lobby() {
   const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
   const [prophetVisibility, setProphetVisibility] = useState<"own_team" | "both_teams" | "all_cards">("own_team");
-  const [prophetCorrectResult, setProphetCorrectResult] = useState<"win" | "tie">("win");
   const [showChaosDetails, setShowChaosDetails] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
@@ -98,7 +97,6 @@ export default function Lobby() {
       setGuesserTime(gameState.guesserTime);
       setChaosMode(gameState.chaosMode || false);
       setProphetVisibility(gameState.prophetVisibility || "own_team");
-      setProphetCorrectResult(gameState.prophetCorrectResult || "win");
     }
   }, [gameState]);
 
@@ -223,10 +221,6 @@ export default function Lobby() {
   const handleProphetVisibilityUpdate = (visibility: "own_team" | "both_teams" | "all_cards") => {
     send("update_prophet_visibility", { visibility });
   };
-  
-  const handleProphetCorrectResultUpdate = (result: "win" | "tie") => {
-    send("update_prophet_correct_result", { result });
-  };
 
   if (!isConnected) {
     return (
@@ -349,7 +343,7 @@ export default function Lobby() {
                       size="sm"
                       variant="ghost"
                       onClick={() => setShowRoomCode(!showRoomCode)}
-                      className="h-9 w-9 sm:h-7 sm:w-7 p-1 sm:p-0 hover:bg-white/10 text-slate-300 touch-manipulation"
+                      className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300"
                     >
                       {showRoomCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </Button>
@@ -357,7 +351,7 @@ export default function Lobby() {
                       size="sm"
                       variant="ghost"
                       onClick={handleCopyRoomCode}
-                      className="h-9 w-9 sm:h-7 sm:w-7 p-1 sm:p-0 hover:bg-white/10 text-slate-300 touch-manipulation"
+                      className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300"
                     >
                       {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                     </Button>
@@ -377,7 +371,7 @@ export default function Lobby() {
                   size="sm"
                   variant="ghost"
                   onClick={() => setShowRoomCode(!showRoomCode)}
-                  className="h-9 w-9 sm:h-6 sm:w-6 p-1 sm:p-0 text-slate-300 hover:bg-white/10 touch-manipulation"
+                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
                 >
                   {showRoomCode ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                 </Button>
@@ -385,7 +379,7 @@ export default function Lobby() {
                   size="sm"
                   variant="ghost"
                   onClick={handleCopyRoomCode}
-                  className="h-9 w-9 sm:h-6 sm:w-6 p-1 sm:p-0 text-slate-300 hover:bg-white/10 touch-manipulation"
+                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
                 >
                   {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                 </Button>
@@ -683,40 +677,6 @@ export default function Lobby() {
                           {prophetVisibility === "own_team" && "Kahinler kendi takımlarının tüm kartlarını görebilir"}
                           {prophetVisibility === "both_teams" && "Kahinler her iki takımın tüm kartlarını görebilir (beyaz ve siyah hariç)"}
                           {prophetVisibility === "all_cards" && "Kahinler beyaz ve siyah kartlar dahil tüm kartları görebilir"}
-                        </p>
-                      </div>
-                      
-                      {/* Prophet Correct Result Setting */}
-                      <div className="space-y-2 mt-4">
-                        <Label htmlFor="prophet-result" className="text-xs text-violet-300">
-                          Kahin Doğru Tahmin Sonucu
-                        </Label>
-                        <Select
-                          value={prophetCorrectResult}
-                          disabled={!currentPlayer?.isRoomOwner}
-                          onValueChange={(value: "win" | "tie") => {
-                            if (currentPlayer?.isRoomOwner) {
-                              setProphetCorrectResult(value);
-                              handleProphetCorrectResultUpdate(value);
-                            }
-                          }}
-                        >
-                          <SelectTrigger id="prophet-result" className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="win">
-                              🏆 Kazanç - Tahmin eden takım kazanır
-                            </SelectItem>
-                            <SelectItem value="tie">
-                              🤝 Beraberlik - Oyun berabere biter
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-[9px] text-violet-400/70">
-                          {prophetCorrectResult === "win" 
-                            ? "Kahin doğru tahmin edilirse, tahmin eden takım oyunu kazanır" 
-                            : "Kahin doğru tahmin edilirse oyun berabere biter"}
                         </p>
                       </div>
                     </div>

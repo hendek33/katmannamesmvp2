@@ -22,7 +22,6 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { useIntroductionMusic } from "@/hooks/useIntroductionMusic";
 import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command, Edit2, UserX } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -86,13 +85,6 @@ export default function Game() {
   const [newUsername, setNewUsername] = useState("");
   const [isChangingName, setIsChangingName] = useState(false);
   
-  // Reset scroll position on mount - especially for mobile
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, []);
-
   // Kullanıcı adı değişikliği yanıtını işle
   useEffect(() => {
     if (usernameChangeStatus) {
@@ -271,14 +263,7 @@ export default function Game() {
       normalWinShownRef.current = false;
     }
 
-    // Also reset when in introduction phase
-    if (gameState.phase === "introduction") {
-      previousTurnRef.current = null;
-      setShowTurnVideo(false);
-      return;
-    }
-
-    // Show turn video when game starts or restarts (but NOT during introduction phase)
+    // Show turn video when game starts or restarts
     if (gameState.phase === "playing" && !previousTurnRef.current) {
       // Store current team for turn video with special flag for game start
       setCurrentTurn(gameState.currentTeam);
@@ -661,10 +646,6 @@ export default function Game() {
   // Don't render introduction phase as separate page, it will be inline
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
-  
-  // Play music during introduction phase
-  useIntroductionMusic(gameState.phase === "introduction");
-  
   if (!currentPlayer) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
@@ -697,7 +678,7 @@ export default function Game() {
   const lastCardId = lastRevealedCard?.cardId;
 
   return (
-    <div className="mobile-game-container lg:h-screen lg:overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <div className="h-screen overflow-hidden bg-slate-900 relative" style={{ backgroundImage: 'url(/arkaplan.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
       {/* Light Effects - reduced for performance */}
       <div className="light-effect light-1" />
       <div className="light-effect light-2" />
@@ -904,143 +885,47 @@ export default function Game() {
         </div>
       )}
       
-      {/* Zoom Viewport Container - Scrollable on Mobile */}
-      <div className="mobile-zoom-viewport relative z-10 lg:h-full" style={{ '--zoom': zoomLevel / 100 } as React.CSSProperties}>
-        <div className="mobile-zoom-layer">
-          <div className="w-full flex-1 flex flex-col gap-2 pb-4 lg:pb-0">
-        {/* Mobile Header - Responsive Stacked Layout */}
-        <div className="lg:hidden flex flex-col gap-2 flex-shrink-0 mb-2">
-          {/* Team Scores Row - Always visible on mobile */}
-          <div className="flex gap-2">
-            {/* Light Team Score */}
-            <Card className="flex-1 px-2 py-1 border-2 shadow-xl bg-gradient-to-br from-red-950/80 to-red-900/70 backdrop-blur-md border-red-700/40">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-xs font-bold text-red-200">{gameState.lightTeamName}</span>
+      {/* Zoom Viewport Container */}
+      <div className="zoom-viewport relative z-10 h-full" style={{ '--zoom': zoomLevel / 100 } as React.CSSProperties}>
+        <div className="zoom-layer">
+          <div className="w-full flex-1 flex flex-col gap-2 min-h-0">
+        {/* Mobile Header */}
+        <div className="lg:hidden flex justify-between gap-2 flex-shrink-0 mb-2">
+          <Card className="flex-1 px-2 py-1 border-2 shadow-2xl bg-slate-900/85 backdrop-blur-md border-blue-900/30">
+            <div className="flex items-center justify-between gap-1">
+              <div className="flex items-center gap-1">
+                <div className="text-[10px] text-muted-foreground">Oda:</div>
+                <div className="text-xs font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
+                  {showRoomCode ? roomCode : "••••"}
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-lg font-black text-red-100">{gameState.lightCardsRemaining}</span>
-                  <span className="text-[10px] text-red-300">kart</span>
-                </div>
-              </div>
-            </Card>
-            
-            {/* Dark Team Score */}
-            <Card className="flex-1 px-2 py-1 border-2 shadow-xl bg-gradient-to-br from-blue-950/80 to-blue-900/70 backdrop-blur-md border-blue-700/40">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                  <span className="text-xs font-bold text-blue-200">{gameState.darkTeamName}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-lg font-black text-blue-100">{gameState.darkCardsRemaining}</span>
-                  <span className="text-[10px] text-blue-300">kart</span>
-                </div>
-              </div>
-            </Card>
-          </div>
-          
-          {/* Room Info & Controls Row */}
-          <Card className="px-2 py-1 border-2 shadow-xl bg-slate-900/85 backdrop-blur-md border-slate-700/30">
-            <div className="flex flex-col gap-1.5">
-              {/* First Row - Room Info */}
-              <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center gap-1">
-                  <div className="text-[10px] text-muted-foreground">Oda:</div>
-                  <div className="text-xs font-mono font-bold bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
-                    {showRoomCode ? roomCode : "••••"}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShowRoomCode(!showRoomCode)}
-                    className="h-7 w-7 sm:h-5 sm:w-5 p-0 touch-manipulation"
-                  >
-                    {showRoomCode ? (
-                      <EyeOff className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
-                    ) : (
-                      <Eye className="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5" />
-                    )}
-                  </Button>
-                </div>
-                
-                {/* Current Turn Indicator */}
-                <div className="flex items-center gap-1">
-                  <div className={cn(
-                    "w-1.5 h-1.5 rounded-full animate-pulse",
-                    gameState.currentTeam === "dark" ? "bg-blue-500" : "bg-red-500"
-                  )} />
-                  <span className="text-[10px] font-medium">
-                    Sıra: <span className={gameState.currentTeam === "dark" ? "text-blue-400" : "text-red-400"}>
-                      {gameState.currentTeam === "dark" ? gameState.darkTeamName : gameState.lightTeamName}
-                    </span>
-                  </span>
-                </div>
-                
-                {/* Player Count & Zoom */}
-                <div className="flex items-center gap-1">
-                  <Button
-                    onClick={handleZoomHelpClick}
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 w-6 p-0 touch-manipulation"
-                    title="Yakınlaştırma"
-                    data-zoom-help-button
-                  >
-                    <Info className="w-3 h-3" />
-                  </Button>
-                  <div className="flex items-center gap-0.5">
-                    <Users className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-[10px]">{gameState.players.length}</span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Second Row - Moderator Controls (Mobile Only) */}
-              {currentPlayer?.isRoomOwner && (gameState.phase === "playing" || gameState.phase === "introduction") && (
-                <div className="flex items-center justify-center gap-1 border-t border-slate-700/30 pt-1">
-                  <Button
-                    onClick={() => send("toggle_taunt", { enabled: !tauntEnabled })}
-                    size="sm"
-                    variant="ghost"
-                    className={cn(
-                      "h-6 px-2 text-[10px] font-medium touch-manipulation",
-                      tauntEnabled 
-                        ? "text-amber-400 bg-amber-500/20" 
-                        : "text-slate-400"
-                    )}
-                  >
-                    <Zap className={cn("w-3 h-3 mr-0.5", tauntEnabled && "animate-pulse")} />
-                    Hareket
-                  </Button>
-                  <Button
-                    onClick={() => send("toggle_insult", { enabled: !insultEnabled })}
-                    size="sm"
-                    variant="ghost"
-                    className={cn(
-                      "h-6 px-2 text-[10px] font-medium touch-manipulation",
-                      insultEnabled 
-                        ? "text-amber-400 bg-amber-500/20" 
-                        : "text-slate-400"
-                    )}
-                  >
-                    <MessageCircle className={cn("w-3 h-3 mr-0.5", insultEnabled && "animate-pulse")} />
-                    Laf
-                  </Button>
-                  {currentPlayer?.isRoomOwner && (
-                    <Button
-                      onClick={handleRestart}
-                      size="sm"
-                      variant="ghost"
-                      className="h-6 px-2 text-[10px] font-medium text-green-400 touch-manipulation"
-                    >
-                      <RotateCcw className="w-3 h-3 mr-0.5" />
-                      Yenile
-                    </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowRoomCode(!showRoomCode)}
+                  className="h-5 w-5 p-0"
+                >
+                  {showRoomCode ? (
+                    <EyeOff className="w-2.5 h-2.5" />
+                  ) : (
+                    <Eye className="w-2.5 h-2.5" />
                   )}
-                </div>
-              )}
+                </Button>
+              </div>
+              {/* Mobile Zoom Info Button */}
+              <Button
+                onClick={handleZoomHelpClick}
+                size="sm"
+                variant="ghost"
+                className="h-6 w-6 p-0"
+                title="Yakınlaştırma Bilgisi"
+                data-zoom-help-button
+              >
+                <Info className="w-3 h-3" />
+              </Button>
+              <div className="flex items-center gap-1">
+                <Users className="w-3 h-3 text-muted-foreground" />
+                <span className="text-xs">{gameState.players.length}</span>
+              </div>
             </div>
           </Card>
         </div>
@@ -2104,19 +1989,19 @@ export default function Game() {
             )}
 
             {/* Clue Input/Display - Overlay at Bottom */}
-            <div className="fixed lg:absolute bottom-0 left-0 right-0 flex justify-center p-0 landscape:relative landscape:mt-2 landscape:mb-2" style={{ zIndex: 9999 }}>
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 9999 }}>
               {/* Clue Display Card - Shows after clue is given */}
               {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
-                <Card className="px-3 py-2 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up mx-2 landscape:mx-0">
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="flex items-center gap-1 sm:gap-1.5">
-                      <Lightbulb className="w-3 h-3 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
+                <Card className="px-5 py-3 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1.5">
+                      <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
                       <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
                     </div>
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <span className="text-sm sm:text-xl font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                        <span className="text-xs sm:text-lg font-black text-white">{gameState.currentClue.count}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg sm:text-xl font-black text-amber-100 uppercase">{gameState.currentClue.word}</span>
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                        <span className="text-base sm:text-lg font-black text-white">{gameState.currentClue.count}</span>
                       </div>
                     </div>
                     {/* End Turn Button for Guessers - Now inside the card */}
@@ -2130,10 +2015,10 @@ export default function Game() {
                             description: "Sıra diğer takıma geçti",
                           });
                         }}
-                        size="sm"
-                        className="h-8 sm:h-12 px-3 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-base"
+                        size="default"
+                        className="h-10 sm:h-12 px-4 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-sm sm:text-base"
                       >
-                        <Check className="w-3 h-3 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                        <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                         Tahmini Bitir
                       </Button>
                     )}
@@ -2142,11 +2027,11 @@ export default function Game() {
               )}
               
               {canGiveClue ? (
-                <Card className="px-2 py-2 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg mx-2 landscape:mx-0">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="flex items-center gap-1 sm:gap-1.5">
-                      <Lightbulb className="w-3 h-3 sm:w-5 sm:h-5 text-amber-400" />
-                      <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider landscape:hidden sm:inline">İpucu</span>
+                <Card className="px-4 py-2.5 sm:px-5 sm:py-3 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5">
+                      <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+                      <span className="text-xs sm:text-sm font-bold uppercase text-amber-400 tracking-wider">İpucu</span>
                     </div>
                     <Input
                       data-testid="input-clue-word"
@@ -2155,29 +2040,29 @@ export default function Game() {
                       onChange={(e) => setClueWord(e.target.value.toLocaleUpperCase('tr-TR'))}
                       onKeyDown={(e) => e.key === "Enter" && handleGiveClue()}
                       maxLength={20}
-                      className="w-32 sm:w-56 text-center font-bold uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-8 sm:h-14 text-slate-100 placeholder:text-slate-500 text-sm sm:text-xl"
-                      style={{fontSize: window.innerWidth < 640 ? "14px" : "21px"}}
+                      className="w-44 sm:w-56 text-center font-bold uppercase bg-slate-900/70 border border-slate-700 focus:border-amber-500 h-12 sm:h-14 text-slate-100 placeholder:text-slate-500"
+                      style={{fontSize: "21px"}}
                     />
                     <div className="relative number-selector-container">
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => setClueCount(String(Math.max(0, parseInt(clueCount) - 1)))}
-                          className="h-8 sm:h-12 w-8 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-sm sm:text-base rounded border border-slate-700"
+                          className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-base rounded border border-slate-700"
                         >
                           -
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowNumberSelector(!showNumberSelector)}
-                          className="h-8 sm:h-12 w-10 sm:w-16 flex items-center justify-center bg-slate-900/70 hover:bg-slate-800/80 border border-amber-500/60 rounded text-sm sm:text-lg font-black text-amber-400 cursor-pointer transition-all"
+                          className="h-10 sm:h-12 w-12 sm:w-16 flex items-center justify-center bg-slate-900/70 hover:bg-slate-800/80 border border-amber-500/60 rounded text-lg font-black text-amber-400 cursor-pointer transition-all"
                         >
                           {clueCount}
                         </button>
                         <button
                           type="button"
                           onClick={() => setClueCount(String(Math.min(9, parseInt(clueCount) + 1)))}
-                          className="h-8 sm:h-12 w-8 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-sm sm:text-base rounded border border-slate-700"
+                          className="h-10 sm:h-12 w-10 sm:w-12 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-base rounded border border-slate-700"
                         >
                           +
                         </button>
@@ -2244,10 +2129,10 @@ export default function Game() {
                       onClick={handleGiveClue}
                       disabled={!clueWord.trim() || parseInt(clueCount) < 0}
                       data-testid="button-give-clue"
-                      size="sm"
-                      className="h-8 sm:h-12 px-3 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-xs sm:text-base"
+                      size="default"
+                      className="h-10 sm:h-12 px-4 sm:px-6 bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-lg text-sm sm:text-base"
                     >
-                      <Send className="w-3 h-3 sm:w-5 sm:h-5 mr-1 sm:mr-2" />
+                      <Send className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Gönder
                     </Button>
                   </div>

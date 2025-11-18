@@ -210,11 +210,6 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
               e.stopPropagation();
               setIsLifted(!isLifted);
             }}
-            onTouchEnd={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              setIsLifted(!isLifted);
-            }}
             title={isLifted ? "Kartı indirmek için tıklayın" : "Altındaki kelimeyi görmek için tıklayın"}
             style={{
               top: card.type === 'assassin' ? '0px' : '-6px',
@@ -241,15 +236,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
             e.stopPropagation();
             onReveal();
           }}
-          onTouchEnd={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            onReveal();
-          }}
-          className="absolute top-1 left-1 z-20 p-1.5 sm:p-1 bg-green-600/80 hover:bg-green-500 active:bg-green-400 rounded transition-colors touch-manipulation"
+          className="absolute top-1 left-1 z-20 p-1 bg-green-600/80 hover:bg-green-500 rounded transition-colors"
           title="Kartı Aç"
         >
-          <CheckSquare className="w-4 h-4 sm:w-4 sm:h-4 text-white" />
+          <CheckSquare className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
         </button>
       )}
 
@@ -280,14 +270,10 @@ export function GameCard({ card, onReveal, onVote, isSpymaster, disabled, voters
       
       <button
         onClick={canVote ? onVote : undefined}
-        onTouchEnd={canVote ? (e) => {
-          e.preventDefault();
-          onVote?.();
-        } : undefined}
         disabled={!canVote}
         data-testid={`card-${card.id}`}
         className={cn(
-          "flex-1 w-full flex flex-col touch-manipulation"
+          "flex-1 w-full flex flex-col"
         )}
       >
         <div className="flex-1" />
