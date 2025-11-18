@@ -132,6 +132,10 @@ export function useWebSocket() {
               case "player_disconnected":
               case "clue_given":
                 setGameState(message.payload.gameState);
+                // Update tomatoThrowEnabled if it's in gameState
+                if (message.payload.gameState?.tomatoThrowEnabled !== undefined) {
+                  setTomatoThrowEnabled(message.payload.gameState.tomatoThrowEnabled);
+                }
                 break;
 
               case "game_started":
@@ -329,7 +333,7 @@ export function useWebSocket() {
                   }
                   
                   // Override position to use team panel locations
-                  // Dark team panel at 15%, Light team panel at 85%, both at 50% vertical
+                  // Dark team panel at 15%, Light team panel at 85%, both at 35% vertical (upper area)
                   const fromTeam = message.payload.fromTeam;
                   const targetTeam = message.payload.targetTeam;
                   
@@ -337,11 +341,11 @@ export function useWebSocket() {
                     ...message.payload,
                     position: { 
                       x: fromTeam === 'dark' ? 0.15 : 0.85, 
-                      y: 0.50 
+                      y: 0.35 
                     },
                     targetPosition: { 
                       x: targetTeam === 'dark' ? 0.15 : 0.85, 
-                      y: 0.50 
+                      y: 0.35 
                     }
                   };
                   
