@@ -101,8 +101,8 @@ export function TomatoBubble({
         >
           {/* Tomato with enhanced motion effects */}
           <div className="relative">
-            {/* Main tomato - larger size */}
-            <span className="text-5xl drop-shadow-2xl filter brightness-110">
+            {/* Main tomato - EXTRA LARGE size for visibility */}
+            <span className="text-7xl drop-shadow-2xl filter brightness-110">
               🍅
             </span>
             
