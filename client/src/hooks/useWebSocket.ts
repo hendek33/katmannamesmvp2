@@ -320,8 +320,7 @@ export function useWebSocket() {
                 break;
                 
               case "tomato_thrown":
-                // Handle tomato events
-                // Prevent duplicates by checking if this exact tomato already exists
+                // Handle tomato events - USE SERVER POSITIONS DIRECTLY!
                 setTomatoes(prev => {
                   const isDuplicate = prev.some(t => 
                     t.timestamp === message.payload.timestamp &&
@@ -332,24 +331,10 @@ export function useWebSocket() {
                     return prev;
                   }
                   
-                  // Override position to use team panel locations
-                  // Dark team panel at 85% (right), Light team panel at 15% (left), both at 35% vertical (upper area)
-                  const fromTeam = message.payload.fromTeam;
-                  const targetTeam = message.payload.targetTeam;
+                  console.log('🍅 CLIENT RECEIVED TOMATO:', message.payload);
                   
-                  const tomatoWithPanelPositions = {
-                    ...message.payload,
-                    position: { 
-                      x: fromTeam === 'dark' ? 0.85 : 0.15, 
-                      y: 0.35 
-                    },
-                    targetPosition: { 
-                      x: targetTeam === 'dark' ? 0.85 : 0.15, 
-                      y: 0.35 
-                    }
-                  };
-                  
-                  return [...prev, tomatoWithPanelPositions];
+                  // Use server-provided positions directly (no override!)
+                  return [...prev, message.payload];
                 });
                 
                 // Update game state if provided
