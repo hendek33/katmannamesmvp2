@@ -36,6 +36,7 @@ export default function Lobby() {
   const [guesserTime, setGuesserTime] = useState(60);
   const [chaosMode, setChaosMode] = useState(false);
   const [prophetVisibility, setProphetVisibility] = useState<"own_team" | "both_teams" | "all_cards">("own_team");
+  const [prophetWinMode, setProphetWinMode] = useState<"tie" | "guesser_wins">("tie");
   const [showChaosDetails, setShowChaosDetails] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
@@ -97,6 +98,7 @@ export default function Lobby() {
       setGuesserTime(gameState.guesserTime);
       setChaosMode(gameState.chaosMode || false);
       setProphetVisibility(gameState.prophetVisibility || "own_team");
+      setProphetWinMode(gameState.prophetWinMode || "tie");
     }
   }, [gameState]);
 
@@ -220,6 +222,10 @@ export default function Lobby() {
 
   const handleProphetVisibilityUpdate = (visibility: "own_team" | "both_teams" | "all_cards") => {
     send("update_prophet_visibility", { visibility });
+  };
+
+  const handleProphetWinModeUpdate = (mode: "tie" | "guesser_wins") => {
+    send("update-prophet-win-mode", { mode });
   };
 
   if (!isConnected) {
@@ -677,6 +683,39 @@ export default function Lobby() {
                           {prophetVisibility === "own_team" && "Kahinler kendi takımlarının tüm kartlarını görebilir"}
                           {prophetVisibility === "both_teams" && "Kahinler her iki takımın tüm kartlarını görebilir (beyaz ve siyah hariç)"}
                           {prophetVisibility === "all_cards" && "Kahinler beyaz ve siyah kartlar dahil tüm kartları görebilir"}
+                        </p>
+                      </div>
+                      
+                      {/* Prophet Win Mode Settings */}
+                      <div className="space-y-2">
+                        <Label htmlFor="prophet-win-mode" className="text-xs text-violet-300">
+                          Kahin Tahmin Sonucu
+                        </Label>
+                        <Select
+                          value={prophetWinMode}
+                          disabled={!currentPlayer?.isRoomOwner}
+                          onValueChange={(value: "tie" | "guesser_wins") => {
+                            if (currentPlayer?.isRoomOwner) {
+                              setProphetWinMode(value);
+                              handleProphetWinModeUpdate(value);
+                            }
+                          }}
+                        >
+                          <SelectTrigger id="prophet-win-mode" className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="tie">
+                              Oyun Berabere Biter
+                            </SelectItem>
+                            <SelectItem value="guesser_wins">
+                              Tahmin Eden Takım Kazanır
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-[9px] text-violet-400/70">
+                          {prophetWinMode === "tie" && "Kahin doğru tahmin edildiğinde oyun berabere biter"}
+                          {prophetWinMode === "guesser_wins" && "Kahin doğru tahmin edildiğinde tahmin eden takım oyunu kazanır"}
                         </p>
                       </div>
                     </div>

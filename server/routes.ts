@@ -18,6 +18,7 @@ import {
   updateChaosModeSchema,
   updateChaosModeTypeSchema,
   updateProphetVisibilitySchema,
+  updateProphetWinModeSchema,
   guessProphetSchema,
   guessDoubleAgentSchema,
   endGameGuessSchema,
@@ -988,6 +989,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
             break;
           }
+            
+          case "update-prophet-win-mode":
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bir odaya katıl" } });
+              return;
+            }
+
+            // Check if player is room owner
+            const winModePlayer = storage.getRoom(ws.roomCode)?.players.find(p => p.id === ws.playerId);
+            if (!winModePlayer?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi Kahin kazanç modunu değiştirebilir" } });
+              return;
+            }
+
+            const winModeValidation = updateProphetWinModeSchema.safeParse(payload);
+            if (!winModeValidation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz kazanç modu" } });
+              return;
+            }
+
+            const winModeGameState = storage.updateProphetWinMode(ws.roomCode, winModeValidation.data.mode);
+            if (!winModeGameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Kahin kazanç modu güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState: winModeGameState },
+            });
+            break;
 
           case "update_password": {
             if (!ws.roomCode || !ws.playerId) {

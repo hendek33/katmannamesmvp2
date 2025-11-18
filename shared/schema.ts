@@ -68,6 +68,7 @@ export interface GameState {
   chaosMode: boolean; // Whether Chaos Mode is enabled
   chaosModeType?: "prophet" | "double_agent" | null; // Type of chaos mode
   prophetVisibility?: "own_team" | "both_teams" | "all_cards"; // What cards prophets can see
+  prophetWinMode?: "tie" | "guesser_wins"; // What happens when prophet is correctly identified
   prophetGuessUsed?: { dark: boolean; light: boolean }; // Track if prophet guess has been used during game
   prophetGuessResult?: { team: Team; success: boolean; targetId?: string }; // Result of prophet guess
   doubleAgentGuessUsed?: boolean; // Track if losing team used double agent guess
@@ -82,7 +83,7 @@ export interface GameState {
     guessType: "prophet" | "double_agent";
     actualRole?: "prophet" | "double_agent" | null;
     success?: boolean;
-    finalWinner?: Team;
+    finalWinner?: Team | null;
     finalWinnerName?: string;
   };
   introductionPhase?: { // Introduction phase state
@@ -160,6 +161,10 @@ export const updateChaosModeSchema = z.object({
 
 export const updateChaosModeTypeSchema = z.object({
   type: z.enum(["prophet", "double_agent"]),
+});
+
+export const updateProphetWinModeSchema = z.object({
+  mode: z.enum(["tie", "guesser_wins"]),
 });
 
 export const updateProphetVisibilitySchema = z.object({

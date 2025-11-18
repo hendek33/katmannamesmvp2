@@ -35,6 +35,7 @@ export interface IStorage {
   updateChaosMode(roomCode: string, chaosMode: boolean): GameState | null;
   updateChaosModeType(roomCode: string, type: "prophet" | "double_agent"): GameState | null;
   updateProphetVisibility(roomCode: string, visibility: "own_team" | "both_teams" | "all_cards"): GameState | null;
+  updateProphetWinMode(roomCode: string, mode: "tie" | "guesser_wins"): GameState | null;
   updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -706,6 +707,19 @@ export class MemStorage implements IStorage {
     return room;
   }
 
+  updateProphetWinMode(roomCode: string, mode: "tie" | "guesser_wins"): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow prophet win mode to be changed in lobby
+    if (room.phase !== "lobby") return null;
+
+    room.prophetWinMode = mode;
+
+    return room;
+  }
+
   updatePassword(roomCode: string, password: string | null): GameState | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
@@ -1319,10 +1333,17 @@ export class MemStorage implements IStorage {
       targetId: targetPlayerId
     };
     
-    // If correct, the guessing team wins immediately
+    // If correct, check the prophetWinMode setting
     // If incorrect, the guessing team loses immediately!
     if (isCorrect) {
-      room.winner = room.currentTeam;
+      // Check prophetWinMode setting
+      if (room.prophetWinMode === "guesser_wins") {
+        // Guessing team wins
+        room.winner = room.currentTeam;
+      } else {
+        // Default to tie
+        room.winner = null; // null indicates a tie
+      }
       room.phase = "ended";
     } else {
       // Wrong guess means instant loss for the guessing team!
@@ -1493,11 +1514,28 @@ export class MemStorage implements IStorage {
     room.endGameGuessSequence.success = guessCorrect;
     
     if (guessCorrect) {
-      // If guess is correct, the losing team wins!
-      room.winner = player.team;
-      room.endGameGuessSequence.finalWinner = player.team;
-      room.endGameGuessSequence.finalWinnerName = guessingTeamName;
-      console.log(`END GAME GUESS CORRECT! ${player.team} team wins by guessing ${targetPlayer.username}`);
+      // If guess is correct, check prophetWinMode for prophet guesses
+      if (room.chaosModeType === "prophet") {
+        if (room.prophetWinMode === "guesser_wins") {
+          // The losing team wins!
+          room.winner = player.team;
+          room.endGameGuessSequence.finalWinner = player.team;
+          room.endGameGuessSequence.finalWinnerName = guessingTeamName;
+          console.log(`END GAME GUESS CORRECT! ${player.team} team wins by guessing ${targetPlayer.username}`);
+        } else {
+          // Default to tie
+          room.winner = null; // null indicates a tie
+          room.endGameGuessSequence.finalWinner = null;
+          room.endGameGuessSequence.finalWinnerName = "Berabere";
+          console.log(`END GAME GUESS CORRECT! Game ends in a TIE by correctly guessing ${targetPlayer.username}`);
+        }
+      } else {
+        // Double agent mode - losing team always wins on correct guess
+        room.winner = player.team;
+        room.endGameGuessSequence.finalWinner = player.team;
+        room.endGameGuessSequence.finalWinnerName = guessingTeamName;
+        console.log(`END GAME GUESS CORRECT! ${player.team} team wins by guessing ${targetPlayer.username}`);
+      }
     } else {
       // If guess is wrong, the original winner remains
       room.endGameGuessSequence.finalWinnerName = room.winner === "dark" ? room.darkTeamName : room.lightTeamName;
