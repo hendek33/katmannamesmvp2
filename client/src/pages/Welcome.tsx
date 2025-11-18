@@ -143,25 +143,22 @@ export default function Welcome() {
            backgroundRepeat: 'no-repeat',
            backgroundAttachment: 'fixed'
          }}>
-      {/* Light Effects */}
+      {/* Light Effects - Reduced for performance */}
       <div className="light-effect light-1" />
-      <div className="light-effect light-2" />
       <div className="light-effect light-3" />
-      <div className="light-effect light-4" />
-      <div className="light-effect light-5" />
       
-      {/* Particles */}
-      {[...Array(30)].map((_, i) => (
+      {/* Particles - Reduced from 30 to 8 for better performance */}
+      {[...Array(8)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1}`} />
       ))}
 
       {/* Hero Section */}
       <section className="relative overflow-hidden w-full h-full">
-        {/* Physics Cards Background */}
+        {/* Physics Cards Background - Reduced count for performance */}
         <HeroPhysicsCards 
           imageNames={cardImageNames}
           height={canvasHeight}
-          countMobile={24}
+          countMobile={12}
         />
         
         {/* Content Overlay */}
@@ -172,7 +169,11 @@ export default function Welcome() {
               <img 
                 src="/logo.webp" 
                 alt="Katmannames Logo" 
-                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-all duration-300 drop-shadow-[0_10px_30px_rgba(255,255,255,0.4)] hover:drop-shadow-[0_15px_50px_rgba(255,255,255,0.6)] hover:scale-110 cursor-pointer"
+                className="w-80 md:w-96 lg:w-[28rem] h-auto object-contain transition-transform duration-300 will-change-transform drop-shadow-lg hover:drop-shadow-2xl hover:scale-110 cursor-pointer"
+                style={{
+                  transform: 'translateZ(0)',
+                  backfaceVisibility: 'hidden'
+                }}
               />
             </div>
 

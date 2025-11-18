@@ -952,8 +952,11 @@
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(80px);
-  mix-blend-mode: screen;
+  filter: blur(40px); /* Reduced blur for performance */
+  mix-blend-mode: soft-light; /* Less expensive than screen */
+  will-change: transform;
+  transform: translateZ(0); /* GPU acceleration */
+  backface-visibility: hidden;
 }
 
 .light-1 {
@@ -1018,9 +1021,12 @@
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(1px);
-  opacity: 0.7;
+  /* Removed blur filter for better performance */
+  opacity: 0.6;
   z-index: 0;
+  will-change: transform;
+  transform: translateZ(0); /* GPU acceleration */
+  backface-visibility: hidden;
 }
 
 .particle-1 { width: 8px; height: 8px; background: rgba(251, 146, 60, 0.6); animation: float-1 8s infinite alternate ease-in-out; left: 3%; top: 12%; }
