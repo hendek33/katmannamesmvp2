@@ -13,6 +13,8 @@ import { NormalWinVideo } from "@/components/NormalWinVideo";
 import { GameTimer } from "@/components/GameTimer";
 import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
+import { TomatoBubble } from "@/components/TomatoBubble";
+import { TomatoOverlay } from "@/components/TomatoOverlay";
 import { EndGameVoting } from "@/components/EndGameVotingSimple";
 import { EndGameGuessSequence } from "@/components/EndGameGuessSequence";
 import { PlayerIntroduction } from "@/components/PlayerIntroduction";
@@ -45,12 +47,17 @@ export default function Game() {
     taunts,
     insults,
     setInsults,
+    tomatoes,
+    setTomatoes,
     tauntEnabled,
     insultEnabled,
+    tomatoThrowEnabled,
     globalTauntCooldown,
     globalInsultCooldown,
+    globalTomatoCooldown,
     setGlobalTauntCooldown,
-    setGlobalInsultCooldown
+    setGlobalInsultCooldown,
+    setGlobalTomatoCooldown
   } = useWebSocketContext();
   const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState("1");
@@ -59,6 +66,7 @@ export default function Game() {
   const [showRoomCode, setShowRoomCode] = useState(false);
   const [tauntCooldown, setTauntCooldown] = useState<number>(0);
   const [insultCooldown, setInsultCooldown] = useState<number>(0);
+  const [tomatoCooldown, setTomatoCooldown] = useState<number>(0);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const [showDeveloperNote, setShowDeveloperNote] = useState(true);
@@ -565,6 +573,16 @@ export default function Game() {
     send("send_insult_v2", { targetId: targetPlayerId });
     // Global cooldown will be set when server broadcasts the event
   };
+  
+  const handleThrowTomato = (targetTeam: "dark" | "light") => {
+    if (globalTomatoCooldown > 0 || !playerId || !tomatoThrowEnabled || gameState?.phase !== "playing") return;
+    
+    const currentPlayer = gameState?.players.find(p => p.id === playerId);
+    if (!currentPlayer || !currentPlayer.team || currentPlayer.team === targetTeam) return;
+    
+    send("throw_tomato", { targetTeam });
+    // Cooldown will be set when server broadcasts the event
+  };
 
   // Countdown for global taunt cooldown
   useEffect(() => {
@@ -585,6 +603,16 @@ export default function Game() {
       return () => clearTimeout(timer);
     }
   }, [globalInsultCooldown]);
+
+  // Countdown for global tomato cooldown
+  useEffect(() => {
+    if (globalTomatoCooldown > 0) {
+      const timer = setTimeout(() => {
+        setGlobalTomatoCooldown(prev => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [globalTomatoCooldown]);
 
   
   // Get room features on mount
@@ -750,6 +778,26 @@ export default function Game() {
           />
         );
       })}
+      
+      {/* Tomato Bubbles */}
+      {tomatoes.map((tomato) => (
+        <TomatoBubble
+          key={`${tomato.playerId}-${tomato.timestamp}`}
+          senderUsername={tomato.username}
+          fromTeam={tomato.fromTeam}
+          targetTeam={tomato.targetTeam}
+          position={tomato.position}
+          targetPosition={tomato.targetPosition}
+          timestamp={tomato.timestamp}
+        />
+      ))}
+      
+      {/* Tomato Overlay */}
+      <TomatoOverlay 
+        tomatoes={tomatoes}
+        setTomatoes={setTomatoes}
+        targetTeam={currentPlayer?.team || null}
+      />
 
 
       {/* Normal Win Video */}
@@ -1014,6 +1062,24 @@ export default function Game() {
                   >
                     <MessageCircle className={cn("w-3 h-3 mr-1.5", insultEnabled && "animate-pulse")} />
                     <span>{insultEnabled ? "Laf Aktif" : "Laf Pasif"}</span>
+                  </Button>
+                  <div className="w-px h-5 bg-amber-900/40" />
+                  <Button
+                    onClick={() => {
+                      send("update_tomato_throw_enabled", { enabled: !tomatoThrowEnabled });
+                    }}
+                    size="sm"
+                    variant="outline"
+                    className={cn(
+                      "h-6 px-3 text-xs font-medium transition-all",
+                      tomatoThrowEnabled 
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400 hover:border-amber-400 hover:bg-amber-500/20" 
+                        : "border hover:border-amber-500 hover:bg-amber-500/10"
+                    )}
+                    title="Domates fırlatma özelliğini aç/kapat"
+                  >
+                    <span className={cn("mr-1.5", tomatoThrowEnabled && "animate-bounce")}>🍅</span>
+                    <span>{tomatoThrowEnabled ? "Domates Aktif" : "Domates Pasif"}</span>
                   </Button>
                 </>
               )}
@@ -1682,7 +1748,7 @@ export default function Game() {
                       onClick={handleTriggerTaunt}
                       disabled={globalTauntCooldown > 0 || (!tauntEnabled && gameState.phase !== "introduction")}
                       className={`
-                        relative w-full h-12 px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
+                        relative w-full h-12 px-3 py-2 rounded-lg font-bold text-xs overflow-hidden
                         backdrop-blur-md border shadow-lg transition-colors
                         ${globalTauntCooldown > 0 || (!tauntEnabled && gameState.phase !== "introduction")
                           ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
@@ -1806,6 +1872,70 @@ export default function Game() {
                         </div>
                       </div>
                     )}
+                  </div>
+                  
+                  {/* Tomato Button */}
+                  <div className="relative flex-1">
+                    <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
+                      globalTomatoCooldown > 0 || (!tomatoThrowEnabled && gameState.phase === "playing")
+                        ? "bg-gray-600/20"
+                        : "bg-gradient-to-r from-red-600/40 to-orange-600/40"
+                    }`} />
+                    
+                    <button
+                      onClick={() => {
+                        if (!tomatoThrowEnabled || globalTomatoCooldown > 0 || gameState.phase !== "playing") return;
+                        const targetTeam = currentPlayer.team === "dark" ? "light" : "dark";
+                        handleThrowTomato(targetTeam);
+                      }}
+                      disabled={globalTomatoCooldown > 0 || (!tomatoThrowEnabled && gameState.phase === "playing") || gameState.phase !== "playing"}
+                      className={`
+                        relative w-full h-12 px-3 py-2 rounded-lg font-bold text-xs overflow-hidden
+                        backdrop-blur-md border shadow-lg transition-colors
+                        ${globalTomatoCooldown > 0 || (!tomatoThrowEnabled && gameState.phase === "playing") || gameState.phase !== "playing"
+                          ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
+                          : "bg-red-900/60 border-red-600/50 text-red-100 cursor-pointer hover:scale-105 hover:bg-red-900/80 hover:border-red-500/60"
+                        }
+                      `}
+                      data-testid="button-throw-tomato"
+                    >
+                      {/* Animated progress bar for cooldown */}
+                      {globalTomatoCooldown > 0 && (
+                        <div 
+                          className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700"
+                          style={{
+                            transformOrigin: 'right',
+                            transform: `scaleX(${globalTomatoCooldown / 5})`,
+                            transition: 'transform 1s linear',
+                            opacity: 0.9
+                          }}
+                        />
+                      )}
+                      
+                      <span className="relative z-10">
+                        {gameState.phase !== "playing" ? (
+                          <span className="flex items-center justify-center gap-1">
+                            <span className="text-base">🍅</span>
+                            <span>Oyun İçinde</span>
+                          </span>
+                        ) : !tomatoThrowEnabled ? (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <EyeOff className="w-4 h-4" />
+                            Devre Dışı
+                          </span>
+                        ) : globalTomatoCooldown > 0 ? (
+                          <span className="flex items-center justify-center gap-1.5 text-white">
+                            <Timer className="w-4 h-4 text-white animate-pulse" />
+                            <span className="font-mono text-lg font-bold">{globalTomatoCooldown}s</span>
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-1">
+                            <span className="text-base">🍅</span>
+                            Domates Fırlat
+                          </span>
+                        )}
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>

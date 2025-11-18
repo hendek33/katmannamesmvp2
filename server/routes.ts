@@ -19,6 +19,8 @@ import {
   updateChaosModeTypeSchema,
   updateProphetVisibilitySchema,
   updateProphetWinModeSchema,
+  updateTomatoThrowEnabledSchema,
+  throwTomatoSchema,
   guessProphetSchema,
   guessDoubleAgentSchema,
   endGameGuessSchema,
@@ -1062,6 +1064,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
+          case "update_tomato_throw_enabled": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi domates fırlatma ayarını değiştirebilir" } });
+              return;
+            }
+
+            const validation = updateTomatoThrowEnabledSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz domates fırlatma ayarı" } });
+              return;
+            }
+
+            const gameState = storage.updateTomatoThrowEnabled(ws.roomCode, validation.data.enabled);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Domates fırlatma ayarı güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+
           case "guess_prophet": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
@@ -1645,6 +1679,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
           
+          case "throw_tomato": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const validation = throwTomatoSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+
+            const tomatoData = storage.throwTomato(ws.roomCode, ws.playerId);
+            if (!tomatoData) {
+              sendToClient(ws, { type: "error", payload: { message: "Domates fırlatma devre dışı veya cooldown'da" } });
+              return;
+            }
+
+            const gameState = storage.getRoom(ws.roomCode);
+            broadcastToRoom(ws.roomCode, {
+              type: "tomato_thrown",
+              payload: { ...tomatoData, gameState },
+            });
+            break;
+          }
+          
           case "toggle_insult": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
@@ -1678,6 +1738,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             broadcastToRoom(ws.roomCode, {
               type: "insult_toggled",
+              payload: result,
+            });
+            break;
+          }
+          
+          
+          case "toggle_tomato": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+            
+            // Check if player is moderator (room owner)
+            const gameState = storage.getRoom(ws.roomCode);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
+              return;
+            }
+            
+            const player = gameState.players.find(p => p.id === ws.playerId);
+            if (!player || !player.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece moderatör bu özelliği değiştirebilir" } });
+              return;
+            }
+            
+            const validation = z.object({ enabled: z.boolean() }).safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz veri" } });
+              return;
+            }
+            
+            const result = storage.toggleTomato(ws.roomCode, validation.data.enabled);
+            if (!result) {
+              sendToClient(ws, { type: "error", payload: { message: "Özellik değiştirilemedi" } });
+              return;
+            }
+            
+            broadcastToRoom(ws.roomCode, {
+              type: "tomato_toggled",
               payload: result,
             });
             break;

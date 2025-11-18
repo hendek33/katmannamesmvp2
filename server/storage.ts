@@ -11,8 +11,10 @@ interface RoomData {
   cardImages?: Map<number, string>; // kartId -> Açılan kartlar için resim yolu
   tauntEnabled?: boolean;
   insultEnabled?: boolean;
+  tomatoThrowEnabled?: boolean; // Domates fırlatma özelliği
   teamTauntCooldown?: { dark?: number; light?: number }; // Takım özel alay bekleme süresi timestamp'leri
   teamInsultCooldown?: { dark?: number; light?: number }; // Takım özel hakaret bekleme süresi timestamp'leri
+  playerTomatoCooldown?: Map<string, number>; // playerId -> cooldown bitiş zamanı
   endGameGuessVotes?: Map<string, Set<string>>; // hedefOyuncuId -> Oy veren oyuncu ID'lerinin seti
   usedWords?: Set<string>; // Aynı odadaki oyunlarda tekrarı önlemek için kullanılan kelimeleri takip et
   turnRevealMap?: { dark: boolean; light: boolean }; // Takımın kendi turunda kart açıp açmadığını takip et
@@ -36,6 +38,7 @@ export interface IStorage {
   updateChaosModeType(roomCode: string, type: "prophet" | "double_agent"): GameState | null;
   updateProphetVisibility(roomCode: string, visibility: "own_team" | "both_teams" | "all_cards"): GameState | null;
   updateProphetWinMode(roomCode: string, mode: "tie" | "guesser_wins"): GameState | null;
+  updateTomatoThrowEnabled(roomCode: string, enabled: boolean): GameState | null;
   updatePassword(roomCode: string, password: string | null): GameState | null;
   guessProphet(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
   guessDoubleAgent(roomCode: string, playerId: string, targetPlayerId: string): GameState | null;
@@ -54,7 +57,9 @@ export interface IStorage {
   sendInsult(roomCode: string, playerId: string, targetId?: string): any;
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
-  getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number } | null;
+  throwTomato(roomCode: string, playerId: string, targetTeam: "dark" | "light"): any;
+  toggleTomato(roomCode: string, enabled: boolean): any;
+  getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; tomatoThrowEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number; playerTomatoCooldown?: number } | null;
   updateKickChatConfig(roomCode: string, config: { enabled: boolean; chatroomId?: number; channelName?: string }): boolean;
   getKickChatConfig(roomCode: string): { enabled: boolean; chatroomId?: number; channelName?: string } | null;
   // Tanıtım aşaması metodları
@@ -716,6 +721,25 @@ export class MemStorage implements IStorage {
     if (room.phase !== "lobby") return null;
 
     room.prophetWinMode = mode;
+
+    return room;
+  }
+
+  updateTomatoThrowEnabled(roomCode: string, enabled: boolean): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow tomato throw setting to be changed in lobby
+    if (room.phase !== "lobby") return null;
+
+    room.tomatoThrowEnabled = enabled;
+    roomData.tomatoThrowEnabled = enabled;
+    
+    // Initialize cooldown map if enabling
+    if (enabled && !roomData.playerTomatoCooldown) {
+      roomData.playerTomatoCooldown = new Map();
+    }
 
     return room;
   }
@@ -1950,7 +1974,66 @@ export class MemStorage implements IStorage {
     return { insultEnabled: enabled };
   }
   
-  getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number } | null {
+  throwTomato(roomCode: string, playerId: string, targetTeam: "dark" | "light"): any {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Check if tomato throwing is enabled
+    if (roomData.tomatoThrowEnabled === false) return null;
+    
+    // Only during playing phase
+    if (room.phase !== "playing") return null;
+    
+    // Find the player
+    const player = room.players.find(p => p.id === playerId);
+    if (!player || !player.team) return null;
+    
+    // Can't throw tomato at own team
+    if (player.team === targetTeam) return null;
+    
+    // Check player-specific cooldown (5 seconds)
+    const now = Date.now();
+    if (!roomData.playerTomatoCooldown) {
+      roomData.playerTomatoCooldown = new Map();
+    }
+    
+    const cooldownEnd = roomData.playerTomatoCooldown.get(playerId);
+    if (cooldownEnd && now < cooldownEnd) {
+      const remainingSeconds = Math.ceil((cooldownEnd - now) / 1000);
+      return { error: `Cooldown: ${remainingSeconds} saniye kaldı` };
+    }
+    
+    // Set cooldown for this player (5 seconds)
+    roomData.playerTomatoCooldown.set(playerId, now + 5000);
+    
+    // Generate random positions for animation
+    const startPosition = { x: Math.random(), y: Math.random() };
+    const endPosition = { x: Math.random(), y: Math.random() };
+    
+    const tomatoData = {
+      playerId,
+      username: player.username,
+      fromTeam: player.team,
+      targetTeam,
+      position: startPosition,
+      targetPosition: endPosition,
+      timestamp: now,
+      expiresAt: now + 3000, // Show for 3 seconds
+    };
+    
+    return tomatoData;
+  }
+  
+  toggleTomato(roomCode: string, enabled: boolean): any {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    
+    roomData.tomatoThrowEnabled = enabled;
+    return { tomatoThrowEnabled: enabled };
+  }
+  
+  getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; tomatoThrowEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number; playerTomatoCooldown?: number } | null {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
     const room = roomData.gameState;
@@ -1958,8 +2041,9 @@ export class MemStorage implements IStorage {
     const now = Date.now();
     let tauntRemaining = 0;
     let insultRemaining = 0;
+    let tomatoRemaining = 0;
     
-    // If playerId provided, get team-specific cooldowns
+    // If playerId provided, get team-specific and player-specific cooldowns
     if (playerId) {
       const player = room.players.find(p => p.id === playerId);
       if (player && player.team) {
@@ -1972,14 +2056,22 @@ export class MemStorage implements IStorage {
         insultRemaining = teamInsultCooldown && (teamInsultCooldown + 5000 - now) > 0
           ? Math.ceil((teamInsultCooldown + 5000 - now) / 1000)
           : 0;
+          
+        // Check player-specific tomato cooldown
+        const tomatoCooldownEnd = roomData.playerTomatoCooldown?.get(playerId);
+        if (tomatoCooldownEnd && now < tomatoCooldownEnd) {
+          tomatoRemaining = Math.ceil((tomatoCooldownEnd - now) / 1000);
+        }
       }
     }
     
     return {
       tauntEnabled: roomData.tauntEnabled !== false, // Default to true
       insultEnabled: roomData.insultEnabled !== false, // Default to true
+      tomatoThrowEnabled: roomData.tomatoThrowEnabled !== false, // Default to true
       teamTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
-      teamInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined
+      teamInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined,
+      playerTomatoCooldown: tomatoRemaining > 0 ? tomatoRemaining : undefined
     };
   }
   

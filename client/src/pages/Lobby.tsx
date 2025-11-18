@@ -38,6 +38,7 @@ export default function Lobby() {
   const [prophetVisibility, setProphetVisibility] = useState<"own_team" | "both_teams" | "all_cards">("own_team");
   const [prophetWinMode, setProphetWinMode] = useState<"tie" | "guesser_wins">("tie");
   const [showChaosDetails, setShowChaosDetails] = useState(false);
+  const [tomatoThrowEnabled, setTomatoThrowEnabled] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
   const [newUsername, setNewUsername] = useState("");
@@ -99,6 +100,7 @@ export default function Lobby() {
       setChaosMode(gameState.chaosMode || false);
       setProphetVisibility(gameState.prophetVisibility || "own_team");
       setProphetWinMode(gameState.prophetWinMode || "tie");
+      setTomatoThrowEnabled(gameState.tomatoThrowEnabled || false);
     }
   }, [gameState]);
 
@@ -226,6 +228,10 @@ export default function Lobby() {
 
   const handleProphetWinModeUpdate = (mode: "tie" | "guesser_wins") => {
     send("update-prophet-win-mode", { mode });
+  };
+
+  const handleTomatoThrowUpdate = (enabled: boolean) => {
+    send("update_tomato_throw_enabled", { enabled });
   };
 
   if (!isConnected) {
@@ -802,6 +808,35 @@ export default function Lobby() {
                       </div>
                     </div>
                   )}
+                  </div>
+                </div>
+                
+                {/* Tomato Throw Feature - Enhanced Glassmorphism */}
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-red-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
+                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">🍅</span>
+                        <h3 className="text-base font-bold text-slate-100">Domates Fırlatma</h3>
+                      </div>
+                      <Switch
+                        checked={tomatoThrowEnabled}
+                        disabled={!currentPlayer?.isRoomOwner}
+                        onCheckedChange={(checked) => {
+                          if (currentPlayer?.isRoomOwner) {
+                            setTomatoThrowEnabled(checked);
+                            handleTomatoThrowUpdate(checked);
+                          }
+                        }}
+                        data-testid="switch-tomato-throw"
+                      />
+                    </div>
+                    {tomatoThrowEnabled && (
+                      <p className="text-xs text-red-400/80">
+                        Oyuncular karşı takıma domates fırlatabilir. 5 saniye bekleme süresi vardır.
+                      </p>
+                    )}
                   </div>
                 </div>
                 

@@ -21,10 +21,13 @@ export function useWebSocket() {
   const [usernameChangeStatus, setUsernameChangeStatus] = useState<{ success: boolean; message?: string } | null>(null);
   const [taunts, setTaunts] = useState<any[]>([]);
   const [insults, setInsults] = useState<any[]>([]);
+  const [tomatoes, setTomatoes] = useState<any[]>([]);
   const [tauntEnabled, setTauntEnabled] = useState<boolean>(true);
   const [insultEnabled, setInsultEnabled] = useState<boolean>(true);
+  const [tomatoThrowEnabled, setTomatoThrowEnabled] = useState<boolean>(true);
   const [globalTauntCooldown, setGlobalTauntCooldown] = useState<number>(0);
   const [globalInsultCooldown, setGlobalInsultCooldown] = useState<number>(0);
+  const [globalTomatoCooldown, setGlobalTomatoCooldown] = useState<number>(0);
   const [kickChatMessages, setKickChatMessages] = useState<any[]>([]);
   const [kickChatVotes, setKickChatVotes] = useState({ likes: 0, dislikes: 0 });
   const [kickChatConfig, setKickChatConfig] = useState<any>(null);
@@ -312,11 +315,48 @@ export function useWebSocket() {
                 setInsultEnabled(message.payload.insultEnabled);
                 break;
                 
+              case "tomato_thrown":
+                // Handle tomato events
+                // Prevent duplicates by checking if this exact tomato already exists
+                setTomatoes(prev => {
+                  const isDuplicate = prev.some(t => 
+                    t.timestamp === message.payload.timestamp &&
+                    t.playerId === message.payload.playerId
+                  );
+                  
+                  if (isDuplicate) {
+                    return prev;
+                  }
+                  
+                  return [...prev, message.payload];
+                });
+                
+                // Update game state if provided
+                if (message.payload.gameState) {
+                  setGameState(message.payload.gameState);
+                }
+                
+                // Set cooldown for the throwing player
+                const tomatoGameState = message.payload.gameState;
+                if (tomatoGameState && tomatoGameState.players) {
+                  const currentPlayerForTomato = tomatoGameState.players.find((p: any) => p.id === playerIdRef.current);
+                  if (currentPlayerForTomato && message.payload.playerId === playerIdRef.current) {
+                    setGlobalTomatoCooldown(5);
+                  }
+                }
+                break;
+                
+              case "tomato_toggled":
+                setTomatoThrowEnabled(message.payload.tomatoThrowEnabled);
+                break;
+                
               case "room_features":
                 setTauntEnabled(message.payload.tauntEnabled);
                 setInsultEnabled(message.payload.insultEnabled);
+                setTomatoThrowEnabled(message.payload.tomatoThrowEnabled);
                 setGlobalTauntCooldown(message.payload.teamTauntCooldown || 0);
                 setGlobalInsultCooldown(message.payload.teamInsultCooldown || 0);
+                setGlobalTomatoCooldown(message.payload.playerTomatoCooldown || 0);
                 break;
                 
               case "kick_chat_message":
@@ -481,12 +521,17 @@ export function useWebSocket() {
     taunts,
     insults,
     setInsults,
+    tomatoes,
+    setTomatoes,
     tauntEnabled,
     insultEnabled,
+    tomatoThrowEnabled,
     globalTauntCooldown,
     globalInsultCooldown,
+    globalTomatoCooldown,
     setGlobalTauntCooldown,
     setGlobalInsultCooldown,
+    setGlobalTomatoCooldown,
     kickChatMessages,
     kickChatVotes,
     kickChatConfig,

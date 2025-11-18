@@ -100,6 +100,7 @@ export interface GameState {
     dark: number;
     light: number;
   };
+  tomatoThrowEnabled?: boolean; // Domates fırlatma özelliği etkin mi
 }
 
 export interface RoomListItem {
@@ -171,6 +172,10 @@ export const updateProphetVisibilitySchema = z.object({
   visibility: z.enum(["own_team", "both_teams", "all_cards"]),
 });
 
+export const updateTomatoThrowEnabledSchema = z.object({
+  enabled: z.boolean(),
+});
+
 export const guessProphetSchema = z.object({
   targetPlayerId: z.string(),
 });
@@ -189,6 +194,10 @@ export const voteEndGameGuessSchema = z.object({
 
 export const triggerTauntSchema = z.object({
   playerId: z.string(),
+});
+
+export const throwTomatoSchema = z.object({
+  targetTeam: z.enum(["dark", "light"]),
 });
 
 // Introduction schemas
@@ -220,6 +229,17 @@ export interface TauntBroadcast {
   videoSrc: string;
   position: { x: number; y: number }; // Normalized 0-1 position on board
   expiresAt: number; // When taunt should disappear
+}
+
+// Tomato throw broadcast payload
+export interface TomatoThrowBroadcast {
+  playerId: string;
+  username: string;
+  fromTeam: Team;
+  targetTeam: Team;
+  position: { x: number; y: number }; // Start position
+  targetPosition: { x: number; y: number }; // End position
+  timestamp: number;
 }
 
 export type JoinRoomInput = z.infer<typeof joinRoomSchema>;

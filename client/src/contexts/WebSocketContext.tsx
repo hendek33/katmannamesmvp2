@@ -18,12 +18,17 @@ interface WebSocketContextType {
   taunts: any[];
   insults: any[];
   setInsults: (value: any[] | ((prev: any[]) => any[])) => void;
+  tomatoes: any[];
+  setTomatoes: (value: any[] | ((prev: any[]) => any[])) => void;
   tauntEnabled: boolean;
   insultEnabled: boolean;
+  tomatoThrowEnabled: boolean;
   globalTauntCooldown: number;
   globalInsultCooldown: number;
+  globalTomatoCooldown: number;
   setGlobalTauntCooldown: (value: number | ((prev: number) => number)) => void;
   setGlobalInsultCooldown: (value: number | ((prev: number) => number)) => void;
+  setGlobalTomatoCooldown: (value: number | ((prev: number) => number)) => void;
   kickChatMessages: any[];
   kickChatVotes: { likes: number; dislikes: number };
   kickChatConfig: any;
