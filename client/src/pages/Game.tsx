@@ -271,7 +271,14 @@ export default function Game() {
       normalWinShownRef.current = false;
     }
 
-    // Show turn video when game starts or restarts
+    // Also reset when in introduction phase
+    if (gameState.phase === "introduction") {
+      previousTurnRef.current = null;
+      setShowTurnVideo(false);
+      return;
+    }
+
+    // Show turn video when game starts or restarts (but NOT during introduction phase)
     if (gameState.phase === "playing" && !previousTurnRef.current) {
       // Store current team for turn video with special flag for game start
       setCurrentTurn(gameState.currentTeam);
