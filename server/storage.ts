@@ -705,6 +705,19 @@ export class MemStorage implements IStorage {
 
     return room;
   }
+  
+  updateProphetCorrectResult(roomCode: string, result: "win" | "tie"): GameState | null {
+    const roomData = this.rooms.get(roomCode);
+    if (!roomData) return null;
+    const room = roomData.gameState;
+    
+    // Only allow prophet correct result to be changed in lobby
+    if (room.phase !== "lobby") return null;
+
+    room.prophetCorrectResult = result;
+
+    return room;
+  }
 
   updatePassword(roomCode: string, password: string | null): GameState | null {
     const roomData = this.rooms.get(roomCode);
@@ -1319,11 +1332,18 @@ export class MemStorage implements IStorage {
       targetId: targetPlayerId
     };
     
-    // If correct, the guessing team wins immediately
+    // If correct, check prophetCorrectResult setting for outcome
     // If incorrect, the guessing team loses immediately!
     if (isCorrect) {
-      room.winner = room.currentTeam;
-      room.phase = "ended";
+      if (room.prophetCorrectResult === "tie") {
+        // Tie result - no winner
+        room.winner = null;
+        room.phase = "ended";
+      } else {
+        // Win result (default) - the guessing team wins
+        room.winner = room.currentTeam;
+        room.phase = "ended";
+      }
     } else {
       // Wrong guess means instant loss for the guessing team!
       room.winner = room.currentTeam === "dark" ? "light" : "dark";

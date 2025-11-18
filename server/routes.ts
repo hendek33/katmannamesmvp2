@@ -18,6 +18,7 @@ import {
   updateChaosModeSchema,
   updateChaosModeTypeSchema,
   updateProphetVisibilitySchema,
+  updateProphetCorrectResultSchema,
   guessProphetSchema,
   guessDoubleAgentSchema,
   endGameGuessSchema,
@@ -979,6 +980,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const gameState = storage.updateProphetVisibility(ws.roomCode, validation.data.visibility);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Kahin görünürlük ayarı güncellenemedi" } });
+              return;
+            }
+
+            broadcastToRoom(ws.roomCode, {
+              type: "game_updated",
+              payload: { gameState },
+            });
+            break;
+          }
+          
+          case "update_prophet_correct_result": {
+            if (!ws.roomCode || !ws.playerId) {
+              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
+              return;
+            }
+
+            const room = storage.getRoom(ws.roomCode);
+            const player = room?.players.find(p => p.id === ws.playerId);
+            if (!player?.isRoomOwner) {
+              sendToClient(ws, { type: "error", payload: { message: "Sadece oda sahibi Kahin tahmin sonucunu değiştirebilir" } });
+              return;
+            }
+
+            const validation = updateProphetCorrectResultSchema.safeParse(payload);
+            if (!validation.success) {
+              sendToClient(ws, { type: "error", payload: { message: "Geçersiz sonuç ayarı" } });
+              return;
+            }
+
+            const gameState = storage.updateProphetCorrectResult(ws.roomCode, validation.data.result);
+            if (!gameState) {
+              sendToClient(ws, { type: "error", payload: { message: "Kahin tahmin sonucu güncellenemedi" } });
               return;
             }
 
