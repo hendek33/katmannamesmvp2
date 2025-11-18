@@ -21,17 +21,20 @@ type Props = {
   countMobile?: number;
 };
 
-function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: Props) {
+function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 8 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const runningRef = useRef<boolean>(true);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d", { 
+      alpha: false,  // Opak arka plan, daha hızlı render
+      desynchronized: true  // Daha düşük gecikme
+    } as any)!;
 
     // ---- Parametreler (Arda'nın sevdiği his) ----
     const params = {
-      count: 40,
+      count: 20,  // Masaüstü için de azaltıldı
       pushStrength: 0.7,
       pushRadius: 90,
       drag: 0.96,
@@ -196,27 +199,27 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
     }
 
     function draw() {
-      ctx.clearRect(0,0,bounds.w,bounds.h);
+      // Arka planı temizle
+      ctx.fillStyle = '#0f0f0f';
+      ctx.fillRect(0, 0, bounds.w, bounds.h);
 
-      // kart çizimi (görsel + rotasyon)
+      // Performans için gölgeleri tamamen kaldır
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // kart çizimi (görsel + rotasyon) - basitleştirilmiş
       for (const c of cards) {
         const cx = c.x + c.w/2, cy = c.y + c.h/2;
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(c.a);
 
-        // gölge - daha belirgin
-        ctx.save();
-        ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetX = 4;
-        ctx.shadowOffsetY = 10;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-        roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 12);
-        ctx.fill();
-        ctx.restore();
+        // Basit koyu arka plan (gölge yerine)
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fillRect(-c.w/2 + 2, -c.h/2 + 2, c.w, c.h);
 
-        // Kartı clip et (köşelerin taşmaması için)
+        // Kartı clip et ve çiz (tek seferde)
         ctx.save();
         roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 12);
         ctx.clip();
@@ -225,16 +228,10 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 16 }: P
         ctx.drawImage(c.img, -c.w/2, -c.h/2, c.w, c.h);
         ctx.restore();
 
-        // Daha belirgin kenar (özellikle beyaz kartlar için)
-        ctx.lineWidth = 2.5;
-        ctx.strokeStyle = "rgba(0,0,0,0.4)";
+        // Tek kenar (basitleştirilmiş)
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(0,0,0,0.6)";
         roundRect(ctx, -c.w/2, -c.h/2, c.w, c.h, 12);
-        ctx.stroke();
-        
-        // İkinci ince kenar (parlaklık için)
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "rgba(255,255,255,0.3)";
-        roundRect(ctx, -c.w/2+1, -c.h/2+1, c.w-2, c.h-2, 12);
         ctx.stroke();
 
         ctx.restore();
