@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
+import { useIntroductionMusic } from "@/hooks/useIntroductionMusic";
 import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command, Edit2, UserX } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -653,6 +654,10 @@ export default function Game() {
   // Don't render introduction phase as separate page, it will be inline
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
+  
+  // Play music during introduction phase
+  useIntroductionMusic(gameState.phase === "introduction");
+  
   if (!currentPlayer) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background bg-grid-pattern">
