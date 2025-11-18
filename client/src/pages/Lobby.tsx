@@ -811,35 +811,6 @@ export default function Lobby() {
                   </div>
                 </div>
                 
-                {/* Tomato Throw Feature - Enhanced Glassmorphism */}
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-red-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">🍅</span>
-                        <h3 className="text-base font-bold text-slate-100">Domates Fırlatma</h3>
-                      </div>
-                      <Switch
-                        checked={tomatoThrowEnabled}
-                        disabled={!currentPlayer?.isRoomOwner}
-                        onCheckedChange={(checked) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            setTomatoThrowEnabled(checked);
-                            handleTomatoThrowUpdate(checked);
-                          }
-                        }}
-                        data-testid="switch-tomato-throw"
-                      />
-                    </div>
-                    {tomatoThrowEnabled && (
-                      <p className="text-xs text-red-400/80">
-                        Oyuncular karşı takıma domates fırlatabilir. 5 saniye bekleme süresi vardır.
-                      </p>
-                    )}
-                  </div>
-                </div>
-                
                 {/* Kick Chat Integration - Enhanced Glassmorphism */}
                 <div className="relative group">
                   <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
