@@ -58,11 +58,11 @@ export function TomatoBubble({
 
   // Calculate start and end positions based on team panels
   // If positions are provided, use them; otherwise use team-based defaults
-  // Dark team panel is on the left (~15%), Light team panel is on the right (~85%)
+  // Dark team panel is on the right (~85%), Light team panel is on the left (~15%)
   // Default to 35% vertical (upper area)
-  const startX = position ? position.x * 100 : (fromTeam === 'dark' ? 15 : 85);
+  const startX = position ? position.x * 100 : (fromTeam === 'dark' ? 85 : 15);
   const startY = position ? position.y * 100 : 35;
-  const endX = targetPosition ? targetPosition.x * 100 : (targetTeam === 'dark' ? 15 : 85);
+  const endX = targetPosition ? targetPosition.x * 100 : (targetTeam === 'dark' ? 85 : 15);
   const endY = targetPosition ? targetPosition.y * 100 : 35;
   
   // Parabolic arc calculation for realistic trajectory

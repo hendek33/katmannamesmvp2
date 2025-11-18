@@ -333,18 +333,18 @@ export function useWebSocket() {
                   }
                   
                   // Override position to use team panel locations
-                  // Dark team panel at 15%, Light team panel at 85%, both at 35% vertical (upper area)
+                  // Dark team panel at 85% (right), Light team panel at 15% (left), both at 35% vertical (upper area)
                   const fromTeam = message.payload.fromTeam;
                   const targetTeam = message.payload.targetTeam;
                   
                   const tomatoWithPanelPositions = {
                     ...message.payload,
                     position: { 
-                      x: fromTeam === 'dark' ? 0.15 : 0.85, 
+                      x: fromTeam === 'dark' ? 0.85 : 0.15, 
                       y: 0.35 
                     },
                     targetPosition: { 
-                      x: targetTeam === 'dark' ? 0.15 : 0.85, 
+                      x: targetTeam === 'dark' ? 0.85 : 0.15, 
                       y: 0.35 
                     }
                   };

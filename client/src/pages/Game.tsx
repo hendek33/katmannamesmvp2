@@ -1805,7 +1805,8 @@ export default function Game() {
                       onClick={handleInsultClick}
                       disabled={globalInsultCooldown > 0 || (!insultEnabled && gameState.phase !== "introduction")}
                       className={`
-                        relative w-full h-12 px-4 py-3 rounded-lg font-bold text-sm overflow-hidden
+                        relative w-full h-12 px-4 rounded-lg font-bold text-sm overflow-hidden
+                        flex items-center justify-center
                         backdrop-blur-md border shadow-lg transition-colors
                         ${globalInsultCooldown > 0 || (!insultEnabled && gameState.phase !== "introduction")
                           ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
