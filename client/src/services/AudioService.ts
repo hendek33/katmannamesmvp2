@@ -77,17 +77,25 @@ export class AudioService {
       }
       
       // Load the sound effects file
+      console.log('🎵 Loading sound effects from /effects.mp3...');
       const response = await fetch('/effects.mp3');
+      console.log('🎵 Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        throw new Error(`Failed to load sound effects: ${response.statusText}`);
+        throw new Error(`Failed to load sound effects: ${response.status} ${response.statusText}`);
       }
       
       const arrayBuffer = await response.arrayBuffer();
-      this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      console.log('🎵 Audio file size:', arrayBuffer.byteLength, 'bytes');
       
-      console.log('✅ Sound effects loaded successfully');
+      this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      console.log('✅ Sound effects loaded successfully! Duration:', this.audioBuffer.duration, 'seconds');
     } catch (error) {
       console.error('❌ Failed to load sound effects:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
       // Don't throw - game should work without sounds
     }
   }
