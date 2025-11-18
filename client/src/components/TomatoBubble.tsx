@@ -65,6 +65,16 @@ export function TomatoBubble({
   const endX = targetPosition ? targetPosition.x * 100 : (targetTeam === 'dark' ? 85 : 15);
   const endY = targetPosition ? targetPosition.y * 100 : 0.5;
   
+  // DEBUG: Log positions
+  console.log('🍅 TOMATO POSITION DEBUG:', {
+    rawPosition: position,
+    rawTargetPosition: targetPosition,
+    calculatedStartY: startY,
+    calculatedEndY: endY,
+    fromTeam,
+    targetTeam
+  });
+  
   // Parabolic arc calculation for realistic trajectory
   const currentX = startX + (endX - startX) * progress;
   const arcHeight = 20; // Arc height for trajectory
