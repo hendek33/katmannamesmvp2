@@ -1,0 +1,402 @@
+========================================
+KATMANNAMES - ELEVENLABS VOICE LINES
+========================================
+Text-to-Speech voice announcements for game
+========================================
+
+1. INTRODUCTION PHASE ANNOUNCEMENTS
+========================================
+
+intro_welcome
+- Text: "Welcome to Katman Names. Let the introduction begin."
+- Voice: Deep, dramatic narrator
+- Duration: 3 seconds
+- Emotion: Epic, welcoming
+
+player_introduction_template
+- Text: "Now presenting: [PLAYER_NAME]"
+- Voice: Game show host style
+- Duration: 2 seconds
+- Emotion: Excited, theatrical
+
+voting_reminder
+- Text: "Cast your votes now. Time is running out."
+- Voice: Urgent announcer
+- Duration: 2.5 seconds
+- Emotion: Urgent, clear
+
+intro_complete
+- Text: "Introductions complete. Prepare for battle."
+- Voice: Military commander
+- Duration: 2.5 seconds
+- Emotion: Authoritative, intense
+
+========================================
+2. TEAM & ROLE ANNOUNCEMENTS
+========================================
+
+team_blue_join
+- Text: "Player joined Team Blue - Katman Koyu"
+- Voice: Neutral announcer
+- Duration: 2 seconds
+- Emotion: Informative
+
+team_red_join
+- Text: "Player joined Team Red - Katman Açık"
+- Voice: Neutral announcer
+- Duration: 2 seconds
+- Emotion: Informative
+
+spymaster_selected_blue
+- Text: "Blue team spymaster has been chosen. The mission begins."
+- Voice: Spy thriller narrator
+- Duration: 3 seconds
+- Emotion: Mysterious, serious
+
+spymaster_selected_red
+- Text: "Red team spymaster has been chosen. The mission begins."
+- Voice: Spy thriller narrator
+- Duration: 3 seconds
+- Emotion: Mysterious, serious
+
+========================================
+3. GAME START ANNOUNCEMENTS
+========================================
+
+countdown_three
+- Text: "Three"
+- Voice: Deep countdown voice
+- Duration: 0.8 seconds
+- Emotion: Building tension
+
+countdown_two
+- Text: "Two"
+- Voice: Deep countdown voice
+- Duration: 0.8 seconds
+- Emotion: Building tension
+
+countdown_one
+- Text: "One"
+- Voice: Deep countdown voice
+- Duration: 0.8 seconds
+- Emotion: Peak tension
+
+game_begin
+- Text: "Begin! May the best team win."
+- Voice: Epic game announcer
+- Duration: 2.5 seconds
+- Emotion: Explosive, exciting
+
+first_turn_blue
+- Text: "Blue team starts. Spymaster, give your clue."
+- Voice: Game narrator
+- Duration: 3 seconds
+- Emotion: Clear, instructive
+
+first_turn_red
+- Text: "Red team starts. Spymaster, give your clue."
+- Voice: Game narrator
+- Duration: 3 seconds
+- Emotion: Clear, instructive
+
+========================================
+4. CLUE PHASE ANNOUNCEMENTS
+========================================
+
+clue_received
+- Text: "Clue received. Operatives, make your selection."
+- Voice: Mission controller
+- Duration: 2.5 seconds
+- Emotion: Official, clear
+
+time_warning_30
+- Text: "Thirty seconds remaining"
+- Voice: Timer announcer
+- Duration: 1.5 seconds
+- Emotion: Warning, urgent
+
+time_warning_10
+- Text: "Ten seconds"
+- Voice: Timer announcer
+- Duration: 1 second
+- Emotion: Very urgent
+
+times_up
+- Text: "Time's up! Turn ending."
+- Voice: Referee
+- Duration: 1.8 seconds
+- Emotion: Final, decisive
+
+========================================
+5. CARD REVEAL ANNOUNCEMENTS
+========================================
+
+correct_guess_blue
+- Text: "Correct! Blue team scores."
+- Voice: Enthusiastic announcer
+- Duration: 1.8 seconds
+- Emotion: Positive, energetic
+
+correct_guess_red
+- Text: "Correct! Red team scores."
+- Voice: Enthusiastic announcer
+- Duration: 1.8 seconds
+- Emotion: Positive, energetic
+
+wrong_team_card
+- Text: "Wrong choice! That belongs to the enemy."
+- Voice: Disappointed narrator
+- Duration: 2.2 seconds
+- Emotion: Negative, dramatic
+
+neutral_card
+- Text: "Neutral card. Turn ends."
+- Voice: Matter-of-fact announcer
+- Duration: 1.5 seconds
+- Emotion: Neutral, informative
+
+assassin_revealed
+- Text: "ASSASSIN! Game over! Instant defeat!"
+- Voice: Shocked announcer
+- Duration: 2.5 seconds
+- Emotion: Dramatic, explosive
+
+========================================
+6. TURN MANAGEMENT ANNOUNCEMENTS
+========================================
+
+turn_change_to_blue
+- Text: "Blue team's turn"
+- Voice: Turn announcer
+- Duration: 1.2 seconds
+- Emotion: Transitional
+
+turn_change_to_red
+- Text: "Red team's turn"
+- Voice: Turn announcer
+- Duration: 1.2 seconds
+- Emotion: Transitional
+
+pass_turn_voluntary
+- Text: "Turn passed voluntarily"
+- Voice: Neutral narrator
+- Duration: 1.5 seconds
+- Emotion: Informative
+
+========================================
+7. CHAOS MODE ANNOUNCEMENTS
+========================================
+
+chaos_mode_activated
+- Text: "CHAOS MODE ACTIVATED! Special rules now in effect!"
+- Voice: Crazy announcer
+- Duration: 3 seconds
+- Emotion: Wild, exciting
+
+prophet_voting_begins
+- Text: "Prophet voting has begun. Who is the chosen one?"
+- Voice: Mystical narrator
+- Duration: 3 seconds
+- Emotion: Mysterious, magical
+
+prophet_revealed_correct
+- Text: "The prophecy was true! The prophet has spoken!"
+- Voice: Mystical sage
+- Duration: 2.8 seconds
+- Emotion: Triumphant, magical
+
+prophet_revealed_wrong
+- Text: "False prophet! The prediction has failed!"
+- Voice: Disappointed oracle
+- Duration: 2.5 seconds
+- Emotion: Dark, ominous
+
+========================================
+8. SPECIAL EVENTS
+========================================
+
+taunt_activated
+- Text: "Ooh, someone's getting taunted!"
+- Voice: Playful commentator
+- Duration: 2 seconds
+- Emotion: Mocking, playful
+
+last_card_warning_blue
+- Text: "Blue team needs one more card to win!"
+- Voice: Excited sports announcer
+- Duration: 2.5 seconds
+- Emotion: High tension
+
+last_card_warning_red
+- Text: "Red team needs one more card to win!"
+- Voice: Excited sports announcer
+- Duration: 2.5 seconds
+- Emotion: High tension
+
+comeback_possible
+- Text: "What a comeback opportunity!"
+- Voice: Sports commentator
+- Duration: 2 seconds
+- Emotion: Hopeful, exciting
+
+========================================
+9. VICTORY ANNOUNCEMENTS
+========================================
+
+victory_blue_dominant
+- Text: "BLUE TEAM WINS! Absolute domination! Katman Koyu reigns supreme!"
+- Voice: Victory announcer
+- Duration: 4 seconds
+- Emotion: Triumphant, celebrating
+
+victory_red_dominant
+- Text: "RED TEAM WINS! Total victory! Katman Açık claims the crown!"
+- Voice: Victory announcer
+- Duration: 4 seconds
+- Emotion: Triumphant, celebrating
+
+victory_blue_close
+- Text: "Blue team wins by a narrow margin! What a match!"
+- Voice: Excited narrator
+- Duration: 3.5 seconds
+- Emotion: Excited, relieved
+
+victory_red_close
+- Text: "Red team wins by a narrow margin! What a match!"
+- Voice: Excited narrator
+- Duration: 3.5 seconds
+- Emotion: Excited, relieved
+
+victory_by_assassin
+- Text: "Victory by assassin! The ultimate mistake has been made!"
+- Voice: Shocked announcer
+- Duration: 3 seconds
+- Emotion: Dramatic, surprised
+
+========================================
+10. GAME END ANNOUNCEMENTS
+========================================
+
+game_complete
+- Text: "Game complete. Well played, everyone."
+- Voice: Warm narrator
+- Duration: 2.5 seconds
+- Emotion: Satisfied, friendly
+
+stats_reveal
+- Text: "Let's look at the statistics"
+- Voice: Analytical commentator
+- Duration: 2 seconds
+- Emotion: Informative
+
+return_to_lobby_prompt
+- Text: "Returning to lobby in 5 seconds"
+- Voice: System announcer
+- Duration: 2 seconds
+- Emotion: Neutral, clear
+
+rematch_suggestion
+- Text: "Ready for another round?"
+- Voice: Encouraging host
+- Duration: 1.8 seconds
+- Emotion: Inviting, energetic
+
+========================================
+11. ERROR & WARNING MESSAGES
+========================================
+
+connection_lost
+- Text: "Connection lost. Attempting to reconnect."
+- Voice: System voice
+- Duration: 2.5 seconds
+- Emotion: Calm, informative
+
+connection_restored
+- Text: "Connection restored. Welcome back."
+- Voice: System voice
+- Duration: 2 seconds
+- Emotion: Reassuring
+
+invalid_action
+- Text: "That action is not allowed"
+- Voice: Warning voice
+- Duration: 1.5 seconds
+- Emotion: Firm, corrective
+
+please_wait
+- Text: "Please wait for your turn"
+- Voice: Patient instructor
+- Duration: 1.8 seconds
+- Emotion: Calm, guiding
+
+========================================
+12. TUTORIAL & HELP
+========================================
+
+tutorial_welcome
+- Text: "Welcome to the tutorial. Let me explain the rules."
+- Voice: Friendly teacher
+- Duration: 3 seconds
+- Emotion: Welcoming, helpful
+
+tutorial_spymaster
+- Text: "As spymaster, give one-word clues to guide your team"
+- Voice: Instructor
+- Duration: 3.5 seconds
+- Emotion: Educational, clear
+
+tutorial_operative
+- Text: "As operative, interpret clues and select cards carefully"
+- Voice: Instructor
+- Duration: 3.5 seconds
+- Emotion: Educational, clear
+
+tutorial_complete
+- Text: "Tutorial complete. You're ready to play!"
+- Voice: Encouraging coach
+- Duration: 2.5 seconds
+- Emotion: Congratulatory
+
+========================================
+TOTAL VOICE LINES: 60
+========================================
+
+ELEVENLABS IMPLEMENTATION NOTES:
+========================================
+
+VOICE SELECTION:
+- Use different voices for different contexts
+- Game announcer: Deep, dramatic voice (Adam, Antoni)
+- System messages: Neutral, clear voice (Rachel, Domi)
+- Victory/defeat: Enthusiastic sports commentator (Josh, Arnold)
+- Tutorial: Friendly, patient teacher (Bella, Elli)
+
+VOICE SETTINGS:
+- Stability: 50-70% for consistent delivery
+- Similarity: 60-80% for natural sound
+- Style: 20-40% for appropriate emotion
+- Speaker Boost: ON for clearer audio
+
+EMOTION GUIDELINES:
+- Adjust speed for urgency (faster for warnings)
+- Use emphasis on key words (TEAM NAMES, VICTORY)
+- Add pauses for dramatic effect (... between phrases)
+
+FILE FORMAT:
+- Output: MP3 320kbps for quality
+- Normalize volume to -3dB
+- Add 0.1s silence padding at start/end
+
+TURKISH PRONUNCIATION:
+- "Katman Koyu" - KAHT-mahn KOH-yoo
+- "Katman Açık" - KAHT-mahn AH-chuhk
+- Ensure proper pronunciation in voice synthesis
+
+CACHING:
+- Pre-generate all static lines
+- Cache player name combinations
+- Real-time generation only for dynamic content
+
+========================================
+END OF ELEVENLABS VOICE LINES
+========================================
