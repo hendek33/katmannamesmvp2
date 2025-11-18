@@ -1757,7 +1757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             // Check if player is moderator (room owner)
-            const gameState = storage.getRoom(ws.roomCode);
+            let gameState = storage.getRoom(ws.roomCode);
             if (!gameState) {
               sendToClient(ws, { type: "error", payload: { message: "Oda bulunamadı" } });
               return;
@@ -1781,6 +1781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
             
+            // Broadcast tomato_toggled event - clients will update their gameState
             broadcastToRoom(ws.roomCode, {
               type: "tomato_toggled",
               payload: result,

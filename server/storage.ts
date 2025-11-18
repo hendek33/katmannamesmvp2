@@ -730,9 +730,7 @@ export class MemStorage implements IStorage {
     if (!roomData) return null;
     const room = roomData.gameState;
     
-    // Only allow tomato throw setting to be changed in lobby
-    if (room.phase !== "lobby") return null;
-
+    // Allow tomato throw setting to be changed anytime (lobby, introduction, playing)
     room.tomatoThrowEnabled = enabled;
     roomData.tomatoThrowEnabled = enabled;
     
@@ -2028,8 +2026,17 @@ export class MemStorage implements IStorage {
   toggleTomato(roomCode: string, enabled: boolean): any {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
+    const room = roomData.gameState;
     
+    // Update both roomData and gameState
     roomData.tomatoThrowEnabled = enabled;
+    room.tomatoThrowEnabled = enabled;
+    
+    // Initialize cooldown map if enabling
+    if (enabled && !roomData.playerTomatoCooldown) {
+      roomData.playerTomatoCooldown = new Map();
+    }
+    
     return { tomatoThrowEnabled: enabled };
   }
   

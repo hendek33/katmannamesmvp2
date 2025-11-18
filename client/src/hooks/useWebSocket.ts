@@ -369,6 +369,11 @@ export function useWebSocket() {
                 
               case "tomato_toggled":
                 setTomatoThrowEnabled(message.payload.tomatoThrowEnabled);
+                // Also update gameState using functional form to avoid stale closure
+                setGameState(prev => prev ? {
+                  ...prev,
+                  tomatoThrowEnabled: message.payload.tomatoThrowEnabled
+                } : prev);
                 break;
                 
               case "room_features":

@@ -575,7 +575,9 @@ export default function Game() {
   };
   
   const handleThrowTomato = (targetTeam: "dark" | "light") => {
-    if (globalTomatoCooldown > 0 || !playerId || !tomatoThrowEnabled || gameState?.phase !== "playing") return;
+    // Allow tomato throwing during introduction and playing phases
+    if (globalTomatoCooldown > 0 || !playerId || !tomatoThrowEnabled) return;
+    if (gameState?.phase !== "playing" && gameState?.phase !== "introduction") return;
     
     const currentPlayer = gameState?.players.find(p => p.id === playerId);
     if (!currentPlayer || !currentPlayer.team || currentPlayer.team === targetTeam) return;
@@ -1878,22 +1880,23 @@ export default function Game() {
                   {/* Tomato Button */}
                   <div className="relative flex-1">
                     <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
-                      globalTomatoCooldown > 0 || (!tomatoThrowEnabled && gameState.phase === "playing")
+                      globalTomatoCooldown > 0 || !tomatoThrowEnabled || (gameState.phase !== "playing" && gameState.phase !== "introduction")
                         ? "bg-gray-600/20"
                         : "bg-gradient-to-r from-red-600/40 to-orange-600/40"
                     }`} />
                     
                     <button
                       onClick={() => {
-                        if (!tomatoThrowEnabled || globalTomatoCooldown > 0 || gameState.phase !== "playing") return;
+                        if (!tomatoThrowEnabled || globalTomatoCooldown > 0) return;
+                        if (gameState.phase !== "playing" && gameState.phase !== "introduction") return;
                         const targetTeam = currentPlayer.team === "dark" ? "light" : "dark";
                         handleThrowTomato(targetTeam);
                       }}
-                      disabled={globalTomatoCooldown > 0 || (!tomatoThrowEnabled && gameState.phase === "playing") || gameState.phase !== "playing"}
+                      disabled={globalTomatoCooldown > 0 || !tomatoThrowEnabled || (gameState.phase !== "playing" && gameState.phase !== "introduction")}
                       className={`
                         relative w-full h-12 px-3 py-2 rounded-lg font-bold text-xs overflow-hidden
                         backdrop-blur-md border shadow-lg transition-colors
-                        ${globalTomatoCooldown > 0 || (!tomatoThrowEnabled && gameState.phase === "playing") || gameState.phase !== "playing"
+                        ${globalTomatoCooldown > 0 || !tomatoThrowEnabled || (gameState.phase !== "playing" && gameState.phase !== "introduction")
                           ? "bg-gray-800/60 border-gray-600/50 text-gray-400 cursor-not-allowed saturate-0" 
                           : "bg-red-900/60 border-red-600/50 text-red-100 cursor-pointer hover:scale-105 hover:bg-red-900/80 hover:border-red-500/60"
                         }
@@ -1914,7 +1917,7 @@ export default function Game() {
                       )}
                       
                       <span className="relative z-10">
-                        {gameState.phase !== "playing" ? (
+                        {gameState.phase !== "playing" && gameState.phase !== "introduction" ? (
                           <span className="flex items-center justify-center gap-1">
                             <span className="text-base">🍅</span>
                             <span>Oyun İçinde</span>
