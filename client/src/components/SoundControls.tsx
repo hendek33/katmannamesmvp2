@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { audioService } from "@/services/AudioService";
+import { simpleSoundService as audioService } from "@/services/SimpleSoundService";
 import { cn } from "@/lib/utils";
 
 export function SoundControls({ className }: { className?: string }) {
@@ -94,7 +94,7 @@ export function SoundControls({ className }: { className?: string }) {
           )}
           
           <div className="text-xs text-muted-foreground">
-            Codenames orjinal ses efektleri kullanılmaktadır
+            Sentetik ses efektleri kullanılmaktadır
           </div>
         </div>
       </PopoverContent>

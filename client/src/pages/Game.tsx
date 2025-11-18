@@ -22,7 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
-import { audioService } from "@/services/AudioService";
+import { simpleSoundService as audioService } from "@/services/SimpleSoundService";
 import { SoundControls } from "@/components/SoundControls";
 import { Send, Copy, Check, Loader2, Users, Clock, Target, ArrowLeft, Lightbulb, Eye, EyeOff, RotateCcw, Settings, Sparkles, Zap, Timer, MessageSquare, MessageCircle, Crown, X, ZoomIn, ZoomOut, RotateCw, Info, Mouse, Command, Edit2, UserX } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -269,13 +269,13 @@ export default function Game() {
           // Assassin sound will be played with the video
         } else if (lastReveal.type === gameState.currentTeam) {
           // Correct guess - team revealed their own card
-          audioService.playCardReveal('correct');
+          audioService.playCardReveal();
         } else if (lastReveal.type === "neutral") {
-          // Neutral card
-          audioService.playCardReveal('neutral');
+          // Neutral card - play error sound
+          audioService.playError();
         } else {
           // Wrong guess - revealed opponent's card
-          audioService.playCardReveal('wrong');
+          audioService.playWrongGuess();
         }
       }
     }

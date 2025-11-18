@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebSocketProvider } from "@/contexts/WebSocketContext";
 import { VideoBase64Converter } from "@/services/VideoBase64Converter";
 import { GameProtection } from "@/utils/protection";
-import { audioService } from "@/services/AudioService";
+import { simpleSoundService as audioService } from "@/services/SimpleSoundService";
 import Welcome from "@/pages/Welcome";
 import RoomList from "@/pages/RoomList";
 import Lobby from "@/pages/Lobby";
