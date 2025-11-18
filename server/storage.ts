@@ -1980,8 +1980,8 @@ export class MemStorage implements IStorage {
     // Check if tomato throwing is enabled
     if (roomData.tomatoThrowEnabled === false) return null;
     
-    // Only during playing phase
-    if (room.phase !== "playing") return null;
+    // Only during introduction or playing phase
+    if (room.phase !== "playing" && room.phase !== "introduction") return null;
     
     // Find the player
     const player = room.players.find(p => p.id === playerId);
@@ -1990,7 +1990,7 @@ export class MemStorage implements IStorage {
     // Can't throw tomato at own team
     if (player.team === targetTeam) return null;
     
-    // Check player-specific cooldown (5 seconds)
+    // Check player-specific cooldown (2 seconds)
     const now = Date.now();
     if (!roomData.playerTomatoCooldown) {
       roomData.playerTomatoCooldown = new Map();
@@ -2002,8 +2002,8 @@ export class MemStorage implements IStorage {
       return { error: `Cooldown: ${remainingSeconds} saniye kaldı` };
     }
     
-    // Set cooldown for this player (5 seconds)
-    roomData.playerTomatoCooldown.set(playerId, now + 5000);
+    // Set cooldown for this player (2 seconds)
+    roomData.playerTomatoCooldown.set(playerId, now + 2000);
     
     // Generate random positions for animation
     const startPosition = { x: Math.random(), y: Math.random() };
