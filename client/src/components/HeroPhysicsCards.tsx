@@ -21,20 +21,20 @@ type Props = {
   countMobile?: number;
 };
 
-function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 8 }: Props) {
+function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 12 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const runningRef = useRef<boolean>(true);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d", { 
-      alpha: false,  // Opak arka plan, daha hızlı render
+      alpha: true,  // Şeffaf arka plan, arka plan görünsün
       desynchronized: true  // Daha düşük gecikme
     } as any)!;
 
     // ---- Parametreler (Arda'nın sevdiği his) ----
     const params = {
-      count: 20,  // Masaüstü için de azaltıldı
+      count: 30,  // Orta seviye kart sayısı
       pushStrength: 0.7,
       pushRadius: 90,
       drag: 0.96,
@@ -199,9 +199,8 @@ function HeroPhysicsCards({ imageNames = [], height = 560, countMobile = 8 }: Pr
     }
 
     function draw() {
-      // Arka planı temizle
-      ctx.fillStyle = '#0f0f0f';
-      ctx.fillRect(0, 0, bounds.w, bounds.h);
+      // Canvas'ı şeffaf olarak temizle (arka plan görünsün)
+      ctx.clearRect(0, 0, bounds.w, bounds.h);
 
       // Performans için gölgeleri tamamen kaldır
       ctx.shadowBlur = 0;
