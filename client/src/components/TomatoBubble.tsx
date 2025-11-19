@@ -11,6 +11,21 @@ interface TomatoBubbleProps {
   timestamp: number;
 }
 
+// Get color scheme based on vegetable (RGB values for inline styles)
+const getVegetableColors = (veg: string) => {
+  const colorMap: Record<string, { primary: string; secondary: string; particle: string; glow: string; trail: string }> = {
+    "🍅": { primary: "220, 38, 38", secondary: "239, 68, 68", particle: "220, 38, 38", glow: "rgb(239 68 68 / 80%)", trail: "239, 68, 68" }, // Domates - Kırmızı
+    "🌶️": { primary: "185, 28, 28", secondary: "234, 88, 12", particle: "185, 28, 28", glow: "rgb(239 68 68 / 80%)", trail: "234, 88, 12" }, // Biber - Kırmızı-Turuncu
+    "🥒": { primary: "22, 163, 74", secondary: "34, 197, 94", particle: "22, 163, 74", glow: "rgb(34 197 94 / 80%)", trail: "34, 197, 94" }, // Salatalık - Yeşil
+    "🥕": { primary: "234, 88, 12", secondary: "249, 115, 22", particle: "234, 88, 12", glow: "rgb(249 115 22 / 80%)", trail: "249, 115, 22" }, // Havuç - Turuncu
+    "🍆": { primary: "109, 40, 217", secondary: "147, 51, 234", particle: "109, 40, 217", glow: "rgb(147 51 234 / 80%)", trail: "147, 51, 234" }, // Patlıcan - Mor
+    "🥔": { primary: "180, 83, 9", secondary: "161, 98, 7", particle: "180, 83, 9", glow: "rgb(245 158 11 / 80%)", trail: "202, 138, 4" }, // Patates - Kahverengi
+    "🧅": { primary: "202, 138, 4", secondary: "245, 158, 11", particle: "202, 138, 4", glow: "rgb(234 179 8 / 80%)", trail: "245, 158, 11" }, // Soğan - Sarı
+    "🧄": { primary: "203, 213, 225", secondary: "226, 232, 240", particle: "203, 213, 225", glow: "rgb(203 213 225 / 80%)", trail: "226, 232, 240" }, // Sarımsak - Beyaz
+  };
+  return colorMap[veg] || colorMap["🍅"]; // Default to tomato colors
+};
+
 export function TomatoBubble({ 
   senderUsername, 
   fromTeam, 
@@ -22,6 +37,8 @@ export function TomatoBubble({
 }: TomatoBubbleProps) {
   const [phase, setPhase] = useState<'throwing' | 'impact' | 'done'>('throwing');
   const [progress, setProgress] = useState(0);
+  
+  const colors = getVegetableColors(vegetable);
 
   useEffect(() => {
     // Animate the throw with smooth progression
@@ -125,12 +142,13 @@ export function TomatoBubble({
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-12 h-0.5 bg-gradient-to-r from-red-500/60 to-transparent"
+                    className="absolute w-12 h-0.5"
                     style={{
                       left: '-40px',
                       top: `${8 + i * 6}px`,
                       transform: `rotate(-15deg)`,
                       opacity: 0.6 - i * 0.15,
+                      background: `linear-gradient(to right, rgba(${colors.trail}, 0.6), transparent)`
                     }}
                   />
                 ))}
@@ -154,13 +172,23 @@ export function TomatoBubble({
           <div className="relative">
             {/* Central explosion blast */}
             <div className="absolute inset-0 flex items-center justify-center -z-10">
-              <div className="w-24 h-24 lg:w-32 lg:h-32 bg-gradient-radial from-red-600/90 via-red-500/60 to-transparent rounded-full animate-expand-splat" />
+              <div 
+                className="w-24 h-24 lg:w-32 lg:h-32 rounded-full animate-expand-splat"
+                style={{
+                  background: `radial-gradient(circle, rgba(${colors.primary}, 0.9) 0%, rgba(${colors.secondary}, 0.6) 50%, transparent 100%)`
+                }}
+              />
             </div>
             
             {/* Secondary shockwave */}
             <div className="absolute inset-0 flex items-center justify-center -z-20">
-              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-gradient-radial from-orange-500/50 via-red-400/30 to-transparent rounded-full animate-expand-splat" 
-                style={{ animationDelay: '0.1s' }} />
+              <div 
+                className="w-32 h-32 lg:w-40 lg:h-40 rounded-full animate-expand-splat"
+                style={{ 
+                  animationDelay: '0.1s',
+                  background: `radial-gradient(circle, rgba(${colors.secondary}, 0.5) 0%, rgba(${colors.primary}, 0.3) 50%, transparent 100%)`
+                }} 
+              />
             </div>
             
             {/* Splatter particles in all directions */}
@@ -170,10 +198,11 @@ export function TomatoBubble({
               return (
                 <div
                   key={i}
-                  className="absolute w-4 h-4 lg:w-5 lg:h-5 bg-red-600 rounded-full animate-splatter shadow-lg"
+                  className="absolute w-4 h-4 lg:w-5 lg:h-5 rounded-full animate-splatter shadow-lg"
                   style={{
                     left: '50%',
                     top: '50%',
+                    backgroundColor: `rgb(${colors.particle})`,
                     animationDelay: `${i * 30}ms`,
                     '--splatter-x': `${Math.cos(angle) * distance}px`,
                     '--splatter-y': `${Math.sin(angle) * distance}px`,
@@ -189,10 +218,11 @@ export function TomatoBubble({
               return (
                 <div
                   key={`small-${i}`}
-                  className="absolute w-2 h-2 lg:w-3 lg:h-3 bg-red-500/80 rounded-full animate-splatter"
+                  className="absolute w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-splatter"
                   style={{
                     left: '50%',
                     top: '50%',
+                    backgroundColor: `rgba(${colors.secondary}, 0.8)`,
                     animationDelay: `${i * 40 + 100}ms`,
                     '--splatter-x': `${Math.cos(angle) * distance}px`,
                     '--splatter-y': `${Math.sin(angle) * distance}px`,
@@ -203,13 +233,12 @@ export function TomatoBubble({
 
             {/* Impact text - smaller size */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className={cn(
-                "text-3xl lg:text-4xl font-black animate-impact-text drop-shadow-2xl",
-                "tracking-wider",
-                targetTeam === 'dark' 
-                  ? "text-blue-100 [text-shadow:_0_0_20px_rgb(59_130_246_/_80%)]" 
-                  : "text-red-100 [text-shadow:_0_0_20px_rgb(239_68_68_/_80%)]"
-              )}>
+              <span 
+                className="text-3xl lg:text-4xl font-black animate-impact-text drop-shadow-2xl tracking-wider text-white"
+                style={{
+                  textShadow: `0 0 20px ${colors.glow}`
+                }}
+              >
                 SPLAT!
               </span>
             </div>
@@ -224,9 +253,10 @@ export function TomatoBubble({
                 }}
               >
                 <div 
-                  className="w-2 h-12 bg-gradient-to-b from-red-600/90 via-red-600/60 to-transparent animate-drip rounded-full"
+                  className="w-2 h-12 animate-drip rounded-full"
                   style={{
                     animationDelay: `${i * 100}ms`,
+                    background: `linear-gradient(to bottom, rgba(${colors.particle}, 0.9) 0%, rgba(${colors.particle}, 0.6) 50%, transparent 100%)`
                   }}
                 />
               </div>

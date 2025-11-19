@@ -1982,20 +1982,20 @@ export default function Game() {
                     {/* Vegetable Selection List */}
                     {showVegetableDialog && tomatoThrowEnabled && globalTomatoCooldown === 0 && (
                       <div className="absolute top-full mt-2 left-0 right-0 z-50">
-                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
-                          <div className="grid grid-cols-2 gap-1">
+                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 shadow-2xl">
+                          <div className="grid grid-cols-4 gap-2">
                             {VEGETABLES.map((veg) => (
                               <button
                                 key={veg.emoji}
                                 onClick={() => handleThrowVegetable(veg.emoji)}
                                 className={cn(
-                                  "px-3 py-2 rounded text-xs font-medium transition-all flex items-center gap-2",
-                                  "hover:scale-105",
-                                  "bg-gradient-to-r from-red-900/50 to-orange-900/50 text-orange-100 hover:from-red-800/60 hover:to-orange-800/60 border border-red-700/30"
+                                  "w-12 h-12 rounded-lg text-2xl transition-all flex items-center justify-center",
+                                  "hover:scale-110",
+                                  "bg-gradient-to-br from-slate-800/80 to-slate-700/80 hover:from-slate-700/90 hover:to-slate-600/90 border border-amber-700/30 hover:border-amber-500/50"
                                 )}
+                                title={veg.name}
                               >
-                                <span className="text-lg">{veg.emoji}</span>
-                                <span>{veg.name}</span>
+                                {veg.emoji}
                               </button>
                             ))}
                           </div>
