@@ -2001,20 +2001,7 @@ export class MemStorage implements IStorage {
     // Can't throw tomato at own team
     if (player.team === targetTeam) return null;
     
-    // Check player-specific cooldown (2 seconds)
     const now = Date.now();
-    if (!roomData.playerTomatoCooldown) {
-      roomData.playerTomatoCooldown = new Map();
-    }
-    
-    const cooldownEnd = roomData.playerTomatoCooldown.get(playerId);
-    if (cooldownEnd && now < cooldownEnd) {
-      const remainingSeconds = Math.ceil((cooldownEnd - now) / 1000);
-      return { error: `Cooldown: ${remainingSeconds} saniye kaldı` };
-    }
-    
-    // Set cooldown for this player (2 seconds)
-    roomData.playerTomatoCooldown.set(playerId, now + 2000);
     
     // Generate positions at the very top of the page (header area)
     // Y position around 0.005 (0.5% from top, almost at the top edge)
@@ -2078,12 +2065,6 @@ export class MemStorage implements IStorage {
         insultRemaining = teamInsultCooldown && (teamInsultCooldown + 5000 - now) > 0
           ? Math.ceil((teamInsultCooldown + 5000 - now) / 1000)
           : 0;
-          
-        // Check player-specific tomato cooldown
-        const tomatoCooldownEnd = roomData.playerTomatoCooldown?.get(playerId);
-        if (tomatoCooldownEnd && now < tomatoCooldownEnd) {
-          tomatoRemaining = Math.ceil((tomatoCooldownEnd - now) / 1000);
-        }
       }
     }
     
@@ -2093,7 +2074,7 @@ export class MemStorage implements IStorage {
       tomatoThrowEnabled: roomData.tomatoThrowEnabled !== false, // Default to true
       teamTauntCooldown: tauntRemaining > 0 ? tauntRemaining : undefined,
       teamInsultCooldown: insultRemaining > 0 ? insultRemaining : undefined,
-      playerTomatoCooldown: tomatoRemaining > 0 ? tomatoRemaining : undefined
+      playerTomatoCooldown: undefined // No cooldown for vegetable throw
     };
   }
   
