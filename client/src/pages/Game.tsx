@@ -14,7 +14,6 @@ import { GameTimer } from "@/components/GameTimer";
 import { TauntBubble } from "@/components/TauntBubble";
 import { InsultBubble } from "@/components/InsultBubble";
 import { TomatoBubble } from "@/components/TomatoBubble";
-import { TomatoOverlay } from "@/components/TomatoOverlay";
 import { EndGameVoting } from "@/components/EndGameVotingSimple";
 import { EndGameGuessSequence } from "@/components/EndGameGuessSequence";
 import { PlayerIntroduction } from "@/components/PlayerIntroduction";
@@ -836,13 +835,6 @@ export default function Game() {
           timestamp={tomato.timestamp}
         />
       ))}
-      
-      {/* Tomato Overlay */}
-      <TomatoOverlay 
-        tomatoes={tomatoes}
-        setTomatoes={setTomatoes}
-        targetTeam={currentPlayer?.team || null}
-      />
 
 
       {/* Normal Win Video */}
