@@ -357,14 +357,7 @@ export function useWebSocket() {
                   setGameState(message.payload.gameState);
                 }
                 
-                // Set cooldown for the throwing player
-                const tomatoGameState = message.payload.gameState;
-                if (tomatoGameState && tomatoGameState.players) {
-                  const currentPlayerForTomato = tomatoGameState.players.find((p: any) => p.id === playerIdRef.current);
-                  if (currentPlayerForTomato && message.payload.playerId === playerIdRef.current) {
-                    setGlobalTomatoCooldown(5);
-                  }
-                }
+                // No cooldown for vegetable throw
                 break;
                 
               case "tomato_toggled":
