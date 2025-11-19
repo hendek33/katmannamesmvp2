@@ -57,7 +57,7 @@ export interface IStorage {
   sendInsult(roomCode: string, playerId: string, targetId?: string): any;
   toggleTaunt(roomCode: string, enabled: boolean): any;
   toggleInsult(roomCode: string, enabled: boolean): any;
-  throwTomato(roomCode: string, playerId: string, targetTeam: "dark" | "light"): any;
+  throwTomato(roomCode: string, playerId: string, targetTeam: "dark" | "light", vegetable?: string): any;
   toggleTomato(roomCode: string, enabled: boolean): any;
   getRoomFeatures(roomCode: string, playerId?: string): { tauntEnabled: boolean; insultEnabled: boolean; tomatoThrowEnabled: boolean; teamTauntCooldown?: number; teamInsultCooldown?: number; playerTomatoCooldown?: number } | null;
   updateKickChatConfig(roomCode: string, config: { enabled: boolean; chatroomId?: number; channelName?: string }): boolean;
@@ -1972,7 +1972,7 @@ export class MemStorage implements IStorage {
     return { insultEnabled: enabled };
   }
   
-  throwTomato(roomCode: string, playerId: string, targetTeam: "dark" | "light"): any {
+  throwTomato(roomCode: string, playerId: string, targetTeam: "dark" | "light", vegetable: string = "🍅"): any {
     const roomData = this.rooms.get(roomCode);
     if (!roomData) return null;
     const room = roomData.gameState;
@@ -2015,13 +2015,14 @@ export class MemStorage implements IStorage {
       username: player.username,
       fromTeam: player.team,
       targetTeam,
+      vegetable, // Add the selected vegetable emoji
       position: startPosition,
       targetPosition: endPosition,
       timestamp: now,
       expiresAt: now + 3000, // Show for 3 seconds
     };
     
-    console.log('🍅 SERVER SENDING TOMATO:', { startY: startPosition.y, endY: endPosition.y });
+    console.log('🥕 SERVER SENDING VEGETABLE:', { vegetable, startY: startPosition.y, endY: endPosition.y });
     
     return tomatoData;
   }

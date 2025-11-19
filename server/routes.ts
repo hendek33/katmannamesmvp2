@@ -1691,9 +1691,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return;
             }
 
-            const tomatoData = storage.throwTomato(ws.roomCode, ws.playerId, validation.data.targetTeam);
+            const vegetable = payload?.vegetable || "🍅"; // Default to tomato
+            const tomatoData = storage.throwTomato(ws.roomCode, ws.playerId, validation.data.targetTeam, vegetable);
             if (!tomatoData) {
-              sendToClient(ws, { type: "error", payload: { message: "Domates fırlatma devre dışı veya cooldown'da" } });
+              sendToClient(ws, { type: "error", payload: { message: "Sebze fırlatma devre dışı veya cooldown'da" } });
               return;
             }
             

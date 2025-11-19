@@ -29,6 +29,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { cn } from "@/lib/utils";
 import Lobby from "./Lobby";
 
+// Sebze listesi
+const VEGETABLES = [
+  { emoji: "🍅", name: "Domates" },
+  { emoji: "🌶️", name: "Biber" },
+  { emoji: "🥒", name: "Salatalık" },
+  { emoji: "🥕", name: "Havuç" },
+  { emoji: "🍆", name: "Patlıcan" },
+  { emoji: "🥔", name: "Patates" },
+  { emoji: "🧅", name: "Soğan" },
+  { emoji: "🧄", name: "Sarımsak" },
+];
+
 export default function Game() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -68,6 +80,7 @@ export default function Game() {
   const [insultCooldown, setInsultCooldown] = useState<number>(0);
   const [tomatoCooldown, setTomatoCooldown] = useState<number>(0);
   const [showInsultV2Dialog, setShowInsultV2Dialog] = useState(false);
+  const [showVegetableDialog, setShowVegetableDialog] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const [showDeveloperNote, setShowDeveloperNote] = useState(true);
   const [showTurnVideo, setShowTurnVideo] = useState(false);
@@ -143,17 +156,20 @@ export default function Game() {
       if (!target.closest('.insult-button-container')) {
         setShowInsultV2Dialog(false);
       }
+      if (!target.closest('.vegetable-button-container')) {
+        setShowVegetableDialog(false);
+      }
       if (!target.closest('.zoom-help-bubble') && !target.closest('[data-zoom-help-button]')) {
         setShowZoomHelp(false);
         setZoomButtonPosition(null);
       }
     };
     
-    if (showNumberSelector || showInsultV2Dialog || showZoomHelp) {
+    if (showNumberSelector || showInsultV2Dialog || showVegetableDialog || showZoomHelp) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [showNumberSelector, showInsultV2Dialog, showZoomHelp]);
+  }, [showNumberSelector, showInsultV2Dialog, showVegetableDialog, showZoomHelp]);
 
 
   // Preload all card images when the game page loads
@@ -574,6 +590,32 @@ export default function Game() {
     // Global cooldown will be set when server broadcasts the event
   };
   
+  const handleVegetableClick = () => {
+    if (globalTomatoCooldown > 0) return;
+    if (!tomatoThrowEnabled) return;
+    if (!gameState || (gameState.phase !== "playing" && gameState.phase !== "introduction")) return;
+    
+    // Toggle the vegetable selection list
+    setShowVegetableDialog(!showVegetableDialog);
+  };
+
+  const handleThrowVegetable = (vegetableEmoji: string) => {
+    // Close the dialog
+    setShowVegetableDialog(false);
+    
+    // Allow vegetable throwing during introduction and playing phases
+    if (globalTomatoCooldown > 0 || !playerId || !tomatoThrowEnabled) return;
+    if (gameState?.phase !== "playing" && gameState?.phase !== "introduction") return;
+    
+    const currentPlayer = gameState?.players.find(p => p.id === playerId);
+    if (!currentPlayer || !currentPlayer.team) return;
+    
+    const targetTeam = currentPlayer.team === "dark" ? "light" : "dark";
+    
+    send("throw_tomato", { targetTeam, vegetable: vegetableEmoji });
+    // Cooldown will be set when server broadcasts the event
+  };
+
   const handleThrowTomato = (targetTeam: "dark" | "light") => {
     // Allow tomato throwing during introduction and playing phases
     if (globalTomatoCooldown > 0 || !playerId || !tomatoThrowEnabled) return;
@@ -788,6 +830,7 @@ export default function Game() {
           senderUsername={tomato.username}
           fromTeam={tomato.fromTeam}
           targetTeam={tomato.targetTeam}
+          vegetable={tomato.vegetable}
           position={tomato.position}
           targetPosition={tomato.targetPosition}
           timestamp={tomato.timestamp}
@@ -1078,10 +1121,10 @@ export default function Game() {
                         ? "border-amber-500 bg-amber-500/10 text-amber-400 hover:border-amber-400 hover:bg-amber-500/20" 
                         : "border hover:border-amber-500 hover:bg-amber-500/10"
                     )}
-                    title="Domates fırlatma özelliğini aç/kapat"
+                    title="Sebze fırlatma özelliğini aç/kapat"
                   >
-                    <span className={cn("mr-1.5", tomatoThrowEnabled && "animate-bounce")}>🍅</span>
-                    <span>Domates</span>
+                    <span className={cn("mr-1.5", tomatoThrowEnabled && "animate-bounce")}>🥕</span>
+                    <span>Sebze</span>
                   </Button>
                 </>
               )}
@@ -1877,8 +1920,8 @@ export default function Game() {
                     )}
                   </div>
                   
-                  {/* Tomato Button */}
-                  <div className="relative flex-1">
+                  {/* Vegetable Button */}
+                  <div className="relative flex-1 vegetable-button-container">
                     <div className={`absolute inset-0 rounded-lg blur-md transition-all ${
                       globalTomatoCooldown > 0 || !tomatoThrowEnabled || (gameState.phase !== "playing" && gameState.phase !== "introduction")
                         ? "bg-gray-600/20"
@@ -1886,12 +1929,7 @@ export default function Game() {
                     }`} />
                     
                     <button
-                      onClick={() => {
-                        if (!tomatoThrowEnabled || globalTomatoCooldown > 0) return;
-                        if (gameState.phase !== "playing" && gameState.phase !== "introduction") return;
-                        const targetTeam = currentPlayer.team === "dark" ? "light" : "dark";
-                        handleThrowTomato(targetTeam);
-                      }}
+                      onClick={handleVegetableClick}
                       disabled={globalTomatoCooldown > 0 || !tomatoThrowEnabled || (gameState.phase !== "playing" && gameState.phase !== "introduction")}
                       className={`
                         relative w-full h-12 px-3 py-2 rounded-lg font-bold text-xs overflow-hidden
@@ -1901,7 +1939,7 @@ export default function Game() {
                           : "bg-red-900/60 border-red-600/50 text-red-100 cursor-pointer hover:scale-105 hover:bg-red-900/80 hover:border-red-500/60"
                         }
                       `}
-                      data-testid="button-throw-tomato"
+                      data-testid="button-throw-vegetable"
                     >
                       {/* Animated progress bar for cooldown */}
                       {globalTomatoCooldown > 0 && (
@@ -1919,7 +1957,7 @@ export default function Game() {
                       <span className="relative z-10">
                         {gameState.phase !== "playing" && gameState.phase !== "introduction" ? (
                           <span className="flex items-center justify-center gap-1">
-                            <span className="text-base">🍅</span>
+                            <span className="text-base">🥕</span>
                             <span>Oyun İçinde</span>
                           </span>
                         ) : !tomatoThrowEnabled ? (
@@ -1934,12 +1972,36 @@ export default function Game() {
                           </span>
                         ) : (
                           <span className="flex items-center justify-center gap-1">
-                            <span className="text-base">🍅</span>
-                            Domates Fırlat
+                            <span className="text-base">🥕</span>
+                            Sebze Fırlat
                           </span>
                         )}
                       </span>
                     </button>
+                    
+                    {/* Vegetable Selection List */}
+                    {showVegetableDialog && tomatoThrowEnabled && globalTomatoCooldown === 0 && (
+                      <div className="absolute top-full mt-2 left-0 right-0 z-50">
+                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 space-y-1 shadow-2xl">
+                          <div className="grid grid-cols-2 gap-1">
+                            {VEGETABLES.map((veg) => (
+                              <button
+                                key={veg.emoji}
+                                onClick={() => handleThrowVegetable(veg.emoji)}
+                                className={cn(
+                                  "px-3 py-2 rounded text-xs font-medium transition-all flex items-center gap-2",
+                                  "hover:scale-105",
+                                  "bg-gradient-to-r from-red-900/50 to-orange-900/50 text-orange-100 hover:from-red-800/60 hover:to-orange-800/60 border border-red-700/30"
+                                )}
+                              >
+                                <span className="text-lg">{veg.emoji}</span>
+                                <span>{veg.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -5,6 +5,7 @@ interface TomatoBubbleProps {
   senderUsername: string;
   fromTeam: 'dark' | 'light';
   targetTeam: 'dark' | 'light';
+  vegetable?: string;
   position?: { x: number; y: number };
   targetPosition?: { x: number; y: number };
   timestamp: number;
@@ -13,7 +14,8 @@ interface TomatoBubbleProps {
 export function TomatoBubble({ 
   senderUsername, 
   fromTeam, 
-  targetTeam, 
+  targetTeam,
+  vegetable = "🍅",
   position,
   targetPosition,
   timestamp 
@@ -99,22 +101,22 @@ export function TomatoBubble({
             transition: 'none', // Use manual animation for smoothness
           }}
         >
-          {/* Tomato with enhanced motion effects */}
+          {/* Vegetable with enhanced motion effects */}
           <div className="relative">
-            {/* Main tomato - EXTRA LARGE size for visibility */}
+            {/* Main vegetable - EXTRA LARGE size for visibility */}
             <span className="text-7xl drop-shadow-2xl filter brightness-110">
-              🍅
+              {vegetable}
             </span>
             
             {/* Enhanced motion trail with multiple layers */}
             <div className="absolute inset-0 -z-10 -translate-x-2 -translate-y-1">
-              <span className="text-5xl opacity-40 blur-[2px]">🍅</span>
+              <span className="text-5xl opacity-40 blur-[2px]">{vegetable}</span>
             </div>
             <div className="absolute inset-0 -z-10 -translate-x-4 -translate-y-1.5">
-              <span className="text-5xl opacity-25 blur-[4px]">🍅</span>
+              <span className="text-5xl opacity-25 blur-[4px]">{vegetable}</span>
             </div>
             <div className="absolute inset-0 -z-10 -translate-x-6 -translate-y-2">
-              <span className="text-5xl opacity-15 blur-[6px]">🍅</span>
+              <span className="text-5xl opacity-15 blur-[6px]">{vegetable}</span>
             </div>
             
             {/* Speed lines for dramatic effect */}
