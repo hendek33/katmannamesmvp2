@@ -1983,7 +1983,7 @@ export default function Game() {
                     {showVegetableDialog && tomatoThrowEnabled && globalTomatoCooldown === 0 && (
                       <div className="absolute top-full mt-2 left-0 right-0 z-50">
                         <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 shadow-2xl">
-                          <div className="grid grid-cols-4 gap-2">
+                          <div className="grid grid-cols-2 gap-2">
                             {VEGETABLES.map((veg) => (
                               <button
                                 key={veg.emoji}
