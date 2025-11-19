@@ -37,9 +37,10 @@ export function PlayerIntroduction({
   const likeButtonRef = useRef<HTMLDivElement>(null);
   const dislikeButtonRef = useRef<HTMLDivElement>(null);
   
-  // Track previous vote counts to detect new votes from other players
-  const prevLikesCountRef = useRef<number>(0);
-  const prevDislikesCountRef = useRef<number>(0);
+  // Track previous votes to detect changes from other players
+  const prevLikesRef = useRef<Record<string, string | null>>({});
+  const prevDislikesRef = useRef<Record<string, string | null>>({});
+  const lastOwnVoteTimeRef = useRef<number>(0);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team spymaster controls
@@ -80,11 +81,19 @@ export function PlayerIntroduction({
   useEffect(() => {
     if (!introducingPlayer) return;
     
-    const currentLikesCount = Object.keys(introducingPlayer.introductionLikes || {}).length;
-    const currentDislikesCount = Object.keys(introducingPlayer.introductionDislikes || {}).length;
+    const currentLikes = introducingPlayer.introductionLikes || {};
+    const currentDislikes = introducingPlayer.introductionDislikes || {};
     
-    // Check if likes count changed (new like vote or vote removed)
-    if (currentLikesCount !== prevLikesCountRef.current && likeButtonRef.current) {
+    // Ignore updates within 300ms of our own vote to prevent double effects
+    const timeSinceOwnVote = Date.now() - lastOwnVoteTimeRef.current;
+    const isOwnVoteRecent = timeSinceOwnVote < 300;
+    
+    // Check for new or changed likes (comparing player IDs)
+    const prevLikeIds = Object.keys(prevLikesRef.current);
+    const currentLikeIds = Object.keys(currentLikes);
+    
+    // If likes changed and it's not our own recent vote
+    if (!isOwnVoteRecent && currentLikeIds.length !== prevLikeIds.length && likeButtonRef.current) {
       const rect = likeButtonRef.current.getBoundingClientRect();
       const newParticle = {
         id: Date.now() + Math.random(),
@@ -100,8 +109,12 @@ export function PlayerIntroduction({
       }, 800);
     }
     
-    // Check if dislikes count changed (new dislike vote or vote removed)
-    if (currentDislikesCount !== prevDislikesCountRef.current && dislikeButtonRef.current) {
+    // Check for new or changed dislikes
+    const prevDislikeIds = Object.keys(prevDislikesRef.current);
+    const currentDislikeIds = Object.keys(currentDislikes);
+    
+    // If dislikes changed and it's not our own recent vote
+    if (!isOwnVoteRecent && currentDislikeIds.length !== prevDislikeIds.length && dislikeButtonRef.current) {
       const rect = dislikeButtonRef.current.getBoundingClientRect();
       const newParticle = {
         id: Date.now() + Math.random(),
@@ -117,10 +130,10 @@ export function PlayerIntroduction({
       }, 800);
     }
     
-    // Update previous counts
-    prevLikesCountRef.current = currentLikesCount;
-    prevDislikesCountRef.current = currentDislikesCount;
-  }, [JSON.stringify(introducingPlayer?.introductionLikes), JSON.stringify(introducingPlayer?.introductionDislikes)]);
+    // Update previous votes
+    prevLikesRef.current = { ...currentLikes };
+    prevDislikesRef.current = { ...currentDislikes };
+  }, [introducingPlayer?.introductionLikes, introducingPlayer?.introductionDislikes, introducingPlayer]);
   
   const handlePlayerClick = (player: Player) => {
     if (canSelectPlayer && !player.introduced && !currentIntroducingPlayer) {
@@ -136,7 +149,10 @@ export function PlayerIntroduction({
   
   const handleLikeDislike = (isLike: boolean, event: React.MouseEvent) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
-      // Add single particle effect for cleaner animation
+      // Mark timestamp of our own vote to prevent double effect from useEffect
+      lastOwnVoteTimeRef.current = Date.now();
+      
+      // Add single particle effect for our own click
       const rect = event.currentTarget.getBoundingClientRect();
       const newParticle = {
         id: Date.now(),
