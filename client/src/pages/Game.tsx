@@ -104,8 +104,6 @@ export default function Game() {
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [isChangingName, setIsChangingName] = useState(false);
-  const [clueAnimationStage, setClueAnimationStage] = useState<'idle' | 'dropping' | 'impact' | 'sliding'>('idle');
-  const [currentClueId, setCurrentClueId] = useState<string | null>(null);
   
   // Kullanıcı adı değişikliği yanıtını işle
   useEffect(() => {
@@ -262,29 +260,10 @@ export default function Game() {
   useEffect(() => {
     if (!gameState?.currentClue) {
       previousClueRef.current = null;
-      setClueAnimationStage('idle');
-      setCurrentClueId(null);
       return;
     }
 
     const clueKey = `${gameState.currentClue.word}-${gameState.currentClue.count}`;
-    
-    // If this is a NEW clue (different from previous), start animation
-    if (previousClueRef.current !== clueKey) {
-      setCurrentClueId(clueKey);
-      setClueAnimationStage('dropping');
-      
-      // After dropping animation (1s), show impact
-      setTimeout(() => {
-        setClueAnimationStage('impact');
-        
-        // After impact pause (0.8s), slide to position
-        setTimeout(() => {
-          setClueAnimationStage('sliding');
-        }, 800);
-      }, 1000);
-    }
-    
     previousClueRef.current = clueKey;
   }, [gameState?.currentClue]);
 
@@ -2201,50 +2180,8 @@ export default function Game() {
             {/* Clue Input/Display - Overlay at Bottom */}
             <div className="absolute bottom-0 left-0 right-0 flex justify-center p-0" style={{ zIndex: 9999 }}>
               {/* Clue Display Card - Shows after clue is given */}
-              {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && clueAnimationStage !== 'idle' && (
-                <>
-                  {/* Dust particles - only during impact */}
-                  {clueAnimationStage === 'impact' && (
-                    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 9998 }}>
-                      {[...Array(20)].map((_, i) => {
-                        const angle = (i * Math.PI * 2) / 20;
-                        const distance = 80 + Math.random() * 60;
-                        return (
-                          <div
-                            key={i}
-                            className="absolute animate-dust"
-                            style={{
-                              left: '50%',
-                              top: '50%',
-                              width: '12px',
-                              height: '12px',
-                              borderRadius: '50%',
-                              backgroundColor: `rgba(251, 191, 36, ${0.6 - Math.random() * 0.3})`,
-                              '--dust-x': `${Math.cos(angle) * distance}px`,
-                              '--dust-y': `${Math.sin(angle) * distance}px`,
-                              animationDelay: `${i * 20}ms`,
-                            } as React.CSSProperties}
-                          />
-                        );
-                      })}
-                    </div>
-                  )}
-                  
-                  {/* Clue box with stage-based positioning and animation */}
-                  <Card 
-                    className={cn(
-                      "px-5 py-3 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg",
-                      clueAnimationStage === 'dropping' && "animate-clue-drop",
-                      clueAnimationStage === 'impact' && "animate-clue-impact",
-                      clueAnimationStage === 'sliding' && "animate-clue-slide"
-                    )}
-                    style={{
-                      position: clueAnimationStage === 'sliding' ? 'relative' : 'fixed',
-                      left: clueAnimationStage !== 'sliding' ? '50%' : 'auto',
-                      top: clueAnimationStage !== 'sliding' ? '50%' : 'auto',
-                      zIndex: 9999,
-                    }}
-                  >
+              {!canGiveClue && gameState.currentClue && gameState.phase !== "ended" && (
+                <Card className="px-5 py-3 sm:px-6 sm:py-4 border-2 bg-slate-950/95 border-amber-500/60 shadow-2xl backdrop-blur-lg animate-clue-slide-up">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
                       <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 animate-pulse" />
@@ -2276,7 +2213,6 @@ export default function Game() {
                     )}
                   </div>
                 </Card>
-                </>
               )}
               
               {canGiveClue ? (
