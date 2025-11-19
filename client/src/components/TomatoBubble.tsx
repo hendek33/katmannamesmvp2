@@ -63,7 +63,7 @@ export function TomatoBubble({
     // Remove after impact animation completes
     const removeTimer = setTimeout(() => {
       setPhase('done');
-    }, 2500);
+    }, 10000);
 
     return () => {
       if (animationFrameId !== null) {
