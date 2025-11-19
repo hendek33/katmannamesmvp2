@@ -1044,7 +1044,7 @@ export default function Lobby() {
                       <h4 className="font-bold text-lg text-cyan-500">Kahin Rolü</h4>
                     </div>
                     <p className="text-sm leading-relaxed">
-                      Her takımda 1 tane gizli Kahin bulunur. 
+                      Her takımda 1 tane gizli Kahin bulunur. Kahinler belirli kartların yerlerini görebilirler.
                       Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
                       <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Ama tahmin yapabilmenin bazı koşulları vardır.</span>
                     </p>
