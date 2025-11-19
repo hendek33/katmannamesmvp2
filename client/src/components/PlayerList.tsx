@@ -332,31 +332,29 @@ export function PlayerList({
       {noTeam.length > 0 && (
         <div className="relative group">
           <div className="absolute inset-0 bg-amber-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-          <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border-2 border-dashed border-amber-600/50 p-3 space-y-2 shadow-2xl">
-          <h3 className="font-bold text-sm text-amber-400">Takım Seçilmemiş ({noTeam.length})</h3>
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border-2 border-dashed border-amber-600/50 p-2 space-y-1.5 shadow-2xl">
+          <h3 className="font-bold text-sm text-amber-400 px-1">Takım Seçilmemiş ({noTeam.length})</h3>
+          <div className="grid grid-cols-6 gap-1">
             {noTeam.map(player => (
               <div 
                 key={player.id}
                 data-testid={`player-${player.id}`}
-                className="relative flex flex-col items-center justify-center gap-1 p-2 rounded bg-amber-900/20 border border-amber-700/30 hover:bg-amber-900/30 transition-colors group/player"
+                className="flex items-center justify-center gap-0.5 px-1 py-0.5 rounded bg-amber-900/20 border border-amber-700/30 hover:bg-amber-900/30 transition-colors min-h-[24px]"
               >
-                <div className="flex items-center gap-1 w-full justify-center">
-                  {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-400 flex-shrink-0" />}
-                  <span className="text-xs font-medium text-slate-200 text-center truncate max-w-full">{player.username}</span>
-                </div>
-                {player.id === currentPlayerId && <span className="text-[10px] text-amber-300">(Sen)</span>}
                 {currentPlayer?.isRoomOwner && player.id !== currentPlayerId && onKickPlayer && (
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => onKickPlayer(player.id)}
-                    className="absolute -top-1 -right-1 h-5 w-5 p-0 opacity-0 group-hover/player:opacity-100 hover:bg-red-900/60 hover:text-red-300 transition-opacity"
+                    className="h-4 w-4 p-0 hover:bg-red-900/60 hover:text-red-300 flex-shrink-0"
                     title="Oyuncuyu At"
                   >
-                    <UserX className="w-3 h-3" />
+                    <UserX className="w-2.5 h-2.5" />
                   </Button>
                 )}
+                {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400 flex-shrink-0" />}
+                <span className="text-[11px] font-medium text-slate-200 text-center truncate">{player.username}</span>
+                {player.id === currentPlayerId && <span className="text-[9px] text-amber-300 flex-shrink-0">(Sen)</span>}
               </div>
             ))}
           </div>
