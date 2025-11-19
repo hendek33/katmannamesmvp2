@@ -97,18 +97,6 @@ function TomatoAnimation({ tomato }: { tomato: TomatoProps }) {
           </div>
         )}
       </div>
-      
-      {/* Sender name */}
-      <div className={cn(
-        "absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap",
-        "text-sm font-bold px-2 py-1 rounded-md",
-        "bg-gradient-to-r",
-        tomato.fromTeam === "dark" 
-          ? "from-blue-500/80 to-blue-600/80 text-blue-100"
-          : "from-red-500/80 to-red-600/80 text-red-100"
-      )}>
-        {tomato.username} fırlattı!
-      </div>
     </div>
   );
 }
