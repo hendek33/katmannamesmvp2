@@ -69,7 +69,7 @@ export function useWebSocket() {
             if (ws.current && ws.current.readyState === WebSocket.OPEN) {
               ws.current.send(JSON.stringify({ type: "ping", payload: {} }));
             }
-          }, 4000); // Ping every 4 seconds to prevent 5-second timeout
+          }, 30000); // Ping every 30 seconds to keep connection alive
           
           const savedRoomCode = localStorage.getItem("katmannames_room_code");
           const savedPlayerId = localStorage.getItem("katmannames_player_id");
