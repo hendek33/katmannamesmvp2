@@ -91,6 +91,13 @@ export interface GameState {
     currentIntroducingPlayer?: string; // ID of currently introducing player
     introductionStarted?: boolean; // Whether introduction phase has started
     playersIntroduced?: string[]; // IDs of players who have been introduced
+    lastVoteEvent?: { // Last vote event (to detect all votes including spam)
+      targetPlayerId: string; // Player being voted on
+      voterId: string; // Player who voted
+      isLike: boolean; // true for like, false for dislike
+      eventId: number; // Unique incrementing counter
+      timestamp: number; // When the vote happened
+    };
   };
   consecutivePasses?: { // Track consecutive passes per team
     dark: number;

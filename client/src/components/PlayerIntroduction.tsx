@@ -37,10 +37,8 @@ export function PlayerIntroduction({
   const likeButtonRef = useRef<HTMLDivElement>(null);
   const dislikeButtonRef = useRef<HTMLDivElement>(null);
   
-  // Track previous votes to detect changes from other players
-  const prevLikesRef = useRef<Record<string, string | null>>({});
-  const prevDislikesRef = useRef<Record<string, string | null>>({});
-  const lastOwnVoteTimeRef = useRef<number>(0);
+  // Track last seen vote event ID to detect all votes including spam
+  const lastSeenEventIdRef = useRef<number>(0);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team spymaster controls
@@ -77,63 +75,39 @@ export function PlayerIntroduction({
     }
   }, [currentIntroducingPlayer]);
   
-  // Detect new votes from other players and show particle effects
+  // Detect vote events from WebSocket updates using unique event IDs
   useEffect(() => {
-    if (!introducingPlayer) return;
+    if (!gameState.introductionPhase?.lastVoteEvent) return;
     
-    const currentLikes = introducingPlayer.introductionLikes || {};
-    const currentDislikes = introducingPlayer.introductionDislikes || {};
+    const voteEvent = gameState.introductionPhase.lastVoteEvent;
     
-    // Ignore updates within 300ms of our own vote to prevent double effects
-    const timeSinceOwnVote = Date.now() - lastOwnVoteTimeRef.current;
-    const isOwnVoteRecent = timeSinceOwnVote < 300;
+    // Check if this is a new event we haven't seen yet
+    if (voteEvent.eventId <= lastSeenEventIdRef.current) return;
     
-    // Check for new or changed likes (comparing player IDs)
-    const prevLikeIds = Object.keys(prevLikesRef.current);
-    const currentLikeIds = Object.keys(currentLikes);
+    // Update last seen event ID
+    lastSeenEventIdRef.current = voteEvent.eventId;
     
-    // If likes changed and it's not our own recent vote
-    if (!isOwnVoteRecent && currentLikeIds.length !== prevLikeIds.length && likeButtonRef.current) {
-      const rect = likeButtonRef.current.getBoundingClientRect();
-      const newParticle = {
-        id: Date.now() + Math.random(),
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-        type: 'like' as const
-      };
-      
-      setParticles(prev => [...prev, newParticle]);
-      
-      setTimeout(() => {
-        setParticles(prev => prev.filter(p => p.id !== newParticle.id));
-      }, 800);
-    }
+    // Don't show particle for our own votes (handleLikeDislike already shows it)
+    if (voteEvent.voterId === playerId) return;
     
-    // Check for new or changed dislikes
-    const prevDislikeIds = Object.keys(prevDislikesRef.current);
-    const currentDislikeIds = Object.keys(currentDislikes);
+    // Show particle effect for the vote type
+    const buttonRef = voteEvent.isLike ? likeButtonRef : dislikeButtonRef;
+    if (!buttonRef.current) return;
     
-    // If dislikes changed and it's not our own recent vote
-    if (!isOwnVoteRecent && currentDislikeIds.length !== prevDislikeIds.length && dislikeButtonRef.current) {
-      const rect = dislikeButtonRef.current.getBoundingClientRect();
-      const newParticle = {
-        id: Date.now() + Math.random(),
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-        type: 'dislike' as const
-      };
-      
-      setParticles(prev => [...prev, newParticle]);
-      
-      setTimeout(() => {
-        setParticles(prev => prev.filter(p => p.id !== newParticle.id));
-      }, 800);
-    }
+    const rect = buttonRef.current.getBoundingClientRect();
+    const newParticle = {
+      id: Date.now() + Math.random(),
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      type: voteEvent.isLike ? 'like' as const : 'dislike' as const
+    };
     
-    // Update previous votes
-    prevLikesRef.current = { ...currentLikes };
-    prevDislikesRef.current = { ...currentDislikes };
-  }, [introducingPlayer?.introductionLikes, introducingPlayer?.introductionDislikes, introducingPlayer]);
+    setParticles(prev => [...prev, newParticle]);
+    
+    setTimeout(() => {
+      setParticles(prev => prev.filter(p => p.id !== newParticle.id));
+    }, 800);
+  }, [gameState.introductionPhase?.lastVoteEvent?.eventId]);
   
   const handlePlayerClick = (player: Player) => {
     if (canSelectPlayer && !player.introduced && !currentIntroducingPlayer) {
@@ -149,10 +123,7 @@ export function PlayerIntroduction({
   
   const handleLikeDislike = (isLike: boolean, event: React.MouseEvent) => {
     if (currentIntroducingPlayer && playerId !== currentIntroducingPlayer) {
-      // Mark timestamp of our own vote to prevent double effect from useEffect
-      lastOwnVoteTimeRef.current = Date.now();
-      
-      // Add single particle effect for our own click
+      // Add particle effect for our own click (before server responds)
       const rect = event.currentTarget.getBoundingClientRect();
       const newParticle = {
         id: Date.now(),

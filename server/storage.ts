@@ -2240,6 +2240,16 @@ export class MemStorage implements IStorage {
       target.introductionDislikes[playerId] = player.team;
     }
     
+    // Track vote event with unique ID (for detecting all votes including spam)
+    const currentEventId = room.introductionPhase.lastVoteEvent?.eventId || 0;
+    room.introductionPhase.lastVoteEvent = {
+      targetPlayerId,
+      voterId: playerId,
+      isLike,
+      eventId: currentEventId + 1,
+      timestamp: Date.now()
+    };
+    
     return room;
   }
 
