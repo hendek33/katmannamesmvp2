@@ -1045,7 +1045,7 @@ export default function Game() {
                     title="Hareket çekme özelliğini aç/kapat"
                   >
                     <Zap className={cn("w-3 h-3 mr-1.5", tauntEnabled && "animate-pulse")} />
-                    <span>{tauntEnabled ? "Hareket Aktif" : "Hareket Pasif"}</span>
+                    <span>Hareket</span>
                   </Button>
                   <div className="w-px h-5 bg-amber-900/40" />
                   <Button
@@ -1063,7 +1063,7 @@ export default function Game() {
                     title="Laf sokma özelliğini aç/kapat"
                   >
                     <MessageCircle className={cn("w-3 h-3 mr-1.5", insultEnabled && "animate-pulse")} />
-                    <span>{insultEnabled ? "Laf Aktif" : "Laf Pasif"}</span>
+                    <span>Laf</span>
                   </Button>
                   <div className="w-px h-5 bg-amber-900/40" />
                   <Button
@@ -1081,7 +1081,7 @@ export default function Game() {
                     title="Domates fırlatma özelliğini aç/kapat"
                   >
                     <span className={cn("mr-1.5", tomatoThrowEnabled && "animate-bounce")}>🍅</span>
-                    <span>{tomatoThrowEnabled ? "Domates Aktif" : "Domates Pasif"}</span>
+                    <span>Domates</span>
                   </Button>
                 </>
               )}

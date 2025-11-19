@@ -341,11 +341,11 @@ export function useWebSocket() {
                     ...message.payload,
                     position: { 
                       x: fromTeam === 'dark' ? 0.85 : 0.15, 
-                      y: 0.35 
+                      y: 0.20 
                     },
                     targetPosition: { 
                       x: targetTeam === 'dark' ? 0.85 : 0.15, 
-                      y: 0.35 
+                      y: 0.20 
                     }
                   };
                   
