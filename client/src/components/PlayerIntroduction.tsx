@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { GameState, Player } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -32,6 +32,14 @@ export function PlayerIntroduction({
   
   // Get Kick chat data from context
   const { kickChatMessages, kickChatVotes, kickChatConfig } = useWebSocketContext();
+  
+  // Refs for vote button positions
+  const likeButtonRef = useRef<HTMLDivElement>(null);
+  const dislikeButtonRef = useRef<HTMLDivElement>(null);
+  
+  // Track previous vote counts to detect new votes from other players
+  const prevLikesCountRef = useRef<number>(0);
+  const prevDislikesCountRef = useRef<number>(0);
   
   const currentPlayer = gameState.players.find((p) => p.id === playerId);
   const isController = currentPlayer?.team === "light" && currentPlayer?.role === "spymaster"; // Red team spymaster controls
@@ -67,6 +75,52 @@ export function PlayerIntroduction({
       return () => clearInterval(interval);
     }
   }, [currentIntroducingPlayer]);
+  
+  // Detect new votes from other players and show particle effects
+  useEffect(() => {
+    if (!introducingPlayer) return;
+    
+    const currentLikesCount = Object.keys(introducingPlayer.introductionLikes || {}).length;
+    const currentDislikesCount = Object.keys(introducingPlayer.introductionDislikes || {}).length;
+    
+    // Check if likes increased (new like vote)
+    if (currentLikesCount > prevLikesCountRef.current && likeButtonRef.current) {
+      const rect = likeButtonRef.current.getBoundingClientRect();
+      const newParticle = {
+        id: Date.now() + Math.random(),
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        type: 'like' as const
+      };
+      
+      setParticles(prev => [...prev, newParticle]);
+      
+      setTimeout(() => {
+        setParticles(prev => prev.filter(p => p.id !== newParticle.id));
+      }, 800);
+    }
+    
+    // Check if dislikes increased (new dislike vote)
+    if (currentDislikesCount > prevDislikesCountRef.current && dislikeButtonRef.current) {
+      const rect = dislikeButtonRef.current.getBoundingClientRect();
+      const newParticle = {
+        id: Date.now() + Math.random(),
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        type: 'dislike' as const
+      };
+      
+      setParticles(prev => [...prev, newParticle]);
+      
+      setTimeout(() => {
+        setParticles(prev => prev.filter(p => p.id !== newParticle.id));
+      }, 800);
+    }
+    
+    // Update previous counts
+    prevLikesCountRef.current = currentLikesCount;
+    prevDislikesCountRef.current = currentDislikesCount;
+  }, [introducingPlayer?.introductionLikes, introducingPlayer?.introductionDislikes]);
   
   const handlePlayerClick = (player: Player) => {
     if (canSelectPlayer && !player.introduced && !currentIntroducingPlayer) {
@@ -935,6 +989,7 @@ export function PlayerIntroduction({
                 <div className="grid grid-cols-2 gap-4 w-full">
                 {/* Likes - Clickable Card */}
                 <motion.div
+                  ref={likeButtonRef}
                   className={`relative bg-green-900/30 border-2 rounded-lg p-4 
                     ${hasVotedLike ? 'border-green-400 bg-green-800/50' : 'border-green-500/50'}
                     ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-green-900/50 hover:border-green-400/70' : ''}`}
@@ -991,6 +1046,7 @@ export function PlayerIntroduction({
                 
                 {/* Dislikes - Clickable Card */}
                 <motion.div
+                  ref={dislikeButtonRef}
                   className={`relative bg-red-900/30 border-2 rounded-lg p-4 
                     ${hasVotedDislike ? 'border-red-400 bg-red-800/50' : 'border-red-500/50'}
                     ${playerId !== currentIntroducingPlayer ? 'cursor-pointer hover:bg-red-900/50 hover:border-red-400/70' : ''}`}
