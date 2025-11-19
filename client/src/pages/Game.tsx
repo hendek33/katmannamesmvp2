@@ -658,12 +658,12 @@ export default function Game() {
   }, [globalTomatoCooldown]);
 
   
-  // Get room features on mount
+  // Get room features on mount (only once when connected)
   useEffect(() => {
-    if (isConnected && gameState) {
+    if (isConnected) {
       send("get_room_features", {});
     }
-  }, [isConnected, gameState, send]);
+  }, [isConnected, send]);
 
   useEffect(() => {
     if (!gameState && isConnected) {
