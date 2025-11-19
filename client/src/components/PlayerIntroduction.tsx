@@ -83,8 +83,8 @@ export function PlayerIntroduction({
     const currentLikesCount = Object.keys(introducingPlayer.introductionLikes || {}).length;
     const currentDislikesCount = Object.keys(introducingPlayer.introductionDislikes || {}).length;
     
-    // Check if likes increased (new like vote)
-    if (currentLikesCount > prevLikesCountRef.current && likeButtonRef.current) {
+    // Check if likes count changed (new like vote or vote removed)
+    if (currentLikesCount !== prevLikesCountRef.current && likeButtonRef.current) {
       const rect = likeButtonRef.current.getBoundingClientRect();
       const newParticle = {
         id: Date.now() + Math.random(),
@@ -100,8 +100,8 @@ export function PlayerIntroduction({
       }, 800);
     }
     
-    // Check if dislikes increased (new dislike vote)
-    if (currentDislikesCount > prevDislikesCountRef.current && dislikeButtonRef.current) {
+    // Check if dislikes count changed (new dislike vote or vote removed)
+    if (currentDislikesCount !== prevDislikesCountRef.current && dislikeButtonRef.current) {
       const rect = dislikeButtonRef.current.getBoundingClientRect();
       const newParticle = {
         id: Date.now() + Math.random(),
@@ -120,7 +120,7 @@ export function PlayerIntroduction({
     // Update previous counts
     prevLikesCountRef.current = currentLikesCount;
     prevDislikesCountRef.current = currentDislikesCount;
-  }, [introducingPlayer?.introductionLikes, introducingPlayer?.introductionDislikes]);
+  }, [JSON.stringify(introducingPlayer?.introductionLikes), JSON.stringify(introducingPlayer?.introductionDislikes)]);
   
   const handlePlayerClick = (player: Player) => {
     if (canSelectPlayer && !player.introduced && !currentIntroducingPlayer) {
