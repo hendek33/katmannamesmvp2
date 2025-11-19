@@ -334,16 +334,29 @@ export function PlayerList({
           <div className="absolute inset-0 bg-amber-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
           <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border-2 border-dashed border-amber-600/50 p-3 space-y-2 shadow-2xl">
           <h3 className="font-bold text-sm text-amber-400">Takım Seçilmemiş ({noTeam.length})</h3>
-          <div className="grid grid-cols-5 gap-1">
+          <div className="space-y-1.5">
             {noTeam.map(player => (
               <div 
                 key={player.id}
                 data-testid={`player-${player.id}`}
-                className="flex items-center justify-center gap-0.5 p-1 rounded bg-amber-900/20 border border-amber-700/30"
+                className="flex items-center justify-between gap-2 p-2 rounded bg-amber-900/20 border border-amber-700/30 hover:bg-amber-900/30 transition-colors"
               >
-                {player.isRoomOwner && <Crown className="w-2.5 h-2.5 text-yellow-400" />}
-                <span className="text-xs font-medium text-slate-200 text-center truncate">{player.username}</span>
-                {player.id === currentPlayerId && <span className="text-[10px] text-amber-300 ml-0.5">(Sen)</span>}
+                <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                  {player.isRoomOwner && <Crown className="w-3 h-3 text-yellow-400 flex-shrink-0" />}
+                  <span className="text-xs font-medium text-slate-200 truncate">{player.username}</span>
+                  {player.id === currentPlayerId && <span className="text-[10px] text-amber-300">(Sen)</span>}
+                </div>
+                {currentPlayer?.isRoomOwner && player.id !== currentPlayerId && onKickPlayer && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onKickPlayer(player.id)}
+                    className="h-6 w-6 p-0 hover:bg-red-900/40 hover:text-red-300"
+                    title="Oyuncuyu At"
+                  >
+                    <UserX className="w-3 h-3" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>

@@ -880,15 +880,6 @@ export class MemStorage implements IStorage {
       return null;
     }
 
-    // Kick players who haven't selected a team
-    const playersWithoutTeam = room.players.filter(p => !p.team);
-    if (playersWithoutTeam.length > 0) {
-      console.log(`Kicking ${playersWithoutTeam.length} players without team`);
-      playersWithoutTeam.forEach(player => {
-        this.removePlayer(roomCode, player.id);
-      });
-    }
-
     const darkTeam = room.players.filter(p => p.team === "dark");
     const lightTeam = room.players.filter(p => p.team === "light");
 
