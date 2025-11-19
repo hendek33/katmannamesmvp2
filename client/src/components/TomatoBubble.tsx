@@ -232,7 +232,7 @@ export function TomatoBubble({
             })}
 
             {/* Impact text - smaller size */}
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center z-50">
               <span 
                 className="text-3xl lg:text-4xl font-black animate-impact-text drop-shadow-2xl tracking-wider text-white"
                 style={{
