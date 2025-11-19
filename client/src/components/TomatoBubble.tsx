@@ -261,23 +261,6 @@ export function TomatoBubble({
                 />
               </div>
             ))}
-            
-            {/* Juice splashes - fewer and smaller */}
-            {[...Array(6)].map((_, i) => {
-              const spreadAngle = (i * Math.PI) / 3;
-              return (
-                <div
-                  key={`juice-${i}`}
-                  className="absolute w-1.5 h-8 bg-gradient-to-b from-red-500/70 to-transparent animate-drip"
-                  style={{
-                    left: '50%',
-                    top: '50%',
-                    transform: `rotate(${spreadAngle}rad) translateY(-15px)`,
-                    animationDelay: `${i * 80}ms`,
-                  }}
-                />
-              );
-            })}
           </div>
         </div>
       )}
