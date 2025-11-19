@@ -1982,14 +1982,14 @@ export default function Game() {
                     {/* Vegetable Selection List */}
                     {showVegetableDialog && tomatoThrowEnabled && globalTomatoCooldown === 0 && (
                       <div className="absolute top-full mt-2 left-0 right-0 z-50">
-                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-2 shadow-2xl">
-                          <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/30 rounded-lg p-1.5 shadow-2xl">
+                          <div className="grid grid-cols-2 gap-1.5">
                             {VEGETABLES.map((veg) => (
                               <button
                                 key={veg.emoji}
                                 onClick={() => handleThrowVegetable(veg.emoji)}
                                 className={cn(
-                                  "w-12 h-12 rounded-lg text-2xl transition-all flex items-center justify-center",
+                                  "w-10 h-10 rounded-lg text-xl transition-all flex items-center justify-center",
                                   "hover:scale-110",
                                   "bg-gradient-to-br from-slate-800/80 to-slate-700/80 hover:from-slate-700/90 hover:to-slate-600/90 border border-amber-700/30 hover:border-amber-500/50"
                                 )}
