@@ -34,7 +34,6 @@ interface WebSocketContextType {
   kickChatConfig: any;
   setKickChatMessages: (value: any[] | ((prev: any[]) => any[])) => void;
   send: (type: string, payload: any) => void;
-  chatMessages: any[];
 }
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);

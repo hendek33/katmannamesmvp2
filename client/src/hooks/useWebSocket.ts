@@ -31,7 +31,6 @@ export function useWebSocket() {
   const [kickChatMessages, setKickChatMessages] = useState<any[]>([]);
   const [kickChatVotes, setKickChatVotes] = useState({ likes: 0, dislikes: 0 });
   const [kickChatConfig, setKickChatConfig] = useState<any>(null);
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -109,7 +108,6 @@ export function useWebSocket() {
                 setError(""); // Clear any previous errors
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.roomCode);
-                setChatMessages([]); // Clear chat on new room
                 break;
 
               case "room_joined":
@@ -126,7 +124,6 @@ export function useWebSocket() {
                 }
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.gameState.roomCode);
-                setChatMessages([]); // Clear chat on join
                 break;
 
               case "game_updated":
@@ -181,7 +178,6 @@ export function useWebSocket() {
                 setPlayerId("");
                 localStorage.removeItem("katmannames_room_code");
                 localStorage.removeItem("katmannames_player_id");
-                setChatMessages([]);
                 break;
 
               case "kicked":
@@ -262,10 +258,6 @@ export function useWebSocket() {
                     }
                   }
                 }
-                break;
-
-              case "chat_message":
-                setChatMessages(prev => [...prev, message.payload]);
                 break;
 
               case "taunt_triggered":
@@ -564,6 +556,5 @@ export function useWebSocket() {
     kickChatConfig,
     setKickChatMessages,
     send,
-    chatMessages,
   };
 }

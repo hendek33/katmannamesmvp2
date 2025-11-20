@@ -1594,39 +1594,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             break;
           }
 
-          case "send_chat_message": {
-            if (!ws.roomCode || !ws.playerId) {
-              sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
-              return;
-            }
-
-            const messageContent = payload.message;
-            if (!messageContent || typeof messageContent !== "string" || !messageContent.trim()) {
-              return;
-            }
-
-            // Basic sanitization and length limit
-            const sanitizedMessage = messageContent.trim().substring(0, 200);
-
-            const room = storage.getRoom(ws.roomCode);
-            const player = room?.players.find(p => p.id === ws.playerId);
-
-            if (player) {
-              broadcastToRoom(ws.roomCode, {
-                type: "chat_message",
-                payload: {
-                  id: Date.now().toString() + Math.random().toString().slice(2),
-                  sender: player.username,
-                  senderId: player.id,
-                  team: player.team,
-                  message: sanitizedMessage,
-                  timestamp: Date.now()
-                }
-              });
-            }
-            break;
-          }
-
           case "send_insult": {
             if (!ws.roomCode || !ws.playerId) {
               sendToClient(ws, { type: "error", payload: { message: "Bağlantı hatası" } });
