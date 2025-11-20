@@ -31,6 +31,7 @@ export function useWebSocket() {
   const [kickChatMessages, setKickChatMessages] = useState<any[]>([]);
   const [kickChatVotes, setKickChatVotes] = useState({ likes: 0, dislikes: 0 });
   const [kickChatConfig, setKickChatConfig] = useState<any>(null);
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
   const reconnectTimeout = useRef<NodeJS.Timeout>();
   const reconnectAttempts = useRef<number>(0);
   const maxReconnectAttempts = 5;
@@ -42,7 +43,7 @@ export function useWebSocket() {
 
     const connect = () => {
       if (isCleanedUp) return;
-      
+
       const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${protocol}//${window.location.host}/ws`;
 
@@ -52,7 +53,7 @@ export function useWebSocket() {
         }
 
         ws.current = new WebSocket(wsUrl);
-        
+
         // Expose ws ref globally for taunt handling
         (window as any).wsRef = ws;
 
@@ -60,7 +61,7 @@ export function useWebSocket() {
           setIsConnected(true);
           setError("");
           reconnectAttempts.current = 0;
-          
+
           // Start ping interval to keep connection alive
           if (pingInterval.current) {
             clearInterval(pingInterval.current);
@@ -70,11 +71,11 @@ export function useWebSocket() {
               ws.current.send(JSON.stringify({ type: "ping", payload: {} }));
             }
           }, 30000); // Ping every 30 seconds to keep connection alive
-          
+
           const savedRoomCode = localStorage.getItem("katmannames_room_code");
           const savedPlayerId = localStorage.getItem("katmannames_player_id");
           const savedUsername = localStorage.getItem("katmannames_username");
-          
+
           if (savedRoomCode && savedUsername && ws.current) {
             if (savedPlayerId) {
               playerIdRef.current = savedPlayerId;
@@ -82,8 +83,8 @@ export function useWebSocket() {
             }
             ws.current.send(JSON.stringify({
               type: "join_room",
-              payload: { 
-                roomCode: savedRoomCode, 
+              payload: {
+                roomCode: savedRoomCode,
                 username: savedUsername,
                 playerId: savedPlayerId || undefined
               }
@@ -94,7 +95,7 @@ export function useWebSocket() {
         ws.current.onmessage = (event) => {
           try {
             const message: WSMessage = JSON.parse(event.data);
-            
+
             switch (message.type) {
               case "rooms_list":
                 setRoomsList(message.payload.rooms);
@@ -108,6 +109,7 @@ export function useWebSocket() {
                 setError(""); // Clear any previous errors
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.roomCode);
+                setChatMessages([]); // Clear chat on new room
                 break;
 
               case "room_joined":
@@ -124,6 +126,7 @@ export function useWebSocket() {
                 }
                 localStorage.setItem("katmannames_player_id", message.payload.playerId);
                 localStorage.setItem("katmannames_room_code", message.payload.gameState.roomCode);
+                setChatMessages([]); // Clear chat on join
                 break;
 
               case "game_updated":
@@ -154,19 +157,19 @@ export function useWebSocket() {
                 // Reset votes when a new player starts introducing
                 setKickChatVotes({ likes: 0, dislikes: 0 });
                 break;
-                
+
               case "introduction_finished":
               case "introduction_liked":
                 setGameState(message.payload.gameState);
                 break;
-                
+
               case "card_revealed":
                 setGameState(message.payload.gameState);
                 if (message.payload.cardImages) {
                   setCardImages(message.payload.cardImages);
                 }
                 break;
-                
+
               case "returned_to_lobby":
                 setGameState(message.payload.gameState);
                 setCardImages({});
@@ -178,8 +181,9 @@ export function useWebSocket() {
                 setPlayerId("");
                 localStorage.removeItem("katmannames_room_code");
                 localStorage.removeItem("katmannames_player_id");
+                setChatMessages([]);
                 break;
-                
+
               case "kicked":
                 // Player was kicked from the room
                 setGameState(null);
@@ -191,7 +195,7 @@ export function useWebSocket() {
                 // Redirect to rooms page
                 window.location.href = "/rooms";
                 break;
-                
+
               case "player_kicked":
                 // Another player was kicked from the room
                 setGameState(message.payload.gameState);
@@ -207,25 +211,25 @@ export function useWebSocket() {
                   setGameState(message.payload.gameState);
                 }
                 break;
-                
+
               case "error":
                 setError(message.payload.message);
                 break;
-                
+
               case "pong":
                 // Server acknowledged our ping, connection is alive
                 break;
-                
+
               case "timer_tick":
                 // Handle server-sent timer updates
                 setServerTimer(message.payload);
                 break;
-                
+
               case "timer_expired":
                 // Handle timer expiry notification
                 setServerTimer({ timeRemaining: 0, isExpired: true });
                 break;
-                
+
               case "username_changed":
                 // Handle username change response
                 if (message.payload.success) {
@@ -237,14 +241,14 @@ export function useWebSocket() {
                   setUsernameChangeStatus({ success: true });
                   setError("");
                 } else {
-                  setUsernameChangeStatus({ 
-                    success: false, 
-                    message: message.payload.message || "İsim değiştirilemedi" 
+                  setUsernameChangeStatus({
+                    success: false,
+                    message: message.payload.message || "İsim değiştirilemedi"
                   });
                   setError(message.payload.message || "İsim değiştirilemedi");
                 }
                 break;
-                
+
               case "game_state_updated":
                 // Handle game state updates (team changes, username changes, etc.)
                 if (message.payload.gameState) {
@@ -259,13 +263,17 @@ export function useWebSocket() {
                   }
                 }
                 break;
-                
+
+              case "chat_message":
+                setChatMessages(prev => [...prev, message.payload]);
+                break;
+
               case "taunt_triggered":
                 // Handle taunt events
                 // Prevent duplicates by checking if this exact taunt already exists
                 setTaunts(prev => {
-                  const isDuplicate = prev.some(t => 
-                    t.playerId === message.payload.playerId && 
+                  const isDuplicate = prev.some(t =>
+                    t.playerId === message.payload.playerId &&
                     t.expiresAt === message.payload.expiresAt
                   );
                   if (isDuplicate) {
@@ -285,13 +293,13 @@ export function useWebSocket() {
                 // Remove taunt after expiry - don't set duplicate timeouts
                 // The TauntOverlay component already handles cleanup
                 break;
-                
+
               case "insult_sent":
                 // Handle insult events
                 // Prevent duplicates by checking if this exact insult already exists
                 setInsults(prev => {
-                  const isDuplicate = prev.some(i => 
-                    i.timestamp === message.payload.timestamp && 
+                  const isDuplicate = prev.some(i =>
+                    i.timestamp === message.payload.timestamp &&
                     i.senderId === message.payload.senderId
                   );
                   if (isDuplicate) {
@@ -310,56 +318,56 @@ export function useWebSocket() {
                 }
                 // Don't remove insult here - let InsultBubble component handle its own lifecycle
                 break;
-                
+
               case "taunt_toggled":
                 setTauntEnabled(message.payload.tauntEnabled);
                 break;
-                
+
               case "insult_toggled":
                 setInsultEnabled(message.payload.insultEnabled);
                 break;
-                
+
               case "tomato_thrown":
                 // Handle tomato events
                 // Prevent duplicates by checking if this exact tomato already exists
                 setTomatoes(prev => {
-                  const isDuplicate = prev.some(t => 
+                  const isDuplicate = prev.some(t =>
                     t.timestamp === message.payload.timestamp &&
                     t.playerId === message.payload.playerId
                   );
-                  
+
                   if (isDuplicate) {
                     return prev;
                   }
-                  
+
                   // Override position to use team panel locations
                   // Dark team panel at 85% (right), Light team panel at 15% (left), both at 35% vertical (upper area)
                   const fromTeam = message.payload.fromTeam;
                   const targetTeam = message.payload.targetTeam;
-                  
+
                   const tomatoWithPanelPositions = {
                     ...message.payload,
-                    position: { 
-                      x: fromTeam === 'dark' ? 0.85 : 0.15, 
-                      y: 0.20 
+                    position: {
+                      x: fromTeam === 'dark' ? 0.85 : 0.15,
+                      y: 0.20
                     },
-                    targetPosition: { 
-                      x: targetTeam === 'dark' ? 0.85 : 0.15, 
-                      y: 0.20 
+                    targetPosition: {
+                      x: targetTeam === 'dark' ? 0.85 : 0.15,
+                      y: 0.20
                     }
                   };
-                  
+
                   return [...prev, tomatoWithPanelPositions];
                 });
-                
+
                 // Update game state if provided
                 if (message.payload.gameState) {
                   setGameState(message.payload.gameState);
                 }
-                
+
                 // No cooldown for vegetable throw
                 break;
-                
+
               case "tomato_toggled":
                 setTomatoThrowEnabled(message.payload.tomatoThrowEnabled);
                 // Also update gameState using functional form to avoid stale closure
@@ -368,7 +376,7 @@ export function useWebSocket() {
                   tomatoThrowEnabled: message.payload.tomatoThrowEnabled
                 } : prev);
                 break;
-                
+
               case "room_features":
                 setTauntEnabled(message.payload.tauntEnabled);
                 setInsultEnabled(message.payload.insultEnabled);
@@ -377,7 +385,7 @@ export function useWebSocket() {
                 setGlobalInsultCooldown(message.payload.teamInsultCooldown || 0);
                 setGlobalTomatoCooldown(message.payload.playerTomatoCooldown || 0);
                 break;
-                
+
               case "kick_chat_message":
                 // Handle single message (legacy support)
                 setKickChatMessages(prev => {
@@ -388,26 +396,26 @@ export function useWebSocket() {
                   return next.slice(-limit);
                 });
                 break;
-                
+
               case "kick_chat_messages_batch":
                 // Handle batched messages for better performance
                 setKickChatMessages(prev => {
                   if (!message.payload || !Array.isArray(message.payload)) return prev;
-                  
+
                   // Filter out duplicates and add new messages
                   const existingIds = new Set(prev.map(msg => msg.id));
-                  const newMessages = message.payload.filter(msg => 
+                  const newMessages = message.payload.filter(msg =>
                     msg?.id && !existingIds.has(msg.id)
                   );
-                  
+
                   if (newMessages.length === 0) return prev;
-                  
+
                   const next = [...prev, ...newMessages];
                   const limit = 50; // Keep last 50 messages
                   return next.slice(-limit);
                 });
                 break;
-                
+
               case "kick_chat_vote":
                 setKickChatVotes(prev => {
                   // Check if this is a vote event or a vote summary
@@ -415,24 +423,24 @@ export function useWebSocket() {
                     // Individual vote event - handle vote changes
                     const newVote = message.payload.vote;
                     const previousVote = message.payload.previousVote;
-                    
+
                     let newLikes = prev.likes;
                     let newDislikes = prev.dislikes;
-                    
+
                     // Remove previous vote if it existed
                     if (previousVote === 'like') {
                       newLikes = Math.max(0, newLikes - 1);
                     } else if (previousVote === 'dislike') {
                       newDislikes = Math.max(0, newDislikes - 1);
                     }
-                    
+
                     // Add new vote
                     if (newVote === 'like') {
                       newLikes += 1;
                     } else if (newVote === 'dislike') {
                       newDislikes += 1;
                     }
-                    
+
                     return {
                       likes: newLikes,
                       dislikes: newDislikes
@@ -447,7 +455,7 @@ export function useWebSocket() {
                   return prev;
                 });
                 break;
-                
+
               case "kick_chat_config_updated":
                 if (message.payload?.config) {
                   setKickChatConfig(message.payload.config);
@@ -460,23 +468,23 @@ export function useWebSocket() {
 
         ws.current.onclose = (event) => {
           setIsConnected(false);
-          
+
           // Clear ping interval
           if (pingInterval.current) {
             clearInterval(pingInterval.current);
             pingInterval.current = undefined;
           }
-          
+
           // Don't reconnect if cleaned up or normal closure
           if (isCleanedUp || event.code === 1000) {
             return;
           }
-          
+
           // Only reconnect if haven't exceeded max attempts
           if (reconnectAttempts.current < maxReconnectAttempts) {
             reconnectAttempts.current++;
             const delay = Math.min(3000 * reconnectAttempts.current, 10000);
-            
+
             reconnectTimeout.current = setTimeout(() => {
               connect();
             }, delay);
@@ -556,5 +564,6 @@ export function useWebSocket() {
     kickChatConfig,
     setKickChatMessages,
     send,
+    chatMessages,
   };
 }

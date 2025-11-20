@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Lock, LockOpen, Edit2, Loader2, X, MessageSquare } from "lucide-react";
+import { AlertCircle, CheckCircle2, Copy, Check, EyeOff, Eye, Users, Timer, User, Sparkles, LogOut, Play, Shield, Bot, Zap, Lock, LockOpen, Edit2, Loader2, X, MessageSquare, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useWebSocketContext } from "@/contexts/WebSocketContext";
 import { PlayerList } from "@/components/PlayerList";
+import { LobbyChat } from "@/components/LobbyChat";
+import { QuickRules } from "@/components/QuickRules";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { type Team } from "@shared/schema";
@@ -15,11 +17,11 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  AlertDialog, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogHeader, 
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogFooter,
   AlertDialogAction,
@@ -43,14 +45,14 @@ export default function Lobby() {
   const [showChangeNameDialog, setShowChangeNameDialog] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [isChangingName, setIsChangingName] = useState(false);
-  
+
   // Kick chat configuration state
   const [kickChatEnabled, setKickChatEnabled] = useState(false);
   const [kickChatroomId, setKickChatroomId] = useState("");
   const [kickChannelName, setKickChannelName] = useState("");
-  
+
   const { toast } = useToast();
-  
+
   const playerId = localStorage.getItem("katmannames_player_id");
   const roomCode = gameState?.roomCode || localStorage.getItem("katmannames_room_code") || "";
 
@@ -82,7 +84,7 @@ export default function Lobby() {
     const savedRoomCode = localStorage.getItem("katmannames_room_code");
     const savedPlayerId = localStorage.getItem("katmannames_player_id");
     const savedUsername = localStorage.getItem("katmannames_username");
-    
+
     if (savedRoomCode && savedUsername && !gameState) {
       send("join_room", {
         roomCode: savedRoomCode,
@@ -108,7 +110,6 @@ export default function Lobby() {
   useEffect(() => {
     if (usernameChangeStatus) {
       if (usernameChangeStatus.success) {
-        // Success - close dialog and reset
         setShowChangeNameDialog(false);
         setNewUsername("");
         setIsChangingName(false);
@@ -118,7 +119,6 @@ export default function Lobby() {
           duration: 3000,
         });
       } else {
-        // Error - show message and keep dialog open
         setIsChangingName(false);
         toast({
           title: "Hata",
@@ -127,7 +127,6 @@ export default function Lobby() {
           duration: 4000,
         });
       }
-      // Clear the status after handling
       clearUsernameChangeStatus();
     }
   }, [usernameChangeStatus, clearUsernameChangeStatus, toast]);
@@ -146,7 +145,7 @@ export default function Lobby() {
 
   const handleChangeName = () => {
     if (!newUsername.trim() || isChangingName) return;
-    
+
     if (newUsername.length < 2 || newUsername.length > 20) {
       toast({
         title: "Geçersiz isim",
@@ -155,7 +154,7 @@ export default function Lobby() {
       });
       return;
     }
-    
+
     setIsChangingName(true);
     send("change_username", { newUsername: newUsername.trim() });
   };
@@ -175,7 +174,6 @@ export default function Lobby() {
   const [showTeamNameWarning, setShowTeamNameWarning] = useState(false);
 
   const handleStartGame = () => {
-    // Check if team names are still default
     if (gameState?.darkTeamName === "Mavi Takım" || gameState?.lightTeamName === "Kırmızı Takım") {
       setShowTeamNameWarning(true);
     } else {
@@ -198,16 +196,16 @@ export default function Lobby() {
   };
 
   const handleTimerSettingsUpdate = (mode: boolean, spyTime: number, guessTime: number) => {
-    send("update_timer_settings", { 
+    send("update_timer_settings", {
       timedMode: mode,
       spymasterTime: spyTime,
-      guesserTime: guessTime 
+      guesserTime: guessTime
     });
   };
-  
+
   const handleKickChatUpdate = (enabled: boolean, chatroomId: string, channelName: string) => {
     const parsedChatroomId = chatroomId ? parseInt(chatroomId, 10) : undefined;
-    send("update_kick_chat_config", { 
+    send("update_kick_chat_config", {
       enabled,
       chatroomId: parsedChatroomId,
       channelName: channelName || undefined
@@ -216,7 +214,6 @@ export default function Lobby() {
 
   const handleChaosModeUpdate = (enabled: boolean) => {
     send("update_chaos_mode", { chaosMode: enabled });
-    // When enabling chaos mode, automatically set type to prophet
     if (enabled) {
       send("update_chaos_mode_type", { type: "prophet" });
     }
@@ -240,11 +237,11 @@ export default function Lobby() {
         <div className="absolute inset-0 bg-[url('/arkaplan.webp')] bg-cover bg-center opacity-30" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
-        
+
         {[...Array(8)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1} opacity-50`} />
         ))}
-        
+
         <div className="relative backdrop-blur-xl bg-slate-900/50 p-8 rounded-2xl border border-slate-800/50">
           <div className="flex items-center justify-center space-x-2">
             <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -263,11 +260,11 @@ export default function Lobby() {
         <div className="absolute inset-0 bg-[url('/arkaplan.webp')] bg-cover bg-center opacity-30" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
-        
+
         {[...Array(8)].map((_, i) => (
           <div key={i} className={`particle particle-${i + 1} opacity-50`} />
         ))}
-        
+
         <div className="relative backdrop-blur-xl bg-slate-900/50 p-8 rounded-2xl border border-slate-800/50">
           <div className="flex items-center justify-center space-x-2">
             <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
@@ -281,48 +278,43 @@ export default function Lobby() {
   }
 
   const currentPlayer = gameState.players.find(p => p.id === playerId);
-  
-  // Team filtering
+
   const darkTeam = gameState.players.filter(p => p.team === "dark");
   const lightTeam = gameState.players.filter(p => p.team === "light");
   const noTeam = gameState.players.filter(p => p.team === null);
-  
-  // Check for spymasters
+
   const darkHasSpymaster = darkTeam.some(p => p.role === "spymaster");
   const lightHasSpymaster = lightTeam.some(p => p.role === "spymaster");
-  
-  const canStartGame = currentPlayer?.isRoomOwner && 
+
+  const canStartGame = currentPlayer?.isRoomOwner &&
     darkHasSpymaster &&
     lightHasSpymaster &&
     darkTeam.length >= 2 &&
     lightTeam.length >= 2 &&
     noTeam.length === 0 &&
-    (!gameState?.chaosMode || gameState?.chaosModeType); // If chaos mode is on, type must be selected
+    (!gameState?.chaosMode || gameState?.chaosModeType);
 
   const playerCount = gameState.players.length;
 
   return (
     <div className="h-screen bg-slate-900 relative overflow-hidden flex flex-col">
-      {/* Animated Background - Full visibility */}
+      {/* Animated Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[url('/arkaplan.webp')] bg-cover bg-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40" />
       </div>
-      
-      {/* Codenames Theme - Corner Gradients */}
+
       <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-red-900/30 to-transparent rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-blue-900/30 to-transparent rounded-full blur-3xl" />
-      
-      {/* Minimal Particles */}
+
       {[...Array(8)].map((_, i) => (
         <div key={i} className={`particle particle-${i + 1} opacity-50`} />
       ))}
-      
-      {/* Codenames Header Bar */}
+
+      {/* Header */}
       <header className="relative z-20 backdrop-blur-lg bg-black/50 border-b border-red-900/30">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="max-w-[1800px] mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
-            {/* Left Section - Status */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="relative">
@@ -340,73 +332,29 @@ export default function Lobby() {
                 </div>
               </div>
             </div>
-            
-            {/* Center Section - Room Code */}
+
             <div className="absolute left-1/2 transform -translate-x-1/2 hidden md:block">
               <div className="relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-blue-700 rounded-xl blur opacity-40 group-hover:opacity-60 transition-opacity" />
                 <div className="relative flex items-center gap-3 px-6 py-2.5 backdrop-blur-lg bg-black/60 rounded-xl border border-red-800/50 shadow-xl">
                   <span className="text-sm text-slate-300 font-medium">Oda:</span>
-                  <span className="text-xl font-bold font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-blue-400" data-testid="room-code">
+                  <span className="text-xl font-bold font-mono tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-blue-400">
                     {showRoomCode ? roomCode : "••••••"}
                   </span>
                   <div className="flex items-center gap-1 ml-2 border-l border-slate-600 pl-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setShowRoomCode(!showRoomCode)}
-                      className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300"
-                    >
+                    <Button size="sm" variant="ghost" onClick={() => setShowRoomCode(!showRoomCode)} className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300">
                       {showRoomCode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handleCopyRoomCode}
-                      className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300"
-                    >
+                    <Button size="sm" variant="ghost" onClick={handleCopyRoomCode} className="h-7 w-7 p-0 hover:bg-white/10 text-slate-300">
                       {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>
               </div>
             </div>
-            
-            {/* Mobile Room Code */}
-            <div className="md:hidden flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-400">Oda:</span>
-              <span className="text-sm font-mono font-bold text-slate-200" data-testid="room-code-mobile">
-                {showRoomCode ? roomCode : "••••"}
-              </span>
-              <div className="flex items-center gap-1">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setShowRoomCode(!showRoomCode)}
-                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
-                >
-                  {showRoomCode ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleCopyRoomCode}
-                  className="h-6 w-6 p-0 text-slate-300 hover:bg-white/10"
-                >
-                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                </Button>
-              </div>
-            </div>
-            
-            {/* Right Section - Actions */}
+
             <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowChangeNameDialog(true)}
-                className="text-green-400 hover:text-green-300 hover:bg-green-900/20 border border-green-800/50"
-                title="İsim Değiştir"
-              >
+              <Button size="sm" variant="ghost" onClick={() => setShowChangeNameDialog(true)} className="text-green-400 hover:text-green-300 hover:bg-green-900/20 border border-green-800/50">
                 <Edit2 className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">İsim</span>
               </Button>
@@ -420,7 +368,6 @@ export default function Lobby() {
                   setLocation("/rooms");
                 }}
                 className="text-red-400 hover:text-red-300 hover:bg-red-900/20 border border-red-800/50"
-                data-testid="button-leave-room"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Ayrıl</span>
@@ -429,209 +376,127 @@ export default function Lobby() {
           </div>
         </div>
       </header>
-      
-      {/* Main Content Grid */}
-      <div className="flex-1 overflow-hidden relative z-10">
-        <div className="h-full max-w-6xl mx-auto px-4 py-6">
-          <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Panel - Team Operations (7 cols on lg) */}
-            <div className="col-span-12 lg:col-span-7 flex flex-col gap-4 overflow-hidden">
-              {/* Developer Note Card */}
-              {currentPlayer && (
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 to-yellow-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
-                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-yellow-600 blur-md opacity-50" />
-                        <div className="relative w-10 h-10 rounded-lg bg-gradient-to-r from-amber-700 to-yellow-700 flex items-center justify-center shadow-lg">
-                          <Zap className="w-5 h-5 text-white" />
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-xs text-amber-400/80 space-y-0.5">
-                          <div className="font-medium flex items-center gap-1">
-                            Geliştiriciden not:
-                          </div>
-                          <div className="italic text-amber-400/60">
-                            Gerizekalılar takımı kırmızı takım olabilirler, iyi oyunlar!  
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
+      {/* Main Content Grid - 3 Columns */}
+      <div className="flex-1 overflow-hidden relative z-10 p-4">
+        <div className="max-w-[1800px] mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          {/* Left Column - Chat (3 cols) */}
+          <div className="hidden lg:block lg:col-span-3 h-full">
+            <LobbyChat />
+          </div>
+
+          {/* Center Column - Player List (6 cols) */}
+          <div className="lg:col-span-6 h-full flex flex-col gap-4 overflow-hidden">
+            {/* Game Status & Requirements */}
+            <div className="bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-800 p-4 shrink-0">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-slate-100">Oyun Durumu</h3>
+                {canStartGame ? (
+                  <div className="flex items-center gap-2 text-emerald-400">
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span className="text-sm font-semibold">Hazır</span>
                   </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-amber-400">
+                    <AlertCircle className="w-5 h-5" />
+                    <span className="text-sm font-semibold">Bekliyor</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className={`flex items-center gap-2 text-sm font-medium ${darkHasSpymaster ? 'text-emerald-400' : 'text-slate-500'}`}>
+                  {darkHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                  <span>{gameState.darkTeamName} İstihbarat Şefi</span>
                 </div>
-              )}
-              
-              {/* Team Dashboard */}
-              <div className="flex-1 overflow-hidden">
-                <PlayerList
-                  players={gameState.players}
-                  currentPlayerId={playerId || undefined}
-                  onTeamSelect={handleTeamSelect}
-                  onRoleToggle={handleRoleToggle}
-                  isLobby={true}
-                  darkTeamName={gameState.darkTeamName}
-                  lightTeamName={gameState.lightTeamName}
-                  onTeamNameChange={handleTeamNameChange}
-                  onRemoveBot={handleRemoveBot}
-                  onKickPlayer={(targetPlayerId) => {
-                    send("kick_player", { targetPlayerId });
-                  }}
-                />
+                <div className={`flex items-center gap-2 text-sm font-medium ${lightHasSpymaster ? 'text-emerald-400' : 'text-slate-500'}`}>
+                  {lightHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                  <span>{gameState.lightTeamName} İstihbarat Şefi</span>
+                </div>
+                <div className={`flex items-center gap-2 text-sm font-medium ${darkTeam.length >= 2 ? 'text-emerald-400' : 'text-slate-500'}`}>
+                  {darkTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                  <span>{gameState.darkTeamName}: {darkTeam.length}/2+ Oyuncu</span>
+                </div>
+                <div className={`flex items-center gap-2 text-sm font-medium ${lightTeam.length >= 2 ? 'text-emerald-400' : 'text-slate-500'}`}>
+                  {lightTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                  <span>{gameState.lightTeamName}: {lightTeam.length}/2+ Oyuncu</span>
+                </div>
+                <div className={`flex items-center gap-2 text-sm font-medium ${noTeam.length === 0 ? 'text-emerald-400' : 'text-slate-500'}`}>
+                  {noTeam.length === 0 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
+                  <span>Tüm oyuncular takım seçti</span>
+                </div>
               </div>
             </div>
-            
-            {/* Right Panel - Control Console (5 cols on lg) */}
-            <div className="col-span-12 lg:col-span-5 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
-              {/* Game Start Panel - Enhanced Glassmorphism */}
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-600/20 to-blue-600/20 rounded-xl blur-xl group-hover:blur-2xl transition-all" />
-                <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-6">
-                  <div className="space-y-4">
-                  {/* Status Indicator */}
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-slate-100">Oyun Durumu</h3>
-                    {canStartGame ? (
-                      <div className="flex items-center gap-2 text-emerald-400">
-                        <CheckCircle2 className="w-5 h-5" />
-                        <span className="text-sm font-semibold">Hazır</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 text-amber-400">
-                        <AlertCircle className="w-5 h-5" />
-                        <span className="text-sm font-semibold">Bekliyor</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Requirements Checklist */}
-                  <div className="space-y-2">
-                    <div className={`flex items-center gap-2 text-sm font-medium ${darkHasSpymaster ? 'text-emerald-400' : 'text-slate-500'}`}>
-                      {darkHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
-                      <span>{gameState.darkTeamName} İstihbarat Şefi</span>
+
+            {/* Player List */}
+            <div className="flex-1 overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm">
+              <PlayerList
+                players={gameState.players}
+                currentPlayerId={playerId || undefined}
+                onTeamSelect={handleTeamSelect}
+                onRoleToggle={handleRoleToggle}
+                isLobby={true}
+                darkTeamName={gameState.darkTeamName}
+                lightTeamName={gameState.lightTeamName}
+                onTeamNameChange={handleTeamNameChange}
+                onRemoveBot={handleRemoveBot}
+                onKickPlayer={(targetPlayerId) => {
+                  send("kick_player", { targetPlayerId });
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Right Column - Settings & Rules (3 cols) */}
+          <div className="lg:col-span-3 h-full flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+            {/* Game Controls */}
+            <div className="bg-slate-900/50 backdrop-blur-sm rounded-xl border border-slate-800 p-4 space-y-4">
+              <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Oyun Ayarları
+              </h3>
+
+              {/* Start Game Button */}
+              {currentPlayer?.isRoomOwner && (
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 200 }}
+                  whileHover={canStartGame ? { scale: 1.02 } : {}}
+                  whileTap={canStartGame ? { scale: 0.98 } : {}}
+                >
+                  <Button
+                    onClick={handleStartGame}
+                    disabled={!canStartGame}
+                    className={`relative w-full py-6 text-lg font-bold rounded-xl transition-all duration-300 overflow-hidden ${canStartGame
+                        ? 'bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-500 hover:via-green-500 hover:to-teal-500 text-white shadow-2xl shadow-emerald-500/40 border-2 border-emerald-400/50'
+                        : 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-500 border-2 border-slate-700/30 cursor-not-allowed opacity-60'
+                      }`}
+                  >
+                    <div className="relative flex items-center justify-center gap-3">
+                      <Play className="w-6 h-6 fill-current" />
+                      <span>Oyunu Başlat</span>
                     </div>
-                    <div className={`flex items-center gap-2 text-sm font-medium ${lightHasSpymaster ? 'text-emerald-400' : 'text-slate-500'}`}>
-                      {lightHasSpymaster ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
-                      <span>{gameState.lightTeamName} İstihbarat Şefi</span>
-                    </div>
-                    <div className={`flex items-center gap-2 text-sm font-medium ${darkTeam.length >= 2 ? 'text-emerald-400' : 'text-slate-500'}`}>
-                      {darkTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
-                      <span>{gameState.darkTeamName}: {darkTeam.length}/2+ Oyuncu</span>
-                    </div>
-                    <div className={`flex items-center gap-2 text-sm font-medium ${lightTeam.length >= 2 ? 'text-emerald-400' : 'text-slate-500'}`}>
-                      {lightTeam.length >= 2 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
-                      <span>{gameState.lightTeamName}: {lightTeam.length}/2+ Oyuncu</span>
-                    </div>
-                    <div className={`flex items-center gap-2 text-sm font-medium ${noTeam.length === 0 ? 'text-emerald-400' : 'text-slate-500'}`}>
-                      {noTeam.length === 0 ? <CheckCircle2 className="w-4 h-4" /> : <div className="w-4 h-4 rounded-full border border-slate-600" />}
-                      <span>Tüm oyuncular takım seçti</span>
-                    </div>
-                  </div>
-                  
-                  {/* Start Button - Beautiful Glassmorphism Style */}
-                  {currentPlayer?.isRoomOwner && (
-                    <motion.div
-                      initial={{ scale: 0.95, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 200 }}
-                      whileHover={canStartGame ? { scale: 1.02 } : {}}
-                      whileTap={canStartGame ? { scale: 0.98 } : {}}
-                    >
-                      <Button
-                        onClick={handleStartGame}
-                        disabled={!canStartGame}
-                        className={`relative w-full py-6 text-lg font-bold rounded-xl transition-all duration-300 overflow-hidden ${
-                          canStartGame 
-                            ? 'bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-500 hover:via-green-500 hover:to-teal-500 text-white shadow-2xl shadow-emerald-500/40 border-2 border-emerald-400/50 backdrop-blur-sm'
-                            : 'bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-slate-500 border-2 border-slate-700/30 cursor-not-allowed opacity-60'
-                        }`}
-                        data-testid="button-start-game"
-                      >
-                        {canStartGame && (
-                          <>
-                            {/* Animated background shimmer for enabled state */}
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                              animate={{
-                                x: [-200, 200, -200]
-                              }}
-                              transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                ease: "linear"
-                              }}
-                            />
-                            
-                            {/* Pulsing glow effect for enabled state */}
-                            <motion.div
-                              className="absolute inset-0 rounded-xl"
-                              animate={{
-                                boxShadow: [
-                                  "inset 0 0 20px rgba(16, 185, 129, 0.3)",
-                                  "inset 0 0 40px rgba(16, 185, 129, 0.5)",
-                                  "inset 0 0 20px rgba(16, 185, 129, 0.3)"
-                                ]
-                              }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                            />
-                          </>
-                        )}
-                        
-                        <div className="relative flex items-center justify-center gap-3">
-                          <motion.div
-                            animate={canStartGame ? { scale: [1, 1.2, 1] } : {}}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                          >
-                            <Play className="w-6 h-6 fill-current" />
-                          </motion.div>
-                          <span className="tracking-wide">Oyunu Başlat</span>
-                          {canStartGame && (
-                            <motion.div
-                              animate={{ rotate: [0, 360] }}
-                              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            >
-                              <Sparkles className="w-5 h-5 text-yellow-300" />
-                            </motion.div>
-                          )}
-                        </div>
-                      </Button>
-                    </motion.div>
-                  )}
-                </div>
-                </div>
-              </div>
-              
-              {/* Game Settings - Codenames Style */}
+                  </Button>
+                </motion.div>
+              )}
+
+              {/* Settings Content */}
               <div className="space-y-4">
-                {/* Chaos Mode - Codenames Style */}
-                <div className={`rounded-xl border p-4 transition-all duration-500 ${
-                  chaosMode 
-                    ? 'bg-gradient-to-br from-violet-950/30 to-fuchsia-950/30 border-violet-600/30 shadow-xl backdrop-blur-sm' 
-                    : 'bg-slate-900/40 border-slate-700/30 backdrop-blur-sm'
-                }`}>
+                {/* Chaos Mode */}
+                <div className={`rounded-xl border p-4 transition-all ${chaosMode ? 'bg-gradient-to-br from-violet-950/30 to-fuchsia-950/30 border-violet-600/30' : 'bg-slate-900/40 border-slate-700/30'}`}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      {/* Minimalist Chaos Mode Badge */}
-                      <div className={`px-3 py-1.5 rounded-full transition-all duration-500 ${
-                        chaosMode 
-                          ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow-lg' 
-                          : 'bg-slate-700/50'
-                      }`}>
+                      <div className={`px-3 py-1.5 rounded-full transition-all ${chaosMode ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600' : 'bg-slate-700/50'}`}>
                         <span className={`text-sm font-semibold ${chaosMode ? 'text-white' : 'text-slate-400'}`}>
                           {chaosMode ? '✨' : '○'} KAOS
                         </span>
                       </div>
-                      <h3 className={`text-sm font-medium transition-colors ${chaosMode ? 'text-violet-200' : 'text-slate-400'}`}>
-                        {chaosMode ? "🔮 Kahin Modu Aktif" : "Kahin Modu"}
-                      </h3>
                       <button
                         onClick={() => setShowChaosDetails(!showChaosDetails)}
-                        className={`px-2 py-0.5 text-sm rounded transition-all ${
-                          chaosMode 
-                            ? 'text-purple-300 hover:text-purple-200 bg-purple-900/30 hover:bg-purple-900/50 border border-purple-600/50' 
-                            : 'text-amber-400 hover:text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-700/50'
-                        }`}
+                        className={`px-2 py-0.5 text-sm rounded transition-all ${chaosMode ? 'text-purple-300 bg-purple-900/30 border border-purple-600/50' : 'text-amber-400 bg-amber-900/30 border border-amber-700/50'
+                          }`}
                       >
                         ?
                       </button>
@@ -645,21 +510,16 @@ export default function Lobby() {
                           handleChaosModeUpdate(checked);
                         }
                       }}
-                      data-testid="switch-chaos-mode"
                     />
                   </div>
-                  {/* Chaos Mode Info when enabled */}
                   {chaosMode && (
                     <div className="mt-4 space-y-3">
-                      <div className="p-2 rounded-lg text-[10px] leading-relaxed bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20">
-                        Her takıma gizli bir Kahin atanacak • Kahinler oyundaki kartların yerlerini bilir.
+                      <div className="p-2 rounded-lg text-[10px] bg-cyan-900/20 text-cyan-200/80 border border-cyan-600/20">
+                        Her takıma gizli bir Kahin atanacak
                       </div>
-                      
-                      {/* Prophet Visibility Settings */}
+
                       <div className="space-y-2">
-                        <Label htmlFor="prophet-visibility" className="text-xs text-violet-300">
-                          Kahin Görüş Ayarı
-                        </Label>
+                        <Label className="text-xs text-violet-300">Kahin Görüş Ayarı</Label>
                         <Select
                           value={prophetVisibility}
                           disabled={!currentPlayer?.isRoomOwner}
@@ -670,33 +530,19 @@ export default function Lobby() {
                             }
                           }}
                         >
-                          <SelectTrigger id="prophet-visibility" className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
+                          <SelectTrigger className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="own_team">
-                              Sadece Kendi Takımı
-                            </SelectItem>
-                            <SelectItem value="both_teams">
-                              Her İki Takım
-                            </SelectItem>
-                            <SelectItem value="all_cards">
-                              Tüm Kartlar (beyaz ve siyah dahil)
-                            </SelectItem>
+                            <SelectItem value="own_team">Sadece Kendi Takımı</SelectItem>
+                            <SelectItem value="both_teams">Her İki Takım</SelectItem>
+                            <SelectItem value="all_cards">Tüm Kartlar</SelectItem>
                           </SelectContent>
                         </Select>
-                        <p className="text-[9px] text-violet-400/70">
-                          {prophetVisibility === "own_team" && "Kahinler kendi takımlarının tüm kartlarını görebilir"}
-                          {prophetVisibility === "both_teams" && "Kahinler her iki takımın tüm kartlarını görebilir (beyaz ve siyah hariç)"}
-                          {prophetVisibility === "all_cards" && "Kahinler beyaz ve siyah kartlar dahil tüm kartları görebilir"}
-                        </p>
                       </div>
-                      
-                      {/* Prophet Win Mode Settings */}
+
                       <div className="space-y-2">
-                        <Label htmlFor="prophet-win-mode" className="text-xs text-violet-300">
-                          Kahin Tahmin Sonucu
-                        </Label>
+                        <Label className="text-xs text-violet-300">Kahin Tahmin Sonucu</Label>
                         <Select
                           value={prophetWinMode}
                           disabled={!currentPlayer?.isRoomOwner}
@@ -707,31 +553,21 @@ export default function Lobby() {
                             }
                           }}
                         >
-                          <SelectTrigger id="prophet-win-mode" className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
+                          <SelectTrigger className="w-full bg-slate-800/50 border-violet-600/30 text-violet-100">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="tie">
-                              Oyun Berabere Biter
-                            </SelectItem>
-                            <SelectItem value="guesser_wins">
-                              Tahmin Eden Takım Kazanır
-                            </SelectItem>
+                            <SelectItem value="tie">Oyun Berabere Biter</SelectItem>
+                            <SelectItem value="guesser_wins">Tahmin Eden Kazanır</SelectItem>
                           </SelectContent>
                         </Select>
-                        <p className="text-[9px] text-violet-400/70">
-                          {prophetWinMode === "tie" && "Kahin doğru tahmin edildiğinde oyun berabere biter"}
-                          {prophetWinMode === "guesser_wins" && "Kahin doğru tahmin edildiğinde tahmin eden takım oyunu kazanır"}
-                        </p>
                       </div>
                     </div>
                   )}
                 </div>
-                
-                {/* Timer Settings - Enhanced Glassmorphism */}
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+
+                {/* Timer Settings */}
+                <div className="backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Timer className="w-5 h-5 text-purple-400" />
@@ -746,10 +582,8 @@ export default function Lobby() {
                           handleTimerSettingsUpdate(checked, spymasterTime, guesserTime);
                         }
                       }}
-                      data-testid="switch-timed-mode"
                     />
                   </div>
-                  
                   {timedMode && (
                     <div className="space-y-3">
                       <div>
@@ -776,7 +610,6 @@ export default function Lobby() {
                           max={300}
                           step={30}
                           className="w-full"
-                          data-testid="slider-spymaster-time"
                         />
                       </div>
                       <div>
@@ -803,188 +636,140 @@ export default function Lobby() {
                           max={300}
                           step={30}
                           className="w-full"
-                          data-testid="slider-guesser-time"
                         />
                       </div>
                     </div>
                   )}
-                  </div>
                 </div>
-                
-                {/* Kick Chat Integration - Enhanced Glassmorphism */}
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
+
+                {/* Kick Chat */}
+                <div className="backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5 text-purple-400" />
+                      <h3 className="text-base font-bold text-slate-100">Kick Chat</h3>
+                    </div>
+                    <Switch
+                      checked={kickChatEnabled}
+                      disabled={!currentPlayer?.isRoomOwner}
+                      onCheckedChange={(checked) => {
+                        if (currentPlayer?.isRoomOwner) {
+                          setKickChatEnabled(checked);
+                          handleKickChatUpdate(checked, kickChatroomId, kickChannelName);
+                        }
+                      }}
+                    />
+                  </div>
+                  {kickChatEnabled && currentPlayer?.isRoomOwner && (
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs text-slate-400 mb-1">Chatroom ID</Label>
+                        <Input
+                          type="number"
+                          value={kickChatroomId}
+                          onChange={(e) => setKickChatroomId(e.target.value)}
+                          onBlur={() => handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName)}
+                          placeholder="24495088"
+                          className="bg-black/30 border-white/20 text-white text-sm h-8"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-slate-400 mb-1">Kanal (Opsiyonel)</Label>
+                        <Input
+                          type="text"
+                          value={kickChannelName}
+                          onChange={(e) => setKickChannelName(e.target.value)}
+                          onBlur={() => handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName)}
+                          placeholder="hype"
+                          className="bg-black/30 border-white/20 text-white text-sm h-8"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Password Settings */}
+                {currentPlayer?.isRoomOwner && (
+                  <div className="backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <MessageSquare className="w-5 h-5 text-purple-400" />
-                        <h3 className="text-base font-bold text-slate-100">Kick Chat Entegrasyonu</h3>
-                      </div>
-                      <Switch
-                        checked={kickChatEnabled}
-                        disabled={!currentPlayer?.isRoomOwner}
-                        onCheckedChange={(checked) => {
-                          if (currentPlayer?.isRoomOwner) {
-                            setKickChatEnabled(checked);
-                            handleKickChatUpdate(checked, kickChatroomId, kickChannelName);
-                          }
-                        }}
-                        data-testid="switch-kick-chat"
-                      />
-                    </div>
-                    
-                    {kickChatEnabled && (
-                      <div className="space-y-3">
-                        {currentPlayer?.isRoomOwner ? (
-                          <>
-                            <div>
-                              <Label className="text-xs text-slate-400 mb-1">Chatroom ID</Label>
-                              <Input
-                                type="number"
-                                value={kickChatroomId}
-                                onChange={(e) => setKickChatroomId(e.target.value)}
-                                onBlur={() => {
-                                  if (currentPlayer?.isRoomOwner) {
-                                    handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
-                                  }
-                                }}
-                                disabled={!currentPlayer?.isRoomOwner}
-                                placeholder="Örn: 24495088"
-                                className="bg-black/30 border-white/20 text-white text-sm h-8"
-                                data-testid="input-kick-chatroom-id"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs text-slate-400 mb-1">Kanal Adı (Opsiyonel)</Label>
-                              <Input
-                                type="text"
-                                value={kickChannelName}
-                                onChange={(e) => setKickChannelName(e.target.value)}
-                                onBlur={() => {
-                                  if (currentPlayer?.isRoomOwner) {
-                                    handleKickChatUpdate(kickChatEnabled, kickChatroomId, kickChannelName);
-                                  }
-                                }}
-                                disabled={!currentPlayer?.isRoomOwner}
-                                placeholder="Örn: hype"
-                                className="bg-black/30 border-white/20 text-white text-sm h-8"
-                                data-testid="input-kick-channel-name"
-                              />
-                            </div>
-                            <p className="text-[9px] text-violet-400/70">
-                              Tanışma aşamasında chat'ten "1" beğeni, "2" beğenmeme olarak sayılacak
-                            </p>
-                          </>
+                        {gameState.hasPassword ? (
+                          <Lock className="w-5 h-5 text-emerald-400" />
                         ) : (
-                          <div className="p-2 rounded-lg bg-purple-900/20 border border-purple-600/20">
-                            <p className="text-xs text-purple-300">
-                              ✅ Chat entegrasyonu aktif
-                            </p>
-                            <p className="text-[9px] text-purple-400/70 mt-1">
-                              Tanışma aşamasında chat'ten "1" beğeni, "2" beğenmeme olarak sayılacak
-                            </p>
-                          </div>
+                          <LockOpen className="w-5 h-5 text-slate-400" />
                         )}
+                        <h3 className="text-base font-bold text-slate-100">Oda Şifresi</h3>
                       </div>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Password Settings - Enhanced Glassmorphism */}
-                {currentPlayer?.isRoomOwner && (
-                  <div className="relative group">
-                    <div className="absolute inset-0 bg-emerald-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                    <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          {gameState.hasPassword ? (
-                            <Lock className="w-5 h-5 text-emerald-400" />
-                          ) : (
-                            <LockOpen className="w-5 h-5 text-slate-400" />
-                          )}
-                          <h3 className="text-base font-bold text-slate-100">Oda Şifresi</h3>
-                        </div>
-                        <Button
-                          onClick={() => setShowPasswordModal(true)}
-                          size="sm"
-                          variant="outline"
-                          className={`text-xs ${
-                            gameState.hasPassword 
-                              ? 'border-emerald-600/50 text-emerald-400 hover:bg-emerald-900/20' 
-                              : 'border-slate-600/50 text-slate-400 hover:bg-slate-800/20'
+                      <Button
+                        onClick={() => setShowPasswordModal(true)}
+                        size="sm"
+                        variant="outline"
+                        className={`text-xs ${gameState.hasPassword ? 'border-emerald-600/50 text-emerald-400' : 'border-slate-600/50 text-slate-400'
                           }`}
-                        >
-                          {gameState.hasPassword ? 'Şifreyi Değiştir' : 'Şifre Koy'}
-                        </Button>
-                      </div>
-                      <p className="text-xs text-slate-400">
-                        {gameState.hasPassword 
-                          ? 'Bu oda şifre korumalı. Sadece şifreyi bilen kişiler katılabilir.'
-                          : 'Bu oda herkese açık. İsterseniz şifre koyabilirsiniz.'}
-                      </p>
+                      >
+                        {gameState.hasPassword ? 'Değiştir' : 'Şifre Koy'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bot Controls */}
+                {currentPlayer?.isRoomOwner && (
+                  <div className="backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 p-4">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Bot className="w-5 h-5 text-purple-400" />
+                      <h3 className="text-lg font-bold text-slate-100">Bot Yönetimi</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        onClick={() => handleAddBot("dark", "spymaster")}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-blue-700/50 text-blue-300"
+                        disabled={darkHasSpymaster}
+                      >
+                        {gameState.darkTeamName} Şef
+                      </Button>
+                      <Button
+                        onClick={() => handleAddBot("dark", "guesser")}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-blue-700/50 text-blue-300"
+                      >
+                        {gameState.darkTeamName} Ajan
+                      </Button>
+                      <Button
+                        onClick={() => handleAddBot("light", "spymaster")}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-red-700/50 text-red-300"
+                        disabled={lightHasSpymaster}
+                      >
+                        {gameState.lightTeamName} Şef
+                      </Button>
+                      <Button
+                        onClick={() => handleAddBot("light", "guesser")}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs border-red-700/50 text-red-300"
+                      >
+                        {gameState.lightTeamName} Ajan
+                      </Button>
                     </div>
                   </div>
                 )}
               </div>
-              
-              {/* Bot Controls - Enhanced Glassmorphism */}
-              {currentPlayer?.isRoomOwner && (
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-purple-600/20 rounded-xl blur-lg group-hover:blur-xl transition-all" />
-                  <div className="relative backdrop-blur-xl bg-black/40 rounded-xl border border-white/10 shadow-2xl p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Bot className="w-5 h-5 text-purple-400" />
-                    <h3 className="text-lg font-bold text-slate-100">Bot Yönetimi</h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      onClick={() => handleAddBot("dark", "spymaster")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-blue-700/50 text-blue-300 hover:bg-blue-900/20"
-                      disabled={darkHasSpymaster}
-                      data-testid="button-add-bot-dark-spymaster"
-                    >
-                      {gameState.darkTeamName} Şef
-                    </Button>
-                    <Button
-                      onClick={() => handleAddBot("dark", "guesser")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-blue-700/50 text-blue-300 hover:bg-blue-900/20"
-                      data-testid="button-add-bot-dark-guesser"
-                    >
-                      {gameState.darkTeamName} Ajan
-                    </Button>
-                    <Button
-                      onClick={() => handleAddBot("light", "spymaster")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-red-700/50 text-red-300 hover:bg-red-900/20"
-                      disabled={lightHasSpymaster}
-                      data-testid="button-add-bot-light-spymaster"
-                    >
-                      {gameState.lightTeamName} Şef
-                    </Button>
-                    <Button
-                      onClick={() => handleAddBot("light", "guesser")}
-                      size="sm"
-                      variant="outline"
-                      className="text-xs border-red-700/50 text-red-300 hover:bg-red-900/20"
-                      data-testid="button-add-bot-light-guesser"
-                    >
-                      {gameState.lightTeamName} Ajan
-                    </Button>
-                  </div>
-                  </div>
-                </div>
-              )}
+            </div>
+
+            {/* Quick Rules */}
+            <div className="flex-1">
+              <QuickRules />
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Team Name Warning Dialog */}
+
+      {/* Dialogs */}
       <AlertDialog open={showTeamNameWarning} onOpenChange={setShowTeamNameWarning}>
         <AlertDialogContent className="max-w-md backdrop-blur-xl bg-slate-900/95 border-slate-800">
           <AlertDialogHeader>
@@ -992,40 +777,20 @@ export default function Lobby() {
             <AlertDialogDescription>
               Oyunu başlatmak için her iki takımın da ismini değiştirmelisiniz.<br /><br />
               <span className="font-semibold">Mevcut isimler:</span><br />
-              • {gameState?.darkTeamName === "Mavi Takım" && <span className="text-red-400">Mavi Takım (varsayılan - değiştirilmeli)</span>}
+              • {gameState?.darkTeamName === "Mavi Takım" && <span className="text-red-400">Mavi Takım (varsayılan)</span>}
               {gameState?.darkTeamName !== "Mavi Takım" && <span className="text-green-400">{gameState?.darkTeamName} ✓</span>}<br />
-              • {gameState?.lightTeamName === "Kırmızı Takım" && <span className="text-red-400">Kırmızı Takım (varsayılan - değiştirilmeli)</span>}
-              {gameState?.lightTeamName !== "Kırmızı Takım" && <span className="text-green-400">{gameState?.lightTeamName} ✓</span>}<br /><br />
-              Lütfen takım isimlerini değiştirin ve tekrar deneyin.
+              • {gameState?.lightTeamName === "Kırmızı Takım" && <span className="text-red-400">Kırmızı Takım (varsayılan)</span>}
+              {gameState?.lightTeamName !== "Kırmızı Takım" && <span className="text-green-400">{gameState?.lightTeamName} ✓</span>}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowTeamNameWarning(false)}>
-              Tamam
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => setShowTeamNameWarning(false)}>Tamam</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      {/* Chaos Mode Details Dialog */}
+
       <AlertDialog open={showChaosDetails} onOpenChange={setShowChaosDetails}>
-        <AlertDialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800 
-          [&::-webkit-scrollbar]:w-2
-          [&::-webkit-scrollbar-track]:bg-slate-800/20
-          [&::-webkit-scrollbar-track]:rounded-full
-          [&::-webkit-scrollbar-track]:backdrop-blur-sm
-          [&::-webkit-scrollbar-thumb]:bg-gradient-to-b
-          [&::-webkit-scrollbar-thumb]:from-cyan-500/40
-          [&::-webkit-scrollbar-thumb]:to-blue-500/40
-          [&::-webkit-scrollbar-thumb]:rounded-full
-          [&::-webkit-scrollbar-thumb]:border
-          [&::-webkit-scrollbar-thumb]:border-cyan-400/20
-          [&::-webkit-scrollbar-thumb]:shadow-lg
-          hover:[&::-webkit-scrollbar-thumb]:from-cyan-500/60
-          hover:[&::-webkit-scrollbar-thumb]:to-blue-500/60
-          hover:[&::-webkit-scrollbar-thumb]:shadow-cyan-400/30
-          [&::-webkit-scrollbar-thumb]:transition-all
-          [&::-webkit-scrollbar-thumb]:duration-200">
+        <AlertDialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-xl bg-slate-900/95 border-slate-800">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
               🔮 KAHİN MODU NEDİR?
@@ -1033,63 +798,28 @@ export default function Lobby() {
             <AlertDialogDescription asChild>
               <div className="space-y-5 pt-4">
                 <p className="text-base">
-                  Kahin Modu, klasik Katmannames oyununa gizli bir rol ekleyerek oyunu daha stratejik ve heyecanlı hale getirir. 
-                  Her takıma atanan gizli Kahin, oyunun dinamiğini tamamen değiştirir!
+                  Kahin Modu, klasik Katmannames oyununa gizli bir rol ekleyerek oyunu daha stratejik ve heyecanlı hale getirir.
                 </p>
-                
-                <div className="space-y-4">
-                  <div className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-2xl">🔮</span>
-                      <h4 className="font-bold text-lg text-cyan-500">Kahin Rolü</h4>
-                    </div>
-                    <p className="text-sm leading-relaxed">
-                      Her takımda 1 tane gizli Kahin bulunur. Kahinler belirli kartların yerlerini görebilirler.
-                      Bu bilgiyi akıllıca ipuçları vererek takımına aktarmalıdır.
-                      <span className="text-amber-400 font-bold"> Oyun sonunda kaybeden takım karşı takımın Kahin'ini tahmin edebilir - Ama tahmin yapabilmenin bazı koşulları vardır.</span>
-                    </p>
+                <div className="p-4 bg-cyan-500/10 border border-cyan-500/30 rounded-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-2xl">🔮</span>
+                    <h4 className="font-bold text-lg text-cyan-500">Kahin Rolü</h4>
                   </div>
-                </div>
-                
-                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
-                  <h4 className="font-semibold text-amber-400 text-base mb-3">⚡ Oyun Kuralları</h4>
-                  <ul className="text-sm space-y-2 leading-relaxed">
-                    <li className="flex items-start">
-                      <span className="mr-1 text-red-500">•</span>
-                      <span><span className="text-red-500 font-bold">Siyah kelime açılırsa</span> KAHİN TAHMİNİNDE BULUNULAMAZ, <span className="text-red-400 font-semibold">hükmen kaybedilir</span></span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-1 text-red-500">•</span>
-                      <span><span className="text-red-500 font-bold">Karşı takımın son kalan kelimesi açılırsa</span> KAHİN TAHMİNİNDE BULUNULAMAZ, <span className="text-red-400 font-semibold">hükmen kaybedilir</span></span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-1 text-orange-500">•</span>
-                      <span><span className="text-orange-400 font-semibold">Üst üste iki tur kelime açmadan</span> tahmini bitiren takım oyun sonunda <span className="text-orange-300">KAHİN TAHMİNİNDE BULUNAMAZ</span></span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-1 text-amber-500">•</span>
-                      <span><span className="text-amber-400 font-semibold">Her takımın 3 tane beyaz kart açma hakkı vardır,</span> <span className="text-amber-500 font-bold">3'ten fazla açıldığı takdirde</span> <span className="text-amber-300">KAHİN TAHMİNİNDE BULUNULAMAZ</span></span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="mr-1 text-yellow-500">•</span>
-                      <span>Kahin tahminini doğru yapmak oyun kuralına göre <span className="text-yellow-400 font-bold">BERABERLİK / KAZANÇ</span> sayılır</span>
-                    </li>
-                  </ul>
+                  <p className="text-sm">
+                    Her takımda gizli bir Kahin bulunur. Kahinler belirli kartların yerlerini görebilirler.
+                  </p>
                 </div>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowChaosDetails(false)}>
-              Anladım
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => setShowChaosDetails(false)}>Anladım</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      {/* Password Modal */}
+
       {showPasswordModal && currentPlayer?.isRoomOwner && (
-        <PasswordModal 
+        <PasswordModal
           hasPassword={gameState.hasPassword}
           onClose={() => setShowPasswordModal(false)}
           send={send}
@@ -1097,7 +827,6 @@ export default function Lobby() {
         />
       )}
 
-      {/* Change Username Dialog */}
       <Dialog open={showChangeNameDialog} onOpenChange={setShowChangeNameDialog}>
         <DialogContent className="bg-slate-900/95 border-2 border-green-900/30 max-w-md">
           <DialogHeader>
@@ -1167,7 +896,7 @@ export default function Lobby() {
   );
 }
 
-function PasswordModal({ hasPassword, onClose, send, roomCode }: { 
+function PasswordModal({ hasPassword, onClose, send, roomCode }: {
   hasPassword: boolean;
   onClose: () => void;
   send: (type: string, payload: any) => void;
@@ -1187,10 +916,10 @@ function PasswordModal({ hasPassword, onClose, send, roomCode }: {
       });
       return;
     }
-    
+
     if (password !== confirmPassword) {
       toast({
-        title: "Hata", 
+        title: "Hata",
         description: "Şifreler eşleşmiyor",
         variant: "destructive",
       });
@@ -1201,12 +930,12 @@ function PasswordModal({ hasPassword, onClose, send, roomCode }: {
       roomCode,
       password: password || null
     });
-    
+
     toast({
       title: hasPassword ? "Şifre Güncellendi" : "Şifre Eklendi",
       description: password ? "Oda artık şifre korumalı" : "Şifre kaldırıldı",
     });
-    
+
     onClose();
   };
 
@@ -1215,12 +944,12 @@ function PasswordModal({ hasPassword, onClose, send, roomCode }: {
       roomCode,
       password: null
     });
-    
+
     toast({
       title: "Şifre Kaldırıldı",
       description: "Oda artık herkese açık",
     });
-    
+
     onClose();
   };
 
@@ -1231,14 +960,14 @@ function PasswordModal({ hasPassword, onClose, send, roomCode }: {
           <h2 className="text-2xl font-bold text-white mb-4">
             {hasPassword ? 'Oda Şifresini Değiştir' : 'Oda Şifresi Belirle'}
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Yeni Şifre
               </label>
               <div className="relative">
-                <input 
+                <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -1259,7 +988,7 @@ function PasswordModal({ hasPassword, onClose, send, roomCode }: {
               <label className="block text-sm font-medium text-slate-300 mb-2">
                 Şifre Tekrar
               </label>
-              <input 
+              <input
                 type={showPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -1280,14 +1009,14 @@ function PasswordModal({ hasPassword, onClose, send, roomCode }: {
             )}
 
             <div className="flex gap-3 mt-6">
-              <Button 
+              <Button
                 onClick={onClose}
                 variant="outline"
                 className="flex-1"
               >
                 İptal
               </Button>
-              <Button 
+              <Button
                 onClick={handleSubmit}
                 className="flex-1 bg-emerald-600 hover:bg-emerald-700"
                 disabled={!password || password !== confirmPassword}

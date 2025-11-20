@@ -3,20 +3,22 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Security headers for copyright protection
 app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'no-referrer');
-  res.setHeader('X-Copyright', '© 2025 Katmannames - All Rights Reserved');
-  res.setHeader('X-Protected-By', 'Katmannames Security System');
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader("X-Copyright", "© 2025 Katmannames - All Rights Reserved");
+  res.setHeader("X-Protected-By", "Katmannames Security System");
   next();
 });
 
+// API log middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -35,11 +37,9 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
       log(logLine);
     }
   });
@@ -50,33 +50,34 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Global error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
     res.status(status).json({ message });
-    throw err;
+    console.error(err); // hata stack’ini konsola da yaz
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Development → Vite HMR, Production → static files
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  // PORT & HOST ayarları (Replit + yerel makine uyumlu)
+  const port = parseInt(process.env.PORT || "5000", 10);
+
+  // Replit’te PORT tanımlıysa → host "0.0.0.0" olmalı
+  // Yerel makinede → localhost yeterli ve ENOTSUP hatası vermez
+  const host = process.env.PORT ? "0.0.0.0" : "localhost";
+
+  server.listen(port, host, () => {
+    if (process.env.PORT) {
+      log(`Server Replit modunda port ${port}'da çalışıyor`);
+    } else {
+      log(`Server http://localhost:${port} adresinde çalışıyor`);
+      log(`Development modunda isen: http://localhost:${port}`);
+    }
   });
 })();
